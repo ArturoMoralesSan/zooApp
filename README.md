@@ -15,13 +15,15 @@ There are some prerequisites that need to be fulfilled before starting developin
 
 Copy and paste the following in your terminal to install Volta:
 
-```bash
+bash
+
 # Linux
+
 curl "https://get.volta.sh" | bash
 
 # Windows
+
 winget install Volta.Volta
-```
 
 This is used to manage multiple versions of both NodeJS and NPM. Since the expo CLI does not work properly yet on NPM 12, the 11th version is pinned for this project.
 
@@ -29,13 +31,15 @@ You can find further instructions [here][1].
 
 A JDK 17 installation is also needed for generating local development builds. On Linux you can use sdkman.
 
-```bash
+bash
+
 # Install sdkman
+
 curl -s "https://get.sdkman.io" | bash
 
 # Install the required JDK
+
 sdk install java 17.0.20-tem
-```
 
 On windows go to the [Temurin JDK webpage][3] and download the corresponding JDK for your system.
 
@@ -51,13 +55,15 @@ More information [here][4].
 
 To start the project execute the following commands.
 
-```bash
+bash
+
 # Generate the prebuild
+
 npx expo prebuild --clean
 
 # Run the project
+
 npx expo run:android
-```
 
 [1]: https://docs.volta.sh/guide/getting-started 'Getting started, Volta.'
 [2]: https://sdkman.io/ 'sdkman.'
