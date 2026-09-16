@@ -34,7 +34,6 @@ export default function TabLayout() {
 							alignItems: 'center',
 							paddingHorizontal: 6,
 							paddingVertical: 6,
-
 							shadowColor: '#000',
 							shadowOffset: {
 								width: 0,
@@ -42,7 +41,6 @@ export default function TabLayout() {
 							},
 							shadowOpacity: 0.12,
 							shadowRadius: 10,
-
 							elevation: 8,
 						}}
 					>
@@ -50,13 +48,20 @@ export default function TabLayout() {
 							.filter((route) => route.name !== 'ar')
 							.map((route) => {
 								const { options } = descriptors[route.key]
+
 								const isFocused = state.routes[state.index]?.key === route.key
 
-								const icons: Record<string, typeof MapIcon> = {
+								const icons = {
 									index: DiscoverCircleIcon,
 									mizoo: UserGroupIcon,
 									zoodeek: MapIcon,
 									panel: WalletIcon,
+								} as const
+
+								const icon = icons[route.name as keyof typeof icons]
+
+								if (!icon) {
+									return null
 								}
 
 								const onPress = () => {
@@ -84,7 +89,7 @@ export default function TabLayout() {
 										}}
 									>
 										<HugeiconsIcon
-											icon={icons[route.name]}
+											icon={icon}
 											size={23}
 											color={isFocused ? '#047857' : '#9ca3af'}
 										/>

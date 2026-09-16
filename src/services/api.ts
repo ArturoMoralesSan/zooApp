@@ -1,4 +1,4 @@
-const API_URL = 'http://10.59.115.149:8000/api'
+const API_URL = 'http://192.168.1.76:8000/api'
 
 export type ApiErrors = Record<string, string[]>
 
