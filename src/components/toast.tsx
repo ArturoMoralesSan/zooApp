@@ -34,13 +34,28 @@ export default function Toast({
 		return null
 	}
 
-	const backgroundColor =
-		type === 'success' ? '#6EE7B7' : type === 'error' ? '#FCA5A5' : '#FCD34D'
+	const config = {
+		success: {
+			color: '#087A5A',
+			background: '#FFFFFF',
+			border: '#B8DCCA',
+			icon: '✓',
+		},
+		error: {
+			color: '#C83B3B',
+			background: '#FFFFFF',
+			border: '#FFE3E1',
+			icon: '!',
+		},
+		warning: {
+			color: '#D97706',
+			background: '#FFFFFF',
+			border: '#FDE7B2',
+			icon: '⚠',
+		},
+	}
 
-	const textColor =
-		type === 'warning' ? '#78350F' : type === 'error' ? '#7F1D1D' : '#064E3B'
-
-	const icon = type === 'success' ? '✓' : type === 'error' ? '!' : '⚠'
+	const current = config[type]
 
 	return (
 		<View
@@ -51,42 +66,63 @@ export default function Toast({
 				right: 20,
 				zIndex: 9999,
 				elevation: 9999,
+
 				flexDirection: 'row',
 				alignItems: 'center',
-				paddingHorizontal: 16,
-				paddingVertical: 14,
-				borderRadius: 16,
-				backgroundColor,
+
+				paddingHorizontal: 14,
+				paddingVertical: 13,
+
+				borderRadius: 18,
+				backgroundColor: current.background,
+				borderWidth: 1,
+				borderColor: current.border,
+
+				shadowColor: '#123C32',
+				shadowOffset: {
+					width: 0,
+					height: 4,
+				},
+				shadowOpacity: 0.12,
+				shadowRadius: 10,
 			}}
 		>
+			{/* ICONO */}
 			<View
 				style={{
-					width: 32,
-					height: 32,
-					borderRadius: 16,
+					width: 34,
+					height: 34,
+					borderRadius: 17,
 					alignItems: 'center',
 					justifyContent: 'center',
 					marginRight: 12,
-					backgroundColor: 'rgba(255,255,255,0.35)',
+					backgroundColor:
+						type === 'success'
+							? '#DCEFE5'
+							: type === 'error'
+								? '#FFF1F0'
+								: '#FFF7E6',
 				}}
 			>
 				<Text
 					style={{
 						fontSize: 16,
-						fontWeight: '700',
-						color: textColor,
+						fontWeight: '800',
+						color: current.color,
 					}}
 				>
-					{icon}
+					{current.icon}
 				</Text>
 			</View>
 
+			{/* MENSAJE */}
 			<Text
 				style={{
 					flex: 1,
 					fontSize: 14,
 					fontWeight: '600',
-					color: textColor,
+					lineHeight: 20,
+					color: '#123C32',
 				}}
 			>
 				{message}

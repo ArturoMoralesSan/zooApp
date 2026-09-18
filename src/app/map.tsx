@@ -1,21 +1,23 @@
-import { api } from '@/services/api'
+import { api, API_URL } from '@/services/api'
 import { getToken } from '@/services/auth'
+import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react-native'
 import {
 	Camera,
 	GeoJSONSource,
+	ImageSource,
 	Layer,
 	Map as MapView,
 	Marker,
 	RasterSource,
 } from '@maplibre/maplibre-react-native'
+import { Image } from 'expo-image'
 import * as Location from 'expo-location'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
 	ActivityIndicator,
-	Modal,
 	Pressable,
 	SafeAreaView,
-	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -35,11 +37,21 @@ type MapMarker = {
 	color?: string | null
 }
 
+type SpeciesImage = {
+	id: number
+	species_id: number
+	type: string
+	path: string
+	alt_text?: string | null
+	sort_order?: number | null
+}
+
 type Species = {
 	id: number
 	common_name: string
 	scientific_name?: string | null
 	description?: string | null
+	images?: SpeciesImage[]
 }
 
 type SpeciesLocation = {
@@ -138,6 +150,8 @@ type SelectableItem = {
 	coordinate: Coordinate
 	color?: string | null
 	icon?: string | null
+	iconImage?: string | null
+	thumbnail?: string | null
 	species?: Species | null
 }
 
@@ -151,14 +165,33 @@ type GraphEdge = {
 	distance: number
 }
 
+type NearestPathPoint = {
+	point: Coordinate
+	nodeId: string
+	distance: number
+}
+
 type RouteResult = {
 	coordinates: Coordinate[]
 	distance: number
+	pathCoordinates: Coordinate[]
+	connectors: Coordinate[][]
 }
 
 const ZOO_CENTER: Coordinate = [-104.6532, 24.0277]
 const DEFAULT_ZOOM = 17
 const USER_ZOOM = 18
+
+const cardShadow = {
+	shadowColor: '#000000',
+	shadowOffset: {
+		width: 0,
+		height: 5,
+	},
+	shadowOpacity: 0.18,
+	shadowRadius: 8,
+	elevation: 1,
+}
 
 function toNumber(value: unknown): number | null {
 	if (typeof value === 'number' && Number.isFinite(value)) {
@@ -301,6 +334,312 @@ function normalizeZoneGeometry(
 	return null
 }
 
+function normalizeMapImageUrl(value: unknown): string | null {
+	if (typeof value !== 'string') {
+		return null
+	}
+
+	let raw = value.trim()
+
+	if (!raw) {
+		return null
+	}
+
+	const baseUrl = API_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '')
+
+	if (/^https?:\/\//i.test(raw)) {
+		try {
+			const url = new URL(raw)
+
+			if (
+				url.hostname === 'localhost' ||
+				url.hostname === '127.0.0.1' ||
+				url.hostname === '0.0.0.0'
+			) {
+				return `${baseUrl}${url.pathname}${url.search}`
+			}
+
+			return raw
+		} catch {
+			return null
+		}
+	}
+
+	raw = raw.replace(/^\/+/, '')
+	raw = raw.replace(/^storage\/app\/public\//i, '')
+	raw = raw.replace(/^public\/storage\//i, 'storage/')
+	raw = raw.replace(/^public\//i, '')
+
+	if (/^storage\//i.test(raw)) {
+		return `${baseUrl}/${raw}`
+	}
+
+	return `${baseUrl}/storage/${raw}`
+}
+
+function normalizeSpeciesImageUrl(value: unknown): string | null {
+	if (typeof value !== 'string') {
+		return null
+	}
+
+	let raw = value.trim()
+
+	if (!raw) {
+		return null
+	}
+
+	const baseUrl = API_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '')
+
+	if (/^https?:\/\//i.test(raw)) {
+		try {
+			const url = new URL(raw)
+
+			if (
+				url.hostname === 'localhost' ||
+				url.hostname === '127.0.0.1' ||
+				url.hostname === '0.0.0.0'
+			) {
+				return `${baseUrl}${url.pathname}${url.search}`
+			}
+
+			return raw
+		} catch {
+			return null
+		}
+	}
+
+	raw = raw.replace(/^\/+/, '')
+	raw = raw.replace(/^storage\/app\/public\//i, '')
+	raw = raw.replace(/^public\/storage\//i, 'storage/')
+	raw = raw.replace(/^public\//i, '')
+
+	if (/^storage\//i.test(raw)) {
+		return `${baseUrl}/${raw}`
+	}
+
+	return `${baseUrl}/storage/${raw}`
+}
+
+function normalizeMarkerIconUrl(value: unknown): string | null {
+	if (typeof value !== 'string') {
+		return null
+	}
+
+	let raw = value.trim()
+
+	if (!raw) {
+		return null
+	}
+
+	const baseUrl = API_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '')
+
+	if (/^https?:\/\//i.test(raw)) {
+		try {
+			const url = new URL(raw)
+
+			if (
+				url.hostname === 'localhost' ||
+				url.hostname === '127.0.0.1' ||
+				url.hostname === '0.0.0.0'
+			) {
+				return `${baseUrl}${url.pathname}${url.search}`
+			}
+
+			return raw
+		} catch {
+			return null
+		}
+	}
+
+	raw = raw.replace(/^\/+/, '')
+	raw = raw.replace(/^storage\/app\/public\//i, '')
+	raw = raw.replace(/^public\/storage\//i, 'storage/')
+	raw = raw.replace(/^public\//i, '')
+
+	if (/^storage\/markers\//i.test(raw)) {
+		return `${baseUrl}/${raw}`
+	}
+
+	if (/^markers\//i.test(raw)) {
+		return `${baseUrl}/storage/${raw}`
+	}
+
+	return `${baseUrl}/storage/markers/${raw}`
+}
+
+function isImageIcon(value: unknown): boolean {
+	if (typeof value !== 'string') {
+		return false
+	}
+
+	const raw = value.trim()
+
+	if (!raw) {
+		return false
+	}
+
+	return (
+		/^https?:\/\//i.test(raw) ||
+		/^\/?(storage\/)?markers\//i.test(raw) ||
+		/\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(raw)
+	)
+}
+
+function normalizeImageBounds(
+	bounds: unknown,
+	geometry: GeoJSONGeometry | null,
+): Coordinate[] | null {
+	const parsed = parseJsonValue(bounds)
+
+	if (parsed && typeof parsed === 'object') {
+		const value = parsed as Record<string, any>
+
+		const north = toNumber(value.north)
+		const south = toNumber(value.south)
+		const east = toNumber(value.east)
+		const west = toNumber(value.west)
+
+		if (north !== null && south !== null && east !== null && west !== null) {
+			return [
+				[west, north],
+				[east, north],
+				[east, south],
+				[west, south],
+			]
+		}
+
+		const topLeft = normalizeCoordinate(
+			value.topLeft ?? value.top_left ?? value.northWest ?? value.northwest,
+		)
+
+		const topRight = normalizeCoordinate(
+			value.topRight ?? value.top_right ?? value.northEast ?? value.northeast,
+		)
+
+		const bottomRight = normalizeCoordinate(
+			value.bottomRight ??
+				value.bottom_right ??
+				value.southEast ??
+				value.southeast,
+		)
+
+		const bottomLeft = normalizeCoordinate(
+			value.bottomLeft ??
+				value.bottom_left ??
+				value.southWest ??
+				value.southwest,
+		)
+
+		if (topLeft && topRight && bottomRight && bottomLeft) {
+			return [topLeft, topRight, bottomRight, bottomLeft]
+		}
+
+		if (Array.isArray(value.coordinates)) {
+			const coordinates = value.coordinates
+				.map((item: unknown) => normalizeCoordinate(item))
+				.filter((item: Coordinate | null): item is Coordinate => item !== null)
+
+			if (coordinates.length >= 4) {
+				return coordinates.slice(0, 4)
+			}
+		}
+	}
+
+	if (Array.isArray(parsed)) {
+		if (
+			parsed.length === 4 &&
+			parsed.every(
+				(item) => typeof item === 'number' || typeof item === 'string',
+			)
+		) {
+			const first = toNumber(parsed[0])
+			const second = toNumber(parsed[1])
+			const third = toNumber(parsed[2])
+			const fourth = toNumber(parsed[3])
+
+			if (
+				first !== null &&
+				second !== null &&
+				third !== null &&
+				fourth !== null
+			) {
+				const west = first
+				const south = second
+				const east = third
+				const north = fourth
+
+				return [
+					[west, north],
+					[east, north],
+					[east, south],
+					[west, south],
+				]
+			}
+		}
+
+		const coordinates = parsed
+			.map((item) => normalizeCoordinate(item))
+			.filter((item): item is Coordinate => item !== null)
+
+		if (coordinates.length >= 4) {
+			return coordinates.slice(0, 4)
+		}
+	}
+
+	if (geometry) {
+		const points: Coordinate[] = []
+
+		if (geometry.type === 'Polygon') {
+			geometry.coordinates.forEach((ring) => {
+				ring.forEach((coordinate) => {
+					const normalized = normalizeCoordinate(coordinate)
+
+					if (normalized) {
+						points.push(normalized)
+					}
+				})
+			})
+		}
+
+		if (geometry.type === 'MultiPolygon') {
+			geometry.coordinates.forEach((polygon) => {
+				polygon.forEach((ring) => {
+					ring.forEach((coordinate) => {
+						const normalized = normalizeCoordinate(coordinate)
+
+						if (normalized) {
+							points.push(normalized)
+						}
+					})
+				})
+			})
+		}
+
+		if (points.length > 0) {
+			const longitudes = points.map((point) => point[0])
+
+			const latitudes = points.map((point) => point[1])
+
+			const west = Math.min(...longitudes)
+
+			const east = Math.max(...longitudes)
+
+			const south = Math.min(...latitudes)
+
+			const north = Math.max(...latitudes)
+
+			return [
+				[west, north],
+				[east, north],
+				[east, south],
+				[west, south],
+			]
+		}
+	}
+
+	return null
+}
+
 function normalizeSimplePathCoordinates(coordinates: unknown): Coordinate[] {
 	const parsed = parseJsonValue(coordinates)
 
@@ -318,7 +657,6 @@ function haversineDistance(a: Coordinate, b: Coordinate): number {
 
 	const lat1 = (a[1] * Math.PI) / 180
 	const lat2 = (b[1] * Math.PI) / 180
-
 	const deltaLat = ((b[1] - a[1]) * Math.PI) / 180
 	const deltaLng = ((b[0] - a[0]) * Math.PI) / 180
 
@@ -337,7 +675,9 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 	lines: Coordinate[][]
 } {
 	const nodes: GraphNode[] = []
+
 	const edges = new globalThis.Map<string, GraphEdge[]>()
+
 	const lines: Coordinate[][] = []
 
 	const parsed = parseJsonValue(coordinates)
@@ -458,6 +798,7 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 		const to = String(toValue)
 
 		const fromNode = nodeById.get(from)
+
 		const toNode = nodeById.get(to)
 
 		if (!fromNode || !toNode) {
@@ -504,6 +845,7 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 	if (rawNodes.length > 1 && rawEdges.length === 0 && nodes.length > 1) {
 		for (let index = 1; index < nodes.length; index++) {
 			const previous = nodes[index - 1]
+
 			const current = nodes[index]
 
 			const distance = haversineDistance(
@@ -540,14 +882,147 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 	}
 }
 
+/*
+|--------------------------------------------------------------------------
+| BUSCA EL PUNTO MÁS CERCANO SOBRE UN SEGMENTO
+|--------------------------------------------------------------------------
+|
+| Esto evita que la ruta empiece desde un nodo lejano.
+|
+*/
+
+function nearestPointOnSegment(
+	point: Coordinate,
+	segmentStart: Coordinate,
+	segmentEnd: Coordinate,
+): {
+	point: Coordinate
+	ratio: number
+	distance: number
+} {
+	const latitude = (point[1] * Math.PI) / 180
+
+	const metersPerDegreeLat = 111320
+
+	const metersPerDegreeLng = 111320 * Math.cos(latitude)
+
+	const ax = segmentStart[0] * metersPerDegreeLng
+
+	const ay = segmentStart[1] * metersPerDegreeLat
+
+	const bx = segmentEnd[0] * metersPerDegreeLng
+
+	const by = segmentEnd[1] * metersPerDegreeLat
+
+	const px = point[0] * metersPerDegreeLng
+
+	const py = point[1] * metersPerDegreeLat
+
+	const dx = bx - ax
+	const dy = by - ay
+
+	const lengthSquared = dx * dx + dy * dy
+
+	if (lengthSquared === 0) {
+		return {
+			point: segmentStart,
+			ratio: 0,
+			distance: haversineDistance(point, segmentStart),
+		}
+	}
+
+	let ratio = ((px - ax) * dx + (py - ay) * dy) / lengthSquared
+
+	ratio = Math.max(0, Math.min(1, ratio))
+
+	const projectedX = ax + ratio * dx
+
+	const projectedY = ay + ratio * dy
+
+	const projected: Coordinate = [
+		projectedX / metersPerDegreeLng,
+		projectedY / metersPerDegreeLat,
+	]
+
+	return {
+		point: projected,
+		ratio,
+		distance: haversineDistance(point, projected),
+	}
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENCUENTRA EL SEGMENTO REAL MÁS CERCANO
+|--------------------------------------------------------------------------
+*/
+
+function findNearestPathPoint(
+	point: Coordinate,
+	graph: {
+		nodes: globalThis.Map<string, GraphNode>
+		edges: globalThis.Map<string, GraphEdge[]>
+	},
+): NearestPathPoint | null {
+	let nearest: NearestPathPoint | null = null
+
+	const processedSegments = new Set<string>()
+
+	graph.edges.forEach((edgeList, fromId) => {
+		const fromNode = graph.nodes.get(fromId)
+
+		if (!fromNode) {
+			return
+		}
+
+		edgeList.forEach((edge) => {
+			const toNode = graph.nodes.get(edge.to)
+
+			if (!toNode) {
+				return
+			}
+
+			const key = [fromId, edge.to].sort().join('|')
+
+			if (processedSegments.has(key)) {
+				return
+			}
+
+			processedSegments.add(key)
+
+			const projection = nearestPointOnSegment(
+				point,
+				fromNode.coordinate,
+				toNode.coordinate,
+			)
+
+			const selectedNodeId = projection.ratio <= 0.5 ? fromNode.id : toNode.id
+
+			if (!nearest || projection.distance < nearest.distance) {
+				nearest = {
+					point: projection.point,
+					nodeId: selectedNodeId,
+					distance: projection.distance,
+				}
+			}
+		})
+	})
+
+	return nearest
+}
+
 function pointInRing(point: Coordinate, ring: number[][]): boolean {
 	const [x, y] = point
+
 	let inside = false
 
 	for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
 		const xi = Number(ring[i]?.[0])
+
 		const yi = Number(ring[i]?.[1])
+
 		const xj = Number(ring[j]?.[0])
+
 		const yj = Number(ring[j]?.[1])
 
 		const intersect =
@@ -600,56 +1075,6 @@ function pointInGeometry(
 	return false
 }
 
-function getGeometryCenter(
-	geometry: GeoJSONGeometry | null,
-): Coordinate | null {
-	if (!geometry) {
-		return null
-	}
-
-	const points: Coordinate[] = []
-
-	if (geometry.type === 'Polygon') {
-		geometry.coordinates.forEach((ring) => {
-			ring.forEach((coordinate) => {
-				const point = normalizeCoordinate(coordinate)
-
-				if (point) {
-					points.push(point)
-				}
-			})
-		})
-	}
-
-	if (geometry.type === 'MultiPolygon') {
-		geometry.coordinates.forEach((polygon) => {
-			polygon.forEach((ring) => {
-				ring.forEach((coordinate) => {
-					const point = normalizeCoordinate(coordinate)
-
-					if (point) {
-						points.push(point)
-					}
-				})
-			})
-		})
-	}
-
-	if (!points.length) {
-		return null
-	}
-
-	let longitude = 0
-	let latitude = 0
-
-	points.forEach(([lng, lat]) => {
-		longitude += lng
-		latitude += lat
-	})
-
-	return [longitude / points.length, latitude / points.length]
-}
-
 function formatDistance(distance: number): string {
 	if (distance < 1000) {
 		return `${Math.round(distance)} m`
@@ -668,6 +1093,7 @@ function formatMinutes(minutes: number | null | undefined): string {
 	}
 
 	const hours = Math.floor(minutes / 60)
+
 	const rest = Math.round(minutes % 60)
 
 	if (rest === 0) {
@@ -686,14 +1112,14 @@ export default function MapScreen() {
 	)
 
 	const [loading, setLoading] = useState(true)
+
 	const [error, setError] = useState<string | null>(null)
+
 	const [zones, setZones] = useState<Zone[]>([])
+
 	const [userLocation, setUserLocation] = useState<Coordinate | null>(null)
+
 	const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null)
-
-	const [selectedZoneId, setSelectedZoneId] = useState<number | null>(null)
-
-	const [zoneSelectorOpen, setZoneSelectorOpen] = useState(false)
 
 	const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null)
 
@@ -703,6 +1129,8 @@ export default function MapScreen() {
 
 	const [mapReady, setMapReady] = useState(false)
 
+	const [routeCardCollapsed, setRouteCardCollapsed] = useState(false)
+
 	useEffect(() => {
 		let mounted = true
 
@@ -711,8 +1139,6 @@ export default function MapScreen() {
 				const permission = await Location.requestForegroundPermissionsAsync()
 
 				if (permission.status !== Location.PermissionStatus.GRANTED) {
-					console.log('⚠️ Permiso de ubicación no concedido')
-
 					return
 				}
 
@@ -725,21 +1151,16 @@ export default function MapScreen() {
 				}
 
 				const longitude = current.coords.longitude
+
 				const latitude = current.coords.latitude
 
 				if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
 					return
 				}
 
-				const coordinate: Coordinate = [longitude, latitude]
-
-				setUserLocation(coordinate)
+				setUserLocation([longitude, latitude])
 
 				setLocationAccuracy(current.coords.accuracy ?? null)
-
-				console.log('📍 Ubicación actual:', coordinate)
-
-				console.log('📐 Precisión GPS:', current.coords.accuracy, 'metros')
 
 				locationSubscription.current = await Location.watchPositionAsync(
 					{
@@ -765,8 +1186,8 @@ export default function MapScreen() {
 						setLocationAccuracy(location.coords.accuracy ?? null)
 					},
 				)
-			} catch (locationError) {
-				console.error('❌ Error obteniendo ubicación:', locationError)
+			} catch {
+				return
 			}
 		}
 
@@ -776,6 +1197,7 @@ export default function MapScreen() {
 			mounted = false
 
 			locationSubscription.current?.remove()
+
 			locationSubscription.current = null
 		}
 	}, [])
@@ -804,23 +1226,8 @@ export default function MapScreen() {
 
 				const receivedZones = response?.data?.zones ?? []
 
-				console.log('🗺️ Zonas recibidas:', receivedZones.length)
-
-				receivedZones.forEach((zone) => {
-					console.log(`Zona ${zone.id}: ${zone.name}`, {
-						geometry: Boolean(normalizeZoneGeometry(zone.geometry)),
-						markers: zone.markers?.length ?? 0,
-						paths: zone.paths?.length ?? 0,
-						species: zone.species_locations?.length ?? 0,
-					})
-				})
-
 				setZones(receivedZones)
-
-				setSelectedZoneId(null)
 			} catch (apiError) {
-				console.error('❌ Error cargando mapa:', apiError)
-
 				if (mounted) {
 					setError(
 						apiError instanceof Error
@@ -842,24 +1249,12 @@ export default function MapScreen() {
 		}
 	}, [])
 
-	const selectedZone = useMemo(() => {
-		if (selectedZoneId === null) {
-			return null
-		}
-
-		return (
-			zones.find((zone) => Number(zone.id) === Number(selectedZoneId)) ?? null
-		)
-	}, [zones, selectedZoneId])
-
 	const zonesGeoJson = useMemo(() => {
 		const features = zones
 			.map((zone) => {
 				const geometry = normalizeZoneGeometry(zone.geometry)
 
 				if (!geometry) {
-					console.log('⚠️ Zona sin geometría:', zone.name)
-
 					return null
 				}
 
@@ -874,25 +1269,52 @@ export default function MapScreen() {
 			})
 			.filter((item): item is NonNullable<typeof item> => item !== null)
 
-		console.log('🟩 ZONAS A PINTAR:', features.length)
-
 		return {
 			type: 'FeatureCollection',
 			features,
 		}
 	}, [zones])
 
+	const mapImages = useMemo(() => {
+		return zones
+			.filter((zone) => Boolean(zone.map_image))
+			.map((zone) => {
+				const geometry = normalizeZoneGeometry(zone.geometry)
+
+				const url = normalizeMapImageUrl(zone.map_image)
+
+				const coordinates = normalizeImageBounds(
+					zone.map_image_bounds,
+					geometry,
+				)
+
+				if (!url || !coordinates) {
+					return null
+				}
+
+				return {
+					id: Number(zone.id),
+					name: String(zone.name ?? ''),
+					url,
+					coordinates,
+				}
+			})
+			.filter(
+				(
+					item,
+				): item is {
+					id: number
+					name: string
+					url: string
+					coordinates: Coordinate[]
+				} => item !== null,
+			)
+	}, [zones])
+
 	const pathsGeoJson = useMemo(() => {
 		const features: any[] = []
 
 		zones.forEach((zone) => {
-			if (
-				selectedZoneId !== null &&
-				Number(zone.id) !== Number(selectedZoneId)
-			) {
-				return
-			}
-
 			;(zone.paths ?? []).forEach((path) => {
 				const normalized = normalizePathGraph(path.coordinates)
 
@@ -918,13 +1340,11 @@ export default function MapScreen() {
 			})
 		})
 
-		console.log('🔵 CAMINOS A PINTAR:', features.length)
-
 		return {
 			type: 'FeatureCollection',
 			features,
 		}
-	}, [zones, selectedZoneId])
+	}, [zones])
 
 	const navigationGraph = useMemo(() => {
 		const nodes = new globalThis.Map<string, GraphNode>()
@@ -932,13 +1352,6 @@ export default function MapScreen() {
 		const edges = new globalThis.Map<string, GraphEdge[]>()
 
 		zones.forEach((zone) => {
-			if (
-				selectedZoneId !== null &&
-				Number(zone.id) !== Number(selectedZoneId)
-			) {
-				return
-			}
-
 			;(zone.paths ?? []).forEach((path) => {
 				const graph = normalizePathGraph(path.coordinates)
 
@@ -977,9 +1390,11 @@ export default function MapScreen() {
 		for (let i = 0; i < graphNodes.length; i++) {
 			for (let j = i + 1; j < graphNodes.length; j++) {
 				const nodeA = graphNodes[i]
+
 				const nodeB = graphNodes[j]
 
 				const pathA = nodeA.id.split('-')[0]
+
 				const pathB = nodeB.id.split('-')[0]
 
 				if (pathA === pathB) {
@@ -1014,19 +1429,12 @@ export default function MapScreen() {
 			nodes,
 			edges,
 		}
-	}, [zones, selectedZoneId])
+	}, [zones])
 
 	const selectableItems = useMemo(() => {
 		const items: SelectableItem[] = []
 
 		zones.forEach((zone) => {
-			if (
-				selectedZoneId !== null &&
-				Number(zone.id) !== Number(selectedZoneId)
-			) {
-				return
-			}
-
 			;(zone.markers ?? []).forEach((marker) => {
 				const longitude = toNumber(marker.longitude)
 
@@ -1036,14 +1444,21 @@ export default function MapScreen() {
 					return
 				}
 
+				const rawIcon = marker.icon?.trim() ?? null
+
+				const iconIsImage = isImageIcon(rawIcon)
+
+				const iconImage = iconIsImage ? normalizeMarkerIconUrl(rawIcon) : null
+
 				items.push({
 					id: `marker-${marker.id}`,
 					name: String(marker.name ?? 'Punto'),
 					type: 'marker',
 					description: marker.description,
 					coordinate: [longitude, latitude],
-					color: marker.color ?? '#2563eb',
-					icon: marker.icon ?? '📍',
+					color: marker.color ?? '#087A5A',
+					icon: rawIcon ?? '📍',
+					iconImage,
 				})
 			})
 
@@ -1056,6 +1471,16 @@ export default function MapScreen() {
 					return
 				}
 
+				const thumbnailImage =
+					speciesLocation.species?.images?.find(
+						(image) =>
+							image.type === 'thumbnail' &&
+							typeof image.path === 'string' &&
+							image.path.trim() !== '',
+					) ?? null
+
+				const thumbnail = normalizeSpeciesImageUrl(thumbnailImage?.path)
+
 				items.push({
 					id: `species-${speciesLocation.id}`,
 					name:
@@ -1066,17 +1491,16 @@ export default function MapScreen() {
 					description:
 						speciesLocation.description ?? speciesLocation.species?.description,
 					coordinate: [longitude, latitude],
-					color: '#16a34a',
+					color: '#087A5A',
 					icon: '🦁',
+					thumbnail,
 					species: speciesLocation.species,
 				})
 			})
 		})
 
-		console.log('📍 PUNTOS A MOSTRAR:', items.length)
-
 		return items
-	}, [zones, selectedZoneId])
+	}, [zones])
 
 	useEffect(() => {
 		if (!userLocation) {
@@ -1091,8 +1515,6 @@ export default function MapScreen() {
 		})
 
 		setIsUserInsideZoo(inside)
-
-		console.log('📍 Usuario dentro:', inside)
 	}, [zones, userLocation])
 
 	useEffect(() => {
@@ -1107,87 +1529,48 @@ export default function MapScreen() {
 					zoom: USER_ZOOM,
 					duration: 500,
 				})
-			} catch (cameraError) {
-				console.log('⚠️ No fue posible centrar cámara:', cameraError)
+			} catch {
+				return
 			}
 		}, 300)
 
 		return () => clearTimeout(timer)
 	}, [mapReady, userLocation])
 
-	const selectZone = (zone: Zone) => {
-		setSelectedZoneId(Number(zone.id))
-
-		setZoneSelectorOpen(false)
-		setSelectedItem(null)
-		setRoute(null)
-
-		const geometry = normalizeZoneGeometry(zone.geometry)
-
-		const center = getGeometryCenter(geometry)
-
-		if (!center) {
-			console.log('⚠️ La zona no tiene centro:', zone.name)
-
-			return
-		}
-
-		setTimeout(() => {
-			try {
-				cameraRef.current?.flyTo({
-					center,
-					zoom: 17,
-					duration: 800,
-				})
-			} catch (cameraError) {
-				console.log('⚠️ Error centrando zona:', cameraError)
-			}
-		}, 250)
-	}
+	/*
+	|--------------------------------------------------------------------------
+	| CALCULAR RUTA
+	|--------------------------------------------------------------------------
+	*/
 
 	const calculateRoute = (
 		origin: Coordinate,
 		destination: Coordinate,
 	): RouteResult | null => {
 		if (navigationGraph.nodes.size === 0) {
-			console.log('⚠️ No hay nodos de navegación.')
-
 			return null
 		}
 
-		let startNode: GraphNode | null = null
+		/*
+		|--------------------------------------------------------------------------
+		| BUSCAR EL PUNTO REAL MÁS CERCANO AL CAMINO
+		|--------------------------------------------------------------------------
+		*/
 
-		let endNode: GraphNode | null = null
+		const nearestOrigin = findNearestPathPoint(origin, navigationGraph)
 
-		let startDistance = Number.POSITIVE_INFINITY
+		const nearestDestination = findNearestPathPoint(
+			destination,
+			navigationGraph,
+		)
 
-		let endDistance = Number.POSITIVE_INFINITY
-
-		navigationGraph.nodes.forEach((node) => {
-			const originDistance = haversineDistance(origin, node.coordinate)
-
-			const destinationDistance = haversineDistance(
-				destination,
-				node.coordinate,
-			)
-
-			if (originDistance < startDistance) {
-				startDistance = originDistance
-				startNode = node
-			}
-
-			if (destinationDistance < endDistance) {
-				endDistance = destinationDistance
-				endNode = node
-			}
-		})
-
-		if (!startNode || !endNode) {
+		if (!nearestOrigin || !nearestDestination) {
 			return null
 		}
 
-		const startId = startNode.id
-		const endId = endNode.id
+		const startId = nearestOrigin.nodeId
+
+		const endId = nearestDestination.nodeId
 
 		const distances = new globalThis.Map<string, number>()
 
@@ -1205,6 +1588,12 @@ export default function MapScreen() {
 
 		distances.set(startId, 0)
 
+		/*
+		|--------------------------------------------------------------------------
+		| DIJKSTRA
+		|--------------------------------------------------------------------------
+		*/
+
 		while (unvisited.size > 0) {
 			let currentId: string | null = null
 
@@ -1215,6 +1604,7 @@ export default function MapScreen() {
 
 				if (distance < currentDistance) {
 					currentDistance = distance
+
 					currentId = id
 				}
 			})
@@ -1249,10 +1639,14 @@ export default function MapScreen() {
 		}
 
 		if (startId !== endId && !previous.get(endId)) {
-			console.log('⚠️ No existe ruta entre los puntos.')
-
 			return null
 		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| RECONSTRUIR CAMINO
+		|--------------------------------------------------------------------------
+		*/
 
 		const ids: string[] = []
 
@@ -1272,48 +1666,162 @@ export default function MapScreen() {
 			return null
 		}
 
-		const coordinates = ids
+		const graphCoordinates = ids
 			.map((id) => navigationGraph.nodes.get(id)?.coordinate)
 			.filter(
 				(coordinate): coordinate is Coordinate => coordinate !== undefined,
 			)
 
-		if (coordinates.length < 2) {
+		if (graphCoordinates.length < 1) {
 			return null
 		}
 
+		/*
+		|--------------------------------------------------------------------------
+		| RUTA SÓLIDA
+		|--------------------------------------------------------------------------
+		|
+		| La línea comienza exactamente en el punto más cercano del
+		| camino, no en la ubicación arbitraria del usuario.
+		|
+		*/
+
+		const pathCoordinates: Coordinate[] = [
+			nearestOrigin.point,
+			...graphCoordinates,
+		]
+
+		/*
+		|--------------------------------------------------------------------------
+		| EVITAR DUPLICADOS
+		|--------------------------------------------------------------------------
+		*/
+
+		const cleanedPathCoordinates = pathCoordinates.filter(
+			(coordinate, index) => {
+				if (index === 0) {
+					return true
+				}
+
+				const previous = pathCoordinates[index - 1]
+
+				return haversineDistance(previous, coordinate) > 0.05
+			},
+		)
+
+		if (nearestDestination.distance > 0.5) {
+			cleanedPathCoordinates.push(nearestDestination.point)
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| CONECTORES PUNTEADOS
+		|--------------------------------------------------------------------------
+		*/
+
+		const connectors: Coordinate[][] = []
+
+		/*
+		|--------------------------------------------------------------------------
+		| USUARIO -> CAMINO
+		|--------------------------------------------------------------------------
+		*/
+
+		if (nearestOrigin.distance > 0.5) {
+			connectors.push([origin, nearestOrigin.point])
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| CAMINO -> DESTINO
+		|--------------------------------------------------------------------------
+		*/
+
+		if (nearestDestination.distance > 0.5) {
+			connectors.push([nearestDestination.point, destination])
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| DISTANCIA
+		|--------------------------------------------------------------------------
+		*/
+
 		const graphDistance = distances.get(endId) ?? 0
 
-		const totalDistance = graphDistance + startDistance + endDistance
-
-		const routeCoordinates: Coordinate[] = [origin, ...coordinates, destination]
+		const totalDistance =
+			nearestOrigin.distance + graphDistance + nearestDestination.distance
 
 		return {
-			coordinates: routeCoordinates,
+			coordinates: [origin, ...cleanedPathCoordinates, destination],
 			distance: totalDistance,
+			pathCoordinates: cleanedPathCoordinates,
+			connectors,
 		}
 	}
 
+	/*
+	|--------------------------------------------------------------------------
+	| GEOJSON DE RUTA
+	|--------------------------------------------------------------------------
+	*/
+
 	const routeGeoJson = useMemo(() => {
-		if (!route || route.coordinates.length < 2) {
+		if (!route) {
 			return {
 				type: 'FeatureCollection',
 				features: [],
 			}
 		}
 
+		const features: any[] = []
+
+		/*
+			|--------------------------------------------------------------------------
+			| CAMINO REAL - SÓLIDO
+			|--------------------------------------------------------------------------
+			*/
+
+		if (route.pathCoordinates.length >= 2) {
+			features.push({
+				type: 'Feature',
+				properties: {
+					type: 'real-path',
+				},
+				geometry: {
+					type: 'LineString',
+					coordinates: route.pathCoordinates,
+				},
+			})
+		}
+
+		/*
+			|--------------------------------------------------------------------------
+			| CONECTORES - PUNTEADOS
+			|--------------------------------------------------------------------------
+			*/
+
+		route.connectors.forEach((connector, index) => {
+			if (connector.length < 2) {
+				return
+			}
+
+			features.push({
+				type: 'Feature',
+				properties: {
+					type: 'connector',
+					id: `connector-${index}`,
+				},
+				geometry: {
+					type: 'LineString',
+					coordinates: connector,
+				},
+			})
+		})
+
 		return {
 			type: 'FeatureCollection',
-			features: [
-				{
-					type: 'Feature',
-					properties: {},
-					geometry: {
-						type: 'LineString',
-						coordinates: route.coordinates,
-					},
-				},
-			],
+			features,
 		}
 	}, [route])
 
@@ -1324,12 +1832,16 @@ export default function MapScreen() {
 				zoom: 18,
 				duration,
 			})
-		} catch {}
+		} catch {
+			return
+		}
 	}
 
 	const selectItem = (item: SelectableItem) => {
 		setSelectedItem(item)
 		setRoute(null)
+		setRouteCardCollapsed(false)
+
 		flyToDestination(item.coordinate)
 	}
 
@@ -1344,8 +1856,6 @@ export default function MapScreen() {
 		}
 
 		if (!isUserInsideZoo) {
-			console.log('⚠️ Usuario fuera del zoológico.')
-
 			setRoute(null)
 			return
 		}
@@ -1353,35 +1863,21 @@ export default function MapScreen() {
 		const result = calculateRoute(userLocation, selectedItem.coordinate)
 
 		setRoute(result)
+		setRouteCardCollapsed(false)
 
 		if (result) {
 			flyToDestination(selectedItem.coordinate, 800)
 		}
 	}
 
-	const showAllZoo = () => {
-		setSelectedZoneId(null)
-		setSelectedItem(null)
-		setRoute(null)
-		setZoneSelectorOpen(false)
-
-		setTimeout(() => {
-			try {
-				cameraRef.current?.flyTo({
-					center: ZOO_CENTER,
-					zoom: 17,
-					duration: 800,
-				})
-			} catch {}
-		}, 250)
-	}
-
 	if (loading) {
 		return (
 			<SafeAreaView style={styles.loadingContainer}>
-				<ActivityIndicator size='large' color='#16a34a' />
+				<View style={styles.loadingCard}>
+					<ActivityIndicator size='large' color='#087A5A' />
 
-				<Text style={styles.loadingText}>Cargando mapa...</Text>
+					<Text style={styles.loadingText}>Cargando mapa...</Text>
+				</View>
 			</SafeAreaView>
 		)
 	}
@@ -1389,11 +1885,15 @@ export default function MapScreen() {
 	if (error) {
 		return (
 			<SafeAreaView style={styles.loadingContainer}>
-				<Text style={styles.errorIcon}>⚠️</Text>
+				<View style={styles.errorCard}>
+					<View style={styles.errorIconContainer}>
+						<Text style={styles.errorIcon}>!</Text>
+					</View>
 
-				<Text style={styles.errorTitle}>No fue posible cargar el mapa</Text>
+					<Text style={styles.errorTitle}>No fue posible cargar el mapa</Text>
 
-				<Text style={styles.errorText}>{error}</Text>
+					<Text style={styles.errorText}>{error}</Text>
+				</View>
 			</SafeAreaView>
 		)
 	}
@@ -1409,8 +1909,6 @@ export default function MapScreen() {
 					layers: [],
 				}}
 				onDidFinishLoadingMap={() => {
-					console.log('🗺️ Mapa listo')
-
 					setMapReady(true)
 				}}
 			>
@@ -1436,24 +1934,31 @@ export default function MapScreen() {
 					/>
 				</RasterSource>
 
+				{mapImages.map((image) => (
+					<ImageSource
+						key={`zone-image-source-${image.id}`}
+						id={`zone-image-source-${image.id}`}
+						url={image.url}
+						coordinates={image.coordinates}
+					>
+						<Layer
+							id={`zone-image-layer-${image.id}`}
+							type='raster'
+							paint={{
+								'raster-opacity': 1,
+							}}
+						/>
+					</ImageSource>
+				))}
+
 				<GeoJSONSource id='zoo-zones-source' data={zonesGeoJson as any}>
 					<Layer
 						id='zoo-zones-fill'
 						type='fill'
 						source='zoo-zones-source'
 						paint={{
-							'fill-color': [
-								'case',
-								['==', ['get', 'id'], selectedZoneId ?? -1],
-								'#16a34a',
-								'#64748b',
-							],
-							'fill-opacity': [
-								'case',
-								['==', ['get', 'id'], selectedZoneId ?? -1],
-								0.38,
-								0.12,
-							],
+							'fill-color': '#087A5A',
+							'fill-opacity': 0.12,
 						}}
 					/>
 
@@ -1462,24 +1967,9 @@ export default function MapScreen() {
 						type='line'
 						source='zoo-zones-source'
 						paint={{
-							'line-color': [
-								'case',
-								['==', ['get', 'id'], selectedZoneId ?? -1],
-								'#15803d',
-								'#475569',
-							],
-							'line-width': [
-								'case',
-								['==', ['get', 'id'], selectedZoneId ?? -1],
-								5,
-								2,
-							],
-							'line-opacity': [
-								'case',
-								['==', ['get', 'id'], selectedZoneId ?? -1],
-								1,
-								0.75,
-							],
+							'line-color': '#087A5A',
+							'line-width': 2,
+							'line-opacity': 0.7,
 						}}
 					/>
 				</GeoJSONSource>
@@ -1490,9 +1980,9 @@ export default function MapScreen() {
 						type='line'
 						source='zoo-paths-source'
 						paint={{
-							'line-color': '#ffffff',
+							'line-color': '#123C32',
 							'line-width': 9,
-							'line-opacity': 0.7,
+							'line-opacity': 0.5,
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1503,24 +1993,35 @@ export default function MapScreen() {
 						type='line'
 						source='zoo-paths-source'
 						paint={{
-							'line-color': '#2563eb',
-							'line-width': 5,
-							'line-opacity': 0.95,
+							'line-color': '#F7F7EE',
+							'line-width': 6,
+							'line-opacity': 1,
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
 					/>
 				</GeoJSONSource>
 
+				{/*
+				|--------------------------------------------------------------------------
+				| RUTA DE NAVEGACIÓN
+				|--------------------------------------------------------------------------
+				|
+				| real-path = camino sólido
+				| connector = conexión punteada
+				|
+				*/}
+
 				<GeoJSONSource id='zoo-route-source' data={routeGeoJson as any}>
 					<Layer
 						id='zoo-route-outline'
 						type='line'
 						source='zoo-route-source'
+						filter={['==', ['get', 'type'], 'real-path']}
 						paint={{
-							'line-color': '#ffffff',
+							'line-color': '#F7F7EE',
 							'line-width': 12,
-							'line-opacity': 0.9,
+							'line-opacity': 0.95,
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1530,15 +2031,33 @@ export default function MapScreen() {
 						id='zoo-route-line'
 						type='line'
 						source='zoo-route-source'
+						filter={['==', ['get', 'type'], 'real-path']}
 						paint={{
-							'line-color': '#dc2626',
+							'line-color': '#064D36',
 							'line-width': 7,
 							'line-opacity': 1,
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
 					/>
+
+					<Layer
+						id='zoo-route-connector'
+						type='line'
+						source='zoo-route-source'
+						filter={['==', ['get', 'type'], 'connector']}
+						paint={{
+							'line-color': '#064D36',
+							'line-width': 5,
+							'line-opacity': 0.9,
+							'line-dasharray': [1.5, 2.5],
+							'line-cap': 'round',
+							'line-join': 'round',
+						}}
+					/>
 				</GeoJSONSource>
+
+				{/* MARKERS DEL ZOOLÓGICO */}
 
 				{selectableItems
 					.filter((item) => item.type === 'marker')
@@ -1552,14 +2071,27 @@ export default function MapScreen() {
 								style={[
 									styles.mapMarker,
 									{
-										backgroundColor: item.color ?? '#2563eb',
+										backgroundColor: item.color ?? '#087A5A',
 									},
 								]}
 							>
-								<Text style={styles.mapMarkerIcon}>{item.icon ?? '📍'}</Text>
+								{item.iconImage ? (
+									<Image
+										source={{
+											uri: item.iconImage,
+										}}
+										style={styles.mapMarkerImage}
+										contentFit='contain'
+										cachePolicy='memory-disk'
+									/>
+								) : (
+									<Text style={styles.mapMarkerIcon}>{item.icon ?? '📍'}</Text>
+								)}
 							</View>
 						</Marker>
 					))}
+
+				{/* ESPECIES */}
 
 				{selectableItems
 					.filter((item) => item.type === 'species')
@@ -1569,8 +2101,26 @@ export default function MapScreen() {
 							lngLat={item.coordinate}
 							onPress={() => selectItem(item)}
 						>
-							<View style={styles.speciesMarker}>
-								<Text style={styles.mapMarkerIcon}>🦁</Text>
+							<View
+								style={[
+									styles.speciesMarker,
+									{
+										backgroundColor: item.color ?? '#064D36',
+									},
+								]}
+							>
+								{item.thumbnail ? (
+									<Image
+										source={{
+											uri: item.thumbnail,
+										}}
+										style={styles.speciesMarkerImage}
+										contentFit='cover'
+										cachePolicy='memory-disk'
+									/>
+								) : (
+									<Text style={styles.mapMarkerIcon}>{item.icon ?? '🦁'}</Text>
+								)}
 							</View>
 						</Marker>
 					))}
@@ -1589,12 +2139,39 @@ export default function MapScreen() {
 							style={
 								selectedItem.type === 'species'
 									? styles.destinationSpecies
-									: styles.destinationMarker
+									: [
+											styles.destinationMarker,
+											{
+												backgroundColor: selectedItem.color ?? '#064D36',
+											},
+										]
 							}
 						>
-							<Text style={styles.destinationIcon}>
-								{selectedItem.type === 'species' ? '🦁' : '📍'}
-							</Text>
+							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
+								<Image
+									source={{
+										uri: selectedItem.thumbnail,
+									}}
+									style={styles.destinationSpeciesImage}
+									contentFit='cover'
+									cachePolicy='memory-disk'
+								/>
+							) : selectedItem.type === 'marker' && selectedItem.iconImage ? (
+								<Image
+									source={{
+										uri: selectedItem.iconImage,
+									}}
+									style={styles.destinationMarkerImage}
+									contentFit='contain'
+									cachePolicy='memory-disk'
+								/>
+							) : (
+								<Text style={styles.destinationIcon}>
+									{selectedItem.type === 'species'
+										? (selectedItem.icon ?? '🦁')
+										: (selectedItem.icon ?? '📍')}
+								</Text>
+							)}
 						</View>
 					</Marker>
 				)}
@@ -1615,7 +2192,7 @@ export default function MapScreen() {
 							style={[
 								styles.statusDot,
 								{
-									backgroundColor: isUserInsideZoo ? '#16a34a' : '#f59e0b',
+									backgroundColor: isUserInsideZoo ? '#087A5A' : '#B8DCCA',
 								},
 							]}
 						/>
@@ -1625,21 +2202,6 @@ export default function MapScreen() {
 						</Text>
 					</View>
 				</View>
-
-				<Text style={styles.selectorLabel}>Zona</Text>
-
-				<Pressable
-					style={styles.zoneSelector}
-					onPress={() => setZoneSelectorOpen(true)}
-				>
-					<View style={styles.zoneSelectorTextContainer}>
-						<Text style={styles.zoneSelectorTitle} numberOfLines={1}>
-							{selectedZone ? selectedZone.name : 'Todo el zoológico'}
-						</Text>
-					</View>
-
-					<Text style={styles.chevron}>›</Text>
-				</Pressable>
 			</View>
 
 			{userLocation && (
@@ -1658,15 +2220,51 @@ export default function MapScreen() {
 				</View>
 			)}
 
-			{selectedItem && (
+			{selectedItem && !routeCardCollapsed && (
 				<View style={styles.bottomCard}>
 					<View style={styles.bottomCardHeader}>
-						<View style={styles.itemIcon}>
-							<Text>{selectedItem.type === 'species' ? '🦁' : '📍'}</Text>
+						<View
+							style={[
+								styles.itemIcon,
+								selectedItem.type === 'species'
+									? styles.itemIconSpecies
+									: styles.itemIconMarker,
+								selectedItem.type === 'marker' && {
+									backgroundColor: selectedItem.color ?? '#DCEFE5',
+								},
+							]}
+						>
+							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
+								<Image
+									source={{
+										uri: selectedItem.thumbnail,
+									}}
+									style={styles.itemSpeciesImage}
+									contentFit='cover'
+									cachePolicy='memory-disk'
+								/>
+							) : selectedItem.type === 'marker' && selectedItem.iconImage ? (
+								<Image
+									source={{
+										uri: selectedItem.iconImage,
+									}}
+									style={styles.itemMarkerImage}
+									contentFit='contain'
+									cachePolicy='memory-disk'
+								/>
+							) : (
+								<Text>
+									{selectedItem.type === 'species'
+										? (selectedItem.icon ?? '🦁')
+										: (selectedItem.icon ?? '📍')}
+								</Text>
+							)}
 						</View>
 
 						<View style={styles.itemTextContainer}>
-							<Text style={styles.itemTitle}>{selectedItem.name}</Text>
+							<Text style={styles.itemTitle} numberOfLines={1}>
+								{selectedItem.name}
+							</Text>
 
 							<Text style={styles.itemType}>
 								{selectedItem.type === 'species'
@@ -1676,11 +2274,11 @@ export default function MapScreen() {
 						</View>
 
 						<Pressable
-							onPress={() => {
-								setSelectedItem(null)
-								setRoute(null)
-							}}
-							style={styles.closeButton}
+							onPress={() => setRouteCardCollapsed(true)}
+							style={({ pressed }) => ({
+								...styles.closeButton,
+								opacity: pressed ? 0.7 : 1,
+							})}
 						>
 							<Text style={styles.closeButtonText}>×</Text>
 						</Pressable>
@@ -1700,19 +2298,31 @@ export default function MapScreen() {
 					)}
 
 					<View style={styles.actionRow}>
-						<Pressable
+						<View
 							style={[
-								styles.howToButton,
-								!userLocation || !isUserInsideZoo
-									? styles.howToButtonDisabled
-									: null,
+								styles.howToButtonContainer,
+								{
+									backgroundColor:
+										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#087A5A',
+									borderColor:
+										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#064D36',
+								},
 							]}
-							onPress={handleHowToGetThere}
 						>
-							<Text style={styles.howToIcon}>➜</Text>
-
-							<Text style={styles.howToButtonText}>Cómo llegar</Text>
-						</Pressable>
+							<Pressable
+								onPress={handleHowToGetThere}
+								disabled={!userLocation || !isUserInsideZoo}
+								style={({ pressed }) => ({
+									flex: 1,
+									alignItems: 'center',
+									justifyContent: 'center',
+									backgroundColor: 'transparent',
+									opacity: pressed ? 0.7 : 1,
+								})}
+							>
+								<Text style={styles.howToButtonText}>Cómo llegar ➜</Text>
+							</Pressable>
+						</View>
 					</View>
 
 					{!isUserInsideZoo && userLocation && (
@@ -1724,7 +2334,7 @@ export default function MapScreen() {
 
 					{route && (
 						<View style={styles.routeInfo}>
-							<View>
+							<View style={styles.routeSummary}>
 								<Text style={styles.routeLabel}>Ruta por caminos</Text>
 
 								<Text style={styles.routeDistance}>
@@ -1741,7 +2351,10 @@ export default function MapScreen() {
 							</View>
 
 							<Pressable
-								style={styles.routeButton}
+								style={({ pressed }) => ({
+									...styles.routeButton,
+									opacity: pressed ? 0.7 : 1,
+								})}
 								onPress={() => flyToDestination(selectedItem.coordinate, 500)}
 							>
 								<Text style={styles.routeButtonText}>Ver destino</Text>
@@ -1764,127 +2377,90 @@ export default function MapScreen() {
 				</View>
 			)}
 
-			<Modal
-				visible={zoneSelectorOpen}
-				transparent
-				animationType='fade'
-				onRequestClose={() => setZoneSelectorOpen(false)}
-			>
-				<View style={styles.modalOverlay}>
+			{selectedItem && routeCardCollapsed && (
+				<View style={styles.collapsedCardShadow}>
 					<Pressable
-						style={StyleSheet.absoluteFill}
-						onPress={() => setZoneSelectorOpen(false)}
-					/>
+						onPress={() => setRouteCardCollapsed(false)}
+						style={({ pressed }) => ({
+							...styles.collapsedRouteCard,
+							opacity: pressed ? 0.7 : 1,
+						})}
+					>
+						<View
+							style={[
+								styles.collapsedRouteIcon,
+								selectedItem.type === 'marker' && {
+									backgroundColor: selectedItem.color ?? '#087A5A',
+								},
+							]}
+						>
+							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
+								<Image
+									source={{
+										uri: selectedItem.thumbnail,
+									}}
+									style={styles.collapsedSpeciesImage}
+									contentFit='cover'
+									cachePolicy='memory-disk'
+								/>
+							) : selectedItem.type === 'marker' && selectedItem.iconImage ? (
+								<Image
+									source={{
+										uri: selectedItem.iconImage,
+									}}
+									style={styles.collapsedMarkerImage}
+									contentFit='contain'
+									cachePolicy='memory-disk'
+								/>
+							) : (
+								<Text style={styles.collapsedRouteIconText}>
+									{selectedItem.type === 'species'
+										? (selectedItem.icon ?? '🦁')
+										: (selectedItem.icon ?? '📍')}
+								</Text>
+							)}
+						</View>
 
-					<View style={styles.modalContainer}>
-						<View style={styles.modalHeader}>
-							<View>
-								<Text style={styles.modalTitle}>Seleccionar zona</Text>
+						<View style={styles.collapsedRouteMain}>
+							<View style={styles.collapsedRouteName}>
+								<Text style={styles.collapsedRouteTitle} numberOfLines={1}>
+									{selectedItem.name}
+								</Text>
 
-								<Text style={styles.modalSubtitle}>
-									Elige el área que quieres explorar
+								<Text style={styles.collapsedRouteSubtitle}>
+									Ruta por caminos
 								</Text>
 							</View>
 
-							<Pressable
-								onPress={() => setZoneSelectorOpen(false)}
-								style={styles.modalCloseButton}
-							>
-								<Text style={styles.modalCloseText}>×</Text>
-							</Pressable>
+							{route && (
+								<View style={styles.collapsedRouteStats}>
+									<View style={styles.collapsedRouteStat}>
+										<Text style={styles.collapsedRouteDistance}>
+											{formatDistance(route.distance)}
+										</Text>
+
+										<Text style={styles.collapsedRouteLabel}>distancia</Text>
+									</View>
+
+									<View style={styles.collapsedRouteSeparator} />
+
+									<View style={styles.collapsedRouteStat}>
+										<Text style={styles.collapsedRouteTime}>
+											{formatMinutes(route.distance / 80)}
+										</Text>
+
+										<Text style={styles.collapsedRouteLabel}>caminando</Text>
+									</View>
+								</View>
+							)}
 						</View>
 
-						<ScrollView
-							style={styles.zoneList}
-							showsVerticalScrollIndicator={false}
-						>
-							<Pressable
-								style={
-									selectedZoneId === null
-										? [styles.zoneOption, styles.zoneOptionActive]
-										: styles.zoneOption
-								}
-								onPress={showAllZoo}
-							>
-								<View
-									style={
-										selectedZoneId === null
-											? [styles.zoneOptionIcon, styles.zoneOptionIconActive]
-											: styles.zoneOptionIcon
-									}
-								>
-									<Text>🦁</Text>
-								</View>
-
-								<View style={styles.zoneOptionText}>
-									<Text
-										style={
-											selectedZoneId === null
-												? [styles.zoneOptionTitle, styles.zoneOptionTitleActive]
-												: styles.zoneOptionTitle
-										}
-									>
-										Todo el zoológico
-									</Text>
-								</View>
-
-								{selectedZoneId === null && (
-									<View style={styles.checkCircle}>
-										<Text style={styles.checkText}>✓</Text>
-									</View>
-								)}
-							</Pressable>
-
-							{zones.map((zone) => {
-								const active = Number(zone.id) === Number(selectedZoneId)
-
-								return (
-									<Pressable
-										key={zone.id}
-										style={
-											active
-												? [styles.zoneOption, styles.zoneOptionActive]
-												: styles.zoneOption
-										}
-										onPress={() => selectZone(zone)}
-									>
-										<View
-											style={
-												active
-													? [styles.zoneOptionIcon, styles.zoneOptionIconActive]
-													: styles.zoneOptionIcon
-											}
-										>
-											<Text>🗺️</Text>
-										</View>
-
-										<View style={styles.zoneOptionText}>
-											<Text
-												style={
-													active
-														? [
-																styles.zoneOptionTitle,
-																styles.zoneOptionTitleActive,
-															]
-														: styles.zoneOptionTitle
-												}
-											>
-												{zone.name}
-											</Text>
-										</View>
-
-										{active && (
-											<View style={styles.checkCircle}>
-												<Text style={styles.checkText}>✓</Text>
-											</View>
-										)}
-									</Pressable>
-								)
-							})}
-						</ScrollView>
-					</View>
+						<View style={styles.collapsedRouteExpand}>
+							<HugeiconsIcon icon={ArrowUp01Icon} size={18} color='#087A5A' />
+						</View>
+					</Pressable>
 				</View>
-			</Modal>
+			)}
 		</SafeAreaView>
 	)
 }
@@ -1892,7 +2468,7 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#f8fafc',
+		backgroundColor: '#F7F8F3',
 	},
 
 	map: {
@@ -1903,25 +2479,62 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#f8fafc',
-		paddingHorizontal: 30,
+		backgroundColor: '#F7F8F3',
+		paddingHorizontal: 24,
+	},
+
+	loadingCard: {
+		width: '100%',
+		maxWidth: 320,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#F7F7EE',
+		borderRadius: 24,
+		paddingVertical: 30,
+		paddingHorizontal: 24,
+		...cardShadow,
 	},
 
 	loadingText: {
 		marginTop: 14,
 		fontSize: 15,
-		color: '#475569',
+		fontWeight: '600',
+		color: '#6F8A7D',
+	},
+
+	errorCard: {
+		width: '100%',
+		maxWidth: 360,
+		alignItems: 'center',
+		backgroundColor: '#FFF1F0',
+		borderRadius: 24,
+		borderWidth: 1,
+		borderColor: '#FFE3E1',
+		paddingVertical: 28,
+		paddingHorizontal: 24,
+		...cardShadow,
+	},
+
+	errorIconContainer: {
+		width: 52,
+		height: 52,
+		borderRadius: 18,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#FFE3E1',
+		marginBottom: 14,
 	},
 
 	errorIcon: {
-		fontSize: 42,
-		marginBottom: 15,
+		fontSize: 28,
+		fontWeight: '800',
+		color: '#C24141',
 	},
 
 	errorTitle: {
 		fontSize: 20,
-		fontWeight: '700',
-		color: '#0f172a',
+		fontWeight: '800',
+		color: '#123C32',
 		textAlign: 'center',
 		marginBottom: 8,
 	},
@@ -1929,26 +2542,19 @@ const styles = StyleSheet.create({
 	errorText: {
 		fontSize: 14,
 		lineHeight: 21,
-		color: '#64748b',
+		color: '#6F8A7D',
 		textAlign: 'center',
 	},
 
 	topPanel: {
 		position: 'absolute',
-		top: 12,
+		top: 60,
 		left: 12,
 		right: 12,
-		backgroundColor: 'rgba(255,255,255,0.97)',
+		backgroundColor: '#F7F7EE',
 		borderRadius: 22,
 		padding: 16,
-		shadowColor: '#000000',
-		shadowOpacity: 0.15,
-		shadowRadius: 10,
-		shadowOffset: {
-			width: 0,
-			height: 4,
-		},
-		elevation: 7,
+		...cardShadow,
 	},
 
 	headerRow: {
@@ -1965,22 +2571,22 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 19,
 		fontWeight: '800',
-		color: '#0f172a',
+		color: '#123C32',
 	},
 
 	subtitle: {
 		marginTop: 3,
 		fontSize: 12,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	statusBadge: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: 999,
+		borderRadius: 16,
 		paddingHorizontal: 10,
 		paddingVertical: 7,
-		backgroundColor: '#f8fafc',
+		backgroundColor: '#DCEFE5',
 	},
 
 	statusDot: {
@@ -1993,128 +2599,78 @@ const styles = StyleSheet.create({
 	statusText: {
 		fontSize: 11,
 		fontWeight: '700',
-		color: '#334155',
-	},
-
-	selectorLabel: {
-		marginTop: 14,
-		marginBottom: 6,
-		fontSize: 11,
-		fontWeight: '700',
-		color: '#64748b',
-		textTransform: 'uppercase',
-		letterSpacing: 0.5,
-	},
-
-	zoneSelector: {
-		minHeight: 56,
-		borderWidth: 1,
-		borderColor: '#e2e8f0',
-		backgroundColor: '#f8fafc',
-		borderRadius: 999,
-		paddingHorizontal: 16,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-
-	zoneSelectorTextContainer: {
-		flex: 1,
-		paddingRight: 10,
-	},
-
-	zoneSelectorTitle: {
-		fontSize: 15,
-		fontWeight: '700',
-		color: '#0f172a',
-	},
-
-	chevron: {
-		fontSize: 28,
-		lineHeight: 28,
-		color: '#64748b',
-		transform: [
-			{
-				rotate: '90deg',
-			},
-		],
+		color: '#123C32',
 	},
 
 	locationBadge: {
 		position: 'absolute',
 		right: 14,
-		top: 190,
-		backgroundColor: 'rgba(255,255,255,0.96)',
-		borderRadius: 999,
+		top: 150,
+		backgroundColor: '#F7F7EE',
+		borderRadius: 16,
 		paddingHorizontal: 11,
 		paddingVertical: 8,
 		flexDirection: 'row',
 		alignItems: 'center',
-		shadowColor: '#000000',
-		shadowOpacity: 0.12,
-		shadowRadius: 7,
-		shadowOffset: {
-			width: 0,
-			height: 3,
-		},
-		elevation: 5,
+		...cardShadow,
 	},
 
 	locationBadgeDot: {
 		width: 9,
 		height: 9,
 		borderRadius: 5,
-		backgroundColor: '#2563eb',
+		backgroundColor: '#0977b8',
 		marginRight: 7,
 	},
 
 	locationBadgeTitle: {
 		fontSize: 11,
 		fontWeight: '700',
-		color: '#0f172a',
+		color: '#123C32',
 	},
 
 	locationBadgeText: {
 		marginTop: 1,
 		fontSize: 9,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	mapMarker: {
 		width: 38,
 		height: 38,
-		borderRadius: 999,
+		borderRadius: 19,
 		alignItems: 'center',
 		justifyContent: 'center',
+		backgroundColor: '#087A5A',
 		borderWidth: 3,
-		borderColor: '#ffffff',
-		shadowColor: '#000000',
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		elevation: 6,
+		borderColor: '#F7F7EE',
+		overflow: 'hidden',
+		...cardShadow,
+	},
+
+	mapMarkerImage: {
+		width: 30,
+		height: 30,
+		borderRadius: 15,
 	},
 
 	speciesMarker: {
 		width: 42,
 		height: 42,
-		borderRadius: 999,
+		borderRadius: 21,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#16a34a',
+		backgroundColor: '#064D36',
 		borderWidth: 3,
-		borderColor: '#ffffff',
-		shadowColor: '#000000',
-		shadowOpacity: 0.3,
-		shadowRadius: 4,
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		elevation: 7,
+		borderColor: '#F7F7EE',
+		overflow: 'hidden',
+		...cardShadow,
+	},
+
+	speciesMarkerImage: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
 	},
 
 	mapMarkerIcon: {
@@ -2124,67 +2680,60 @@ const styles = StyleSheet.create({
 	userLocationOuter: {
 		width: 46,
 		height: 46,
-		borderRadius: 999,
-		backgroundColor: 'rgba(37,99,235,0.20)',
+		borderRadius: 23,
+		backgroundColor: 'rgba(8, 118, 161, 0.2)',
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1,
-		borderColor: 'rgba(37,99,235,0.40)',
+		borderColor: 'rgba(8, 121, 141, 0.4)',
 	},
 
 	userLocationInner: {
 		width: 17,
 		height: 17,
-		borderRadius: 999,
-		backgroundColor: '#2563eb',
+		borderRadius: 9,
+		backgroundColor: '#0977b8',
 		borderWidth: 3,
-		borderColor: '#ffffff',
-		shadowColor: '#000000',
-		shadowOpacity: 0.3,
-		shadowRadius: 3,
-		shadowOffset: {
-			width: 0,
-			height: 1,
-		},
-		elevation: 5,
+		borderColor: '#F7F7EE',
+		...cardShadow,
 	},
 
 	destinationMarker: {
 		width: 46,
 		height: 46,
-		borderRadius: 999,
-		backgroundColor: '#dc2626',
+		borderRadius: 23,
+		backgroundColor: '#064D36',
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 4,
-		borderColor: '#ffffff',
-		shadowColor: '#000000',
-		shadowOpacity: 0.35,
-		shadowRadius: 5,
-		shadowOffset: {
-			width: 0,
-			height: 3,
-		},
-		elevation: 8,
+		borderColor: '#F7F7EE',
+		overflow: 'hidden',
+		...cardShadow,
+	},
+
+	destinationMarkerImage: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
 	},
 
 	destinationSpecies: {
 		width: 48,
 		height: 48,
-		borderRadius: 999,
-		backgroundColor: '#dc2626',
+		borderRadius: 24,
+		backgroundColor: '#087A5A',
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 4,
-		borderColor: '#ffffff',
-		shadowColor: '#000000',
-		shadowOpacity: 0.35,
-		shadowRadius: 5,
-		shadowOffset: {
-			width: 0,
-			height: 3,
-		},
-		elevation: 8,
+		borderColor: '#F7F7EE',
+		overflow: 'hidden',
+		...cardShadow,
+	},
+
+	destinationSpeciesImage: {
+		width: 40,
+		height: 40,
+		borderRadius: 20,
 	},
 
 	destinationIcon: {
@@ -2196,17 +2745,10 @@ const styles = StyleSheet.create({
 		left: 12,
 		right: 12,
 		bottom: 15,
-		backgroundColor: 'rgba(255,255,255,0.98)',
+		backgroundColor: '#F7F7EE',
 		borderRadius: 22,
 		padding: 16,
-		shadowColor: '#000000',
-		shadowOpacity: 0.18,
-		shadowRadius: 12,
-		shadowOffset: {
-			width: 0,
-			height: 5,
-		},
-		elevation: 8,
+		...cardShadow,
 	},
 
 	bottomCardHeader: {
@@ -2217,274 +2759,336 @@ const styles = StyleSheet.create({
 	itemIcon: {
 		width: 42,
 		height: 42,
-		borderRadius: 999,
-		backgroundColor: '#f1f5f9',
+		borderRadius: 16,
 		alignItems: 'center',
 		justifyContent: 'center',
+		backgroundColor: '#DCEFE5',
+		overflow: 'hidden',
+	},
+
+	itemIconSpecies: {
+		backgroundColor: '#DCEFE5',
+	},
+
+	itemIconMarker: {
+		backgroundColor: '#DCEFE5',
+	},
+
+	itemSpeciesImage: {
+		width: 42,
+		height: 42,
+		borderRadius: 16,
+	},
+
+	itemMarkerImage: {
+		width: 34,
+		height: 34,
+		borderRadius: 12,
 	},
 
 	itemTextContainer: {
 		flex: 1,
+		minWidth: 0,
 		marginLeft: 10,
+		marginRight: 10,
 	},
 
 	itemTitle: {
 		fontSize: 16,
 		fontWeight: '800',
-		color: '#0f172a',
+		color: '#123C32',
 	},
 
 	itemType: {
 		marginTop: 2,
 		fontSize: 11,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	scientificName: {
 		marginTop: 8,
 		fontSize: 12,
 		fontStyle: 'italic',
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	closeButton: {
 		width: 34,
 		height: 34,
-		borderRadius: 999,
+		borderRadius: 16,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: '#f1f5f9',
+		backgroundColor: '#DCEFE5',
 	},
 
 	closeButtonText: {
 		fontSize: 23,
 		lineHeight: 25,
-		color: '#475569',
+		color: '#123C32',
 	},
 
 	itemDescription: {
 		marginTop: 12,
 		fontSize: 13,
 		lineHeight: 19,
-		color: '#475569',
+		color: '#6F8A7D',
 	},
 
 	actionRow: {
+		width: '100%',
 		marginTop: 14,
 	},
 
-	howToButton: {
-		minHeight: 46,
-		borderRadius: 999,
-		backgroundColor: '#16a34a',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		paddingHorizontal: 18,
-	},
-
-	howToButtonDisabled: {
-		backgroundColor: '#94a3b8',
-	},
-
-	howToIcon: {
-		fontSize: 18,
-		color: '#ffffff',
-		marginRight: 8,
+	howToButtonContainer: {
+		width: '100%',
+		height: 56,
+		borderRadius: 16,
+		borderWidth: 1,
+		shadowColor: '#000000',
+		shadowOffset: {
+			width: 0,
+			height: 5,
+		},
+		shadowOpacity: 0.18,
+		shadowRadius: 8,
+		elevation: 1,
+		overflow: 'hidden',
 	},
 
 	howToButtonText: {
-		fontSize: 14,
+		fontSize: 16,
 		fontWeight: '800',
-		color: '#ffffff',
+		color: '#FFFFFF',
+		textAlign: 'center',
+		textAlignVertical: 'center',
+		includeFontPadding: false,
+		lineHeight: 56,
+		padding: 0,
+		margin: 0,
 	},
 
 	outsideZooText: {
 		marginTop: 10,
 		fontSize: 11,
 		lineHeight: 17,
-		color: '#b45309',
+		color: '#6F8A7D',
 	},
 
 	routeInfo: {
 		marginTop: 14,
 		paddingTop: 13,
 		borderTopWidth: 1,
-		borderTopColor: '#e2e8f0',
+		borderTopColor: '#B8DCCA',
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		gap: 10,
 	},
 
+	routeSummary: {
+		flex: 1,
+		minWidth: 0,
+	},
+
 	routeLabel: {
 		fontSize: 11,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	routeDistance: {
 		marginTop: 2,
 		fontSize: 17,
 		fontWeight: '800',
-		color: '#dc2626',
+		color: '#064D36',
 	},
 
 	routeTimeBox: {
 		alignItems: 'center',
+		minWidth: 48,
 	},
 
 	routeTime: {
 		fontSize: 13,
 		fontWeight: '800',
-		color: '#0f172a',
+		color: '#123C32',
 	},
 
 	routeTimeLabel: {
 		fontSize: 9,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	routeButton: {
-		backgroundColor: '#0f172a',
-		borderRadius: 999,
+		backgroundColor: '#064D36',
+		borderRadius: 16,
 		paddingHorizontal: 15,
 		paddingVertical: 10,
+		...cardShadow,
 	},
 
 	routeButtonText: {
 		fontSize: 11,
 		fontWeight: '700',
-		color: '#ffffff',
+		color: '#FFFFFF',
 	},
 
 	routeHint: {
 		marginTop: 10,
 		fontSize: 11,
 		lineHeight: 17,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
 	noRouteText: {
 		marginTop: 12,
 		fontSize: 12,
 		lineHeight: 18,
-		color: '#64748b',
+		color: '#6F8A7D',
 	},
 
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(15,23,42,0.45)',
+	collapsedCardShadow: {
+		position: 'absolute',
+		left: 12,
+		right: 12,
+		bottom: 15,
+		height: 72,
+		borderRadius: 20,
+		backgroundColor: '#F7F7EE',
+		shadowColor: '#000000',
+		shadowOffset: {
+			width: 0,
+			height: 5,
+		},
+		shadowOpacity: 0.18,
+		shadowRadius: 8,
+		elevation: 1,
+	},
+
+	collapsedRouteCard: {
+		position: 'relative',
+		width: '100%',
+		height: 72,
+		backgroundColor: '#F7F7EE',
+		borderRadius: 20,
+		paddingLeft: 12,
+		paddingRight: 12,
+		justifyContent: 'center',
+	},
+
+	collapsedRouteIcon: {
+		position: 'absolute',
+		left: 12,
+		top: 15,
+		width: 35,
+		height: 35,
+		borderRadius: 14,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#087A5A',
+		overflow: 'hidden',
+	},
+
+	collapsedSpeciesImage: {
+		width: 35,
+		height: 35,
+		borderRadius: 14,
+	},
+
+	collapsedMarkerImage: {
+		width: 30,
+		height: 30,
+		borderRadius: 12,
+	},
+
+	collapsedRouteIconText: {
+		fontSize: 18,
+	},
+
+	collapsedRouteMain: {
+		position: 'absolute',
+		left: 59,
+		right: 92,
+		top: 12,
+		height: 48,
+		justifyContent: 'center',
+	},
+
+	collapsedRouteName: {
+		width: '100%',
+		justifyContent: 'center',
+	},
+
+	collapsedRouteTitle: {
+		fontSize: 14,
+		fontWeight: '800',
+		color: '#123C32',
+		lineHeight: 18,
+	},
+
+	collapsedRouteSubtitle: {
+		marginTop: 2,
+		fontSize: 9,
+		color: '#6F8A7D',
+		lineHeight: 12,
+	},
+
+	collapsedRouteStats: {
+		position: 'absolute',
+		right: -30,
+		top: 0,
+		width: 125,
+		height: 48,
+		flexDirection: 'row',
+		alignItems: 'center',
 		justifyContent: 'flex-end',
 	},
 
-	modalContainer: {
-		backgroundColor: '#ffffff',
-		borderTopLeftRadius: 28,
-		borderTopRightRadius: 28,
-		maxHeight: '75%',
-		paddingBottom: 25,
-	},
-
-	modalHeader: {
-		paddingHorizontal: 20,
-		paddingTop: 20,
-		paddingBottom: 14,
-		flexDirection: 'row',
+	collapsedRouteStat: {
+		width: 52,
 		alignItems: 'center',
-		justifyContent: 'space-between',
-		borderBottomWidth: 1,
-		borderBottomColor: '#f1f5f9',
+		justifyContent: 'center',
 	},
 
-	modalTitle: {
-		fontSize: 20,
+	collapsedRouteDistance: {
+		fontSize: 14,
 		fontWeight: '800',
-		color: '#0f172a',
+		color: '#064D36',
+		textAlign: 'center',
+		lineHeight: 17,
 	},
 
-	modalSubtitle: {
-		marginTop: 3,
-		fontSize: 12,
-		color: '#64748b',
-	},
-
-	modalCloseButton: {
-		width: 38,
-		height: 38,
-		borderRadius: 999,
-		backgroundColor: '#f1f5f9',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	modalCloseText: {
-		fontSize: 25,
-		lineHeight: 27,
-		color: '#475569',
-	},
-
-	zoneList: {
-		paddingHorizontal: 14,
-		paddingTop: 8,
-	},
-
-	zoneOption: {
-		minHeight: 62,
-		borderRadius: 18,
-		paddingHorizontal: 12,
-		marginVertical: 5,
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: '#e2e8f0',
-		backgroundColor: '#ffffff',
-	},
-
-	zoneOptionActive: {
-		borderColor: '#86efac',
-		backgroundColor: '#f0fdf4',
-	},
-
-	zoneOptionIcon: {
-		width: 44,
-		height: 44,
-		borderRadius: 999,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#f1f5f9',
-	},
-
-	zoneOptionIconActive: {
-		backgroundColor: '#dcfce7',
-	},
-
-	zoneOptionText: {
-		flex: 1,
-		marginLeft: 11,
-	},
-
-	zoneOptionTitle: {
-		fontSize: 15,
-		fontWeight: '700',
-		color: '#0f172a',
-	},
-
-	zoneOptionTitleActive: {
-		color: '#15803d',
-	},
-
-	checkCircle: {
-		width: 28,
-		height: 28,
-		borderRadius: 999,
-		backgroundColor: '#16a34a',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	checkText: {
-		color: '#ffffff',
-		fontSize: 15,
+	collapsedRouteTime: {
+		fontSize: 13,
 		fontWeight: '800',
+		color: '#123C32',
+		textAlign: 'center',
+		lineHeight: 16,
+	},
+
+	collapsedRouteLabel: {
+		marginTop: 1,
+		fontSize: 7,
+		color: '#6F8A7D',
+		textAlign: 'center',
+		lineHeight: 9,
+	},
+
+	collapsedRouteSeparator: {
+		width: 1,
+		height: 24,
+		marginHorizontal: 5,
+		backgroundColor: '#B8DCCA',
+	},
+
+	collapsedRouteExpand: {
+		position: 'absolute',
+		right: 12,
+		top: 20,
+		width: 32,
+		height: 32,
+		borderRadius: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#DCEFE5',
 	},
 })

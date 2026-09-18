@@ -1,19 +1,28 @@
 import Toast from '@/components/toast'
 import { API_URL, ApiValidationError, api } from '@/services/api'
 import { getToken, type User } from '@/services/auth'
+import {
+	Calendar03Icon,
+	Call02Icon,
+	Globe02Icon,
+	Location01Icon,
+	Mail01Icon,
+	UserIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
+	Animated,
 	Image,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
-	ScrollView,
 	Text,
 	TextInput,
 	View,
@@ -151,7 +160,6 @@ export default function ProfileScreen() {
 	const [country, setCountry] = useState('')
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
-
 	const [errors, setErrors] = useState<FormErrors>({})
 
 	const [toast, setToast] = useState<ToastState>({
@@ -159,6 +167,8 @@ export default function ProfileScreen() {
 		message: '',
 		type: 'success',
 	})
+
+	const scrollY = useRef(new Animated.Value(0)).current
 
 	const showToast = useCallback(
 		(message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -192,13 +202,10 @@ export default function ProfileScreen() {
 			const currentUser = response.user
 
 			setUser(currentUser)
-
 			setName(currentUser.name || '')
 			setEmail(currentUser.email || '')
 			setPhone(currentUser.profile?.phone || '')
-
 			setBirthDate(formatDateForApp(currentUser.profile?.birth_date))
-
 			setCity(currentUser.profile?.city || '')
 			setCountry(currentUser.profile?.country || '')
 		} catch (error) {
@@ -232,7 +239,6 @@ export default function ProfileScreen() {
 		}
 
 		setBirthDate(formatDateForDisplay(selectedDate))
-
 		clearFieldError('birth_date')
 	}
 
@@ -249,9 +255,7 @@ export default function ProfileScreen() {
 
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors)
-
 			showToast('Revisa los campos marcados.', 'warning')
-
 			return
 		}
 
@@ -282,15 +286,11 @@ export default function ProfileScreen() {
 			})
 
 			setUser(response.user)
-
 			setName(response.user.name || '')
 			setEmail(response.user.email || '')
 			setPhone(response.user.profile?.phone || '')
-
 			setBirthDate(formatDateForApp(response.user.profile?.birth_date))
-
 			setCity(response.user.profile?.city || '')
-
 			setCountry(response.user.profile?.country || '')
 
 			showToast(
@@ -435,7 +435,6 @@ export default function ProfileScreen() {
 
 			if (!permission.granted) {
 				showToast('Necesitamos permiso para seleccionar una foto.', 'warning')
-
 				return
 			}
 
@@ -481,17 +480,93 @@ export default function ProfileScreen() {
 
 	if (loading) {
 		return (
-			<View className='flex-1 items-center justify-center bg-gray-50'>
-				<ActivityIndicator size='large' color='#047857' />
+			<View
+				className='flex-1 items-center justify-center'
+				style={{
+					backgroundColor: '#F7F8F3',
+				}}
+			>
+				<ActivityIndicator size='large' color='#087A5A' />
+
+				<Text
+					className='mt-4 text-sm font-medium'
+					style={{
+						color: '#6F8A7D',
+					}}
+				>
+					Cargando perfil...
+				</Text>
 			</View>
 		)
 	}
 
 	const avatarUrl = getAvatarUrl(user?.profile?.avatar)
 
+	const points = user?.gamification?.points ?? user?.points ?? 0
+
+	const currentLevel =
+		user?.gamification?.current_level?.name || user?.level?.name || 'Sin nivel'
+
+	const progress = Math.min(100, Math.max(0, user?.gamification?.progress ?? 0))
+
+	const pointsToNextLevel = user?.gamification?.points_to_next_level ?? 0
+
+	const nextLevel = user?.gamification?.next_level?.name || ''
+
+	/*
+	 * =========================================
+	 * ANIMACIONES
+	 * =========================================
+	 */
+
+	const coverHeight = scrollY.interpolate({
+		inputRange: [0, 180],
+		outputRange: [300, 145],
+		extrapolate: 'clamp',
+	})
+
+	const avatarScale = scrollY.interpolate({
+		inputRange: [0, 180],
+		outputRange: [1, 0.72],
+		extrapolate: 'clamp',
+	})
+
+	const avatarTranslateY = scrollY.interpolate({
+		inputRange: [0, 180],
+		outputRange: [0, -72],
+		extrapolate: 'clamp',
+	})
+
+	const nameTranslateY = scrollY.interpolate({
+		inputRange: [0, 180],
+		outputRange: [0, -58],
+		extrapolate: 'clamp',
+	})
+
+	const emailOpacity = scrollY.interpolate({
+		inputRange: [0, 90, 150],
+		outputRange: [1, 0.4, 0],
+		extrapolate: 'clamp',
+	})
+
+	const backButtonOpacity = scrollY.interpolate({
+		inputRange: [0, 70, 130],
+		outputRange: [1, 0.65, 0],
+		extrapolate: 'clamp',
+	})
+
+	const progressMarginTop = scrollY.interpolate({
+		inputRange: [0, 180],
+		outputRange: [-30, -100],
+		extrapolate: 'clamp',
+	})
+
 	return (
 		<KeyboardAvoidingView
-			className='flex-1 bg-gray-50'
+			className='flex-1'
+			style={{
+				backgroundColor: '#F7F8F3',
+			}}
 			behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 		>
 			<Toast
@@ -506,267 +581,667 @@ export default function ProfileScreen() {
 				}
 			/>
 
-			<ScrollView
+			<Animated.ScrollView
 				className='flex-1'
-				contentContainerStyle={{
-					paddingHorizontal: 20,
-					paddingTop: 55,
-					paddingBottom: 130,
-				}}
 				keyboardShouldPersistTaps='handled'
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={Animated.event(
+					[
+						{
+							nativeEvent: {
+								contentOffset: {
+									y: scrollY,
+								},
+							},
+						},
+					],
+					{
+						useNativeDriver: false,
+					},
+				)}
 			>
-				<Pressable onPress={() => router.back()} className='mb-5'>
-					<Text className='text-base font-semibold text-emerald-700'>
-						← Regresar
-					</Text>
-				</Pressable>
+				{/* =========================================
+					ENCABEZADO
+				========================================= */}
 
-				<Text className='text-3xl font-bold text-gray-900'>Mi perfil</Text>
+				<View className='relative'>
+					<Animated.Image
+						source={require('../../assets/images/profile-background.png')}
+						resizeMode='cover'
+						style={{
+							height: coverHeight,
+							width: '100%',
+						}}
+					/>
 
-				<Text className='mt-2 text-base text-gray-500'>
-					Administra tus datos personales.
-				</Text>
+					{/* BOTÓN REGRESAR */}
 
-				{/* Avatar */}
-				<View className='mt-7 items-center'>
-					<Pressable
-						onPress={handlePickAvatar}
-						disabled={uploadingAvatar}
-						className='relative'
+					<Animated.View
+						className='absolute left-5 top-14 z-20'
+						style={{
+							opacity: backButtonOpacity,
+						}}
 					>
-						<View
+						<Pressable
+							onPress={() => router.back()}
+							className='flex-row items-center rounded-2xl px-4 py-2.5'
 							style={{
-								width: 110,
-								height: 110,
-								borderRadius: 55,
-								backgroundColor: '#D1FAE5',
-								alignItems: 'center',
-								justifyContent: 'center',
-								overflow: 'hidden',
-								borderWidth: 4,
-								borderColor: '#FFFFFF',
-								elevation: 4,
-								shadowColor: '#000',
+								backgroundColor: 'rgba(247,248,243,0.92)',
+								borderWidth: 1,
+								borderColor: 'rgba(255,255,255,0.75)',
+								shadowColor: '#123C32',
 								shadowOffset: {
 									width: 0,
 									height: 2,
 								},
 								shadowOpacity: 0.12,
-								shadowRadius: 6,
+								shadowRadius: 5,
+								elevation: 2,
 							}}
 						>
-							{avatarUrl ? (
-								<Image
-									source={{
-										uri: avatarUrl,
-									}}
-									style={{
-										width: '100%',
-										height: '100%',
-									}}
-									resizeMode='cover'
-								/>
-							) : (
-								<Text className='text-4xl font-bold text-emerald-700'>
-									{user?.name?.charAt(0).toUpperCase() || '?'}
-								</Text>
-							)}
+							<Text
+								className='mr-1 text-lg font-bold'
+								style={{
+									color: '#064D36',
+								}}
+							>
+								‹
+							</Text>
 
-							{uploadingAvatar && (
-								<View
+							<Text
+								className='text-base font-semibold'
+								style={{
+									color: '#123C32',
+								}}
+							>
+								Regresar
+							</Text>
+						</Pressable>
+					</Animated.View>
+
+					{/* PERFIL */}
+
+					<View
+						className='absolute left-0 right-0 items-center'
+						style={{
+							top: 0,
+							paddingTop: 80,
+						}}
+					>
+						{/* FOTO */}
+
+						<Pressable onPress={handlePickAvatar} disabled={uploadingAvatar}>
+							<Animated.View
+								style={{
+									width: 116,
+									height: 116,
+									borderRadius: 58,
+									backgroundColor: '#DCEFE5',
+									alignItems: 'center',
+									justifyContent: 'center',
+									overflow: 'hidden',
+									borderWidth: 5,
+									borderColor: '#F7F7EE',
+									elevation: 7,
+									shadowColor: '#064D36',
+									shadowOffset: {
+										width: 0,
+										height: 4,
+									},
+									shadowOpacity: 0.2,
+									shadowRadius: 9,
+									transform: [
+										{
+											scale: avatarScale,
+										},
+										{
+											translateY: avatarTranslateY,
+										},
+									],
+								}}
+							>
+								{avatarUrl ? (
+									<Image
+										source={{
+											uri: avatarUrl,
+										}}
+										style={{
+											width: '100%',
+											height: '100%',
+										}}
+										resizeMode='cover'
+									/>
+								) : (
+									<Text
+										className='text-5xl font-bold'
+										style={{
+											color: '#087A5A',
+										}}
+									>
+										{user?.name?.charAt(0).toUpperCase() || '?'}
+									</Text>
+								)}
+
+								{uploadingAvatar && (
+									<View
+										style={{
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											right: 0,
+											bottom: 0,
+											backgroundColor: 'rgba(6,77,54,0.52)',
+											alignItems: 'center',
+											justifyContent: 'center',
+										}}
+									>
+										<ActivityIndicator size='large' color='#FFFFFF' />
+									</View>
+								)}
+							</Animated.View>
+
+							{/* CAMBIAR FOTO */}
+
+							<View
+								style={{
+									position: 'absolute',
+									right: -2,
+									bottom: -2,
+									width: 35,
+									height: 35,
+									borderRadius: 18,
+									backgroundColor: '#087A5A',
+									alignItems: 'center',
+									justifyContent: 'center',
+									borderWidth: 3,
+									borderColor: '#F7F7EE',
+									shadowColor: '#064D36',
+									shadowOffset: {
+										width: 0,
+										height: 2,
+									},
+									shadowOpacity: 0.2,
+									shadowRadius: 4,
+									elevation: 3,
+								}}
+							>
+								<Text className='text-xl font-bold text-white'>+</Text>
+							</View>
+						</Pressable>
+
+						{/* NOMBRE */}
+
+						<Animated.Text
+							className='mt-5 text-2xl font-bold'
+							style={{
+								color: '#FFFFFF',
+								textShadowColor: 'rgba(0,0,0,0.18)',
+								textShadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								textShadowRadius: 3,
+								transform: [
+									{
+										translateY: nameTranslateY,
+									},
+								],
+							}}
+						>
+							{user?.name || 'Visitante'}
+						</Animated.Text>
+
+						{/* CORREO */}
+
+						<Animated.Text
+							className='mt-1 text-base'
+							style={{
+								color: '#F7F7EE',
+								opacity: emailOpacity,
+							}}
+						>
+							{user?.email || ''}
+						</Animated.Text>
+					</View>
+				</View>
+
+				{/* =========================================
+					TU PROGRESO
+				========================================= */}
+
+				<Animated.View
+					className='relative z-10 overflow-hidden rounded-t-[30px]'
+					style={{
+						marginTop: progressMarginTop,
+						backgroundColor: '#F7F8F3',
+					}}
+				>
+					<View className='px-5 py-7'>
+						<Text
+							className='text-xl font-bold'
+							style={{
+								color: '#064D36',
+							}}
+						>
+							Tu progreso
+						</Text>
+
+						<Text
+							className='mt-1 text-base'
+							style={{
+								color: '#6F8A7D',
+							}}
+						>
+							Sigue acumulando puntos en ZooApp.
+						</Text>
+
+						<View className='mt-5 flex-row'>
+							{/* PUNTOS */}
+
+							<View
+								className='flex-1 rounded-2xl p-4'
+								style={{
+									backgroundColor: '#DCEFE5',
+									borderWidth: 1,
+									borderColor: '#B8DCCA',
+									shadowColor: '#064D36',
+									shadowOffset: {
+										width: 0,
+										height: 2,
+									},
+									shadowOpacity: 0.07,
+									shadowRadius: 5,
+									elevation: 2,
+								}}
+							>
+								<Text
+									className='text-xs font-bold uppercase tracking-wide'
 									style={{
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										right: 0,
-										bottom: 0,
-										backgroundColor: 'rgba(0,0,0,0.45)',
-										alignItems: 'center',
-										justifyContent: 'center',
+										color: '#087A5A',
 									}}
 								>
-									<ActivityIndicator size='large' color='#FFFFFF' />
-								</View>
-							)}
-						</View>
+									Puntos
+								</Text>
 
-						<View
-							style={{
-								position: 'absolute',
-								right: 0,
-								bottom: 0,
-								width: 34,
-								height: 34,
-								borderRadius: 17,
-								backgroundColor: '#047857',
-								alignItems: 'center',
-								justifyContent: 'center',
-								borderWidth: 3,
-								borderColor: '#FFFFFF',
-							}}
-						>
-							<Text className='text-lg font-bold text-white'>+</Text>
-						</View>
-					</Pressable>
-
-					<Pressable
-						onPress={handlePickAvatar}
-						disabled={uploadingAvatar}
-						className='mt-3'
-					>
-						<Text className='font-semibold text-emerald-700'>
-							{uploadingAvatar ? 'Subiendo foto...' : 'Cambiar foto'}
-						</Text>
-					</Pressable>
-				</View>
-
-				{/* Gamificación */}
-				<View className='mt-7 rounded-3xl bg-white p-5'>
-					<Text className='text-lg font-bold text-gray-900'>Gamificación</Text>
-
-					<View className='mt-4 flex-row justify-between'>
-						<View>
-							<Text className='text-sm text-gray-500'>Puntos</Text>
-
-							<Text className='mt-1 text-2xl font-bold text-emerald-700'>
-								{user?.gamification?.points ?? user?.points ?? 0}
-							</Text>
-						</View>
-
-						<View className='items-end'>
-							<Text className='text-sm text-gray-500'>Nivel</Text>
-
-							<Text className='mt-1 text-lg font-bold text-gray-900'>
-								{user?.gamification?.current_level?.name ||
-									user?.level?.name ||
-									'Sin nivel'}
-							</Text>
-						</View>
-					</View>
-
-					{user?.gamification?.next_level && (
-						<View className='mt-5'>
-							<View className='flex-row justify-between'>
-								<Text className='text-sm text-gray-500'>Progreso</Text>
-
-								<Text className='text-sm font-semibold text-emerald-700'>
-									{user.gamification.progress}%
+								<Text
+									className='mt-2 text-3xl font-bold'
+									style={{
+										color: '#064D36',
+									}}
+								>
+									{points}
 								</Text>
 							</View>
 
-							<View className='mt-2 h-3 overflow-hidden rounded-full bg-gray-100'>
-								<View
-									className='h-full rounded-full bg-emerald-500'
+							{/* NIVEL */}
+
+							<View
+								className='ml-3 flex-1 rounded-2xl p-4'
+								style={{
+									backgroundColor: '#FFFFFF',
+									borderWidth: 1,
+									borderColor: '#B8DCCA',
+									shadowColor: '#064D36',
+									shadowOffset: {
+										width: 0,
+										height: 2,
+									},
+									shadowOpacity: 0.06,
+									shadowRadius: 5,
+									elevation: 2,
+								}}
+							>
+								<Text
+									className='text-xs font-bold uppercase tracking-wide'
 									style={{
-										width: `${Math.min(
-											100,
-											Math.max(0, user.gamification.progress),
-										)}%`,
+										color: '#6F8A7D',
 									}}
-								/>
+								>
+									Nivel
+								</Text>
+
+								<Text
+									className='mt-2 text-lg font-bold'
+									style={{
+										color: '#123C32',
+									}}
+								>
+									{currentLevel}
+								</Text>
 							</View>
-
-							<Text className='mt-2 text-xs text-gray-500'>
-								Te faltan {user.gamification.points_to_next_level} puntos para{' '}
-								{user.gamification.next_level.name}.
-							</Text>
 						</View>
-					)}
-				</View>
 
-				{/* Datos personales */}
-				<View className='mt-5 rounded-3xl bg-white p-5'>
-					<Text className='text-lg font-bold text-gray-900'>
+						{user?.gamification?.next_level && (
+							<View className='mt-6'>
+								<View className='flex-row items-center justify-between'>
+									<Text
+										className='text-sm font-semibold'
+										style={{
+											color: '#123C32',
+										}}
+									>
+										Progreso al siguiente nivel
+									</Text>
+
+									<Text
+										className='text-sm font-bold'
+										style={{
+											color: '#087A5A',
+										}}
+									>
+										{progress}%
+									</Text>
+								</View>
+
+								<View
+									className='mt-3 h-3 overflow-hidden rounded-full'
+									style={{
+										backgroundColor: '#DCEFE5',
+									}}
+								>
+									<View
+										className='h-full rounded-full'
+										style={{
+											width: `${progress}%`,
+											backgroundColor: '#087A5A',
+										}}
+									/>
+								</View>
+
+								<Text
+									className='mt-3 text-base leading-5'
+									style={{
+										color: '#6F8A7D',
+									}}
+								>
+									Te faltan{' '}
+									<Text
+										className='font-bold'
+										style={{
+											color: '#123C32',
+										}}
+									>
+										{pointsToNextLevel}
+									</Text>{' '}
+									puntos para{' '}
+									<Text
+										className='font-semibold'
+										style={{
+											color: '#123C32',
+										}}
+									>
+										{nextLevel}
+									</Text>
+									.
+								</Text>
+							</View>
+						)}
+					</View>
+				</Animated.View>
+
+				{/* =========================================
+					DATOS PERSONALES
+				========================================= */}
+
+				<View
+					className='mt-4 px-5 py-7'
+					style={{
+						backgroundColor: '#F7F8F3',
+					}}
+				>
+					<Text
+						className='text-xl font-bold'
+						style={{
+							color: '#064D36',
+						}}
+					>
 						Datos personales
 					</Text>
 
-					{/* Nombre */}
-					<View className='mt-5'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					<Text
+						className='mt-1 text-base'
+						style={{
+							color: '#6F8A7D',
+						}}
+					>
+						Mantén actualizada tu información.
+					</Text>
+
+					{/* NOMBRE */}
+
+					<View className='mt-6'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							Nombre
 						</Text>
 
-						<TextInput
-							value={name}
-							onChangeText={(value) => {
-								setName(value)
-								clearFieldError('name')
+						<View
+							className='flex-row items-center rounded-2xl border'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.name ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
 							}}
-							placeholder='Nombre completo'
-							placeholderTextColor='#9ca3af'
-							autoCapitalize='words'
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900'
-						/>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={UserIcon}
+									size={21}
+									strokeWidth={1.8}
+									color='#6F8A7D'
+								/>
+							</View>
+
+							<TextInput
+								value={name}
+								onChangeText={(value) => {
+									setName(value)
+									clearFieldError('name')
+								}}
+								placeholder='Nombre completo'
+								placeholderTextColor='#6F8A7D'
+								autoCapitalize='words'
+								className='flex-1 px-3 py-4 text-base'
+								style={{
+									color: '#123C32',
+								}}
+							/>
+						</View>
 
 						{errors.name && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.name}</Text>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
+								{errors.name}
+							</Text>
 						)}
 					</View>
 
-					{/* Email */}
-					<View className='mt-4'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					{/* EMAIL */}
+
+					<View className='mt-5'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							Correo electrónico
 						</Text>
 
-						<TextInput
-							value={email}
-							onChangeText={(value) => {
-								setEmail(value)
-								clearFieldError('email')
+						<View
+							className='flex-row items-center rounded-2xl border'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.email ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
 							}}
-							placeholder='correo@ejemplo.com'
-							placeholderTextColor='#9ca3af'
-							keyboardType='email-address'
-							autoCapitalize='none'
-							autoCorrect={false}
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900'
-						/>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Mail01Icon}
+									size={21}
+									strokeWidth={1.8}
+									color='#6F8A7D'
+								/>
+							</View>
+
+							<TextInput
+								value={email}
+								onChangeText={(value) => {
+									setEmail(value)
+									clearFieldError('email')
+								}}
+								placeholder='correo@ejemplo.com'
+								placeholderTextColor='#6F8A7D'
+								keyboardType='email-address'
+								autoCapitalize='none'
+								autoCorrect={false}
+								className='flex-1 px-3 py-4 text-base'
+								style={{
+									color: '#123C32',
+								}}
+							/>
+						</View>
 
 						{errors.email && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
+								{errors.email}
+							</Text>
 						)}
 					</View>
 
-					{/* Teléfono */}
-					<View className='mt-4'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					{/* TELÉFONO */}
+
+					<View className='mt-5'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							Teléfono
 						</Text>
 
-						<TextInput
-							value={phone}
-							onChangeText={(value) => {
-								setPhone(value)
-								clearFieldError('phone')
+						<View
+							className='flex-row items-center rounded-2xl border'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.phone ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
 							}}
-							placeholder='Número de teléfono'
-							placeholderTextColor='#9ca3af'
-							keyboardType='phone-pad'
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900'
-						/>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Call02Icon}
+									size={21}
+									strokeWidth={1.8}
+									color='#6F8A7D'
+								/>
+							</View>
+
+							<TextInput
+								value={phone}
+								onChangeText={(value) => {
+									setPhone(value)
+									clearFieldError('phone')
+								}}
+								placeholder='Número de teléfono'
+								placeholderTextColor='#6F8A7D'
+								keyboardType='phone-pad'
+								className='flex-1 px-3 py-4 text-base'
+								style={{
+									color: '#123C32',
+								}}
+							/>
+						</View>
 
 						{errors.phone && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.phone}</Text>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
+								{errors.phone}
+							</Text>
 						)}
 					</View>
 
-					{/* Fecha */}
-					<View className='mt-4'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					{/* FECHA DE NACIMIENTO */}
+
+					<View className='mt-5'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							Fecha de nacimiento
 						</Text>
 
 						<Pressable
 							onPress={() => setShowDatePicker(true)}
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5'
+							className='flex-row items-center rounded-2xl border px-4 py-4'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.birth_date ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
+							}}
 						>
+							<HugeiconsIcon
+								icon={Calendar03Icon}
+								size={21}
+								strokeWidth={1.8}
+								color='#6F8A7D'
+							/>
+
 							<Text
-								className={
-									birthDate
-										? 'text-base text-gray-900'
-										: 'text-base text-gray-400'
-								}
+								className='ml-3 flex-1 text-base'
+								style={{
+									color: birthDate ? '#123C32' : '#6F8A7D',
+								}}
 							>
 								{birthDate || 'Seleccionar fecha'}
 							</Text>
@@ -783,76 +1258,184 @@ export default function ProfileScreen() {
 						)}
 
 						{errors.birth_date && (
-							<Text className='mt-1 text-sm text-red-600'>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
 								{errors.birth_date}
 							</Text>
 						)}
 					</View>
 
-					{/* Ciudad */}
-					<View className='mt-4'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					{/* CIUDAD */}
+
+					<View className='mt-5'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							Ciudad
 						</Text>
 
-						<TextInput
-							value={city}
-							onChangeText={(value) => {
-								setCity(value)
-								clearFieldError('city')
+						<View
+							className='flex-row items-center rounded-2xl border'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.city ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
 							}}
-							placeholder='Ciudad'
-							placeholderTextColor='#9ca3af'
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900'
-						/>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Location01Icon}
+									size={21}
+									strokeWidth={1.8}
+									color='#6F8A7D'
+								/>
+							</View>
+
+							<TextInput
+								value={city}
+								onChangeText={(value) => {
+									setCity(value)
+									clearFieldError('city')
+								}}
+								placeholder='Ciudad'
+								placeholderTextColor='#6F8A7D'
+								className='flex-1 px-3 py-4 text-base'
+								style={{
+									color: '#123C32',
+								}}
+							/>
+						</View>
 
 						{errors.city && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.city}</Text>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
+								{errors.city}
+							</Text>
 						)}
 					</View>
 
-					{/* País */}
-					<View className='mt-4'>
-						<Text className='mb-2 text-sm font-semibold text-gray-700'>
+					{/* PAÍS */}
+
+					<View className='mt-5'>
+						<Text
+							className='mb-2 text-sm font-semibold'
+							style={{
+								color: '#123C32',
+							}}
+						>
 							País
 						</Text>
 
-						<TextInput
-							value={country}
-							onChangeText={(value) => {
-								setCountry(value)
-								clearFieldError('country')
+						<View
+							className='flex-row items-center rounded-2xl border'
+							style={{
+								backgroundColor: '#FFFFFF',
+								borderColor: errors.country ? '#C83B3B' : '#B8DCCA',
+								shadowColor: '#064D36',
+								shadowOffset: {
+									width: 0,
+									height: 1,
+								},
+								shadowOpacity: 0.04,
+								shadowRadius: 4,
+								elevation: 1,
 							}}
-							placeholder='País'
-							placeholderTextColor='#9ca3af'
-							className='rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900'
-						/>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Globe02Icon}
+									size={21}
+									strokeWidth={1.8}
+									color='#6F8A7D'
+								/>
+							</View>
+
+							<TextInput
+								value={country}
+								onChangeText={(value) => {
+									setCountry(value)
+									clearFieldError('country')
+								}}
+								placeholder='País'
+								placeholderTextColor='#6F8A7D'
+								className='flex-1 px-3 py-4 text-base'
+								style={{
+									color: '#123C32',
+								}}
+							/>
+						</View>
 
 						{errors.country && (
-							<Text className='mt-1 text-sm text-red-600'>
+							<Text
+								className='mt-1 text-sm'
+								style={{
+									color: '#C83B3B',
+								}}
+							>
 								{errors.country}
 							</Text>
 						)}
 					</View>
 
-					{/* Guardar */}
+					{/* GUARDAR */}
+
 					<Pressable
 						onPress={handleSave}
 						disabled={saving}
-						className={`mt-7 items-center rounded-full px-5 py-4 ${
-							saving ? 'bg-emerald-300' : 'bg-emerald-700'
-						}`}
+						className={`mt-7 rounded-2xl ${saving ? 'opacity-60' : ''}`}
+						style={{
+							shadowColor: '#064D36',
+							shadowOffset: {
+								width: 0,
+								height: 4,
+							},
+							shadowOpacity: 0.16,
+							shadowRadius: 7,
+							elevation: 4,
+						}}
 					>
-						{saving ? (
-							<ActivityIndicator color='#FFFFFF' />
-						) : (
-							<Text className='text-base font-bold text-white'>
-								Guardar cambios
-							</Text>
+						{({ pressed }) => (
+							<View
+								className='w-full items-center rounded-2xl px-5 py-4'
+								style={{
+									backgroundColor: pressed ? '#064D36' : '#087A5A',
+								}}
+							>
+								{saving ? (
+									<ActivityIndicator color='#FFFFFF' />
+								) : (
+									<Text
+										className='text-base font-bold'
+										style={{
+											color: '#FFFFFF',
+										}}
+									>
+										Guardar cambios
+									</Text>
+								)}
+							</View>
 						)}
 					</Pressable>
 				</View>
-			</ScrollView>
+			</Animated.ScrollView>
 		</KeyboardAvoidingView>
 	)
 }

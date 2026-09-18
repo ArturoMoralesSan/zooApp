@@ -1,14 +1,17 @@
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
+
 import {
 	ArrowRight01Icon,
 	Location01Icon,
 	Ticket01Icon,
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
+
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
+
 import {
 	ActivityIndicator,
 	Alert,
@@ -92,6 +95,17 @@ function getEventImageUrl(image: string | null): string | null {
 	return null
 }
 
+const cardShadow = {
+	shadowColor: '#000000',
+	shadowOffset: {
+		width: 0,
+		height: 5,
+	},
+	shadowOpacity: 0.18,
+	shadowRadius: 8,
+	elevation: 1,
+}
+
 export default function Explorar() {
 	const [events, setEvents] = useState<ExploreEvent[]>([])
 	const [loading, setLoading] = useState(true)
@@ -161,7 +175,12 @@ export default function Explorar() {
 	}
 
 	return (
-		<View className='flex-1 bg-gray-50'>
+		<View
+			className='flex-1'
+			style={{
+				backgroundColor: '#F7F8F3',
+			}}
+		>
 			<ScrollView
 				className='flex-1'
 				contentContainerStyle={{
@@ -171,59 +190,137 @@ export default function Explorar() {
 				}}
 				showsVerticalScrollIndicator={false}
 				refreshControl={
-					<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
+						tintColor='#087A5A'
+						colors={['#087A5A']}
+					/>
 				}
 			>
 				{/* Encabezado */}
 				<View>
-					<Text className='text-3xl font-bold text-gray-900'>Explorar</Text>
+					<Text
+						className='text-3xl font-bold'
+						style={{
+							color: '#123C32',
+						}}
+					>
+						Explorar
+					</Text>
 
-					<Text className='mt-2 text-base text-gray-500'>
+					<Text
+						className='mt-2 text-base'
+						style={{
+							color: '#6F8A7D',
+						}}
+					>
 						Descubre todo lo que ZooApp tiene para ti.
 					</Text>
 				</View>
 
 				{/* Eventos destacados */}
 				<View className='mt-7'>
-					<Text className='mb-4 text-xl font-bold text-gray-900'>
+					<Text
+						className='mb-4 text-xl font-bold'
+						style={{
+							color: '#123C32',
+						}}
+					>
 						Eventos destacados
 					</Text>
 
 					{loading ? (
-						<View className='h-60 items-center justify-center overflow-hidden rounded-3xl bg-white'>
-							<ActivityIndicator size='large' color='#047857' />
+						<View
+							className='h-60 items-center justify-center overflow-hidden rounded-3xl'
+							style={{
+								backgroundColor: '#F7F7EE',
+								...cardShadow,
+							}}
+						>
+							<ActivityIndicator size='large' color='#087A5A' />
 
-							<Text className='mt-3 text-sm text-gray-500'>
+							<Text
+								className='mt-3 text-sm'
+								style={{
+									color: '#6F8A7D',
+								}}
+							>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
-						<View className='rounded-3xl bg-white p-5'>
-							<Text className='text-base font-bold text-gray-900'>
+						<View
+							className='rounded-3xl p-5'
+							style={{
+								backgroundColor: '#FFF1F0',
+								borderWidth: 1,
+								borderColor: '#FFE3E1',
+							}}
+						>
+							<Text
+								className='text-base font-bold'
+								style={{
+									color: '#123C32',
+								}}
+							>
 								No pudimos cargar los eventos
 							</Text>
 
-							<Text className='mt-2 text-sm leading-5 text-gray-500'>
+							<Text
+								className='mt-2 text-sm leading-5'
+								style={{
+									color: '#6F8A7D',
+								}}
+							>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-4 self-start rounded-full bg-emerald-700 px-5 py-3'
+								className='mt-4 self-start overflow-hidden rounded-2xl'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
 								}}
+								style={({ pressed }) => ({
+									backgroundColor: pressed ? '#064D36' : '#087A5A',
+								})}
 							>
-								<Text className='font-bold text-white'>Reintentar</Text>
+								<View className='px-5 py-3'>
+									<Text
+										className='font-bold'
+										style={{
+											color: '#FFFFFF',
+										}}
+									>
+										Reintentar
+									</Text>
+								</View>
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						<View className='rounded-3xl bg-white p-6'>
-							<Text className='text-center text-base font-bold text-gray-900'>
+						<View
+							className='rounded-3xl p-6'
+							style={{
+								backgroundColor: '#F7F7EE',
+								...cardShadow,
+							}}
+						>
+							<Text
+								className='text-center text-base font-bold'
+								style={{
+									color: '#123C32',
+								}}
+							>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-2 text-center text-sm leading-5 text-gray-500'>
+							<Text
+								className='mt-2 text-center text-sm leading-5'
+								style={{
+									color: '#6F8A7D',
+								}}
+							>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -254,91 +351,149 @@ export default function Explorar() {
 													index === events.length - 1 ? 0 : carouselGap,
 											}}
 										>
-											<Pressable
-												className='overflow-hidden rounded-3xl bg-white'
-												style={({ pressed }) => ({
-													opacity: pressed ? 0.92 : 1,
-												})}
-												onPress={() =>
-													Alert.alert(
-														event.name,
-														event.description ||
-															'Consulta próximamente todos los detalles de este evento.',
-													)
-												}
+											<View
+												className='overflow-hidden rounded-3xl'
+												style={{
+													backgroundColor: '#F7F7EE',
+													...cardShadow,
+												}}
 											>
-												<View className='relative h-60'>
-													{imageUrl ? (
-														<Image
-															source={{
-																uri: imageUrl,
+												<Pressable
+													className='overflow-hidden rounded-3xl'
+													onPress={() =>
+														Alert.alert(
+															event.name,
+															event.description ||
+																'Consulta próximamente todos los detalles de este evento.',
+														)
+													}
+													style={({ pressed }) => ({
+														backgroundColor: '#F7F7EE',
+														opacity: pressed ? 0.94 : 1,
+													})}
+												>
+													<View className='relative h-60'>
+														{imageUrl ? (
+															<Image
+																source={{
+																	uri: imageUrl,
+																}}
+																className='h-full w-full'
+																resizeMode='cover'
+															/>
+														) : (
+															<View
+																className='h-full w-full items-center justify-center'
+																style={{
+																	backgroundColor: '#DCEFE5',
+																}}
+															>
+																<Text
+																	className='text-6xl font-bold'
+																	style={{
+																		color: '#087A5A',
+																	}}
+																>
+																	Z
+																</Text>
+															</View>
+														)}
+
+														{/* Degradado */}
+														<View
+															className='absolute inset-x-0 bottom-0 h-28'
+															style={{
+																backgroundColor: 'rgba(6,77,54,0.78)',
 															}}
-															className='h-full w-full'
-															resizeMode='cover'
 														/>
-													) : (
-														<View className='h-full w-full items-center justify-center bg-emerald-100'>
-															<Text className='text-6xl font-bold text-emerald-700'>
-																Z
+
+														{/* Etiqueta */}
+														<View
+															className='absolute left-4 top-2 rounded-2xl px-3 py-1.5'
+															style={{
+																backgroundColor: '#087A5A',
+															}}
+														>
+															<Text
+																className='text-xs font-bold uppercase tracking-wide'
+																style={{
+																	color: '#FFFFFF',
+																}}
+															>
+																{event.type || 'Destacado'}
 															</Text>
 														</View>
-													)}
 
-													{/* Degradado */}
-													<View
-														className='absolute inset-x-0 bottom-0 h-40'
-														style={{
-															backgroundColor: 'rgba(0,0,0,0.48)',
-														}}
-													/>
-
-													{/* Etiqueta */}
-													<View className='absolute left-4 top-4 rounded-full bg-emerald-600 px-3 py-1.5'>
-														<Text className='text-xs font-bold uppercase tracking-wide text-white'>
-															{event.type || 'Destacado'}
-														</Text>
-													</View>
-
-													{/* Información */}
-													<View className='absolute bottom-4 left-4 right-4'>
-														<Text
-															className='text-2xl font-bold text-white'
-															numberOfLines={1}
-														>
-															{event.name}
-														</Text>
-
-														{event.description ? (
+														{/* Información */}
+														<View className='absolute bottom-4 left-4 right-4'>
 															<Text
-																className='mt-1 text-sm font-medium text-white/90'
-																numberOfLines={2}
+																className='text-2xl font-bold'
+																style={{
+																	color: '#FFFFFF',
+																}}
+																numberOfLines={1}
 															>
-																{event.description}
-															</Text>
-														) : null}
-
-														<View className='mt-3 flex-row items-center'>
-															<Text className='text-sm font-semibold text-white'>
-																{formatEventDate(event.start_at)}
+																{event.name}
 															</Text>
 
-															<Text className='mx-2 text-white/60'>•</Text>
+															{event.description ? (
+																<Text
+																	className='mt-1 text-sm font-medium'
+																	style={{
+																		color: 'rgba(255,255,255,0.88)',
+																	}}
+																	numberOfLines={2}
+																>
+																	{event.description}
+																</Text>
+															) : null}
 
-															<Text className='text-sm font-semibold text-white'>
-																{formatEventTime(event.start_at)}
-															</Text>
+															<View className='mt-3 flex-row items-center'>
+																<Text
+																	className='text-sm font-semibold'
+																	style={{
+																		color: '#FFFFFF',
+																	}}
+																>
+																	{formatEventDate(event.start_at)}
+																</Text>
 
-															<View className='ml-2'>
-																<HugeiconsIcon
-																	icon={ArrowRight01Icon}
-																	size={16}
-																	color='#ffffff'
-																/>
+																<Text
+																	className='mx-2'
+																	style={{
+																		color: 'rgba(255,255,255,0.65)',
+																	}}
+																>
+																	•
+																</Text>
+
+																<Text
+																	className='text-sm font-semibold'
+																	style={{
+																		color: '#FFFFFF',
+																	}}
+																>
+																	{formatEventTime(event.start_at)}
+																</Text>
+
+																<View
+																	className='ml-2 h-7 w-7 items-center justify-center rounded-full'
+																	style={{
+																		backgroundColor: 'rgba(255,255,255,0.15)',
+																	}}
+																>
+																	<HugeiconsIcon
+																		icon={ArrowRight01Icon}
+																		size={15}
+																		strokeWidth={1.8}
+																		color='#FFFFFF'
+																	/>
+																</View>
 															</View>
 														</View>
 													</View>
-												</View>
-											</Pressable>
+												</Pressable>
+											</View>
 										</View>
 									)
 								})}
@@ -350,11 +505,12 @@ export default function Explorar() {
 									{events.map((event, index) => (
 										<View
 											key={event.id}
-											className={
-												index === activeEventIndex
-													? 'ml-1.5 h-2 w-5 rounded-full bg-emerald-700'
-													: 'ml-1.5 h-2 w-2 rounded-full bg-gray-300'
-											}
+											className='ml-1.5 h-2 rounded-2xl'
+											style={{
+												width: index === activeEventIndex ? 20 : 8,
+												backgroundColor:
+													index === activeEventIndex ? '#087A5A' : '#B8DCCA',
+											}}
 										/>
 									))}
 								</View>
@@ -365,91 +521,183 @@ export default function Explorar() {
 
 				{/* Acciones principales */}
 				<View className='mt-8'>
-					<Text className='mb-4 text-xl font-bold text-gray-900'>
+					<Text
+						className='mb-4 text-xl font-bold'
+						style={{
+							color: '#123C32',
+						}}
+					>
 						¿Qué quieres hacer?
 					</Text>
 
 					<View className='flex-row'>
 						{/* Comprar boletos */}
-						<Pressable
-							onPress={() =>
-								Alert.alert(
-									'Comprar boletos',
-									'Esta sección estará disponible próximamente.',
-								)
-							}
-							className='mr-2 flex-1 rounded-2xl bg-white p-5'
-							style={({ pressed }) => ({
-								opacity: pressed ? 0.7 : 1,
-							})}
+						<View
+							className='mr-2 flex-1 rounded-2xl'
+							style={{
+								backgroundColor: '#FFFFFF',
+								...cardShadow,
+							}}
 						>
-							<View className='h-12 w-12 items-center justify-center rounded-xl bg-emerald-50'>
-								<HugeiconsIcon icon={Ticket01Icon} size={25} color='#047857' />
-							</View>
+							<Pressable
+								onPress={() =>
+									Alert.alert(
+										'Comprar boletos',
+										'Esta sección estará disponible próximamente.',
+									)
+								}
+								className='rounded-2xl p-5'
+								style={({ pressed }) => ({
+									backgroundColor: '#FFFFFF',
+									opacity: pressed ? 0.7 : 1,
+								})}
+							>
+								<View
+									className='h-12 w-12 items-center justify-center rounded-xl'
+									style={{
+										backgroundColor: '#DCEFE5',
+									}}
+								>
+									<HugeiconsIcon
+										icon={Ticket01Icon}
+										size={25}
+										strokeWidth={1.8}
+										color='#087A5A'
+									/>
+								</View>
 
-							<Text className='mt-4 text-base font-bold text-gray-900'>
-								Comprar boletos
-							</Text>
+								<Text
+									className='mt-4 text-base font-bold'
+									style={{
+										color: '#123C32',
+									}}
+								>
+									Comprar boletos
+								</Text>
 
-							<Text className='mt-1 text-sm leading-5 text-gray-500'>
-								Planea tu visita
-							</Text>
-						</Pressable>
+								<Text
+									className='mt-1 text-sm leading-5'
+									style={{
+										color: '#6F8A7D',
+									}}
+								>
+									Planea tu visita
+								</Text>
+							</Pressable>
+						</View>
 
 						{/* Especies */}
-						<Pressable
-							onPress={() =>
-								Alert.alert(
-									'Conoce las especies',
-									'Esta sección estará disponible próximamente.',
-								)
-							}
-							className='ml-2 flex-1 rounded-2xl bg-white p-5'
-							style={({ pressed }) => ({
-								opacity: pressed ? 0.7 : 1,
-							})}
+						<View
+							className='ml-2 flex-1 rounded-2xl'
+							style={{
+								backgroundColor: '#FFFFFF',
+								...cardShadow,
+							}}
 						>
-							<View className='h-12 w-12 items-center justify-center rounded-xl bg-emerald-50'>
-								<HugeiconsIcon icon={UserGroupIcon} size={25} color='#047857' />
-							</View>
+							<Pressable
+								onPress={() => router.push('/species')}
+								className='rounded-2xl p-5'
+								style={({ pressed }) => ({
+									backgroundColor: '#FFFFFF',
+									opacity: pressed ? 0.7 : 1,
+								})}
+							>
+								<View
+									className='h-12 w-12 items-center justify-center rounded-xl'
+									style={{
+										backgroundColor: '#DCEFE5',
+									}}
+								>
+									<HugeiconsIcon
+										icon={UserGroupIcon}
+										size={25}
+										strokeWidth={1.8}
+										color='#087A5A'
+									/>
+								</View>
 
-							<Text className='mt-4 text-base font-bold text-gray-900'>
-								Conoce las especies
-							</Text>
+								<Text
+									className='mt-4 text-base font-bold'
+									style={{
+										color: '#123C32',
+									}}
+								>
+									Conoce las especies
+								</Text>
 
-							<Text className='mt-1 text-sm leading-5 text-gray-500'>
-								Descubre nuestros animales
-							</Text>
-						</Pressable>
+								<Text
+									className='mt-1 text-sm leading-5'
+									style={{
+										color: '#6F8A7D',
+									}}
+								>
+									Descubre nuestros animales
+								</Text>
+							</Pressable>
+						</View>
 					</View>
 				</View>
 
 				{/* Mapa */}
-				<Pressable
-					onPress={() => router.push('/map')}
-					className='mt-4 rounded-2xl bg-white p-5'
-					style={({ pressed }) => ({
-						opacity: pressed ? 0.7 : 1,
-					})}
+				<View
+					className='mt-4 rounded-2xl'
+					style={{
+						backgroundColor: '#FFFFFF',
+						...cardShadow,
+					}}
 				>
-					<View className='flex-row items-center'>
-						<View className='h-12 w-12 items-center justify-center rounded-xl bg-emerald-50'>
-							<HugeiconsIcon icon={Location01Icon} size={25} color='#047857' />
+					<Pressable
+						onPress={() => router.push('/map')}
+						className='rounded-2xl p-5'
+						style={({ pressed }) => ({
+							backgroundColor: '#FFFFFF',
+							opacity: pressed ? 0.7 : 1,
+						})}
+					>
+						<View className='flex-row items-center'>
+							<View
+								className='h-12 w-12 items-center justify-center rounded-xl'
+								style={{
+									backgroundColor: '#DCEFE5',
+								}}
+							>
+								<HugeiconsIcon
+									icon={Location01Icon}
+									size={25}
+									strokeWidth={1.8}
+									color='#087A5A'
+								/>
+							</View>
+
+							<View className='ml-4 flex-1'>
+								<Text
+									className='text-base font-bold'
+									style={{
+										color: '#123C32',
+									}}
+								>
+									Mapa del zoológico
+								</Text>
+
+								<Text
+									className='mt-1 text-sm'
+									style={{
+										color: '#6F8A7D',
+									}}
+								>
+									Explora caminos, especies y puntos de interés.
+								</Text>
+							</View>
+
+							<HugeiconsIcon
+								icon={ArrowRight01Icon}
+								size={22}
+								strokeWidth={1.8}
+								color='#8FB9A8'
+							/>
 						</View>
-
-						<View className='ml-4 flex-1'>
-							<Text className='text-base font-bold text-gray-900'>
-								Mapa del zoológico
-							</Text>
-
-							<Text className='mt-1 text-sm text-gray-500'>
-								Explora caminos, especies y puntos de interés.
-							</Text>
-						</View>
-
-						<HugeiconsIcon icon={ArrowRight01Icon} size={22} color='#9ca3af' />
-					</View>
-				</Pressable>
+					</Pressable>
+				</View>
 			</ScrollView>
 		</View>
 	)

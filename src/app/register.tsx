@@ -1,9 +1,19 @@
 import { ApiValidationError } from '@/services/api'
 import { register } from '@/services/auth'
+import {
+	LockPasswordIcon,
+	Mail01Icon,
+	UserIcon,
+	ViewIcon,
+	ViewOffSlashIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
+
 import {
 	ActivityIndicator,
+	Image,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -33,6 +43,12 @@ export default function Register() {
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 	const [errors, setErrors] = useState<FormErrors>({})
+
+	const [nameFocused, setNameFocused] = useState(false)
+	const [emailFocused, setEmailFocused] = useState(false)
+	const [passwordFocused, setPasswordFocused] = useState(false)
+	const [passwordConfirmationFocused, setPasswordConfirmationFocused] =
+		useState(false)
 
 	const clearFieldError = (field: keyof FormErrors) => {
 		setErrors((current) => ({
@@ -123,98 +139,230 @@ export default function Register() {
 
 	return (
 		<KeyboardAvoidingView
-			className='flex-1 bg-gray-50'
+			className='flex-1'
+			style={{ backgroundColor: '#F7F7EE' }}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 		>
+			{/* FONDO */}
+			<View className='absolute inset-0 overflow-hidden'>
+				<Image
+					source={require('../../assets/images/login-background.png')}
+					className='h-full w-full'
+					resizeMode='cover'
+					style={{
+						transform: [{ scale: 1 }],
+					}}
+				/>
+			</View>
+
 			<ScrollView
 				className='flex-1'
 				contentContainerStyle={{
 					paddingHorizontal: 24,
-					paddingTop: 50,
-					paddingBottom: 120,
+					paddingTop: 45,
+					paddingBottom: 60,
 				}}
 				keyboardShouldPersistTaps='handled'
 				keyboardDismissMode='on-drag'
+				showsVerticalScrollIndicator={false}
 			>
-				<Pressable onPress={() => router.back()} className='mb-8'>
-					<Text className='text-base font-semibold text-emerald-700'>
-						‹ Volver
+				{/* VOLVER */}
+				<Pressable
+					onPress={() => router.back()}
+					className='flex-row items-center self-start rounded-2xl px-5 py-3'
+					style={{
+						backgroundColor: '#DCEFE5',
+						borderWidth: 1,
+						borderColor: '#B8DCCA',
+					}}
+				>
+					<Text className='mr-1 text-lg font-bold' style={{ color: '#123C32' }}>
+						‹
+					</Text>
+
+					<Text className='text-sm font-semibold' style={{ color: '#123C32' }}>
+						Volver
 					</Text>
 				</Pressable>
 
+				{/* LOGO */}
 				<View className='items-center'>
-					<View className='h-20 w-20 items-center justify-center rounded-3xl bg-emerald-600'>
-						<Text className='text-4xl font-bold text-white'>Z</Text>
-					</View>
-
-					<Text className='mt-8 text-3xl font-bold text-gray-900'>
-						Crea tu cuenta
-					</Text>
-
-					<Text className='mt-2 text-center text-base text-gray-500'>
-						Únete a ZooApp y comienza a descubrir el zoológico.
-					</Text>
+					<Image
+						source={require('../../assets/images/zooapp-logo.png')}
+						className='h-36 w-36'
+						resizeMode='contain'
+					/>
 				</View>
 
-				<View className='mt-8'>
-					{/* NOMBRE */}
+				{/* CARD */}
+				<View
+					className='mt-8 rounded-3xl p-5'
+					style={{
+						backgroundColor: '#F7F7EE',
+						borderWidth: 1,
+						borderColor: '#E5E8DF',
+						shadowColor: '#123C32',
+						shadowOffset: {
+							width: 0,
+							height: 4,
+						},
+						shadowOpacity: 0.1,
+						shadowRadius: 10,
+						elevation: 3,
+					}}
+				>
+					{/* ENCABEZADO */}
+					<View className='items-center'>
+						<Text
+							className='text-center text-3xl font-bold'
+							style={{ color: '#123C32' }}
+						>
+							Crea tu cuenta
+						</Text>
 
-					<Text className='mb-2 text-sm font-semibold text-gray-700'>
+						<Text
+							className='mt-2 text-center text-base'
+							style={{ color: '#6F8A7D' }}
+						>
+							Únete a ZooApp y comienza a descubrir el zoológico.
+						</Text>
+					</View>
+
+					{/* NOMBRE */}
+					<Text
+						className='mb-2 mt-8 text-sm font-semibold'
+						style={{ color: '#123C32' }}
+					>
 						Nombre completo
 					</Text>
 
-					<TextInput
-						value={name}
-						onChangeText={(value) => {
-							setName(value)
-							clearFieldError('name')
+					<View
+						className='flex-row items-center rounded-xl border'
+						style={{
+							backgroundColor: '#DCEFE5',
+							borderColor: errors.name
+								? '#C83B3B'
+								: nameFocused
+									? '#087A5A'
+									: '#B8DCCA',
 						}}
-						placeholder='Tu nombre'
-						placeholderTextColor='#9ca3af'
-						autoCapitalize='words'
-						className={`rounded-xl border bg-white px-4 py-4 text-base text-gray-900 ${
-							errors.name ? 'border-red-500' : 'border-gray-200'
-						}`}
-					/>
+					>
+						<View className='pl-4'>
+							<HugeiconsIcon
+								icon={UserIcon}
+								size={21}
+								strokeWidth={1.8}
+								color={nameFocused ? '#087A5A' : '#6F8A7D'}
+							/>
+						</View>
+
+						<TextInput
+							value={name}
+							onChangeText={(value) => {
+								setName(value)
+								clearFieldError('name')
+							}}
+							onFocus={() => setNameFocused(true)}
+							onBlur={() => setNameFocused(false)}
+							placeholder='Tu nombre'
+							placeholderTextColor='#6F8A7D'
+							autoCapitalize='words'
+							className='flex-1 px-3 py-4 text-base'
+							style={{
+								color: '#123C32',
+							}}
+						/>
+					</View>
 
 					{errors.name && (
-						<Text className='mt-1 text-sm text-red-600'>{errors.name}</Text>
+						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
+							{errors.name}
+						</Text>
 					)}
 
 					{/* EMAIL */}
-
-					<Text className='mb-2 mt-5 text-sm font-semibold text-gray-700'>
+					<Text
+						className='mb-2 mt-5 text-sm font-semibold'
+						style={{ color: '#123C32' }}
+					>
 						Correo electrónico
 					</Text>
 
-					<TextInput
-						value={email}
-						onChangeText={(value) => {
-							setEmail(value)
-							clearFieldError('email')
+					<View
+						className='flex-row items-center rounded-xl border'
+						style={{
+							backgroundColor: '#DCEFE5',
+							borderColor: errors.email
+								? '#C83B3B'
+								: emailFocused
+									? '#087A5A'
+									: '#B8DCCA',
 						}}
-						placeholder='correo@ejemplo.com'
-						placeholderTextColor='#9ca3af'
-						keyboardType='email-address'
-						autoCapitalize='none'
-						autoCorrect={false}
-						className={`rounded-xl border bg-white px-4 py-4 text-base text-gray-900 ${
-							errors.email ? 'border-red-500' : 'border-gray-200'
-						}`}
-					/>
+					>
+						<View className='pl-4'>
+							<HugeiconsIcon
+								icon={Mail01Icon}
+								size={21}
+								strokeWidth={1.8}
+								color={emailFocused ? '#087A5A' : '#6F8A7D'}
+							/>
+						</View>
+
+						<TextInput
+							value={email}
+							onChangeText={(value) => {
+								setEmail(value)
+								clearFieldError('email')
+							}}
+							onFocus={() => setEmailFocused(true)}
+							onBlur={() => setEmailFocused(false)}
+							placeholder='correo@ejemplo.com'
+							placeholderTextColor='#6F8A7D'
+							keyboardType='email-address'
+							autoCapitalize='none'
+							autoCorrect={false}
+							className='flex-1 px-3 py-4 text-base'
+							style={{
+								color: '#123C32',
+							}}
+						/>
+					</View>
 
 					{errors.email && (
-						<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
+							{errors.email}
+						</Text>
 					)}
 
 					{/* PASSWORD */}
-
-					<Text className='mb-2 mt-5 text-sm font-semibold text-gray-700'>
+					<Text
+						className='mb-2 mt-5 text-sm font-semibold'
+						style={{ color: '#123C32' }}
+					>
 						Contraseña
 					</Text>
 
-					<View className='relative'>
+					<View
+						className='flex-row items-center rounded-xl border'
+						style={{
+							backgroundColor: '#DCEFE5',
+							borderColor: errors.password
+								? '#C83B3B'
+								: passwordFocused
+									? '#087A5A'
+									: '#B8DCCA',
+						}}
+					>
+						<View className='pl-4'>
+							<HugeiconsIcon
+								icon={LockPasswordIcon}
+								size={21}
+								strokeWidth={1.8}
+								color={passwordFocused ? '#087A5A' : '#6F8A7D'}
+							/>
+						</View>
+
 						<TextInput
 							value={password}
 							onChangeText={(value) => {
@@ -222,104 +370,175 @@ export default function Register() {
 								clearFieldError('password')
 								clearFieldError('password_confirmation')
 							}}
+							onFocus={() => setPasswordFocused(true)}
+							onBlur={() => setPasswordFocused(false)}
 							placeholder='Mínimo 8 caracteres'
-							placeholderTextColor='#9ca3af'
+							placeholderTextColor='#6F8A7D'
 							secureTextEntry={!showPassword}
 							autoCapitalize='none'
-							className={`rounded-xl border bg-white px-4 py-4 pr-24 text-base text-gray-900 ${
-								errors.password ? 'border-red-500' : 'border-gray-200'
-							}`}
+							className='flex-1 px-3 py-4 text-base'
+							style={{
+								color: '#123C32',
+							}}
 						/>
 
 						<Pressable
 							onPress={() => setShowPassword(!showPassword)}
-							className='absolute right-2 top-2 rounded-full bg-gray-100 px-4 py-2.5'
+							className='mr-2 items-center justify-center rounded-xl p-2'
+							hitSlop={8}
 						>
-							<Text className='text-sm font-semibold text-gray-600'>
-								{showPassword ? 'Ocultar' : 'Ver'}
-							</Text>
+							<HugeiconsIcon
+								icon={showPassword ? ViewOffSlashIcon : ViewIcon}
+								size={21}
+								strokeWidth={1.8}
+								color={passwordFocused ? '#087A5A' : '#6F8A7D'}
+							/>
 						</Pressable>
 					</View>
 
 					{errors.password && (
-						<Text className='mt-1 text-sm text-red-600'>{errors.password}</Text>
+						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
+							{errors.password}
+						</Text>
 					)}
 
-					{/* CONFIRM PASSWORD */}
-
-					<Text className='mb-2 mt-5 text-sm font-semibold text-gray-700'>
+					{/* CONFIRMAR PASSWORD */}
+					<Text
+						className='mb-2 mt-5 text-sm font-semibold'
+						style={{ color: '#123C32' }}
+					>
 						Confirmar contraseña
 					</Text>
 
-					<View className='relative'>
+					<View
+						className='flex-row items-center rounded-xl border'
+						style={{
+							backgroundColor: '#DCEFE5',
+							borderColor: errors.password_confirmation
+								? '#C83B3B'
+								: passwordConfirmationFocused
+									? '#087A5A'
+									: '#B8DCCA',
+						}}
+					>
+						<View className='pl-4'>
+							<HugeiconsIcon
+								icon={LockPasswordIcon}
+								size={21}
+								strokeWidth={1.8}
+								color={passwordConfirmationFocused ? '#087A5A' : '#6F8A7D'}
+							/>
+						</View>
+
 						<TextInput
 							value={passwordConfirmation}
 							onChangeText={(value) => {
 								setPasswordConfirmation(value)
 								clearFieldError('password_confirmation')
 							}}
+							onFocus={() => setPasswordConfirmationFocused(true)}
+							onBlur={() => setPasswordConfirmationFocused(false)}
 							placeholder='Repite tu contraseña'
-							placeholderTextColor='#9ca3af'
+							placeholderTextColor='#6F8A7D'
 							secureTextEntry={!showPasswordConfirmation}
 							autoCapitalize='none'
-							className={`rounded-xl border bg-white px-4 py-4 pr-24 text-base text-gray-900 ${
-								errors.password_confirmation
-									? 'border-red-500'
-									: 'border-gray-200'
-							}`}
+							className='flex-1 px-3 py-4 text-base'
+							style={{
+								color: '#123C32',
+							}}
 						/>
 
 						<Pressable
 							onPress={() =>
 								setShowPasswordConfirmation(!showPasswordConfirmation)
 							}
-							className='absolute right-2 top-2 rounded-full bg-gray-100 px-4 py-2.5'
+							className='mr-2 items-center justify-center rounded-xl p-2'
+							hitSlop={8}
 						>
-							<Text className='text-sm font-semibold text-gray-600'>
-								{showPasswordConfirmation ? 'Ocultar' : 'Ver'}
-							</Text>
+							<HugeiconsIcon
+								icon={showPasswordConfirmation ? ViewOffSlashIcon : ViewIcon}
+								size={21}
+								strokeWidth={1.8}
+								color={passwordConfirmationFocused ? '#087A5A' : '#6F8A7D'}
+							/>
 						</Pressable>
 					</View>
 
 					{errors.password_confirmation && (
-						<Text className='mt-1 text-sm text-red-600'>
+						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
 							{errors.password_confirmation}
 						</Text>
 					)}
 
 					{/* ERROR GENERAL */}
-
 					{error !== '' && (
-						<View className='mt-4 rounded-xl bg-red-50 px-4 py-3'>
-							<Text className='text-sm text-red-600'>{error}</Text>
+						<View
+							className='mt-4 rounded-xl px-4 py-3'
+							style={{
+								backgroundColor: '#FFF1F0',
+								borderWidth: 1,
+								borderColor: '#FFE3E1',
+							}}
+						>
+							<Text className='text-sm' style={{ color: '#C83B3B' }}>
+								{error}
+							</Text>
 						</View>
 					)}
 
-					{/* BUTTON */}
-
+					{/* CREAR CUENTA */}
 					<Pressable
 						onPress={handleRegister}
 						disabled={loading}
-						className={`mt-6 items-center rounded-full bg-emerald-600 py-4 ${
-							loading ? 'opacity-60' : ''
-						}`}
+						className={`mt-6 rounded-2xl ${loading ? 'opacity-60' : ''}`}
+						style={{
+							shadowColor: '#064D36',
+							shadowOffset: {
+								width: 0,
+								height: 4,
+							},
+							shadowOpacity: 0.16,
+							shadowRadius: 7,
+							elevation: 4,
+						}}
 					>
-						{loading ? (
-							<ActivityIndicator color='#ffffff' />
-						) : (
-							<Text className='text-base font-bold text-white'>
-								Crear cuenta
-							</Text>
+						{({ pressed }) => (
+							<View
+								className='w-full items-center rounded-2xl px-5 py-4'
+								style={{
+									backgroundColor: pressed ? '#064D36' : '#087A5A',
+								}}
+							>
+								{loading ? (
+									<ActivityIndicator color='#FFFFFF' />
+								) : (
+									<Text
+										className='text-base font-bold'
+										style={{
+											color: '#FFFFFF',
+										}}
+									>
+										Crear cuenta
+									</Text>
+								)}
+							</View>
 						)}
 					</Pressable>
 
+					{/* LOGIN */}
 					<View className='mt-8 flex-row justify-center'>
-						<Text className='text-base text-gray-500'>
+						<Text className='text-base' style={{ color: '#6F8A7D' }}>
 							¿Ya tienes una cuenta?{' '}
 						</Text>
 
-						<Pressable onPress={() => router.replace('/login')}>
-							<Text className='text-base font-bold text-emerald-700'>
+						<Pressable
+							onPress={() => router.replace('/login')}
+							className='rounded-2xl px-1'
+						>
+							<Text
+								className='text-base font-bold'
+								style={{ color: '#087A5A' }}
+							>
 								Inicia sesión
 							</Text>
 						</Pressable>
