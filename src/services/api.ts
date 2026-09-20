@@ -1,4 +1,8 @@
-const API_URL = 'http://192.168.1.76:8000/api'
+const ENV_URL: string | undefined = process.env.EXPO_PUBLIC_API_URL
+
+if (!ENV_URL) throw new Error('EXPO_PUBLIC_API_URL no está definida')
+
+const API_URL = `${ENV_URL}/api`
 
 export type ApiErrors = Record<string, string[]>
 
