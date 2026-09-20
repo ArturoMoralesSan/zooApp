@@ -17,6 +17,7 @@ import {
 	Alert,
 	Dimensions,
 	Image,
+	ImageBackground,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	Pressable,
@@ -28,9 +29,77 @@ import {
 
 const { width: screenWidth } = Dimensions.get('window')
 
+/* -------------------------------------------------------------------------- */
+/*                                   LAYOUT                                   */
+/* -------------------------------------------------------------------------- */
+
 const horizontalPadding = 20
 const carouselGap = 12
 const eventCardWidth = screenWidth - horizontalPadding * 2 - 28
+
+/* -------------------------------------------------------------------------- */
+/*                                   COLORS                                   */
+/* -------------------------------------------------------------------------- */
+
+const colors = {
+	// Background
+	background: '#F7F9F8',
+
+	// Primary
+	primary: '#075C3B',
+	primaryLight: '#16845D',
+
+	// Cards
+	card: '#DDF5EA',
+	cardLight: '#E8F7F0',
+	active: '#BDEED9',
+
+	// Text
+	text: '#17372C',
+	textSecondary: '#557067',
+
+	// Borders
+	border: '#B8E6D3',
+
+	// Base
+	white: '#FFFFFF',
+
+	// Accent colors
+	blue: '#48C6D1',
+	coral: '#D95C4F',
+	gold: '#E8B84A',
+
+	// Error
+	errorBackground: '#FFF3F1',
+	errorBorder: '#F3D5D0',
+	errorText: '#8C4037',
+
+	// Map icon
+	mapBackground: '#F8E1DE',
+	mapBorder: '#EFC2BC',
+
+	// Event overlay
+	eventOverlay: 'rgba(7, 92, 59, 0.82)',
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   SHADOW                                   */
+/* -------------------------------------------------------------------------- */
+
+const cardShadow = {
+	shadowColor: '#075C3B',
+	shadowOffset: {
+		width: 0,
+		height: 5,
+	},
+	shadowOpacity: 0.12,
+	shadowRadius: 10,
+	elevation: 4,
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    TYPES                                   */
+/* -------------------------------------------------------------------------- */
 
 type ExploreZone = {
 	id: number
@@ -56,6 +125,10 @@ type ExploreResponse = {
 		featured_events: ExploreEvent[]
 	}
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  HELPERS                                   */
+/* -------------------------------------------------------------------------- */
 
 function formatEventDate(date: string): string {
 	const eventDate = new Date(date)
@@ -95,16 +168,9 @@ function getEventImageUrl(image: string | null): string | null {
 	return null
 }
 
-const cardShadow = {
-	shadowColor: '#000000',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.18,
-	shadowRadius: 8,
-	elevation: 1,
-}
+/* -------------------------------------------------------------------------- */
+/*                                  COMPONENT                                 */
+/* -------------------------------------------------------------------------- */
 
 export default function Explorar() {
 	const [events, setEvents] = useState<ExploreEvent[]>([])
@@ -112,6 +178,10 @@ export default function Explorar() {
 	const [refreshing, setRefreshing] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [activeEventIndex, setActiveEventIndex] = useState(0)
+
+	/* ---------------------------------------------------------------------- */
+	/*                              LOAD EXPLORE                              */
+	/* ---------------------------------------------------------------------- */
 
 	const loadExplore = useCallback(async () => {
 		try {
@@ -153,14 +223,26 @@ export default function Explorar() {
 		}
 	}, [])
 
+	/* ---------------------------------------------------------------------- */
+	/*                                  EFFECT                                */
+	/* ---------------------------------------------------------------------- */
+
 	useEffect(() => {
 		void loadExplore()
 	}, [loadExplore])
+
+	/* ---------------------------------------------------------------------- */
+	/*                                 REFRESH                                */
+	/* ---------------------------------------------------------------------- */
 
 	const handleRefresh = () => {
 		setRefreshing(true)
 		void loadExplore()
 	}
+
+	/* ---------------------------------------------------------------------- */
+	/*                            CAROUSEL SCROLL                             */
+	/* ---------------------------------------------------------------------- */
 
 	const handleCarouselScroll = (
 		event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -174,11 +256,20 @@ export default function Explorar() {
 		}
 	}
 
+	/* ---------------------------------------------------------------------- */
+	/*                                  RETURN                                */
+	/* ---------------------------------------------------------------------- */
+
 	return (
-		<View
+		<ImageBackground
+			source={require('@/assets/images/zoo-pattern.png')}
 			className='flex-1'
+			resizeMode='repeat'
+			imageStyle={{
+				opacity: 0.3,
+			}}
 			style={{
-				backgroundColor: '#F7F8F3',
+				backgroundColor: colors.background,
 			}}
 		>
 			<ScrollView
@@ -193,17 +284,20 @@ export default function Explorar() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor='#087A5A'
-						colors={['#087A5A']}
+						tintColor={colors.primary}
+						colors={[colors.primary]}
 					/>
 				}
 			>
-				{/* Encabezado */}
+				{/* ========================================================== */}
+				{/*                             HEADER                         */}
+				{/* ========================================================== */}
+
 				<View>
 					<Text
 						className='text-3xl font-bold'
 						style={{
-							color: '#123C32',
+							color: colors.primary,
 						}}
 					>
 						Explorar
@@ -212,56 +306,69 @@ export default function Explorar() {
 					<Text
 						className='mt-2 text-base'
 						style={{
-							color: '#6F8A7D',
+							color: colors.textSecondary,
 						}}
 					>
 						Descubre todo lo que ZooApp tiene para ti.
 					</Text>
 				</View>
 
-				{/* Eventos destacados */}
+				{/* ========================================================== */}
+				{/*                        EVENTOS DESTACADOS                   */}
+				{/* ========================================================== */}
+
 				<View className='mt-7'>
 					<Text
 						className='mb-4 text-xl font-bold'
 						style={{
-							color: '#123C32',
+							color: colors.text,
 						}}
 					>
 						Eventos destacados
 					</Text>
 
+					{/* ------------------------------------------------------ */}
+					{/*                            LOADING                     */}
+					{/* ------------------------------------------------------ */}
+
 					{loading ? (
 						<View
-							className='h-60 items-center justify-center overflow-hidden rounded-3xl'
+							className='h-60 items-center justify-center overflow-hidden rounded-[28px]'
 							style={{
-								backgroundColor: '#F7F7EE',
+								backgroundColor: colors.cardLight,
+								borderWidth: 1,
+								borderColor: colors.border,
 								...cardShadow,
 							}}
 						>
-							<ActivityIndicator size='large' color='#087A5A' />
+							<ActivityIndicator size='large' color={colors.primary} />
 
 							<Text
 								className='mt-3 text-sm'
 								style={{
-									color: '#6F8A7D',
+									color: colors.textSecondary,
 								}}
 							>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
+						/* -------------------------------------------------- */
+						/*                             ERROR                    */
+						/* -------------------------------------------------- */
+
 						<View
-							className='rounded-3xl p-5'
+							className='rounded-[28px] p-5'
 							style={{
-								backgroundColor: '#FFF1F0',
+								backgroundColor: colors.errorBackground,
 								borderWidth: 1,
-								borderColor: '#FFE3E1',
+								borderColor: colors.errorBorder,
 							}}
 						>
 							<Text
 								className='text-base font-bold'
 								style={{
-									color: '#123C32',
+									color: colors.text,
 								}}
 							>
 								No pudimos cargar los eventos
@@ -270,27 +377,34 @@ export default function Explorar() {
 							<Text
 								className='mt-2 text-sm leading-5'
 								style={{
-									color: '#6F8A7D',
+									color: colors.textSecondary,
 								}}
 							>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-4 self-start overflow-hidden rounded-2xl'
+								className='mt-4 self-start overflow-hidden rounded-[18px]'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
 								}}
 								style={({ pressed }) => ({
-									backgroundColor: pressed ? '#064D36' : '#087A5A',
+									backgroundColor: pressed
+										? colors.primaryLight
+										: colors.primary,
+									transform: [
+										{
+											scale: pressed ? 0.98 : 1,
+										},
+									],
 								})}
 							>
 								<View className='px-5 py-3'>
 									<Text
 										className='font-bold'
 										style={{
-											color: '#FFFFFF',
+											color: colors.white,
 										}}
 									>
 										Reintentar
@@ -299,17 +413,23 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
+						/* -------------------------------------------------- */
+						/*                       SIN EVENTOS                    */
+						/* -------------------------------------------------- */
+
 						<View
-							className='rounded-3xl p-6'
+							className='rounded-[28px] p-6'
 							style={{
-								backgroundColor: '#F7F7EE',
+								backgroundColor: colors.cardLight,
+								borderWidth: 1,
+								borderColor: colors.border,
 								...cardShadow,
 							}}
 						>
 							<Text
 								className='text-center text-base font-bold'
 								style={{
-									color: '#123C32',
+									color: colors.text,
 								}}
 							>
 								No hay eventos destacados
@@ -318,7 +438,7 @@ export default function Explorar() {
 							<Text
 								className='mt-2 text-center text-sm leading-5'
 								style={{
-									color: '#6F8A7D',
+									color: colors.textSecondary,
 								}}
 							>
 								Pronto tendremos nuevas actividades para ti.
@@ -326,7 +446,10 @@ export default function Explorar() {
 						</View>
 					) : (
 						<View>
-							{/* Carousel */}
+							{/* ------------------------------------------------ */}
+							{/*                       CAROUSEL                    */}
+							{/* ------------------------------------------------ */}
+
 							<ScrollView
 								horizontal
 								showsHorizontalScrollIndicator={false}
@@ -352,14 +475,16 @@ export default function Explorar() {
 											}}
 										>
 											<View
-												className='overflow-hidden rounded-3xl'
+												className='overflow-hidden rounded-[28px]'
 												style={{
-													backgroundColor: '#F7F7EE',
+													backgroundColor: colors.cardLight,
+													borderWidth: 1,
+													borderColor: colors.border,
 													...cardShadow,
 												}}
 											>
 												<Pressable
-													className='overflow-hidden rounded-3xl'
+													className='overflow-hidden rounded-[28px]'
 													onPress={() =>
 														Alert.alert(
 															event.name,
@@ -368,11 +493,17 @@ export default function Explorar() {
 														)
 													}
 													style={({ pressed }) => ({
-														backgroundColor: '#F7F7EE',
-														opacity: pressed ? 0.94 : 1,
+														backgroundColor: colors.cardLight,
+														opacity: pressed ? 0.96 : 1,
+														transform: [
+															{
+																scale: pressed ? 0.995 : 1,
+															},
+														],
 													})}
 												>
 													<View className='relative h-60'>
+														{/* Imagen */}
 														{imageUrl ? (
 															<Image
 																source={{
@@ -385,13 +516,13 @@ export default function Explorar() {
 															<View
 																className='h-full w-full items-center justify-center'
 																style={{
-																	backgroundColor: '#DCEFE5',
+																	backgroundColor: colors.active,
 																}}
 															>
 																<Text
 																	className='text-6xl font-bold'
 																	style={{
-																		color: '#087A5A',
+																		color: colors.primary,
 																	}}
 																>
 																	Z
@@ -399,25 +530,25 @@ export default function Explorar() {
 															</View>
 														)}
 
-														{/* Degradado */}
+														{/* Overlay */}
 														<View
-															className='absolute inset-x-0 bottom-0 h-28'
+															className='absolute inset-x-0 bottom-0 h-32'
 															style={{
-																backgroundColor: 'rgba(6,77,54,0.78)',
+																backgroundColor: colors.eventOverlay,
 															}}
 														/>
 
 														{/* Etiqueta */}
 														<View
-															className='absolute left-4 top-2 rounded-2xl px-3 py-1.5'
+															className='absolute left-4 top-3 rounded-full px-4 py-2'
 															style={{
-																backgroundColor: '#087A5A',
+																backgroundColor: colors.primary,
 															}}
 														>
 															<Text
 																className='text-xs font-bold uppercase tracking-wide'
 																style={{
-																	color: '#FFFFFF',
+																	color: colors.white,
 																}}
 															>
 																{event.type || 'Destacado'}
@@ -429,7 +560,7 @@ export default function Explorar() {
 															<Text
 																className='text-2xl font-bold'
 																style={{
-																	color: '#FFFFFF',
+																	color: colors.white,
 																}}
 																numberOfLines={1}
 															>
@@ -452,7 +583,7 @@ export default function Explorar() {
 																<Text
 																	className='text-sm font-semibold'
 																	style={{
-																		color: '#FFFFFF',
+																		color: colors.white,
 																	}}
 																>
 																	{formatEventDate(event.start_at)}
@@ -470,7 +601,7 @@ export default function Explorar() {
 																<Text
 																	className='text-sm font-semibold'
 																	style={{
-																		color: '#FFFFFF',
+																		color: colors.white,
 																	}}
 																>
 																	{formatEventTime(event.start_at)}
@@ -479,14 +610,16 @@ export default function Explorar() {
 																<View
 																	className='ml-2 h-7 w-7 items-center justify-center rounded-full'
 																	style={{
-																		backgroundColor: 'rgba(255,255,255,0.15)',
+																		backgroundColor: 'rgba(189,238,217,0.22)',
+																		borderWidth: 1,
+																		borderColor: 'rgba(255,255,255,0.16)',
 																	}}
 																>
 																	<HugeiconsIcon
 																		icon={ArrowRight01Icon}
 																		size={15}
 																		strokeWidth={1.8}
-																		color='#FFFFFF'
+																		color={colors.white}
 																	/>
 																</View>
 															</View>
@@ -499,17 +632,22 @@ export default function Explorar() {
 								})}
 							</ScrollView>
 
-							{/* Indicadores */}
+							{/* ------------------------------------------------ */}
+							{/*                     INDICADORES                   */}
+							{/* ------------------------------------------------ */}
+
 							{events.length > 1 && (
 								<View className='mt-4 flex-row items-center justify-center'>
 									{events.map((event, index) => (
 										<View
 											key={event.id}
-											className='ml-1.5 h-2 rounded-2xl'
+											className='ml-1.5 h-2 rounded-full'
 											style={{
 												width: index === activeEventIndex ? 20 : 8,
 												backgroundColor:
-													index === activeEventIndex ? '#087A5A' : '#B8DCCA',
+													index === activeEventIndex
+														? colors.primary
+														: colors.border,
 											}}
 										/>
 									))}
@@ -519,57 +657,67 @@ export default function Explorar() {
 					)}
 				</View>
 
-				{/* Acciones principales */}
+				{/* ========================================================== */}
+				{/*                         ACCIONES                            */}
+				{/* ========================================================== */}
+
 				<View className='mt-8'>
 					<Text
 						className='mb-4 text-xl font-bold'
 						style={{
-							color: '#123C32',
+							color: colors.text,
 						}}
 					>
 						¿Qué quieres hacer?
 					</Text>
 
 					<View className='flex-row'>
-						{/* Comprar boletos */}
+						{/* ================================================== */}
+						{/*                         BOLETOS                    */}
+						{/* ================================================== */}
+
 						<View
-							className='mr-2 flex-1 rounded-2xl'
+							className='mr-2 flex-1 overflow-hidden rounded-[28px]'
 							style={{
-								backgroundColor: '#FFFFFF',
+								backgroundColor: colors.card,
+								borderWidth: 1,
+								borderColor: colors.border,
 								...cardShadow,
 							}}
 						>
 							<Pressable
-								onPress={() =>
-									Alert.alert(
-										'Comprar boletos',
-										'Esta sección estará disponible próximamente.',
-									)
-								}
-								className='rounded-2xl p-5'
+								onPress={() => router.push('/tickets')}
+								className='rounded-[28px] p-5'
 								style={({ pressed }) => ({
-									backgroundColor: '#FFFFFF',
-									opacity: pressed ? 0.7 : 1,
+									backgroundColor: colors.card,
+									opacity: pressed ? 0.96 : 1,
+									transform: [
+										{
+											scale: pressed ? 0.99 : 1,
+										},
+									],
 								})}
 							>
 								<View
-									className='h-12 w-12 items-center justify-center rounded-xl'
+									className='h-12 w-12 items-center justify-center rounded-[16px]'
 									style={{
-										backgroundColor: '#DCEFE5',
+										backgroundColor: colors.active,
+										borderWidth: 1,
+										borderColor: colors.border,
 									}}
 								>
 									<HugeiconsIcon
 										icon={Ticket01Icon}
 										size={25}
 										strokeWidth={1.8}
-										color='#087A5A'
+										color={colors.primary}
 									/>
 								</View>
 
 								<Text
 									className='mt-4 text-base font-bold'
 									style={{
-										color: '#123C32',
+										color: colors.text,
 									}}
 								>
 									Comprar boletos
@@ -578,7 +726,7 @@ export default function Explorar() {
 								<Text
 									className='mt-1 text-sm leading-5'
 									style={{
-										color: '#6F8A7D',
+										color: colors.textSecondary,
 									}}
 								>
 									Planea tu visita
@@ -586,40 +734,52 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 
-						{/* Especies */}
+						{/* ================================================== */}
+						{/*                        ESPECIES                    */}
+						{/* ================================================== */}
+
 						<View
-							className='ml-2 flex-1 rounded-2xl'
+							className='ml-2 flex-1 overflow-hidden rounded-[28px]'
 							style={{
-								backgroundColor: '#FFFFFF',
+								backgroundColor: colors.card,
+								borderWidth: 1,
+								borderColor: colors.border,
 								...cardShadow,
 							}}
 						>
 							<Pressable
 								onPress={() => router.push('/species')}
-								className='rounded-2xl p-5'
+								className='rounded-[28px] p-5'
 								style={({ pressed }) => ({
-									backgroundColor: '#FFFFFF',
-									opacity: pressed ? 0.7 : 1,
+									backgroundColor: colors.card,
+									opacity: pressed ? 0.96 : 1,
+									transform: [
+										{
+											scale: pressed ? 0.99 : 1,
+										},
+									],
 								})}
 							>
 								<View
-									className='h-12 w-12 items-center justify-center rounded-xl'
+									className='h-12 w-12 items-center justify-center rounded-[16px]'
 									style={{
-										backgroundColor: '#DCEFE5',
+										backgroundColor: colors.active,
+										borderWidth: 1,
+										borderColor: colors.border,
 									}}
 								>
 									<HugeiconsIcon
 										icon={UserGroupIcon}
 										size={25}
 										strokeWidth={1.8}
-										color='#087A5A'
+										color={colors.primary}
 									/>
 								</View>
 
 								<Text
 									className='mt-4 text-base font-bold'
 									style={{
-										color: '#123C32',
+										color: colors.text,
 									}}
 								>
 									Conoce las especies
@@ -628,7 +788,7 @@ export default function Explorar() {
 								<Text
 									className='mt-1 text-sm leading-5'
 									style={{
-										color: '#6F8A7D',
+										color: colors.textSecondary,
 									}}
 								>
 									Descubre nuestros animales
@@ -638,67 +798,82 @@ export default function Explorar() {
 					</View>
 				</View>
 
-				{/* Mapa */}
+				{/* ========================================================== */}
+				{/*                             MAPA                           */}
+				{/* ========================================================== */}
+
 				<View
-					className='mt-4 rounded-2xl'
+					className='mt-4 overflow-hidden rounded-[28px]'
 					style={{
-						backgroundColor: '#FFFFFF',
+						backgroundColor: colors.cardLight,
+						borderWidth: 1,
+						borderColor: colors.border,
 						...cardShadow,
 					}}
 				>
 					<Pressable
 						onPress={() => router.push('/map')}
-						className='rounded-2xl p-5'
+						className='rounded-[28px] p-5'
 						style={({ pressed }) => ({
-							backgroundColor: '#FFFFFF',
-							opacity: pressed ? 0.7 : 1,
+							backgroundColor: colors.cardLight,
+							opacity: pressed ? 0.96 : 1,
+							transform: [
+								{
+									scale: pressed ? 0.99 : 1,
+								},
+							],
 						})}
 					>
 						<View className='flex-row items-center'>
+							{/* Icono mapa */}
 							<View
-								className='h-12 w-12 items-center justify-center rounded-xl'
+								className='h-12 w-12 items-center justify-center rounded-[16px]'
 								style={{
-									backgroundColor: '#DCEFE5',
+									backgroundColor: colors.mapBackground,
+									borderWidth: 1,
+									borderColor: colors.mapBorder,
 								}}
 							>
 								<HugeiconsIcon
 									icon={Location01Icon}
 									size={25}
 									strokeWidth={1.8}
-									color='#087A5A'
+									color={colors.coral}
 								/>
 							</View>
 
+							{/* Información */}
 							<View className='ml-4 flex-1'>
 								<Text
 									className='text-base font-bold'
 									style={{
-										color: '#123C32',
+										color: colors.text,
 									}}
 								>
 									Mapa del zoológico
 								</Text>
 
 								<Text
-									className='mt-1 text-sm'
+									className='mt-1 text-sm leading-5'
 									style={{
-										color: '#6F8A7D',
+										color: colors.textSecondary,
 									}}
 								>
 									Explora caminos, especies y puntos de interés.
 								</Text>
 							</View>
 
+							{/* Flecha */}
 							<HugeiconsIcon
 								icon={ArrowRight01Icon}
 								size={22}
 								strokeWidth={1.8}
-								color='#8FB9A8'
+								color='#7DA996'
 							/>
 						</View>
 					</Pressable>
 				</View>
 			</ScrollView>
-		</View>
+		</ImageBackground>
 	)
 }

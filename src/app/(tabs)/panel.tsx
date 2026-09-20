@@ -8,25 +8,83 @@ import {
 	UserIcon,
 } from '@hugeicons/core-free-icons'
 
+import { getCurrentUser, logout, type User } from '@/services/auth'
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { router } from 'expo-router'
-
 import { useEffect, useState } from 'react'
-
 import {
 	ActivityIndicator,
 	Alert,
+	ImageBackground,
 	Modal,
 	Pressable,
 	ScrollView,
 	Text,
 	View,
 } from 'react-native'
-
 import QRCode from 'react-native-qrcode-svg'
 
-import { getCurrentUser, logout, type User } from '@/services/auth'
+/* -------------------------------------------------------------------------- */
+/*                                   COLORS                                   */
+/* -------------------------------------------------------------------------- */
+
+const colors = {
+	/* Background */
+	background: '#F7F9F8',
+
+	/* Primary */
+	primary: '#075C3B',
+	primaryLight: '#16845D',
+
+	/* Cards */
+	card: '#DDF5EA',
+	cardLight: '#E8F7F0',
+	active: '#BDEED9',
+
+	/* Text */
+	text: '#17372C',
+	textSecondary: '#557067',
+
+	/* Borders */
+	border: '#B8E6D3',
+
+	/* Base */
+	white: '#FFFFFF',
+
+	/* Accent */
+	coral: '#D95C4F',
+
+	/* Error */
+	errorBackground: '#FFF3F1',
+	errorBorder: '#F3D5D0',
+	errorText: '#8C4037',
+
+	/* Map / special */
+	mapBackground: '#F8E1DE',
+	mapBorder: '#EFC2BC',
+
+	/* Overlay */
+	overlay: 'rgba(0,0,0,0.45)',
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   SHADOW                                   */
+/* -------------------------------------------------------------------------- */
+
+const cardShadow = {
+	shadowColor: '#075C3B',
+	shadowOffset: {
+		width: 0,
+		height: 5,
+	},
+	shadowOpacity: 0.12,
+	shadowRadius: 10,
+	elevation: 4,
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    TYPES                                   */
+/* -------------------------------------------------------------------------- */
 
 type MenuItemProps = {
 	icon: typeof UserIcon
@@ -35,74 +93,97 @@ type MenuItemProps = {
 	onPress: () => void
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                 MENU ITEM                                  */
+/* -------------------------------------------------------------------------- */
+
 function MenuItem({ icon, title, description, onPress }: MenuItemProps) {
 	return (
 		<View
-			className='mb-4 rounded-2xl'
+			className='mb-4 overflow-hidden rounded-[28px]'
 			style={{
-				backgroundColor: '#FFFFFF',
-
-				// Sombra iOS
-				shadowColor: '#000000',
-				shadowOffset: {
-					width: 0,
-					height: 5,
-				},
-				shadowOpacity: 0.18,
-				shadowRadius: 8,
-
-				// Sombra Android
-				elevation: 1,
+				backgroundColor: colors.card,
+				borderWidth: 1,
+				borderColor: colors.border,
+				...cardShadow,
 			}}
 		>
 			<Pressable
 				onPress={onPress}
-				className='flex-row items-center rounded-2xl px-4 py-4'
+				className='flex-row items-center rounded-[28px] px-5 py-4'
 				style={({ pressed }) => ({
-					backgroundColor: '#FFFFFF',
-					opacity: pressed ? 0.7 : 1,
+					backgroundColor: colors.card,
+					opacity: pressed ? 0.96 : 1,
+					transform: [
+						{
+							scale: pressed ? 0.99 : 1,
+						},
+					],
 				})}
 			>
+				{/* Icono */}
 				<View
-					className='mr-4 h-12 w-12 items-center justify-center rounded-xl'
+					className='h-12 w-12 items-center justify-center rounded-[16px]'
 					style={{
-						backgroundColor: '#DCEFE5',
+						backgroundColor: colors.active,
+						borderWidth: 1,
+						borderColor: colors.border,
 					}}
 				>
-					<HugeiconsIcon icon={icon} size={24} color='#087A5A' />
+					<HugeiconsIcon
+						icon={icon}
+						size={25}
+						strokeWidth={1.8}
+						color={colors.primary}
+					/>
 				</View>
 
-				<View className='flex-1'>
+				{/* Información */}
+				<View className='ml-4 flex-1'>
 					<Text
-						className='text-base font-semibold'
+						className='text-base font-bold'
 						style={{
-							color: '#123C32',
+							color: colors.text,
 						}}
 					>
 						{title}
 					</Text>
 
 					<Text
-						className='mt-1 text-sm'
+						className='mt-1 text-sm leading-5'
 						style={{
-							color: '#6F8A7D',
+							color: colors.textSecondary,
 						}}
 					>
 						{description}
 					</Text>
 				</View>
 
-				<HugeiconsIcon icon={ArrowRight01Icon} size={20} color='#8FB9A8' />
+				{/* Flecha */}
+				<HugeiconsIcon
+					icon={ArrowRight01Icon}
+					size={22}
+					strokeWidth={1.8}
+					color='#7DA996'
+				/>
 			</Pressable>
 		</View>
 	)
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  COMPONENT                                 */
+/* -------------------------------------------------------------------------- */
 
 export default function Panel() {
 	const [loggingOut, setLoggingOut] = useState(false)
 	const [loadingUser, setLoadingUser] = useState(true)
 	const [user, setUser] = useState<User | null>(null)
 	const [showQr, setShowQr] = useState(false)
+
+	/* ---------------------------------------------------------------------- */
+	/*                              LOAD USER                                 */
+	/* ---------------------------------------------------------------------- */
 
 	useEffect(() => {
 		const loadUser = async () => {
@@ -119,6 +200,10 @@ export default function Panel() {
 		void loadUser()
 	}, [])
 
+	/* ---------------------------------------------------------------------- */
+	/*                               QR                                        */
+	/* ---------------------------------------------------------------------- */
+
 	const handleShowQr = () => {
 		if (loadingUser) {
 			return
@@ -126,12 +211,15 @@ export default function Panel() {
 
 		if (!user?.qr_token) {
 			Alert.alert('Código QR', 'No fue posible obtener tu código QR.')
-
 			return
 		}
 
 		setShowQr(true)
 	}
+
+	/* ---------------------------------------------------------------------- */
+	/*                              LOGOUT                                     */
+	/* ---------------------------------------------------------------------- */
 
 	const handleLogout = () => {
 		Alert.alert('Cerrar sesión', '¿Seguro que deseas cerrar sesión?', [
@@ -163,11 +251,20 @@ export default function Panel() {
 		}
 	}
 
+	/* ---------------------------------------------------------------------- */
+	/*                                  RETURN                                 */
+	/* ---------------------------------------------------------------------- */
+
 	return (
-		<View
+		<ImageBackground
+			source={require('@/assets/images/zoo-pattern.png')}
 			className='flex-1'
+			resizeMode='repeat'
+			imageStyle={{
+				opacity: 0.3,
+			}}
 			style={{
-				backgroundColor: '#F7F8F3',
+				backgroundColor: colors.background,
 			}}
 		>
 			<ScrollView
@@ -179,37 +276,39 @@ export default function Panel() {
 				}}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* =========================
-				    ENCABEZADO
-				========================= */}
+				{/* ========================================================== */}
+				{/*                              HEADER                         */}
+				{/* ========================================================== */}
 
-				<Text
-					className='text-3xl font-bold'
-					style={{
-						color: '#123C32',
-					}}
-				>
-					Panel
-				</Text>
+				<View>
+					<Text
+						className='text-3xl font-bold'
+						style={{
+							color: colors.primary,
+						}}
+					>
+						Panel
+					</Text>
 
-				<Text
-					className='mt-2 text-base'
-					style={{
-						color: '#6F8A7D',
-					}}
-				>
-					Administra tu cuenta y tus beneficios.
-				</Text>
+					<Text
+						className='mt-2 text-base'
+						style={{
+							color: colors.textSecondary,
+						}}
+					>
+						Administra tu cuenta y tus beneficios.
+					</Text>
+				</View>
 
-				{/* =========================
-				    MI CUENTA
-				========================= */}
+				{/* ========================================================== */}
+				{/*                            MI CUENTA                        */}
+				{/* ========================================================== */}
 
 				<View className='mt-7'>
 					<Text
-						className='mb-3 px-1 text-sm font-bold uppercase tracking-wide'
+						className='mb-4 px-1 text-xl font-bold'
 						style={{
-							color: '#6F8A7D',
+							color: colors.text,
 						}}
 					>
 						Mi cuenta
@@ -230,15 +329,15 @@ export default function Panel() {
 					/>
 				</View>
 
-				{/* =========================
-				    MI ACTIVIDAD
-				========================= */}
+				{/* ========================================================== */}
+				{/*                           MI ACTIVIDAD                      */}
+				{/* ========================================================== */}
 
 				<View className='mt-5'>
 					<Text
-						className='mb-3 px-1 text-sm font-bold uppercase tracking-wide'
+						className='mb-4 px-1 text-xl font-bold'
 						style={{
-							color: '#6F8A7D',
+							color: colors.text,
 						}}
 					>
 						Mi actividad
@@ -248,12 +347,7 @@ export default function Panel() {
 						icon={Ticket01Icon}
 						title='Mis entradas'
 						description='Consulta tus entradas al zoológico'
-						onPress={() =>
-							Alert.alert(
-								'Mis entradas',
-								'Esta sección estará disponible próximamente.',
-							)
-						}
+						onPress={() => router.push('/tickets/my-tickets')}
 					/>
 
 					<MenuItem
@@ -269,15 +363,15 @@ export default function Panel() {
 					/>
 				</View>
 
-				{/* =========================
-				    AYUDA
-				========================= */}
+				{/* ========================================================== */}
+				{/*                               AYUDA                        */}
+				{/* ========================================================== */}
 
 				<View className='mt-5'>
 					<Text
-						className='mb-3 px-1 text-sm font-bold uppercase tracking-wide'
+						className='mb-4 px-1 text-xl font-bold'
 						style={{
-							color: '#6F8A7D',
+							color: colors.text,
 						}}
 					>
 						Ayuda
@@ -308,76 +402,81 @@ export default function Panel() {
 					/>
 				</View>
 
-				{/* =========================
-				    CERRAR SESIÓN
-				========================= */}
+				{/* ========================================================== */}
+				{/*                         CERRAR SESIÓN                      */}
+				{/* ========================================================== */}
 
-				<View className='mt-5'>
+				<View className='mt-5 overflow-hidden rounded-[28px]'>
 					<Pressable
 						onPress={handleLogout}
 						disabled={loggingOut}
-						className='flex-row items-center rounded-2xl px-4 py-4'
+						className='flex-row items-center rounded-[28px] px-5 py-4'
 						style={({ pressed }) => ({
-							opacity: pressed ? 0.7 : 1,
-
-							backgroundColor: '#FFF4F2',
-
+							backgroundColor: colors.errorBackground,
 							borderWidth: 1,
-							borderColor: '#F4D2CD',
-
-							shadowColor: '#123C32',
-							shadowOffset: {
-								width: 0,
-								height: 4,
-							},
-							shadowOpacity: 0.08,
-							shadowRadius: 8,
-
-							elevation: 3,
+							borderColor: colors.errorBorder,
+							opacity: pressed ? 0.96 : 1,
+							transform: [
+								{
+									scale: pressed ? 0.99 : 1,
+								},
+							],
+							...cardShadow,
 						})}
 					>
+						{/* Icono */}
 						<View
-							className='h-11 w-11 items-center justify-center rounded-xl'
+							className='h-12 w-12 items-center justify-center rounded-[16px]'
 							style={{
 								backgroundColor: '#FFE5E1',
+								borderWidth: 1,
+								borderColor: '#F4D2CD',
 							}}
 						>
-							<HugeiconsIcon icon={Logout01Icon} size={23} color='#C83B3B' />
+							<HugeiconsIcon
+								icon={Logout01Icon}
+								size={23}
+								strokeWidth={1.8}
+								color={colors.coral}
+							/>
 						</View>
 
+						{/* Información */}
 						<View className='ml-4 flex-1'>
 							<Text
 								className='text-base font-bold'
 								style={{
-									color: '#C83B3B',
+									color: colors.coral,
 								}}
 							>
 								{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 							</Text>
 
 							<Text
-								className='mt-1 text-sm'
+								className='mt-1 text-sm leading-5'
 								style={{
-									color: '#6F8A7D',
+									color: colors.textSecondary,
 								}}
 							>
 								Salir de tu cuenta
 							</Text>
 						</View>
 
-						{loggingOut && <ActivityIndicator size='small' color='#C83B3B' />}
+						{loggingOut && (
+							<ActivityIndicator size='small' color={colors.coral} />
+						)}
 					</Pressable>
 				</View>
 
-				{/* =========================
-				    FOOTER
-				========================= */}
+				{/* ========================================================== */}
+				{/*                              FOOTER                         */}
+				{/* ========================================================== */}
 
 				<View className='mt-8 items-center'>
 					<Text
 						className='text-xs'
 						style={{
-							color: '#6F8A7D',
+							color: colors.textSecondary,
 						}}
 					>
 						ZooApp
@@ -386,7 +485,7 @@ export default function Panel() {
 					<Text
 						className='mt-1 text-xs'
 						style={{
-							color: '#8FB9A8',
+							color: '#7DA996',
 						}}
 					>
 						Sahuatoba
@@ -394,129 +493,146 @@ export default function Panel() {
 				</View>
 			</ScrollView>
 
-			{/* =========================
-			    MODAL QR
-			========================= */}
+			{/* ============================================================== */}
+			{/*                              MODAL QR                           */}
+			{/* ============================================================== */}
 
 			<Modal
 				visible={showQr}
-
 				transparent
-
 				animationType='fade'
-
 				onRequestClose={() => setShowQr(false)}
 			>
 				<View
 					style={{
 						flex: 1,
-
-						backgroundColor: 'rgba(0,0,0,0.45)',
-
+						backgroundColor: colors.overlay,
 						alignItems: 'center',
-
 						justifyContent: 'center',
-
 						paddingHorizontal: 24,
 					}}
 				>
 					<View
-						className='w-full rounded-3xl px-6 py-7'
+						className='w-full overflow-hidden rounded-[28px] px-6 py-7'
 						style={{
 							maxWidth: 400,
-							backgroundColor: '#F7F7EE',
+							backgroundColor: colors.cardLight,
+							borderWidth: 1,
+							borderColor: colors.border,
+							...cardShadow,
 						}}
 					>
 						{/* Encabezado */}
-
 						<View className='items-center'>
-							<View className='h-14 w-14 items-center justify-center rounded-full bg-emerald-100'>
-								<HugeiconsIcon icon={QrCodeIcon} size={28} color='#047857' />
+							<View
+								className='h-14 w-14 items-center justify-center rounded-[16px]'
+								style={{
+									backgroundColor: colors.active,
+									borderWidth: 1,
+									borderColor: colors.border,
+								}}
+							>
+								<HugeiconsIcon
+									icon={QrCodeIcon}
+									size={28}
+									strokeWidth={1.8}
+									color={colors.primary}
+								/>
 							</View>
 
-							<Text className='mt-4 text-2xl font-bold text-gray-900'>
+							<Text
+								className='mt-4 text-2xl font-bold'
+								style={{
+									color: colors.text,
+								}}
+							>
 								Mi código QR
 							</Text>
 
-							<Text className='mt-2 text-center text-sm leading-5 text-gray-500'>
+							<Text
+								className='mt-2 text-center text-sm leading-5'
+								style={{
+									color: colors.textSecondary,
+								}}
+							>
 								Presenta este código en taquilla para identificar tu cuenta y
 								acumular tus beneficios.
 							</Text>
 						</View>
 
 						{/* QR */}
-
 						<View className='mt-6 items-center'>
 							<View
-								className='rounded-2xl border border-gray-100 bg-white p-4'
-
+								className='rounded-[24px] p-4'
 								style={{
-									shadowColor: '#000',
-
-									shadowOffset: {
-										width: 0,
-
-										height: 3,
-									},
-
-									shadowOpacity: 0.08,
-
-									shadowRadius: 8,
-
-									elevation: 4,
+									backgroundColor: colors.white,
+									borderWidth: 1,
+									borderColor: colors.border,
+									...cardShadow,
 								}}
 							>
 								{user?.qr_token ? (
 									<QRCode
 										value={user.qr_token}
-
 										size={240}
-
 										backgroundColor='#ffffff'
-
 										color='#000000'
-
 										eQuietZone={4}
 									/>
 								) : (
 									<View
 										style={{
 											width: 240,
-
 											height: 240,
-
 											alignItems: 'center',
-
 											justifyContent: 'center',
 										}}
 									>
-										<ActivityIndicator size='large' color='#047857' />
+										<ActivityIndicator size='large' color={colors.primary} />
 									</View>
 								)}
 							</View>
 						</View>
 
 						{/* Información */}
-
-						<View className='mt-6 rounded-2xl bg-emerald-50 px-4 py-4'>
-							<Text className='text-center text-sm font-semibold text-emerald-800'>
+						<View
+							className='mt-6 rounded-[20px] px-4 py-4'
+							style={{
+								backgroundColor: colors.active,
+								borderWidth: 1,
+								borderColor: colors.border,
+							}}
+						>
+							<Text
+								className='text-center text-sm font-bold'
+								style={{
+									color: colors.primary,
+								}}
+							>
 								Código personal
 							</Text>
 
-							<Text className='mt-1 text-center text-xs leading-5 text-emerald-700'>
+							<Text
+								className='mt-1 text-center text-xs leading-5'
+								style={{
+									color: colors.textSecondary,
+								}}
+							>
 								Este código está asociado permanentemente a tu cuenta de ZooApp.
 							</Text>
 						</View>
 
 						{/* Cerrar */}
-
 						<Pressable
 							onPress={() => setShowQr(false)}
-
-							className='mt-6 items-center rounded-2xl bg-emerald-700 px-5 py-4'
-
+							className='mt-6 w-full items-center justify-center rounded-[20px] bg-[#075C3B] px-5 py-4'
 							style={({ pressed }) => ({
-								opacity: pressed ? 0.75 : 1,
+								opacity: pressed ? 0.9 : 1,
+								transform: [
+									{
+										scale: pressed ? 0.98 : 1,
+									},
+								],
 							})}
 						>
 							<Text className='text-base font-bold text-white'>Cerrar</Text>
@@ -524,6 +640,6 @@ export default function Panel() {
 					</View>
 				</View>
 			</Modal>
-		</View>
+		</ImageBackground>
 	)
 }

@@ -8,6 +8,13 @@ import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Tabs } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
+const colors = {
+	menuBackground: '#E2F1EA',
+	primary: '#075C3B',
+	textSecondary: '#557067',
+	border: '#B8E6D3',
+}
+
 export default function TabLayout() {
 	return (
 		<Tabs
@@ -28,20 +35,23 @@ export default function TabLayout() {
 						style={{
 							width: '90%',
 							height: 68,
-							borderRadius: 22,
-							backgroundColor: '#ffffff',
+							borderRadius: 30,
+							backgroundColor: colors.menuBackground,
+							borderWidth: 1,
+							borderColor: colors.border,
 							flexDirection: 'row',
 							alignItems: 'center',
 							paddingHorizontal: 6,
 							paddingVertical: 6,
-							shadowColor: '#000',
+
+							shadowColor: colors.primary,
 							shadowOffset: {
 								width: 0,
-								height: 4,
+								height: 5,
 							},
 							shadowOpacity: 0.12,
 							shadowRadius: 10,
-							elevation: 8,
+							elevation: 4,
 						}}
 					>
 						{state.routes
@@ -85,13 +95,13 @@ export default function TabLayout() {
 											height: '100%',
 											alignItems: 'center',
 											justifyContent: 'center',
-											borderRadius: 16,
+											borderRadius: 20,
 										}}
 									>
 										<HugeiconsIcon
 											icon={icon}
-											size={23}
-											color={isFocused ? '#047857' : '#9ca3af'}
+											size={22}
+											color={isFocused ? colors.primary : colors.textSecondary}
 										/>
 
 										<Text
@@ -99,7 +109,9 @@ export default function TabLayout() {
 												marginTop: 3,
 												fontSize: 11,
 												fontWeight: isFocused ? '700' : '500',
-												color: isFocused ? '#047857' : '#6b7280',
+												color: isFocused
+													? colors.primary
+													: colors.textSecondary,
 											}}
 										>
 											{options.title}
@@ -128,7 +140,7 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name='zoodeek'
 				options={{
-					title: 'ZooDeek',
+					title: 'ZooDeck',
 				}}
 			/>
 

@@ -4,23 +4,21 @@ import {
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { router } from 'expo-router'
-
 import { useCallback, useEffect, useMemo, useState } from 'react'
-
 import {
 	ActivityIndicator,
 	Image,
+	ImageBackground,
 	Pressable,
 	ScrollView,
+	StyleSheet,
 	Text,
 	TextInput,
 	View,
 } from 'react-native'
 
 import { api } from '@/services/api'
-
 import { getToken } from '@/services/auth'
 
 type SpeciesCategory = {
@@ -49,15 +47,41 @@ const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
 
 type Filter = (typeof FILTERS)[number]
 
+const COLORS = {
+	background: '#F7F9F8',
+
+	primary: '#075C3B',
+	primaryLight: '#16845D',
+	dark: '#17372C',
+	muted: '#557067',
+
+	card: '#DDF5EA',
+	cardLight: '#E8F7F0',
+	active: '#BDEED9',
+	border: '#B8E6D3',
+	white: '#FFFFFF',
+
+	coral: '#D95C4F',
+	errorBackground: '#FFF3F1',
+	errorBorder: '#F3D5D0',
+	errorText: '#8C4037',
+
+	mapBackground: '#F8E1DE',
+	mapBorder: '#EFC2BC',
+
+	button: '#246F4C',
+	buttonPressed: '#1D5C3F',
+}
+
 const cardShadow = {
-	shadowColor: '#000000',
+	shadowColor: '#075C3B',
 	shadowOffset: {
 		width: 0,
 		height: 5,
 	},
-	shadowOpacity: 0.18,
-	shadowRadius: 8,
-	elevation: 1,
+	shadowOpacity: 0.12,
+	shadowRadius: 10,
+	elevation: 4,
 }
 
 export default function SpeciesScreen() {
@@ -127,450 +151,770 @@ export default function SpeciesScreen() {
 
 	if (loading) {
 		return (
-			<View
-				className='flex-1 items-center justify-center'
-				style={{
-					backgroundColor: '#F7F8F3',
-				}}
-			>
-				<ActivityIndicator size='large' color='#087A5A' />
-
-				<Text
-					className='mt-4 text-sm'
-					style={{
-						color: '#6F8A7D',
+			<View style={styles.loadingContainer}>
+				<ImageBackground
+					source={require('@/assets/images/zoo-pattern.png')}
+					style={styles.loadingBackground}
+					resizeMode='repeat'
+					imageStyle={{
+						opacity: 0.3,
 					}}
 				>
-					Cargando especies...
-				</Text>
+					<View style={styles.loadingContent}>
+						<ActivityIndicator size='large' color={COLORS.primary} />
+
+						<Text style={styles.loadingText}>Cargando especies...</Text>
+					</View>
+				</ImageBackground>
 			</View>
 		)
 	}
 
 	return (
-		<View
-			className='flex-1'
-			style={{
-				backgroundColor: '#F7F8F3',
-			}}
-		>
-			<ScrollView
-				className='flex-1'
-				contentContainerStyle={{
-					paddingHorizontal: 20,
-					paddingTop: 55,
-					paddingBottom: 130,
+		<View style={styles.container}>
+			<ImageBackground
+				source={require('@/assets/images/zoo-pattern.png')}
+				style={styles.background}
+				resizeMode='repeat'
+				imageStyle={{
+					opacity: 0.3,
 				}}
-				keyboardShouldPersistTaps='handled'
-				showsVerticalScrollIndicator={false}
 			>
-				{/* Regresar */}
-				<View
-					className='mb-5 self-start rounded-2xl'
-					style={{
-						backgroundColor: '#FFFFFF',
-						...cardShadow,
-					}}
-				>
-					<Pressable
-						onPress={() => router.back()}
-						className='rounded-2xl px-4 py-2.5'
-						style={({ pressed }) => ({
-							backgroundColor: '#FFFFFF',
-							opacity: pressed ? 0.75 : 1,
-						})}
-					>
-						<Text
-							className='text-base font-semibold'
-							style={{
-								color: '#087A5A',
-							}}
-						>
-							← Regresar
-						</Text>
-					</Pressable>
-				</View>
-
-				{/* Header */}
-				<View className='flex-row items-center'>
-					<View
-						className='h-12 w-12 items-center justify-center rounded-2xl'
-						style={{
-							backgroundColor: '#DCEFE5',
-						}}
-					>
-						<HugeiconsIcon
-							icon={UserGroupIcon}
-							size={26}
-							strokeWidth={1.8}
-							color='#087A5A'
-						/>
-					</View>
-
-					<View className='ml-4 flex-1'>
-						<Text
-							className='text-3xl font-bold'
-							style={{
-								color: '#123C32',
-							}}
-						>
-							Especies
-						</Text>
-
-						<Text
-							className='mt-1 text-base'
-							style={{
-								color: '#6F8A7D',
-							}}
-						>
-							Conoce a los habitantes del zoológico.
-						</Text>
-					</View>
-				</View>
-
-				{/* Buscador */}
-				{/* Buscador */}
-				<View className='mt-5'>
-					<Text
-						className='mb-2 text-sm font-semibold'
-						style={{
-							color: '#123C32',
-						}}
-					>
-						Buscar especie
-					</Text>
-
-					<View
-						className='flex-row items-center rounded-2xl border'
-						style={{
-							backgroundColor: '#FFFFFF',
-							borderColor: '#B8DCCA',
-							shadowColor: '#064D36',
-							shadowOffset: {
-								width: 0,
-								height: 1,
-							},
-							shadowOpacity: 0.04,
-							shadowRadius: 4,
-							elevation: 1,
-						}}
-					>
-						<View className='pl-4'>
-							<HugeiconsIcon
-								icon={Search01Icon}
-								size={21}
-								strokeWidth={1.8}
-								color='#6F8A7D'
-							/>
-						</View>
-
-						<TextInput
-							value={search}
-							onChangeText={setSearch}
-							placeholder='Buscar especie...'
-							placeholderTextColor='#6F8A7D'
-							autoCapitalize='none'
-							autoCorrect={false}
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
-						/>
-					</View>
-				</View>
-
-				{/* Filtros */}
 				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					className='mt-4'
-					contentContainerStyle={{
-						paddingRight: 20,
-					}}
+					style={styles.scrollView}
+					contentContainerStyle={styles.scrollContent}
+					keyboardShouldPersistTaps='handled'
+					showsVerticalScrollIndicator={false}
 				>
-					{FILTERS.map((item) => {
-						const active = filter === item
-
-						return (
-							<View
-								key={item}
-								className='mr-2 rounded-2xl'
-								style={{
-									backgroundColor: active ? '#087A5A' : '#FFFFFF',
-									...cardShadow,
-								}}
-							>
-								<Pressable
-									onPress={() => setFilter(item)}
-									className='rounded-2xl px-5 py-2.5'
-									style={({ pressed }) => ({
-										backgroundColor: active ? '#087A5A' : '#FFFFFF',
-										opacity: pressed ? 0.75 : 1,
-									})}
-								>
-									<Text
-										className='text-sm font-semibold'
-										style={{
-											color: active ? '#FFFFFF' : '#123C32',
-										}}
-									>
-										{item}
-									</Text>
-								</Pressable>
-							</View>
-						)
-					})}
-				</ScrollView>
-
-				{/* Resultados */}
-				<View className='mt-6 flex-row items-center justify-between'>
-					<Text
-						className='text-sm font-semibold'
-						style={{
-							color: '#6F8A7D',
-						}}
-					>
-						{filteredSpecies.length}{' '}
-						{filteredSpecies.length === 1 ? 'especie' : 'especies'}
-					</Text>
-
-					{search.trim() && (
+					{/* Regresar */}
+					<View style={styles.backButtonWrapper}>
 						<Pressable
-							onPress={() => setSearch('')}
-							className='rounded-2xl px-3 py-2'
-							style={({ pressed }) => ({
-								opacity: pressed ? 0.6 : 1,
-							})}
+							onPress={() => router.back()}
+							style={({ pressed }) => [
+								styles.backButton,
+								pressed && styles.backButtonPressed,
+							]}
 						>
-							<Text
-								className='text-sm font-semibold'
-								style={{
-									color: '#087A5A',
-								}}
-							>
-								Limpiar
-							</Text>
-						</Pressable>
-					)}
-				</View>
-
-				{/* Error */}
-				{error ? (
-					<View
-						className='mt-5 rounded-3xl p-6'
-						style={{
-							backgroundColor: '#FFF1F0',
-							borderWidth: 1,
-							borderColor: '#FFE3E1',
-						}}
-					>
-						<Text
-							className='text-center text-base font-semibold'
-							style={{
-								color: '#C24141',
-							}}
-						>
-							No fue posible cargar las especies.
-						</Text>
-
-						<Text
-							className='mt-2 text-center text-sm leading-5'
-							style={{
-								color: '#6F8A7D',
-							}}
-						>
-							{error}
-						</Text>
-
-						<Pressable
-							onPress={() => void loadSpecies()}
-							className='mt-5 items-center overflow-hidden rounded-2xl'
-							style={({ pressed }) => ({
-								backgroundColor: pressed ? '#064D36' : '#087A5A',
-							})}
-						>
-							<View className='px-5 py-3.5'>
-								<Text
-									className='font-bold'
-									style={{
-										color: '#FFFFFF',
-									}}
-								>
-									Intentar nuevamente
-								</Text>
-							</View>
+							<Text style={styles.backText}>‹ Regresar</Text>
 						</Pressable>
 					</View>
-				) : filteredSpecies.length === 0 ? (
-					<View
-						className='mt-5 items-center rounded-3xl px-6 py-10'
-						style={{
-							backgroundColor: '#F7F7EE',
-							...cardShadow,
-						}}
-					>
-						<View
-							className='h-16 w-16 items-center justify-center rounded-2xl'
-							style={{
-								backgroundColor: '#DCEFE5',
-							}}
-						>
+
+					{/* Header */}
+					<View style={styles.header}>
+						<View style={styles.headerIcon}>
 							<HugeiconsIcon
 								icon={UserGroupIcon}
-								size={30}
+								size={26}
 								strokeWidth={1.8}
-								color='#087A5A'
+								color={COLORS.primary}
 							/>
 						</View>
 
-						<Text
-							className='mt-5 text-lg font-bold'
-							style={{
-								color: '#123C32',
-							}}
-						>
-							No encontramos especies
-						</Text>
+						<View style={styles.headerText}>
+							<Text style={styles.title}>Especies</Text>
 
-						<Text
-							className='mt-2 text-center text-sm leading-5'
-							style={{
-								color: '#6F8A7D',
-							}}
-						>
-							Intenta con otro nombre o cambia el filtro.
-						</Text>
+							<Text style={styles.subtitle}>
+								Conoce a los habitantes del zoológico.
+							</Text>
+						</View>
 					</View>
-				) : (
-					<View className='mt-4'>
-						{filteredSpecies.map((item) => (
-							<View
-								key={item.id}
-								className='mb-4 overflow-hidden rounded-3xl'
-								style={{
-									backgroundColor: '#FFFFFF',
-									...cardShadow,
-								}}
-							>
-								<Pressable
-									onPress={() => openSpecies(item.id)}
-									className='overflow-hidden rounded-3xl'
-									style={({ pressed }) => ({
-										backgroundColor: '#FFFFFF',
-										opacity: pressed ? 0.94 : 1,
-									})}
+
+					{/* Buscador */}
+					<View style={styles.searchSection}>
+						<Text style={styles.searchLabel}>Buscar especie</Text>
+
+						<View style={styles.searchContainer}>
+							<View style={styles.searchIcon}>
+								<HugeiconsIcon
+									icon={Search01Icon}
+									size={21}
+									strokeWidth={1.8}
+									color={COLORS.muted}
+								/>
+							</View>
+
+							<TextInput
+								value={search}
+								onChangeText={setSearch}
+								placeholder='Buscar especie...'
+								placeholderTextColor={COLORS.muted}
+								autoCapitalize='none'
+								autoCorrect={false}
+								style={styles.searchInput}
+							/>
+						</View>
+					</View>
+
+					{/* Filtros */}
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						style={styles.filtersScroll}
+						contentContainerStyle={styles.filtersContent}
+					>
+						{FILTERS.map((item) => {
+							const active = filter === item
+
+							return (
+								<View
+									key={item}
+									style={[
+										styles.filterWrapper,
+										active && styles.filterWrapperActive,
+									]}
 								>
-									{item.image ? (
-										<Image
-											source={{
-												uri: item.image,
-											}}
-											className='h-52 w-full'
-											resizeMode='cover'
-										/>
-									) : (
-										<View
-											className='h-52 w-full items-center justify-center'
-											style={{
-												backgroundColor: '#DCEFE5',
-											}}
-										>
-											<HugeiconsIcon
-												icon={UserGroupIcon}
-												size={48}
-												strokeWidth={1.8}
-												color='#087A5A'
-											/>
-										</View>
-									)}
-
-									<View className='p-5'>
-										<View className='flex-row items-start'>
-											<View className='flex-1 pr-3'>
-												<Text
-													className='text-xl font-bold'
-													style={{
-														color: '#123C32',
-													}}
-													numberOfLines={2}
-												>
-													{item.common_name}
-												</Text>
-
-												<Text
-													className='mt-1 text-sm italic'
-													style={{
-														color: '#6F8A7D',
-													}}
-													numberOfLines={1}
-												>
-													{item.scientific_name}
-												</Text>
-											</View>
-
-											{/* Indicador de navegación */}
-											<View
-												className='h-10 w-10 items-center justify-center rounded-full'
-												style={{
-													backgroundColor: '#DCEFE5',
-												}}
-											>
-												<HugeiconsIcon
-													icon={ArrowRight01Icon}
-													size={20}
-													strokeWidth={1.8}
-													color='#087A5A'
-												/>
-											</View>
-										</View>
-
-										{/* Categoría */}
-										{item.category?.name && (
-											<View
-												className='mt-4 self-start rounded-2xl px-3 py-1.5'
-												style={{
-													backgroundColor: '#EEF4F0',
-												}}
-											>
-												<Text
-													className='text-xs font-semibold'
-													style={{
-														color: '#123C32',
-													}}
-												>
-													{item.category.name}
-												</Text>
-											</View>
-										)}
-
-										{/* Descripción */}
-										{item.description && (
-											<Text
-												className='mt-3 text-sm leading-5'
-												style={{
-													color: '#6F8A7D',
-												}}
-												numberOfLines={3}
-											>
-												{item.description}
-											</Text>
-										)}
-
+									<Pressable
+										onPress={() => setFilter(item)}
+										style={({ pressed }) => [
+											styles.filterButton,
+											active && styles.filterButtonActive,
+											pressed && styles.filterButtonPressed,
+										]}
+									>
 										<Text
-											className='mt-4 text-sm font-bold'
-											style={{
-												color: '#087A5A',
-											}}
+											style={[
+												styles.filterText,
+												active && styles.filterTextActive,
+											]}
 										>
-											Ver información
+											{item}
+										</Text>
+									</Pressable>
+								</View>
+							)
+						})}
+					</ScrollView>
+
+					{/* Resultados */}
+					<View style={styles.resultsHeader}>
+						<Text style={styles.resultsCount}>
+							{filteredSpecies.length}{' '}
+							{filteredSpecies.length === 1 ? 'especie' : 'especies'}
+						</Text>
+
+						{search.trim() && (
+							<Pressable
+								onPress={() => setSearch('')}
+								style={({ pressed }) => [
+									styles.clearButton,
+									pressed && styles.clearButtonPressed,
+								]}
+							>
+								<Text style={styles.clearText}>Limpiar</Text>
+							</Pressable>
+						)}
+					</View>
+
+					{/* Error */}
+					{error ? (
+						<View style={styles.errorCard}>
+							<View style={styles.errorIcon}>
+								<Text style={styles.errorIconText}>!</Text>
+							</View>
+
+							<Text style={styles.errorTitle}>
+								No fue posible cargar las especies.
+							</Text>
+
+							<Text style={styles.errorText}>{error}</Text>
+
+							<View style={styles.retryButtonWrapper}>
+								<Pressable
+									onPress={() => void loadSpecies()}
+									style={({ pressed }) => [
+										styles.retryButton,
+										pressed && styles.retryButtonPressed,
+									]}
+								>
+									<View style={styles.retryButtonContent}>
+										<Text style={styles.retryButtonText}>
+											Intentar nuevamente
 										</Text>
 									</View>
 								</Pressable>
 							</View>
-						))}
-					</View>
-				)}
-			</ScrollView>
+						</View>
+					) : filteredSpecies.length === 0 ? (
+						/* Sin resultados */
+						<View style={[styles.emptyCard, cardShadow]}>
+							<View style={styles.emptyIcon}>
+								<HugeiconsIcon
+									icon={UserGroupIcon}
+									size={30}
+									strokeWidth={1.8}
+									color={COLORS.primary}
+								/>
+							</View>
+
+							<Text style={styles.emptyTitle}>No encontramos especies</Text>
+
+							<Text style={styles.emptyText}>
+								Intenta con otro nombre o cambia el filtro.
+							</Text>
+						</View>
+					) : (
+						/* Lista */
+						<View style={styles.speciesList}>
+							{filteredSpecies.map((item) => (
+								<View key={item.id} style={[styles.speciesCard, cardShadow]}>
+									<Pressable
+										onPress={() => openSpecies(item.id)}
+										style={({ pressed }) => [
+											styles.speciesPressable,
+											pressed && styles.speciesPressed,
+										]}
+									>
+										{item.image ? (
+											<Image
+												source={{
+													uri: item.image,
+												}}
+												style={styles.speciesImage}
+												resizeMode='cover'
+											/>
+										) : (
+											<View style={styles.speciesImagePlaceholder}>
+												<HugeiconsIcon
+													icon={UserGroupIcon}
+													size={48}
+													strokeWidth={1.8}
+													color={COLORS.primary}
+												/>
+											</View>
+										)}
+
+										<View style={styles.speciesContent}>
+											<View style={styles.speciesTitleRow}>
+												<View style={styles.speciesNameContainer}>
+													<Text style={styles.speciesName} numberOfLines={2}>
+														{item.common_name}
+													</Text>
+
+													<Text style={styles.scientificName} numberOfLines={1}>
+														{item.scientific_name}
+													</Text>
+												</View>
+
+												<View style={styles.arrowContainer}>
+													<HugeiconsIcon
+														icon={ArrowRight01Icon}
+														size={20}
+														strokeWidth={1.8}
+														color={COLORS.primary}
+													/>
+												</View>
+											</View>
+
+											{/* Categoría */}
+											{item.category?.name && (
+												<View style={styles.categoryBadge}>
+													<Text style={styles.categoryText}>
+														{item.category.name}
+													</Text>
+												</View>
+											)}
+
+											{/* Descripción */}
+											{item.description && (
+												<Text style={styles.description} numberOfLines={3}>
+													{item.description}
+												</Text>
+											)}
+
+											<Text style={styles.viewInfo}>Ver información</Text>
+										</View>
+									</Pressable>
+								</View>
+							))}
+						</View>
+					)}
+
+					<View style={styles.bottomSpace} />
+				</ScrollView>
+			</ImageBackground>
 		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		backgroundColor: COLORS.background,
+	},
+
+	background: {
+		flex: 1,
+	},
+
+	scrollView: {
+		flex: 1,
+	},
+
+	scrollContent: {
+		paddingHorizontal: 20,
+		paddingTop: 55,
+		paddingBottom: 40,
+	},
+
+	loadingContainer: {
+		flex: 1,
+		backgroundColor: COLORS.background,
+	},
+
+	loadingBackground: {
+		flex: 1,
+	},
+
+	loadingContent: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	loadingText: {
+		marginTop: 12,
+		fontSize: 15,
+		fontWeight: '600',
+		color: COLORS.muted,
+	},
+
+	/* ─────────────────────────
+	   REGRESAR
+	───────────────────────── */
+
+	backButtonWrapper: {
+		alignSelf: 'flex-start',
+		marginBottom: 17,
+	},
+
+	backButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'rgba(247,249,248,0.94)',
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: 18,
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+		...cardShadow,
+	},
+
+	backButtonPressed: {
+		opacity: 0.75,
+		backgroundColor: COLORS.card,
+	},
+
+	backText: {
+		fontSize: 15,
+		fontWeight: '700',
+		color: COLORS.dark,
+	},
+
+	/* ─────────────────────────
+	   HEADER
+	───────────────────────── */
+
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: 22,
+	},
+
+	headerIcon: {
+		width: 52,
+		height: 52,
+		borderRadius: 17,
+		backgroundColor: COLORS.active,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+
+	headerText: {
+		flex: 1,
+		marginLeft: 13,
+	},
+
+	title: {
+		fontSize: 27,
+		fontWeight: '900',
+		color: COLORS.dark,
+	},
+
+	subtitle: {
+		marginTop: 4,
+		fontSize: 14,
+		lineHeight: 20,
+		color: COLORS.muted,
+	},
+
+	/* ─────────────────────────
+	   BUSCADOR
+	───────────────────────── */
+
+	searchSection: {
+		marginBottom: 4,
+	},
+
+	searchLabel: {
+		marginBottom: 8,
+		fontSize: 14,
+		fontWeight: '800',
+		color: COLORS.dark,
+	},
+
+	searchContainer: {
+		height: 54,
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: COLORS.cardLight,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: 18,
+	},
+
+	searchIcon: {
+		paddingLeft: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	searchInput: {
+		flex: 1,
+		paddingHorizontal: 12,
+		paddingVertical: 0,
+		fontSize: 15,
+		color: COLORS.dark,
+	},
+
+	/* ─────────────────────────
+	   FILTROS / TAGS
+	───────────────────────── */
+
+	filtersScroll: {
+		marginTop: 15,
+		marginHorizontal: -2,
+	},
+
+	filtersContent: {
+		paddingHorizontal: 2,
+		paddingRight: 20,
+		alignItems: 'center',
+	},
+
+	filterWrapper: {
+		marginRight: 9,
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+		borderRadius: 999,
+		backgroundColor: COLORS.white,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
+	},
+
+	filterWrapperActive: {
+		backgroundColor: COLORS.primary,
+		borderColor: COLORS.primary,
+	},
+
+	filterButton: {
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	filterButtonActive: {
+		backgroundColor: 'transparent',
+	},
+
+	filterButtonPressed: {
+		opacity: 0.72,
+	},
+
+	filterText: {
+		fontSize: 13,
+		fontWeight: '800',
+		color: COLORS.dark,
+	},
+
+	filterTextActive: {
+		color: COLORS.white,
+	},
+
+	/* ─────────────────────────
+	   RESULTADOS
+	───────────────────────── */
+
+	resultsHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginTop: 19,
+		marginBottom: 2,
+	},
+
+	resultsCount: {
+		fontSize: 13,
+		fontWeight: '800',
+		color: COLORS.muted,
+	},
+
+	clearButton: {
+		paddingHorizontal: 10,
+		paddingVertical: 7,
+		borderRadius: 14,
+	},
+
+	clearButtonPressed: {
+		backgroundColor: COLORS.active,
+	},
+
+	clearText: {
+		fontSize: 13,
+		fontWeight: '800',
+		color: COLORS.primary,
+	},
+
+	/* ─────────────────────────
+	   ERROR
+	───────────────────────── */
+
+	errorCard: {
+		marginTop: 15,
+		padding: 18,
+		backgroundColor: COLORS.errorBackground,
+		borderWidth: 1,
+		borderColor: COLORS.errorBorder,
+		borderRadius: 22,
+		alignItems: 'center',
+	},
+
+	errorIcon: {
+		width: 44,
+		height: 44,
+		borderRadius: 15,
+		backgroundColor: COLORS.white,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1,
+		borderColor: COLORS.errorBorder,
+	},
+
+	errorIconText: {
+		fontSize: 21,
+		fontWeight: '900',
+		color: COLORS.errorText,
+	},
+
+	errorTitle: {
+		marginTop: 12,
+		fontSize: 15,
+		fontWeight: '900',
+		color: COLORS.errorText,
+		textAlign: 'center',
+	},
+
+	errorText: {
+		marginTop: 6,
+		fontSize: 12,
+		lineHeight: 18,
+		color: COLORS.muted,
+		textAlign: 'center',
+	},
+
+	retryButtonWrapper: {
+		width: '100%',
+		height: 48,
+		marginTop: 15,
+		borderRadius: 16,
+		backgroundColor: COLORS.button,
+		borderWidth: 1,
+		borderColor: COLORS.button,
+		overflow: 'hidden',
+	},
+
+	retryButton: {
+		width: '100%',
+		height: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	retryButtonContent: {
+		width: '100%',
+		height: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	retryButtonPressed: {
+		backgroundColor: COLORS.buttonPressed,
+	},
+
+	retryButtonText: {
+		fontSize: 14,
+		fontWeight: '900',
+		color: COLORS.white,
+		textAlign: 'center',
+	},
+
+	/* ─────────────────────────
+	   SIN RESULTADOS
+	───────────────────────── */
+
+	emptyCard: {
+		marginTop: 15,
+		paddingHorizontal: 20,
+		paddingVertical: 35,
+		backgroundColor: COLORS.cardLight,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		borderRadius: 25,
+		alignItems: 'center',
+	},
+
+	emptyIcon: {
+		width: 64,
+		height: 64,
+		borderRadius: 20,
+		backgroundColor: COLORS.active,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+
+	emptyTitle: {
+		marginTop: 16,
+		fontSize: 18,
+		fontWeight: '900',
+		color: COLORS.dark,
+		textAlign: 'center',
+	},
+
+	emptyText: {
+		marginTop: 6,
+		fontSize: 13,
+		lineHeight: 19,
+		color: COLORS.muted,
+		textAlign: 'center',
+	},
+
+	/* ─────────────────────────
+	   ESPECIES
+	───────────────────────── */
+
+	speciesList: {
+		marginTop: 15,
+	},
+
+	speciesCard: {
+		width: '100%',
+		marginBottom: 15,
+		backgroundColor: COLORS.cardLight,
+		borderRadius: 25,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+		overflow: 'hidden',
+	},
+
+	speciesPressable: {
+		width: '100%',
+		backgroundColor: COLORS.cardLight,
+		borderRadius: 25,
+		overflow: 'hidden',
+	},
+
+	speciesPressed: {
+		opacity: 0.94,
+	},
+
+	speciesImage: {
+		width: '100%',
+		height: 210,
+	},
+
+	speciesImagePlaceholder: {
+		width: '100%',
+		height: 210,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: COLORS.active,
+	},
+
+	speciesContent: {
+		padding: 18,
+	},
+
+	speciesTitleRow: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+	},
+
+	speciesNameContainer: {
+		flex: 1,
+		paddingRight: 12,
+	},
+
+	speciesName: {
+		fontSize: 20,
+		lineHeight: 25,
+		fontWeight: '900',
+		color: COLORS.dark,
+	},
+
+	scientificName: {
+		marginTop: 4,
+		fontSize: 13,
+		fontStyle: 'italic',
+		color: COLORS.muted,
+	},
+
+	arrowContainer: {
+		width: 42,
+		height: 42,
+		borderRadius: 15,
+		backgroundColor: COLORS.active,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+
+	categoryBadge: {
+		alignSelf: 'flex-start',
+		marginTop: 14,
+		paddingHorizontal: 11,
+		paddingVertical: 6,
+		borderRadius: 13,
+		backgroundColor: COLORS.active,
+		borderWidth: 1,
+		borderColor: COLORS.border,
+	},
+
+	categoryText: {
+		fontSize: 11,
+		fontWeight: '800',
+		color: COLORS.dark,
+	},
+
+	description: {
+		marginTop: 12,
+		fontSize: 13,
+		lineHeight: 19,
+		color: COLORS.muted,
+	},
+
+	viewInfo: {
+		marginTop: 14,
+		fontSize: 13,
+		fontWeight: '900',
+		color: COLORS.primary,
+	},
+
+	bottomSpace: {
+		height: 40,
+	},
+})
