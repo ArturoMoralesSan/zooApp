@@ -349,17 +349,11 @@ export default function Panel() {
 						description='Consulta tus entradas al zoológico'
 						onPress={() => router.push('/tickets/my-tickets')}
 					/>
-
 					<MenuItem
 						icon={Ticket01Icon}
 						title='Mis donaciones'
 						description='Consulta tus donaciones'
-						onPress={() =>
-							Alert.alert(
-								'Mis donaciones',
-								'Esta sección estará disponible próximamente.',
-							)
-						}
+						onPress={() => router.push('/donations/history')}
 					/>
 				</View>
 

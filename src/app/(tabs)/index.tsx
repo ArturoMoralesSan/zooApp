@@ -1,15 +1,19 @@
 import { api } from '@/services/api'
+
 import { getToken } from '@/services/auth'
 
 import {
 	ArrowRight01Icon,
+	HeartAddIcon,
 	Location01Icon,
 	Ticket01Icon,
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
 
 import { HugeiconsIcon } from '@hugeicons/react-native'
+
 import { router } from 'expo-router'
+
 import { useCallback, useEffect, useState } from 'react'
 
 import {
@@ -127,7 +131,7 @@ type ExploreResponse = {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  HELPERS                                   */
+/*                                   HELPERS                                  */
 /* -------------------------------------------------------------------------- */
 
 function formatEventDate(date: string): string {
@@ -241,7 +245,7 @@ export default function Explorar() {
 	}
 
 	/* ---------------------------------------------------------------------- */
-	/*                            CAROUSEL SCROLL                             */
+	/*                           CAROUSEL SCROLL                              */
 	/* ---------------------------------------------------------------------- */
 
 	const handleCarouselScroll = (
@@ -290,7 +294,7 @@ export default function Explorar() {
 				}
 			>
 				{/* ========================================================== */}
-				{/*                             HEADER                         */}
+				{/*                              HEADER                        */}
 				{/* ========================================================== */}
 
 				<View>
@@ -314,7 +318,7 @@ export default function Explorar() {
 				</View>
 
 				{/* ========================================================== */}
-				{/*                        EVENTOS DESTACADOS                   */}
+				{/*                       EVENTOS DESTACADOS                    */}
 				{/* ========================================================== */}
 
 				<View className='mt-7'>
@@ -326,10 +330,6 @@ export default function Explorar() {
 					>
 						Eventos destacados
 					</Text>
-
-					{/* ------------------------------------------------------ */}
-					{/*                            LOADING                     */}
-					{/* ------------------------------------------------------ */}
 
 					{loading ? (
 						<View
@@ -353,10 +353,6 @@ export default function Explorar() {
 							</Text>
 						</View>
 					) : error ? (
-						/* -------------------------------------------------- */
-						/*                             ERROR                    */
-						/* -------------------------------------------------- */
-
 						<View
 							className='rounded-[28px] p-5'
 							style={{
@@ -413,10 +409,6 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						/* -------------------------------------------------- */
-						/*                       SIN EVENTOS                    */
-						/* -------------------------------------------------- */
-
 						<View
 							className='rounded-[28px] p-6'
 							style={{
@@ -446,10 +438,6 @@ export default function Explorar() {
 						</View>
 					) : (
 						<View>
-							{/* ------------------------------------------------ */}
-							{/*                       CAROUSEL                    */}
-							{/* ------------------------------------------------ */}
-
 							<ScrollView
 								horizontal
 								showsHorizontalScrollIndicator={false}
@@ -503,7 +491,6 @@ export default function Explorar() {
 													})}
 												>
 													<View className='relative h-60'>
-														{/* Imagen */}
 														{imageUrl ? (
 															<Image
 																source={{
@@ -530,7 +517,6 @@ export default function Explorar() {
 															</View>
 														)}
 
-														{/* Overlay */}
 														<View
 															className='absolute inset-x-0 bottom-0 h-32'
 															style={{
@@ -538,7 +524,6 @@ export default function Explorar() {
 															}}
 														/>
 
-														{/* Etiqueta */}
 														<View
 															className='absolute left-4 top-3 rounded-full px-4 py-2'
 															style={{
@@ -555,7 +540,6 @@ export default function Explorar() {
 															</Text>
 														</View>
 
-														{/* Información */}
 														<View className='absolute bottom-4 left-4 right-4'>
 															<Text
 																className='text-2xl font-bold'
@@ -632,10 +616,6 @@ export default function Explorar() {
 								})}
 							</ScrollView>
 
-							{/* ------------------------------------------------ */}
-							{/*                     INDICADORES                   */}
-							{/* ------------------------------------------------ */}
-
 							{events.length > 1 && (
 								<View className='mt-4 flex-row items-center justify-center'>
 									{events.map((event, index) => (
@@ -658,7 +638,7 @@ export default function Explorar() {
 				</View>
 
 				{/* ========================================================== */}
-				{/*                         ACCIONES                            */}
+				{/*                           ACCIONES                         */}
 				{/* ========================================================== */}
 
 				<View className='mt-8'>
@@ -671,11 +651,11 @@ export default function Explorar() {
 						¿Qué quieres hacer?
 					</Text>
 
-					<View className='flex-row'>
-						{/* ================================================== */}
-						{/*                         BOLETOS                    */}
-						{/* ================================================== */}
+					{/* ====================================================== */}
+					{/*                           BOLETOS                      */}
+					{/* ====================================================== */}
 
+					<View className='flex-row'>
 						<View
 							className='mr-2 flex-1 overflow-hidden rounded-[28px]'
 							style={{
@@ -735,7 +715,7 @@ export default function Explorar() {
 						</View>
 
 						{/* ================================================== */}
-						{/*                        ESPECIES                    */}
+						{/*                         ESPECIES                    */}
 						{/* ================================================== */}
 
 						<View
@@ -796,10 +776,83 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 					</View>
+
+					{/* ====================================================== */}
+					{/*                         DONACIONES                     */}
+					{/* ====================================================== */}
+
+					<View
+						className='mt-4 overflow-hidden rounded-[28px]'
+						style={{
+							backgroundColor: colors.cardLight,
+							borderWidth: 1,
+							borderColor: colors.border,
+							...cardShadow,
+						}}
+					>
+						<Pressable
+							onPress={() => router.push('/donations')}
+							className='rounded-[28px] p-5'
+							style={({ pressed }) => ({
+								backgroundColor: colors.cardLight,
+								opacity: pressed ? 0.96 : 1,
+								transform: [
+									{
+										scale: pressed ? 0.99 : 1,
+									},
+								],
+							})}
+						>
+							<View className='flex-row items-center'>
+								<View
+									className='h-12 w-12 items-center justify-center rounded-[16px]'
+									style={{
+										backgroundColor: colors.active,
+										borderWidth: 1,
+										borderColor: colors.border,
+									}}
+								>
+									<HugeiconsIcon
+										icon={HeartAddIcon}
+										size={25}
+										strokeWidth={1.8}
+										color={colors.primary}
+									/>
+								</View>
+
+								<View className='ml-4 flex-1'>
+									<Text
+										className='text-base font-bold'
+										style={{
+											color: colors.text,
+										}}
+									>
+										Apoya al zoológico
+									</Text>
+
+									<Text
+										className='mt-1 text-sm leading-5'
+										style={{
+											color: colors.textSecondary,
+										}}
+									>
+										Haz una donación y ayuda a conservar nuestra fauna.
+									</Text>
+								</View>
+
+								<HugeiconsIcon
+									icon={ArrowRight01Icon}
+									size={22}
+									strokeWidth={1.8}
+									color='#7DA996'
+								/>
+							</View>
+						</Pressable>
+					</View>
 				</View>
 
 				{/* ========================================================== */}
-				{/*                             MAPA                           */}
+				{/*                              MAPA                          */}
 				{/* ========================================================== */}
 
 				<View
@@ -825,7 +878,6 @@ export default function Explorar() {
 						})}
 					>
 						<View className='flex-row items-center'>
-							{/* Icono mapa */}
 							<View
 								className='h-12 w-12 items-center justify-center rounded-[16px]'
 								style={{
@@ -842,7 +894,6 @@ export default function Explorar() {
 								/>
 							</View>
 
-							{/* Información */}
 							<View className='ml-4 flex-1'>
 								<Text
 									className='text-base font-bold'
@@ -863,7 +914,6 @@ export default function Explorar() {
 								</Text>
 							</View>
 
-							{/* Flecha */}
 							<HugeiconsIcon
 								icon={ArrowRight01Icon}
 								size={22}

@@ -56,7 +56,8 @@
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "@maplibre/maplibre-react-native",
-      "expo-image"
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
