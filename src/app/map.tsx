@@ -1,7 +1,9 @@
 import { api, API_URL } from '@/services/api'
 import { getToken } from '@/services/auth'
+
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
+
 import {
 	Camera,
 	GeoJSONSource,
@@ -11,17 +13,17 @@ import {
 	Marker,
 	RasterSource,
 } from '@maplibre/maplibre-react-native'
+
 import { Image } from 'expo-image'
 import * as Location from 'expo-location'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-	ActivityIndicator,
-	Pressable,
-	SafeAreaView,
-	StyleSheet,
-	Text,
-	View,
-} from 'react-native'
+
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import { styles } from '@/styles/map'
 
 type Coordinate = [number, number]
 
@@ -179,19 +181,9 @@ type RouteResult = {
 }
 
 const ZOO_CENTER: Coordinate = [-104.6532, 24.0277]
+
 const DEFAULT_ZOOM = 17
 const USER_ZOOM = 18
-
-const cardShadow = {
-	shadowColor: '#000000',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.18,
-	shadowRadius: 8,
-	elevation: 1,
-}
 
 function toNumber(value: unknown): number | null {
 	if (typeof value === 'number' && Number.isFinite(value)) {
@@ -621,11 +613,8 @@ function normalizeImageBounds(
 			const latitudes = points.map((point) => point[1])
 
 			const west = Math.min(...longitudes)
-
 			const east = Math.max(...longitudes)
-
 			const south = Math.min(...latitudes)
-
 			const north = Math.max(...latitudes)
 
 			return [
@@ -657,6 +646,7 @@ function haversineDistance(a: Coordinate, b: Coordinate): number {
 
 	const lat1 = (a[1] * Math.PI) / 180
 	const lat2 = (b[1] * Math.PI) / 180
+
 	const deltaLat = ((b[1] - a[1]) * Math.PI) / 180
 	const deltaLng = ((b[0] - a[0]) * Math.PI) / 180
 
@@ -798,7 +788,6 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 		const to = String(toValue)
 
 		const fromNode = nodeById.get(from)
-
 		const toNode = nodeById.get(to)
 
 		if (!fromNode || !toNode) {
@@ -845,7 +834,6 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 	if (rawNodes.length > 1 && rawEdges.length === 0 && nodes.length > 1) {
 		for (let index = 1; index < nodes.length; index++) {
 			const previous = nodes[index - 1]
-
 			const current = nodes[index]
 
 			const distance = haversineDistance(
@@ -882,15 +870,6 @@ function normalizePathGraph(coordinates: PathCoordinates): {
 	}
 }
 
-/*
-|--------------------------------------------------------------------------
-| BUSCA EL PUNTO MÁS CERCANO SOBRE UN SEGMENTO
-|--------------------------------------------------------------------------
-|
-| Esto evita que la ruta empiece desde un nodo lejano.
-|
-*/
-
 function nearestPointOnSegment(
 	point: Coordinate,
 	segmentStart: Coordinate,
@@ -903,7 +882,6 @@ function nearestPointOnSegment(
 	const latitude = (point[1] * Math.PI) / 180
 
 	const metersPerDegreeLat = 111320
-
 	const metersPerDegreeLng = 111320 * Math.cos(latitude)
 
 	const ax = segmentStart[0] * metersPerDegreeLng
@@ -936,7 +914,6 @@ function nearestPointOnSegment(
 	ratio = Math.max(0, Math.min(1, ratio))
 
 	const projectedX = ax + ratio * dx
-
 	const projectedY = ay + ratio * dy
 
 	const projected: Coordinate = [
@@ -950,12 +927,6 @@ function nearestPointOnSegment(
 		distance: haversineDistance(point, projected),
 	}
 }
-
-/*
-|--------------------------------------------------------------------------
-| ENCUENTRA EL SEGMENTO REAL MÁS CERCANO
-|--------------------------------------------------------------------------
-*/
 
 function findNearestPathPoint(
 	point: Coordinate,
@@ -1018,11 +989,9 @@ function pointInRing(point: Coordinate, ring: number[][]): boolean {
 
 	for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
 		const xi = Number(ring[i]?.[0])
-
 		const yi = Number(ring[i]?.[1])
 
 		const xj = Number(ring[j]?.[0])
-
 		const yj = Number(ring[j]?.[1])
 
 		const intersect =
@@ -1195,9 +1164,7 @@ export default function MapScreen() {
 
 		return () => {
 			mounted = false
-
 			locationSubscription.current?.remove()
-
 			locationSubscription.current = null
 		}
 	}, [])
@@ -1537,12 +1504,6 @@ export default function MapScreen() {
 		return () => clearTimeout(timer)
 	}, [mapReady, userLocation])
 
-	/*
-	|--------------------------------------------------------------------------
-	| CALCULAR RUTA
-	|--------------------------------------------------------------------------
-	*/
-
 	const calculateRoute = (
 		origin: Coordinate,
 		destination: Coordinate,
@@ -1550,12 +1511,6 @@ export default function MapScreen() {
 		if (navigationGraph.nodes.size === 0) {
 			return null
 		}
-
-		/*
-		|--------------------------------------------------------------------------
-		| BUSCAR EL PUNTO REAL MÁS CERCANO AL CAMINO
-		|--------------------------------------------------------------------------
-		*/
 
 		const nearestOrigin = findNearestPathPoint(origin, navigationGraph)
 
@@ -1587,12 +1542,6 @@ export default function MapScreen() {
 		})
 
 		distances.set(startId, 0)
-
-		/*
-		|--------------------------------------------------------------------------
-		| DIJKSTRA
-		|--------------------------------------------------------------------------
-		*/
 
 		while (unvisited.size > 0) {
 			let currentId: string | null = null
@@ -1642,12 +1591,6 @@ export default function MapScreen() {
 			return null
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		| RECONSTRUIR CAMINO
-		|--------------------------------------------------------------------------
-		*/
-
 		const ids: string[] = []
 
 		let current: string | null = endId
@@ -1676,26 +1619,10 @@ export default function MapScreen() {
 			return null
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		| RUTA SÓLIDA
-		|--------------------------------------------------------------------------
-		|
-		| La línea comienza exactamente en el punto más cercano del
-		| camino, no en la ubicación arbitraria del usuario.
-		|
-		*/
-
 		const pathCoordinates: Coordinate[] = [
 			nearestOrigin.point,
 			...graphCoordinates,
 		]
-
-		/*
-		|--------------------------------------------------------------------------
-		| EVITAR DUPLICADOS
-		|--------------------------------------------------------------------------
-		*/
 
 		const cleanedPathCoordinates = pathCoordinates.filter(
 			(coordinate, index) => {
@@ -1713,39 +1640,15 @@ export default function MapScreen() {
 			cleanedPathCoordinates.push(nearestDestination.point)
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		| CONECTORES PUNTEADOS
-		|--------------------------------------------------------------------------
-		*/
-
 		const connectors: Coordinate[][] = []
-
-		/*
-		|--------------------------------------------------------------------------
-		| USUARIO -> CAMINO
-		|--------------------------------------------------------------------------
-		*/
 
 		if (nearestOrigin.distance > 0.5) {
 			connectors.push([origin, nearestOrigin.point])
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		| CAMINO -> DESTINO
-		|--------------------------------------------------------------------------
-		*/
-
 		if (nearestDestination.distance > 0.5) {
 			connectors.push([nearestDestination.point, destination])
 		}
-
-		/*
-		|--------------------------------------------------------------------------
-		| DISTANCIA
-		|--------------------------------------------------------------------------
-		*/
 
 		const graphDistance = distances.get(endId) ?? 0
 
@@ -1760,12 +1663,6 @@ export default function MapScreen() {
 		}
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| GEOJSON DE RUTA
-	|--------------------------------------------------------------------------
-	*/
-
 	const routeGeoJson = useMemo(() => {
 		if (!route) {
 			return {
@@ -1775,12 +1672,6 @@ export default function MapScreen() {
 		}
 
 		const features: any[] = []
-
-		/*
-			|--------------------------------------------------------------------------
-			| CAMINO REAL - SÓLIDO
-			|--------------------------------------------------------------------------
-			*/
 
 		if (route.pathCoordinates.length >= 2) {
 			features.push({
@@ -1794,12 +1685,6 @@ export default function MapScreen() {
 				},
 			})
 		}
-
-		/*
-			|--------------------------------------------------------------------------
-			| CONECTORES - PUNTEADOS
-			|--------------------------------------------------------------------------
-			*/
 
 		route.connectors.forEach((connector, index) => {
 			if (connector.length < 2) {
@@ -2002,16 +1887,6 @@ export default function MapScreen() {
 					/>
 				</GeoJSONSource>
 
-				{/*
-				|--------------------------------------------------------------------------
-				| RUTA DE NAVEGACIÓN
-				|--------------------------------------------------------------------------
-				|
-				| real-path = camino sólido
-				| connector = conexión punteada
-				|
-				*/}
-
 				<GeoJSONSource id='zoo-route-source' data={routeGeoJson as any}>
 					<Layer
 						id='zoo-route-outline'
@@ -2057,8 +1932,6 @@ export default function MapScreen() {
 					/>
 				</GeoJSONSource>
 
-				{/* MARKERS DEL ZOOLÓGICO */}
-
 				{selectableItems
 					.filter((item) => item.type === 'marker')
 					.map((item) => (
@@ -2090,8 +1963,6 @@ export default function MapScreen() {
 							</View>
 						</Marker>
 					))}
-
-				{/* ESPECIES */}
 
 				{selectableItems
 					.filter((item) => item.type === 'species')
@@ -2304,6 +2175,7 @@ export default function MapScreen() {
 								{
 									backgroundColor:
 										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#087A5A',
+
 									borderColor:
 										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#064D36',
 								},
@@ -2464,631 +2336,3 @@ export default function MapScreen() {
 		</SafeAreaView>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#F7F8F3',
-	},
-
-	map: {
-		flex: 1,
-	},
-
-	loadingContainer: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#F7F8F3',
-		paddingHorizontal: 24,
-	},
-
-	loadingCard: {
-		width: '100%',
-		maxWidth: 320,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#F7F7EE',
-		borderRadius: 24,
-		paddingVertical: 30,
-		paddingHorizontal: 24,
-		...cardShadow,
-	},
-
-	loadingText: {
-		marginTop: 14,
-		fontSize: 15,
-		fontWeight: '600',
-		color: '#6F8A7D',
-	},
-
-	errorCard: {
-		width: '100%',
-		maxWidth: 360,
-		alignItems: 'center',
-		backgroundColor: '#FFF1F0',
-		borderRadius: 24,
-		borderWidth: 1,
-		borderColor: '#FFE3E1',
-		paddingVertical: 28,
-		paddingHorizontal: 24,
-		...cardShadow,
-	},
-
-	errorIconContainer: {
-		width: 52,
-		height: 52,
-		borderRadius: 18,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#FFE3E1',
-		marginBottom: 14,
-	},
-
-	errorIcon: {
-		fontSize: 28,
-		fontWeight: '800',
-		color: '#C24141',
-	},
-
-	errorTitle: {
-		fontSize: 20,
-		fontWeight: '800',
-		color: '#123C32',
-		textAlign: 'center',
-		marginBottom: 8,
-	},
-
-	errorText: {
-		fontSize: 14,
-		lineHeight: 21,
-		color: '#6F8A7D',
-		textAlign: 'center',
-	},
-
-	topPanel: {
-		position: 'absolute',
-		top: 60,
-		left: 12,
-		right: 12,
-		backgroundColor: '#F7F7EE',
-		borderRadius: 22,
-		padding: 16,
-		...cardShadow,
-	},
-
-	headerRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-
-	headerTextContainer: {
-		flex: 1,
-		paddingRight: 10,
-	},
-
-	title: {
-		fontSize: 19,
-		fontWeight: '800',
-		color: '#123C32',
-	},
-
-	subtitle: {
-		marginTop: 3,
-		fontSize: 12,
-		color: '#6F8A7D',
-	},
-
-	statusBadge: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderRadius: 16,
-		paddingHorizontal: 10,
-		paddingVertical: 7,
-		backgroundColor: '#DCEFE5',
-	},
-
-	statusDot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		marginRight: 5,
-	},
-
-	statusText: {
-		fontSize: 11,
-		fontWeight: '700',
-		color: '#123C32',
-	},
-
-	locationBadge: {
-		position: 'absolute',
-		right: 14,
-		top: 150,
-		backgroundColor: '#F7F7EE',
-		borderRadius: 16,
-		paddingHorizontal: 11,
-		paddingVertical: 8,
-		flexDirection: 'row',
-		alignItems: 'center',
-		...cardShadow,
-	},
-
-	locationBadgeDot: {
-		width: 9,
-		height: 9,
-		borderRadius: 5,
-		backgroundColor: '#0977b8',
-		marginRight: 7,
-	},
-
-	locationBadgeTitle: {
-		fontSize: 11,
-		fontWeight: '700',
-		color: '#123C32',
-	},
-
-	locationBadgeText: {
-		marginTop: 1,
-		fontSize: 9,
-		color: '#6F8A7D',
-	},
-
-	mapMarker: {
-		width: 38,
-		height: 38,
-		borderRadius: 19,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#087A5A',
-		borderWidth: 3,
-		borderColor: '#F7F7EE',
-		overflow: 'hidden',
-		...cardShadow,
-	},
-
-	mapMarkerImage: {
-		width: 30,
-		height: 30,
-		borderRadius: 15,
-	},
-
-	speciesMarker: {
-		width: 42,
-		height: 42,
-		borderRadius: 21,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#064D36',
-		borderWidth: 3,
-		borderColor: '#F7F7EE',
-		overflow: 'hidden',
-		...cardShadow,
-	},
-
-	speciesMarkerImage: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
-	},
-
-	mapMarkerIcon: {
-		fontSize: 18,
-	},
-
-	userLocationOuter: {
-		width: 46,
-		height: 46,
-		borderRadius: 23,
-		backgroundColor: 'rgba(8, 118, 161, 0.2)',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderWidth: 1,
-		borderColor: 'rgba(8, 121, 141, 0.4)',
-	},
-
-	userLocationInner: {
-		width: 17,
-		height: 17,
-		borderRadius: 9,
-		backgroundColor: '#0977b8',
-		borderWidth: 3,
-		borderColor: '#F7F7EE',
-		...cardShadow,
-	},
-
-	destinationMarker: {
-		width: 46,
-		height: 46,
-		borderRadius: 23,
-		backgroundColor: '#064D36',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderWidth: 4,
-		borderColor: '#F7F7EE',
-		overflow: 'hidden',
-		...cardShadow,
-	},
-
-	destinationMarkerImage: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
-	},
-
-	destinationSpecies: {
-		width: 48,
-		height: 48,
-		borderRadius: 24,
-		backgroundColor: '#087A5A',
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderWidth: 4,
-		borderColor: '#F7F7EE',
-		overflow: 'hidden',
-		...cardShadow,
-	},
-
-	destinationSpeciesImage: {
-		width: 40,
-		height: 40,
-		borderRadius: 20,
-	},
-
-	destinationIcon: {
-		fontSize: 20,
-	},
-
-	bottomCard: {
-		position: 'absolute',
-		left: 12,
-		right: 12,
-		bottom: 15,
-		backgroundColor: '#F7F7EE',
-		borderRadius: 22,
-		padding: 16,
-		...cardShadow,
-	},
-
-	bottomCardHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	itemIcon: {
-		width: 42,
-		height: 42,
-		borderRadius: 16,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#DCEFE5',
-		overflow: 'hidden',
-	},
-
-	itemIconSpecies: {
-		backgroundColor: '#DCEFE5',
-	},
-
-	itemIconMarker: {
-		backgroundColor: '#DCEFE5',
-	},
-
-	itemSpeciesImage: {
-		width: 42,
-		height: 42,
-		borderRadius: 16,
-	},
-
-	itemMarkerImage: {
-		width: 34,
-		height: 34,
-		borderRadius: 12,
-	},
-
-	itemTextContainer: {
-		flex: 1,
-		minWidth: 0,
-		marginLeft: 10,
-		marginRight: 10,
-	},
-
-	itemTitle: {
-		fontSize: 16,
-		fontWeight: '800',
-		color: '#123C32',
-	},
-
-	itemType: {
-		marginTop: 2,
-		fontSize: 11,
-		color: '#6F8A7D',
-	},
-
-	scientificName: {
-		marginTop: 8,
-		fontSize: 12,
-		fontStyle: 'italic',
-		color: '#6F8A7D',
-	},
-
-	closeButton: {
-		width: 34,
-		height: 34,
-		borderRadius: 16,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#DCEFE5',
-	},
-
-	closeButtonText: {
-		fontSize: 23,
-		lineHeight: 25,
-		color: '#123C32',
-	},
-
-	itemDescription: {
-		marginTop: 12,
-		fontSize: 13,
-		lineHeight: 19,
-		color: '#6F8A7D',
-	},
-
-	actionRow: {
-		width: '100%',
-		marginTop: 14,
-	},
-
-	howToButtonContainer: {
-		width: '100%',
-		height: 56,
-		borderRadius: 16,
-		borderWidth: 1,
-		shadowColor: '#000000',
-		shadowOffset: {
-			width: 0,
-			height: 5,
-		},
-		shadowOpacity: 0.18,
-		shadowRadius: 8,
-		elevation: 1,
-		overflow: 'hidden',
-	},
-
-	howToButtonText: {
-		fontSize: 16,
-		fontWeight: '800',
-		color: '#FFFFFF',
-		textAlign: 'center',
-		textAlignVertical: 'center',
-		includeFontPadding: false,
-		lineHeight: 56,
-		padding: 0,
-		margin: 0,
-	},
-
-	outsideZooText: {
-		marginTop: 10,
-		fontSize: 11,
-		lineHeight: 17,
-		color: '#6F8A7D',
-	},
-
-	routeInfo: {
-		marginTop: 14,
-		paddingTop: 13,
-		borderTopWidth: 1,
-		borderTopColor: '#B8DCCA',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		gap: 10,
-	},
-
-	routeSummary: {
-		flex: 1,
-		minWidth: 0,
-	},
-
-	routeLabel: {
-		fontSize: 11,
-		color: '#6F8A7D',
-	},
-
-	routeDistance: {
-		marginTop: 2,
-		fontSize: 17,
-		fontWeight: '800',
-		color: '#064D36',
-	},
-
-	routeTimeBox: {
-		alignItems: 'center',
-		minWidth: 48,
-	},
-
-	routeTime: {
-		fontSize: 13,
-		fontWeight: '800',
-		color: '#123C32',
-	},
-
-	routeTimeLabel: {
-		fontSize: 9,
-		color: '#6F8A7D',
-	},
-
-	routeButton: {
-		backgroundColor: '#064D36',
-		borderRadius: 16,
-		paddingHorizontal: 15,
-		paddingVertical: 10,
-		...cardShadow,
-	},
-
-	routeButtonText: {
-		fontSize: 11,
-		fontWeight: '700',
-		color: '#FFFFFF',
-	},
-
-	routeHint: {
-		marginTop: 10,
-		fontSize: 11,
-		lineHeight: 17,
-		color: '#6F8A7D',
-	},
-
-	noRouteText: {
-		marginTop: 12,
-		fontSize: 12,
-		lineHeight: 18,
-		color: '#6F8A7D',
-	},
-
-	collapsedCardShadow: {
-		position: 'absolute',
-		left: 12,
-		right: 12,
-		bottom: 15,
-		height: 72,
-		borderRadius: 20,
-		backgroundColor: '#F7F7EE',
-		shadowColor: '#000000',
-		shadowOffset: {
-			width: 0,
-			height: 5,
-		},
-		shadowOpacity: 0.18,
-		shadowRadius: 8,
-		elevation: 1,
-	},
-
-	collapsedRouteCard: {
-		position: 'relative',
-		width: '100%',
-		height: 72,
-		backgroundColor: '#F7F7EE',
-		borderRadius: 20,
-		paddingLeft: 12,
-		paddingRight: 12,
-		justifyContent: 'center',
-	},
-
-	collapsedRouteIcon: {
-		position: 'absolute',
-		left: 12,
-		top: 15,
-		width: 35,
-		height: 35,
-		borderRadius: 14,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#087A5A',
-		overflow: 'hidden',
-	},
-
-	collapsedSpeciesImage: {
-		width: 35,
-		height: 35,
-		borderRadius: 14,
-	},
-
-	collapsedMarkerImage: {
-		width: 30,
-		height: 30,
-		borderRadius: 12,
-	},
-
-	collapsedRouteIconText: {
-		fontSize: 18,
-	},
-
-	collapsedRouteMain: {
-		position: 'absolute',
-		left: 59,
-		right: 92,
-		top: 12,
-		height: 48,
-		justifyContent: 'center',
-	},
-
-	collapsedRouteName: {
-		width: '100%',
-		justifyContent: 'center',
-	},
-
-	collapsedRouteTitle: {
-		fontSize: 14,
-		fontWeight: '800',
-		color: '#123C32',
-		lineHeight: 18,
-	},
-
-	collapsedRouteSubtitle: {
-		marginTop: 2,
-		fontSize: 9,
-		color: '#6F8A7D',
-		lineHeight: 12,
-	},
-
-	collapsedRouteStats: {
-		position: 'absolute',
-		right: -30,
-		top: 0,
-		width: 125,
-		height: 48,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'flex-end',
-	},
-
-	collapsedRouteStat: {
-		width: 52,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	collapsedRouteDistance: {
-		fontSize: 14,
-		fontWeight: '800',
-		color: '#064D36',
-		textAlign: 'center',
-		lineHeight: 17,
-	},
-
-	collapsedRouteTime: {
-		fontSize: 13,
-		fontWeight: '800',
-		color: '#123C32',
-		textAlign: 'center',
-		lineHeight: 16,
-	},
-
-	collapsedRouteLabel: {
-		marginTop: 1,
-		fontSize: 7,
-		color: '#6F8A7D',
-		textAlign: 'center',
-		lineHeight: 9,
-	},
-
-	collapsedRouteSeparator: {
-		width: 1,
-		height: 24,
-		marginHorizontal: 5,
-		backgroundColor: '#B8DCCA',
-	},
-
-	collapsedRouteExpand: {
-		position: 'absolute',
-		right: 12,
-		top: 20,
-		width: 32,
-		height: 32,
-		borderRadius: 16,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: '#DCEFE5',
-	},
-})

@@ -17,6 +17,8 @@ import {
 	View,
 } from 'react-native'
 
+import styles, { colors } from '@/styles/species-detail'
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 type SpeciesImage = {
@@ -60,48 +62,6 @@ type SpeciesResponse = {
 	}
 }
 
-const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	text: '#17372C',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
-	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
-	overlay: 'rgba(0,0,0,0.45)',
-}
-
-const cardShadow = {
-	shadowColor: '#075C3B',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
-
-const subtleShadow = {
-	shadowColor: '#075C3B',
-	shadowOffset: {
-		width: 0,
-		height: 3,
-	},
-	shadowOpacity: 0.08,
-	shadowRadius: 7,
-	elevation: 2,
-}
-
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
 
@@ -117,7 +77,7 @@ export default function SpeciesDetailScreen() {
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
 
 	useEffect(() => {
-		loadSpecies()
+		void loadSpecies()
 	}, [params.id])
 
 	async function loadSpecies() {
@@ -193,21 +153,12 @@ export default function SpeciesDetailScreen() {
 				source={require('@/assets/images/zoo-pattern.png')}
 				className='flex-1 items-center justify-center'
 				resizeMode='repeat'
-				imageStyle={{
-					opacity: 0.9,
-				}}
-				style={{
-					backgroundColor: colors.background,
-				}}
+				imageStyle={styles.patternImage}
+				style={styles.loadingBackground}
 			>
 				<ActivityIndicator size='large' color={colors.primary} />
 
-				<Text
-					className='mt-4 text-sm font-medium'
-					style={{
-						color: colors.textSecondary,
-					}}
-				>
+				<Text className='mt-4 text-sm font-medium' style={styles.loadingText}>
 					Cargando especie...
 				</Text>
 			</ImageBackground>
@@ -220,66 +171,26 @@ export default function SpeciesDetailScreen() {
 				source={require('@/assets/images/zoo-pattern.png')}
 				className='flex-1 px-5 pt-16'
 				resizeMode='repeat'
-				imageStyle={{
-					opacity: 0.9,
-				}}
-				style={{
-					backgroundColor: colors.background,
-				}}
+				imageStyle={styles.patternImage}
+				style={styles.errorBackground}
 			>
-				<View
-					className='mb-8 self-start overflow-hidden rounded-2xl'
-					style={{
-						backgroundColor: colors.cardLight,
-						borderWidth: 1,
-						borderColor: colors.border,
-						...subtleShadow,
-					}}
-				>
+				<View style={styles.errorBackWrapper}>
 					<Pressable
 						onPress={() => router.back()}
 						className='flex-row items-center rounded-2xl px-4 py-3'
-						style={({ pressed }) => ({
-							backgroundColor: pressed ? colors.active : colors.cardLight,
-						})}
+						style={({ pressed }) => [
+							styles.errorBackButton,
+							pressed && styles.errorBackButtonPressed,
+						]}
 					>
-						<Text
-							className='mr-1 text-xl font-bold'
-							style={{
-								color: colors.primary,
-								lineHeight: 20,
-							}}
-						>
-							‹
-						</Text>
+						<Text style={styles.errorBackArrow}>‹</Text>
 
-						<Text
-							className='text-sm font-semibold'
-							style={{
-								color: colors.text,
-							}}
-						>
-							Regresar
-						</Text>
+						<Text style={styles.errorBackText}>Regresar</Text>
 					</Pressable>
 				</View>
 
-				<View
-					className='items-center rounded-[28px] border px-6 py-10'
-					style={{
-						backgroundColor: colors.errorBackground,
-						borderColor: colors.errorBorder,
-						...cardShadow,
-					}}
-				>
-					<View
-						className='h-16 w-16 items-center justify-center rounded-2xl'
-						style={{
-							backgroundColor: colors.errorBorder,
-							borderWidth: 1,
-							borderColor: colors.errorBorder,
-						}}
-					>
+				<View style={styles.errorCard}>
+					<View style={styles.errorIcon}>
 						<HugeiconsIcon
 							icon={UserGroupIcon}
 							size={34}
@@ -288,46 +199,24 @@ export default function SpeciesDetailScreen() {
 						/>
 					</View>
 
-					<Text
-						className='mt-5 text-center text-lg font-bold'
-						style={{
-							color: colors.text,
-						}}
-					>
+					<Text style={styles.errorTitle}>
 						No fue posible cargar la especie
 					</Text>
 
-					<Text
-						className='mt-2 text-center text-sm leading-5'
-						style={{
-							color: colors.textSecondary,
-						}}
-					>
+					<Text style={styles.errorMessage}>
 						{error ?? 'La información no está disponible en este momento.'}
 					</Text>
 
-					<View
-						className='mt-6 overflow-hidden rounded-[20px]'
-						style={{
-							backgroundColor: colors.primary,
-							...subtleShadow,
-						}}
-					>
+					<View style={styles.retryButtonWrapper}>
 						<Pressable
 							onPress={loadSpecies}
 							className='rounded-[20px] px-6 py-3.5'
-							style={({ pressed }) => ({
-								backgroundColor: pressed ? colors.primaryLight : colors.primary,
-							})}
+							style={({ pressed }) => [
+								styles.retryButton,
+								pressed && styles.retryButtonPressed,
+							]}
 						>
-							<Text
-								className='font-bold'
-								style={{
-									color: colors.white,
-								}}
-							>
-								Intentar nuevamente
-							</Text>
+							<Text style={styles.retryButtonText}>Intentar nuevamente</Text>
 						</Pressable>
 					</View>
 				</View>
@@ -339,9 +228,7 @@ export default function SpeciesDetailScreen() {
 		<>
 			<Animated.ScrollView
 				className='flex-1'
-				style={{
-					backgroundColor: colors.background,
-				}}
+				style={styles.scrollView}
 				showsVerticalScrollIndicator={false}
 				scrollEventThrottle={16}
 				onScroll={Animated.event(
@@ -359,21 +246,11 @@ export default function SpeciesDetailScreen() {
 					},
 				)}
 			>
-				<View
-					className='relative'
-					style={{
-						backgroundColor: colors.background,
-					}}
-				>
-					{/* =====================================================
-                        HERO
-                    ====================================================== */}
-
+				<View className='relative' style={styles.mainBackground}>
+					{/* HERO */}
 					<View
 						className='h-[470px] w-full overflow-hidden'
-						style={{
-							backgroundColor: colors.card,
-						}}
+						style={styles.heroContainer}
 					>
 						{heroImage ? (
 							<Pressable
@@ -392,9 +269,7 @@ export default function SpeciesDetailScreen() {
 						) : (
 							<View
 								className='h-full w-full items-center justify-center'
-								style={{
-									backgroundColor: colors.card,
-								}}
+								style={styles.heroPlaceholder}
 							>
 								<HugeiconsIcon
 									icon={UserGroupIcon}
@@ -408,13 +283,10 @@ export default function SpeciesDetailScreen() {
 						<View
 							className='absolute inset-0'
 							pointerEvents='none'
-							style={{
-								backgroundColor: 'rgba(7,92,59,0.08)',
-							}}
+							style={styles.heroOverlay}
 						/>
 
 						{/* REGRESAR */}
-
 						<Animated.View
 							className='absolute left-5 top-14 z-20'
 							style={{
@@ -424,78 +296,45 @@ export default function SpeciesDetailScreen() {
 							<Pressable
 								onPress={() => router.back()}
 								className='flex-row items-center rounded-full px-3.5 py-2.5'
-								style={({ pressed }) => ({
-									backgroundColor: pressed
-										? colors.active
-										: 'rgba(255,255,255,0.92)',
-									...cardShadow,
-								})}
+								style={({ pressed }) => [
+									styles.heroBackButton,
+									pressed && styles.heroBackButtonPressed,
+								]}
 							>
-								<Text
-									className='mr-1 text-xl font-bold'
-									style={{
-										color: colors.primary,
-										lineHeight: 20,
-									}}
-								>
-									‹
-								</Text>
+								<Text style={styles.heroBackArrow}>‹</Text>
 
-								<Text
-									className='text-sm font-semibold'
-									style={{
-										color: colors.text,
-									}}
-								>
-									Regresar
-								</Text>
+								<Text style={styles.heroBackText}>Regresar</Text>
 							</Pressable>
 						</Animated.View>
 					</View>
 
-					{/* =====================================================
-                        CARD PRINCIPAL
-                    ====================================================== */}
-
+					{/* CARD PRINCIPAL */}
 					<Animated.View
 						className='relative z-10 w-full overflow-hidden rounded-t-[30px]'
-						style={{
-							marginTop: cardMarginTop,
-							backgroundColor: colors.cardLight,
-							borderWidth: 1,
-							borderColor: colors.border,
-							...cardShadow,
-						}}
+						style={[
+							styles.mainCard,
+							{
+								marginTop: cardMarginTop,
+							},
+						]}
 					>
-						{/* ZOO PATTERN DENTRO DE LA CARD */}
-
+						{/* ZOO PATTERN */}
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
 							resizeMode='repeat'
-							imageStyle={{
-								opacity: 0.3,
-							}}
-							style={{
-								backgroundColor: colors.background,
-							}}
+							imageStyle={styles.cardPatternImage}
+							style={styles.cardBackground}
 						>
 							<View className='px-5 pb-8 pt-7'>
 								{/* CATEGORÍA */}
-
 								{species.category && (
 									<View
 										className='self-start rounded-full px-3.5 py-1.5'
-										style={{
-											backgroundColor: colors.active,
-											borderWidth: 1,
-											borderColor: colors.border,
-										}}
+										style={styles.categoryBadge}
 									>
 										<Text
 											className='text-xs font-bold uppercase tracking-wide'
-											style={{
-												color: colors.primary,
-											}}
+											style={styles.categoryText}
 										>
 											{species.category.name}
 										</Text>
@@ -503,47 +342,36 @@ export default function SpeciesDetailScreen() {
 								)}
 
 								{/* NOMBRE */}
-
 								<Text
 									className='mt-4 text-[30px] font-bold leading-9'
-									style={{
-										color: colors.text,
-									}}
+									style={styles.speciesName}
 								>
 									{species.common_name}
 								</Text>
 
 								{/* NOMBRE CIENTÍFICO */}
-
 								{species.scientific_name && (
 									<Text
 										className='mt-1.5 text-base italic'
-										style={{
-											color: colors.textSecondary,
-										}}
+										style={styles.scientificName}
 									>
 										{species.scientific_name}
 									</Text>
 								)}
 
 								{/* DESCRIPCIÓN */}
-
 								{species.description && (
 									<View className='mt-8'>
 										<Text
 											className='text-[21px] font-bold'
-											style={{
-												color: colors.primary,
-											}}
+											style={styles.sectionTitle}
 										>
 											Conoce a esta especie
 										</Text>
 
 										<Text
 											className='mt-2 text-[15px] leading-7'
-											style={{
-												color: colors.textSecondary,
-											}}
+											style={styles.description}
 										>
 											{species.description}
 										</Text>
@@ -551,13 +379,10 @@ export default function SpeciesDetailScreen() {
 								)}
 
 								{/* DATOS */}
-
 								<View className='mt-8'>
 									<Text
 										className='text-[21px] font-bold'
-										style={{
-											color: colors.primary,
-										}}
+										style={styles.sectionTitle}
 									>
 										Datos de la especie
 									</Text>
@@ -592,14 +417,11 @@ export default function SpeciesDetailScreen() {
 								</View>
 
 								{/* ETIQUETAS */}
-
 								{species.tags.length > 0 && (
 									<View className='mt-8'>
 										<Text
 											className='text-[21px] font-bold'
-											style={{
-												color: colors.primary,
-											}}
+											style={styles.sectionTitle}
 										>
 											Etiquetas
 										</Text>
@@ -609,16 +431,11 @@ export default function SpeciesDetailScreen() {
 												<View
 													key={tag.id}
 													className='rounded-full border px-4 py-2.5'
-													style={{
-														backgroundColor: colors.active,
-														borderColor: colors.border,
-													}}
+													style={styles.tag}
 												>
 													<Text
 														className='text-sm font-semibold'
-														style={{
-															color: colors.primary,
-														}}
+														style={styles.tagText}
 													>
 														{tag.name}
 													</Text>
@@ -629,14 +446,11 @@ export default function SpeciesDetailScreen() {
 								)}
 
 								{/* GALERÍA */}
-
 								{galleryImages.length > 0 && (
 									<View className='mt-8'>
 										<Text
 											className='text-[21px] font-bold'
-											style={{
-												color: colors.primary,
-											}}
+											style={styles.sectionTitle}
 										>
 											Galería
 										</Text>
@@ -645,29 +459,27 @@ export default function SpeciesDetailScreen() {
 											horizontal
 											showsHorizontalScrollIndicator={false}
 											className='-mx-5 mt-4'
-											contentContainerStyle={{
-												paddingHorizontal: 20,
-											}}
+											contentContainerStyle={styles.galleryContent}
 										>
 											{galleryImages.map((image) => (
 												<View
 													key={image.id}
 													className='mr-3 overflow-hidden rounded-[22px]'
-													style={{
-														width: SCREEN_WIDTH * 0.68,
-														height: SCREEN_WIDTH * 0.48,
-														backgroundColor: colors.card,
-														borderWidth: 1,
-														borderColor: colors.border,
-														...subtleShadow,
-													}}
+													style={[
+														styles.galleryItem,
+														{
+															width: SCREEN_WIDTH * 0.68,
+															height: SCREEN_WIDTH * 0.48,
+														},
+													]}
 												>
 													<Pressable
 														onPress={() => setSelectedImage(image)}
 														className='h-full w-full'
-														style={({ pressed }) => ({
-															opacity: pressed ? 0.88 : 1,
-														})}
+														style={({ pressed }) => [
+															styles.galleryPressable,
+															pressed && styles.galleryPressed,
+														]}
 													>
 														<Image
 															source={{
@@ -693,10 +505,7 @@ export default function SpeciesDetailScreen() {
 				</View>
 			</Animated.ScrollView>
 
-			{/* =========================================================
-                VISOR DE IMAGEN
-            ========================================================== */}
-
+			{/* VISOR DE IMAGEN */}
 			<Modal
 				visible={selectedImage !== null}
 				transparent
@@ -705,35 +514,18 @@ export default function SpeciesDetailScreen() {
 			>
 				<View
 					className='flex-1 items-center justify-center'
-					style={{
-						backgroundColor: 'rgba(23,55,44,0.95)',
-					}}
+					style={styles.modalContainer}
 				>
-					<View
-						className='absolute right-5 top-14 z-10 overflow-hidden rounded-full'
-						style={{
-							backgroundColor: 'rgba(221,245,234,0.20)',
-							borderWidth: 1,
-							borderColor: 'rgba(189,238,217,0.35)',
-						}}
-					>
+					<View style={styles.modalCloseWrapper}>
 						<Pressable
 							onPress={() => setSelectedImage(null)}
 							className='rounded-full px-4 py-2.5'
-							style={({ pressed }) => ({
-								backgroundColor: pressed
-									? 'rgba(189,238,217,0.30)'
-									: 'rgba(221,245,234,0.20)',
-							})}
+							style={({ pressed }) => [
+								styles.modalCloseButton,
+								pressed && styles.modalCloseButtonPressed,
+							]}
 						>
-							<Text
-								className='text-sm font-bold'
-								style={{
-									color: colors.white,
-								}}
-							>
-								Cerrar
-							</Text>
+							<Text style={styles.modalCloseText}>Cerrar</Text>
 						</Pressable>
 					</View>
 
@@ -765,26 +557,18 @@ function SpeciesDataCard({
 	return (
 		<View
 			className='rounded-[22px] border p-4'
-			style={{
-				backgroundColor: accent ? colors.active : colors.white,
-				borderColor: colors.border,
-				...subtleShadow,
-			}}
+			style={[styles.dataCard, accent && styles.dataCardAccent]}
 		>
 			<Text
 				className='text-[11px] font-bold uppercase tracking-wider'
-				style={{
-					color: accent ? colors.primary : colors.textSecondary,
-				}}
+				style={[styles.dataLabel, accent && styles.dataLabelAccent]}
 			>
 				{label}
 			</Text>
 
 			<Text
 				className='mt-1.5 text-base font-medium leading-6'
-				style={{
-					color: colors.text,
-				}}
+				style={styles.dataValue}
 			>
 				{value}
 			</Text>

@@ -1,5 +1,6 @@
+import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import { login } from '@/services/auth'
+import { colors, styles } from '@/styles/login'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -27,6 +28,8 @@ type FormErrors = {
 }
 
 export default function Login() {
+	const { login } = useAuth()
+
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [showPassword, setShowPassword] = useState(false)
@@ -101,98 +104,67 @@ export default function Login() {
 
 	return (
 		<KeyboardAvoidingView
-			className='flex-1'
-			style={{ backgroundColor: '#F7F7EE' }}
+			style={styles.container}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 		>
-			{/* FONDO */}
-			<View className='absolute inset-0 overflow-hidden'>
+			<View style={styles.background}>
 				<Image
 					source={require('../../assets/images/login-background.png')}
-					className='h-full w-full'
+					style={styles.backgroundImage}
 					resizeMode='cover'
-					style={{
-						transform: [{ scale: 1 }],
-					}}
 				/>
 			</View>
 
 			<ScrollView
-				className='flex-1'
-				contentContainerStyle={{
-					paddingHorizontal: 24,
-					paddingTop: 45,
-					paddingBottom: 100,
-				}}
+				style={styles.scrollView}
+				contentContainerStyle={styles.scrollContent}
 				keyboardShouldPersistTaps='handled'
 				keyboardDismissMode='on-drag'
 				showsVerticalScrollIndicator={false}
 			>
-				{/* LOGO */}
-				<View className='mt-12 items-center'>
+				<View style={styles.logoContainer}>
 					<Image
 						source={require('../../assets/images/zooapp-logo.png')}
-						className='h-36 w-36'
+						style={styles.logo}
 						resizeMode='contain'
 					/>
 				</View>
 
-				{/* CARD */}
-				<View
-					className='mt-8 rounded-3xl p-5 shadow-sm'
-					style={{
-						backgroundColor: '#F7F7EE',
-					}}
-				>
-					{/* ENCABEZADO */}
-					<View className='items-center'>
-						<Text
-							className='text-center text-3xl font-bold'
-							style={{ color: '#123C32' }}
-						>
-							¡Bienvenido a ZooApp!
-						</Text>
+				<View style={styles.card}>
+					<View style={styles.header}>
+						<Text style={styles.title}>¡Bienvenido a ZooApp!</Text>
 
-						<Text
-							className='mt-2 text-center text-base'
-							style={{ color: '#6F8A7D' }}
-						>
+						<Text style={styles.subtitle}>
 							Inicia sesión para continuar tu aventura.
 						</Text>
 					</View>
 
-					{/* EMAIL */}
-					<Text
-						className='mb-2 mt-8 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Correo electrónico
-					</Text>
+					<Text style={styles.labelFirst}>Correo electrónico</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.email
-								? '#C83B3B'
-								: emailFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.email
+									? colors.error
+									: emailFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						{/* ICONO EMAIL */}
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={Mail01Icon}
 								size={20}
 								strokeWidth={1.8}
 								color={
 									errors.email
-										? '#C83B3B'
+										? colors.error
 										: emailFocused
-											? '#087A5A'
-											: '#6F8A7D'
+											? colors.primary
+											: colors.muted
 								}
 							/>
 						</View>
@@ -206,54 +178,43 @@ export default function Login() {
 							onFocus={() => setEmailFocused(true)}
 							onBlur={() => setEmailFocused(false)}
 							placeholder='correo@ejemplo.com'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							autoCapitalize='none'
 							autoCorrect={false}
 							keyboardType='email-address'
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 					</View>
 
 					{errors.email && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
-							{errors.email}
-						</Text>
+						<Text style={styles.fieldError}>{errors.email}</Text>
 					)}
 
-					{/* PASSWORD */}
-					<Text
-						className='mb-2 mt-5 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Contraseña
-					</Text>
+					<Text style={styles.label}>Contraseña</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.password
-								? '#C83B3B'
-								: passwordFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.password
+									? colors.error
+									: passwordFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						{/* ICONO CONTRASEÑA */}
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={LockPasswordIcon}
 								size={20}
 								strokeWidth={1.8}
 								color={
 									errors.password
-										? '#C83B3B'
+										? colors.error
 										: passwordFocused
-											? '#087A5A'
-											: '#6F8A7D'
+											? colors.primary
+											: colors.muted
 								}
 							/>
 						</View>
@@ -267,118 +228,67 @@ export default function Login() {
 							onFocus={() => setPasswordFocused(true)}
 							onBlur={() => setPasswordFocused(false)}
 							placeholder='Tu contraseña'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							secureTextEntry={!showPassword}
 							autoCapitalize='none'
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 
-						{/* OJO */}
 						<Pressable
 							onPress={() => setShowPassword(!showPassword)}
-							className='mr-2 items-center justify-center rounded-xl p-2'
+							style={styles.passwordToggle}
 							hitSlop={8}
 						>
 							<HugeiconsIcon
 								icon={showPassword ? ViewOffSlashIcon : ViewIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={passwordFocused ? '#087A5A' : '#6F8A7D'}
+								color={passwordFocused ? colors.primary : colors.muted}
 							/>
 						</Pressable>
 					</View>
 
 					{errors.password && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
-							{errors.password}
-						</Text>
+						<Text style={styles.fieldError}>{errors.password}</Text>
 					)}
 
-					{/* ERROR GENERAL */}
 					{error !== '' && (
-						<View
-							className='mt-4 rounded-xl px-4 py-3'
-							style={{
-								backgroundColor: '#FFF1F0',
-								borderWidth: 1,
-								borderColor: '#FFE3E1',
-							}}
-						>
-							<Text className='text-sm' style={{ color: '#C83B3B' }}>
-								{error}
-							</Text>
+						<View style={styles.generalError}>
+							<Text style={styles.generalErrorText}>{error}</Text>
 						</View>
 					)}
 
-					{/* RECUPERAR CONTRASEÑA */}
 					<Pressable
 						onPress={() => router.push('/forgot-password')}
-						className='mt-4 self-end rounded-2xl px-1 py-1'
+						style={styles.forgotPassword}
 					>
-						<Text
-							className='text-sm font-semibold'
-							style={{ color: '#087A5A' }}
-						>
+						<Text style={styles.forgotPasswordText}>
 							¿Olvidaste tu contraseña?
 						</Text>
 					</Pressable>
 
-					{/* LOGIN */}
 					<Pressable
 						onPress={handleLogin}
 						disabled={loading}
-						className={`mt-6 rounded-2xl ${loading ? 'opacity-60' : ''}`}
-						style={{
-							shadowColor: '#064D36',
-							shadowOffset: {
-								width: 0,
-								height: 4,
-							},
-							shadowOpacity: 0.16,
-							shadowRadius: 7,
-							elevation: 4,
-						}}
+						style={[styles.loginButton, loading && styles.loginButtonDisabled]}
 					>
-						<View
-							className='w-full items-center rounded-2xl px-5 py-4'
-							style={{
-								backgroundColor: '#087A5A',
-							}}
-						>
+						<View style={styles.loginButtonContent}>
 							{loading ? (
-								<ActivityIndicator color='#FFFFFF' />
+								<ActivityIndicator color={colors.white} />
 							) : (
-								<Text
-									className='text-base font-bold'
-									style={{
-										color: '#FFFFFF',
-									}}
-								>
-									Iniciar sesión
-								</Text>
+								<Text style={styles.loginButtonText}>Iniciar sesión</Text>
 							)}
 						</View>
 					</Pressable>
 
-					{/* REGISTRO */}
-					<View className='mt-8 flex-row justify-center'>
-						<Text className='text-base' style={{ color: '#6F8A7D' }}>
-							¿No tienes una cuenta?{' '}
-						</Text>
+					<View style={styles.registerRow}>
+						<Text style={styles.registerText}>¿No tienes una cuenta? </Text>
 
 						<Pressable
 							onPress={() => router.push('/register')}
-							className='rounded-2xl px-1'
+							style={styles.registerButton}
 						>
-							<Text
-								className='text-base font-bold'
-								style={{ color: '#087A5A' }}
-							>
-								Regístrate
-							</Text>
+							<Text style={styles.registerButtonText}>Regístrate</Text>
 						</Pressable>
 					</View>
 				</View>

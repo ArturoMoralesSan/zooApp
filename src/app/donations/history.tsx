@@ -15,12 +15,62 @@ import {
 	Alert,
 	ImageBackground,
 	Pressable,
-	SafeAreaView,
 	ScrollView,
-	StyleSheet,
 	Text,
 	View,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import {
+	backButtonStyle,
+	backTextStyle,
+	backgroundImageStyle,
+	backgroundStyle,
+	buyButtonStyle,
+	buyButtonTextStyle,
+	cardShadow,
+	colors,
+	containerStyle,
+	dividerStyle,
+	donationAmountStyle,
+	donationCardStyle,
+	donationDateStyle,
+	donationHeaderStyle,
+	donationIconStyle,
+	donationInfoStyle,
+	donationTimeStyle,
+	donationsListStyle,
+	emptyCardStyle,
+	emptyIconStyle,
+	emptyTextStyle,
+	emptyTitleStyle,
+	headerStyle,
+	infoBlockStyle,
+	infoLabelStyle,
+	infoRowStyle,
+	infoValueStyle,
+	loadingContainerStyle,
+	loadingTextStyle,
+	paymentRowStyle,
+	referenceContainerStyle,
+	referenceInfoStyle,
+	scrollContentStyle,
+	sectionTitleStyle,
+	statCardStyle,
+	statIconStyle,
+	statLabelStyle,
+	statNumberStyle,
+	statsContainerStyle,
+	statusBadgeStyle,
+	statusTextStyle,
+	subtitleStyle,
+	titleStyle,
+	totalAmountStyle,
+	totalCardStyle,
+	totalIconStyle,
+	totalInfoStyle,
+	totalLabelStyle,
+} from '@/styles/donation-history'
 
 type PaymentMethod = {
 	id?: number
@@ -34,41 +84,6 @@ type Donation = {
 	reference?: string | null
 	created_at?: string | null
 	payment_method?: PaymentMethod | null
-}
-
-const COLORS = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
-	white: '#FFFFFF',
-
-	coral: '#D95C4F',
-	coralLight: '#F8E1DE',
-
-	orange: '#B76E00',
-	orangeLight: '#FFF0D4',
-
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-
-	overlay: 'rgba(0,0,0,0.45)',
-}
-
-const cardShadow = {
-	shadowColor: '#075C3B',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
 }
 
 const getDonationStatus = (donation?: Donation) => {
@@ -118,24 +133,24 @@ const getDonationStatusColors = (donation?: Donation) => {
 		status === 'fallido'
 	) {
 		return {
-			backgroundColor: COLORS.coralLight,
-			color: COLORS.coral,
+			backgroundColor: colors.coralLight,
+			color: colors.coral,
 			borderColor: '#EFC5C0',
 		}
 	}
 
 	if (status === 'pending' || status === 'pendiente') {
 		return {
-			backgroundColor: COLORS.orangeLight,
-			color: COLORS.orange,
+			backgroundColor: colors.orangeLight,
+			color: colors.orange,
 			borderColor: '#E8D2A7',
 		}
 	}
 
 	return {
-		backgroundColor: COLORS.active,
-		color: COLORS.primary,
-		borderColor: COLORS.border,
+		backgroundColor: colors.active,
+		color: colors.primary,
+		borderColor: colors.border,
 	}
 }
 
@@ -170,20 +185,6 @@ export default function DonationHistoryScreen() {
 			const data = response?.data ?? response
 
 			let normalizedData: unknown = data
-
-			/*
-			 * Soporta distintas respuestas posibles:
-			 *
-			 * { data: [...] }
-			 *
-			 * { data: { data: [...] } }
-			 *
-			 * { data: { donations: [...] } }
-			 *
-			 * { donations: [...] }
-			 *
-			 * [...]
-			 */
 
 			if (
 				normalizedData &&
@@ -227,7 +228,6 @@ export default function DonationHistoryScreen() {
 	const sortedDonations = useMemo(() => {
 		return [...donations].sort((a, b) => {
 			const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
-
 			const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
 
 			return dateB - dateA
@@ -304,189 +304,160 @@ export default function DonationHistoryScreen() {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={styles.background}
-				className='flex-1'
+				style={backgroundStyle}
 				resizeMode='repeat'
-				imageStyle={{
-					opacity: 0.3,
-				}}
+				imageStyle={backgroundImageStyle}
 			>
-				<View style={styles.backButtonWrapper}>
+				<View style={backButtonStyle}>
 					<Pressable
 						onPress={() => router.back()}
-						className='flex-row items-center rounded-[18px] px-4 py-2.5'
-						style={({ pressed }) => ({
-							backgroundColor: pressed ? COLORS.card : COLORS.cardLight,
-							borderWidth: 1,
-							borderColor: COLORS.border,
-							shadowColor: COLORS.primary,
-							shadowOffset: {
-								width: 0,
-								height: 3,
+						style={({ pressed }) => [
+							{
+								opacity: pressed ? 0.75 : 1,
 							},
-							shadowOpacity: 0.1,
-							shadowRadius: 7,
-							elevation: 3,
-							opacity: pressed ? 0.75 : 1,
-						})}
+						]}
 					>
-						<Text
-							className='mr-1 text-lg font-bold'
-							style={{
-								color: COLORS.primary,
-							}}
-						>
-							‹
-						</Text>
-
-						<Text
-							className='text-base font-semibold'
-							style={{
-								color: COLORS.dark,
-							}}
-						>
-							Regresar
-						</Text>
+						<Text style={backTextStyle}>‹ Regresar</Text>
 					</Pressable>
 				</View>
 
 				<ScrollView
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={styles.scrollContent}
+					contentContainerStyle={scrollContentStyle}
 				>
-					<View style={styles.header}>
-						<Text style={styles.title}>Mis donaciones</Text>
+					<View style={headerStyle}>
+						<Text style={titleStyle}>Mis donaciones</Text>
 
-						<Text style={styles.subtitle}>
+						<Text style={subtitleStyle}>
 							Consulta el historial de tus donaciones.
 						</Text>
 					</View>
 
-					<View style={styles.statsContainer}>
-						<View style={styles.statCard}>
-							<View style={styles.statIcon}>
+					<View style={statsContainerStyle}>
+						<View style={statCardStyle}>
+							<View style={statIconStyle}>
 								<HugeiconsIcon
 									icon={HeartAddIcon}
 									size={21}
 									strokeWidth={1.8}
-									color={COLORS.primary}
+									color={colors.primary}
 								/>
 							</View>
 
 							<View>
-								<Text style={styles.statNumber}>{donations.length}</Text>
+								<Text style={statNumberStyle}>{donations.length}</Text>
 
-								<Text style={styles.statLabel}>Donaciones</Text>
+								<Text style={statLabelStyle}>Donaciones</Text>
 							</View>
 						</View>
 
-						<View style={styles.statCard}>
-							<View style={styles.statIcon}>
+						<View style={statCardStyle}>
+							<View style={statIconStyle}>
 								<HugeiconsIcon
 									icon={CheckmarkCircle02Icon}
 									size={21}
 									strokeWidth={1.8}
-									color={COLORS.primary}
+									color={colors.primary}
 								/>
 							</View>
 
 							<View>
-								<Text style={styles.statNumber}>{completedDonations}</Text>
+								<Text style={statNumberStyle}>{completedDonations}</Text>
 
-								<Text style={styles.statLabel}>Completadas</Text>
+								<Text style={statLabelStyle}>Completadas</Text>
 							</View>
 						</View>
 					</View>
 
-					<View style={styles.totalCard}>
-						<View style={styles.totalIcon}>
+					<View style={totalCardStyle}>
+						<View style={totalIconStyle}>
 							<HugeiconsIcon
 								icon={HeartAddIcon}
 								size={25}
 								strokeWidth={1.8}
-								color={COLORS.primary}
+								color={colors.primary}
 							/>
 						</View>
 
-						<View style={styles.totalInfo}>
-							<Text style={styles.totalLabel}>Total donado</Text>
+						<View style={totalInfoStyle}>
+							<Text style={totalLabelStyle}>Total donado</Text>
 
-							<Text style={styles.totalAmount}>
-								{formatAmount(totalDonated)}
-							</Text>
+							<Text style={totalAmountStyle}>{formatAmount(totalDonated)}</Text>
 						</View>
 					</View>
 
 					{loading ? (
-						<View style={styles.loadingContainer}>
-							<ActivityIndicator size='large' color={COLORS.primary} />
+						<View style={loadingContainerStyle}>
+							<ActivityIndicator size='large' color={colors.primary} />
 
-							<Text style={styles.loadingText}>Cargando tus donaciones...</Text>
+							<Text style={loadingTextStyle}>Cargando tus donaciones...</Text>
 						</View>
 					) : sortedDonations.length === 0 ? (
-						<View style={styles.emptyCard}>
-							<View style={styles.emptyIcon}>
+						<View style={emptyCardStyle}>
+							<View style={emptyIconStyle}>
 								<HugeiconsIcon
 									icon={HeartAddIcon}
 									size={32}
 									strokeWidth={1.8}
-									color={COLORS.primary}
+									color={colors.primary}
 								/>
 							</View>
 
-							<Text style={styles.emptyTitle}>No tienes donaciones</Text>
+							<Text style={emptyTitleStyle}>No tienes donaciones</Text>
 
-							<Text style={styles.emptyText}>
+							<Text style={emptyTextStyle}>
 								Cuando realices una donación aparecerá aquí.
 							</Text>
 
-							<View style={styles.buyButtonWrapper}>
+							<View style={cardShadow}>
 								<Pressable
 									onPress={() => router.push('/donations')}
-									style={({ pressed }) => ({
-										...styles.buyButton,
-										backgroundColor: pressed
-											? COLORS.buttonPressed
-											: COLORS.button,
-									})}
+									style={({ pressed }) => [
+										buyButtonStyle,
+										{
+											backgroundColor: pressed
+												? colors.buttonPressed
+												: colors.button,
+										},
+									]}
 								>
-									<Text style={styles.buyButtonText}>Hacer una donación</Text>
+									<Text style={buyButtonTextStyle}>Hacer una donación</Text>
 								</Pressable>
 							</View>
 						</View>
 					) : (
-						<View style={styles.donationsList}>
-							<Text style={styles.sectionTitle}>Historial</Text>
+						<View style={donationsListStyle}>
+							<Text style={sectionTitleStyle}>Historial</Text>
 
 							{sortedDonations.map((donation) => {
 								const statusColors = getDonationStatusColors(donation)
 
 								return (
-									<View key={donation.id} style={styles.donationCard}>
-										<View style={styles.donationHeader}>
-											<View style={styles.donationIcon}>
+									<View key={donation.id} style={donationCardStyle}>
+										<View style={donationHeaderStyle}>
+											<View style={donationIconStyle}>
 												<HugeiconsIcon
 													icon={HeartAddIcon}
 													size={25}
 													strokeWidth={1.8}
-													color={COLORS.primary}
+													color={colors.primary}
 												/>
 											</View>
 
-											<View style={styles.donationInfo}>
-												<Text style={styles.donationAmount}>
+											<View style={donationInfoStyle}>
+												<Text style={donationAmountStyle}>
 													{formatAmount(donation.amount)}
 												</Text>
 
-												<Text style={styles.donationDate}>
+												<Text style={donationDateStyle}>
 													{formatDate(donation.created_at)}
 												</Text>
 
 												{formatTime(donation.created_at) ? (
-													<Text style={styles.donationTime}>
+													<Text style={donationTimeStyle}>
 														{formatTime(donation.created_at)}
 													</Text>
 												) : null}
@@ -494,7 +465,7 @@ export default function DonationHistoryScreen() {
 
 											<View
 												style={[
-													styles.statusBadge,
+													statusBadgeStyle,
 													{
 														backgroundColor: statusColors.backgroundColor,
 														borderColor: statusColors.borderColor,
@@ -503,7 +474,7 @@ export default function DonationHistoryScreen() {
 											>
 												<Text
 													style={[
-														styles.statusText,
+														statusTextStyle,
 														{
 															color: statusColors.color,
 														},
@@ -514,21 +485,21 @@ export default function DonationHistoryScreen() {
 											</View>
 										</View>
 
-										<View style={styles.divider} />
+										<View style={dividerStyle} />
 
-										<View style={styles.infoRow}>
-											<View style={styles.infoBlock}>
-												<Text style={styles.infoLabel}>Método de pago</Text>
+										<View style={infoRowStyle}>
+											<View style={infoBlockStyle}>
+												<Text style={infoLabelStyle}>Método de pago</Text>
 
-												<View style={styles.paymentRow}>
+												<View style={paymentRowStyle}>
 													<HugeiconsIcon
 														icon={CreditCardIcon}
 														size={17}
 														strokeWidth={1.8}
-														color={COLORS.primary}
+														color={colors.primary}
 													/>
 
-													<Text style={styles.infoValue}>
+													<Text style={infoValueStyle}>
 														{donation.payment_method?.name ?? 'No especificado'}
 													</Text>
 												</View>
@@ -536,18 +507,18 @@ export default function DonationHistoryScreen() {
 										</View>
 
 										{donation.reference ? (
-											<View style={styles.referenceContainer}>
+											<View style={referenceContainerStyle}>
 												<HugeiconsIcon
 													icon={CheckmarkCircle02Icon}
 													size={17}
 													strokeWidth={1.8}
-													color={COLORS.primary}
+													color={colors.primary}
 												/>
 
-												<View style={styles.referenceInfo}>
-													<Text style={styles.infoLabel}>Referencia</Text>
+												<View style={referenceInfoStyle}>
+													<Text style={infoLabelStyle}>Referencia</Text>
 
-													<Text style={styles.infoValue}>
+													<Text style={infoValueStyle}>
 														{donation.reference}
 													</Text>
 												</View>
@@ -565,322 +536,3 @@ export default function DonationHistoryScreen() {
 		</SafeAreaView>
 	)
 }
-
-const styles = StyleSheet.create({
-	background: {
-		flex: 1,
-	},
-
-	container: {
-		flex: 1,
-		backgroundColor: COLORS.background,
-	},
-
-	backButtonWrapper: {
-		position: 'absolute',
-		left: 20,
-		top: 56,
-		zIndex: 20,
-	},
-
-	scrollContent: {
-		paddingHorizontal: 20,
-		paddingTop: 125,
-		paddingBottom: 40,
-	},
-
-	header: {
-		marginBottom: 20,
-	},
-
-	title: {
-		fontSize: 27,
-		fontWeight: '900',
-		color: COLORS.dark,
-	},
-
-	subtitle: {
-		marginTop: 4,
-		fontSize: 14,
-		lineHeight: 20,
-		color: COLORS.muted,
-	},
-
-	statsContainer: {
-		flexDirection: 'row',
-		gap: 12,
-		marginBottom: 18,
-	},
-
-	statCard: {
-		flex: 1,
-		backgroundColor: COLORS.card,
-		borderRadius: 22,
-		padding: 14,
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		...cardShadow,
-	},
-
-	statIcon: {
-		width: 42,
-		height: 42,
-		borderRadius: 15,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: 10,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	statNumber: {
-		fontSize: 20,
-		fontWeight: '900',
-		color: COLORS.dark,
-	},
-
-	statLabel: {
-		marginTop: 1,
-		fontSize: 11,
-		color: COLORS.muted,
-	},
-
-	totalCard: {
-		width: '100%',
-		backgroundColor: COLORS.cardLight,
-		borderRadius: 22,
-		padding: 16,
-		marginBottom: 22,
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		...cardShadow,
-	},
-
-	totalIcon: {
-		width: 50,
-		height: 50,
-		borderRadius: 17,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: 12,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	totalInfo: {
-		flex: 1,
-	},
-
-	totalLabel: {
-		fontSize: 12,
-		fontWeight: '700',
-		color: COLORS.muted,
-	},
-
-	totalAmount: {
-		marginTop: 2,
-		fontSize: 24,
-		fontWeight: '900',
-		color: COLORS.primary,
-	},
-
-	loadingContainer: {
-		paddingVertical: 60,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	loadingText: {
-		marginTop: 12,
-		fontSize: 14,
-		color: COLORS.muted,
-	},
-
-	emptyCard: {
-		backgroundColor: COLORS.cardLight,
-		borderRadius: 28,
-		paddingHorizontal: 25,
-		paddingVertical: 35,
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		...cardShadow,
-	},
-
-	emptyIcon: {
-		width: 68,
-		height: 68,
-		borderRadius: 22,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginBottom: 16,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	emptyTitle: {
-		fontSize: 18,
-		fontWeight: '900',
-		color: COLORS.dark,
-		textAlign: 'center',
-	},
-
-	emptyText: {
-		marginTop: 7,
-		fontSize: 13,
-		lineHeight: 19,
-		color: COLORS.muted,
-		textAlign: 'center',
-	},
-
-	buyButtonWrapper: {
-		width: '100%',
-		marginTop: 20,
-		borderRadius: 17,
-		overflow: 'hidden',
-		backgroundColor: COLORS.button,
-		...cardShadow,
-	},
-
-	buyButton: {
-		width: '100%',
-		height: 48,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	buyButtonText: {
-		color: COLORS.white,
-		fontSize: 14,
-		fontWeight: '800',
-	},
-
-	donationsList: {
-		width: '100%',
-	},
-
-	sectionTitle: {
-		marginBottom: 12,
-		fontSize: 18,
-		fontWeight: '900',
-		color: COLORS.dark,
-	},
-
-	donationCard: {
-		width: '100%',
-		backgroundColor: COLORS.cardLight,
-		borderRadius: 28,
-		padding: 17,
-		marginBottom: 16,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		...cardShadow,
-	},
-
-	donationHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	donationIcon: {
-		width: 50,
-		height: 50,
-		borderRadius: 17,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: 12,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	donationInfo: {
-		flex: 1,
-		minWidth: 0,
-	},
-
-	donationAmount: {
-		fontSize: 19,
-		fontWeight: '900',
-		color: COLORS.primary,
-	},
-
-	donationDate: {
-		marginTop: 4,
-		fontSize: 12,
-		color: COLORS.muted,
-	},
-
-	donationTime: {
-		marginTop: 2,
-		fontSize: 11,
-		color: COLORS.muted,
-	},
-
-	statusBadge: {
-		borderRadius: 12,
-		paddingHorizontal: 9,
-		paddingVertical: 6,
-		marginLeft: 8,
-		borderWidth: 1,
-	},
-
-	statusText: {
-		fontSize: 10,
-		fontWeight: '800',
-	},
-
-	divider: {
-		height: 1,
-		backgroundColor: COLORS.border,
-		marginVertical: 14,
-	},
-
-	infoRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-
-	infoBlock: {
-		flex: 1,
-	},
-
-	infoLabel: {
-		fontSize: 11,
-		color: COLORS.muted,
-	},
-
-	paymentRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: 4,
-	},
-
-	infoValue: {
-		marginLeft: 7,
-		fontSize: 13,
-		fontWeight: '700',
-		color: COLORS.dark,
-	},
-
-	referenceContainer: {
-		marginTop: 13,
-		paddingTop: 13,
-		borderTopWidth: 1,
-		borderTopColor: COLORS.border,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-
-	referenceInfo: {
-		flex: 1,
-		marginLeft: 8,
-	},
-})

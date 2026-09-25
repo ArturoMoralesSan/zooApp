@@ -1,5 +1,6 @@
+import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import { register } from '@/services/auth'
+import { colors, styles } from '@/styles/register'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -10,7 +11,6 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
-
 import {
 	ActivityIndicator,
 	Image,
@@ -31,6 +31,8 @@ type FormErrors = {
 }
 
 export default function Register() {
+	const { register } = useAuth()
+
 	const [name, setName] = useState('')
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
@@ -123,7 +125,6 @@ export default function Register() {
 				}
 
 				setErrors(apiErrors)
-
 				return
 			}
 
@@ -139,121 +140,78 @@ export default function Register() {
 
 	return (
 		<KeyboardAvoidingView
-			className='flex-1'
-			style={{ backgroundColor: '#F7F7EE' }}
+			style={styles.container}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 		>
-			{/* FONDO */}
-			<View className='absolute inset-0 overflow-hidden'>
+			{/* Fondo */}
+			<View style={styles.background}>
 				<Image
 					source={require('../../assets/images/login-background.png')}
-					className='h-full w-full'
+					style={styles.backgroundImage}
 					resizeMode='cover'
-					style={{
-						transform: [{ scale: 1 }],
-					}}
 				/>
 			</View>
 
 			<ScrollView
-				className='flex-1'
-				contentContainerStyle={{
-					paddingHorizontal: 24,
-					paddingTop: 45,
-					paddingBottom: 60,
-				}}
+				style={styles.scrollView}
+				contentContainerStyle={styles.scrollContent}
 				keyboardShouldPersistTaps='handled'
 				keyboardDismissMode='on-drag'
 				showsVerticalScrollIndicator={false}
 			>
-				{/* VOLVER */}
+				{/* Volver */}
 				<Pressable
 					onPress={() => router.back()}
-					className='flex-row items-center self-start rounded-2xl px-5 py-3'
-					style={{
-						backgroundColor: '#DCEFE5',
-						borderWidth: 1,
-						borderColor: '#B8DCCA',
-					}}
+					style={({ pressed }) => [
+						styles.backButton,
+						pressed && styles.backButtonPressed,
+					]}
 				>
-					<Text className='mr-1 text-lg font-bold' style={{ color: '#123C32' }}>
-						‹
-					</Text>
-
-					<Text className='text-sm font-semibold' style={{ color: '#123C32' }}>
-						Volver
-					</Text>
+					<Text style={styles.backText}>‹ Regresar</Text>
 				</Pressable>
 
-				{/* LOGO */}
-				<View className='items-center'>
+				{/* Logo */}
+				<View style={styles.logoContainer}>
 					<Image
 						source={require('../../assets/images/zooapp-logo.png')}
-						className='h-36 w-36'
+						style={styles.logo}
 						resizeMode='contain'
 					/>
 				</View>
 
-				{/* CARD */}
-				<View
-					className='mt-8 rounded-3xl p-5'
-					style={{
-						backgroundColor: '#F7F7EE',
-						borderWidth: 1,
-						borderColor: '#E5E8DF',
-						shadowColor: '#123C32',
-						shadowOffset: {
-							width: 0,
-							height: 4,
-						},
-						shadowOpacity: 0.1,
-						shadowRadius: 10,
-						elevation: 3,
-					}}
-				>
-					{/* ENCABEZADO */}
-					<View className='items-center'>
-						<Text
-							className='text-center text-3xl font-bold'
-							style={{ color: '#123C32' }}
-						>
-							Crea tu cuenta
-						</Text>
+				{/* Card */}
+				<View style={styles.card}>
+					{/* Encabezado */}
+					<View style={styles.header}>
+						<Text style={styles.title}>Crea tu cuenta</Text>
 
-						<Text
-							className='mt-2 text-center text-base'
-							style={{ color: '#6F8A7D' }}
-						>
+						<Text style={styles.subtitle}>
 							Únete a ZooApp y comienza a descubrir el zoológico.
 						</Text>
 					</View>
 
-					{/* NOMBRE */}
-					<Text
-						className='mb-2 mt-8 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Nombre completo
-					</Text>
+					{/* Nombre */}
+					<Text style={styles.labelFirst}>Nombre completo</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.name
-								? '#C83B3B'
-								: nameFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.name
+									? colors.error
+									: nameFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={UserIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={nameFocused ? '#087A5A' : '#6F8A7D'}
+								color={nameFocused ? colors.primary : colors.muted}
 							/>
 						</View>
 
@@ -266,46 +224,35 @@ export default function Register() {
 							onFocus={() => setNameFocused(true)}
 							onBlur={() => setNameFocused(false)}
 							placeholder='Tu nombre'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							autoCapitalize='words'
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 					</View>
 
-					{errors.name && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
-							{errors.name}
-						</Text>
-					)}
+					{errors.name && <Text style={styles.fieldError}>{errors.name}</Text>}
 
-					{/* EMAIL */}
-					<Text
-						className='mb-2 mt-5 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Correo electrónico
-					</Text>
+					{/* Email */}
+					<Text style={styles.label}>Correo electrónico</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.email
-								? '#C83B3B'
-								: emailFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.email
+									? colors.error
+									: emailFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={Mail01Icon}
 								size={21}
 								strokeWidth={1.8}
-								color={emailFocused ? '#087A5A' : '#6F8A7D'}
+								color={emailFocused ? colors.primary : colors.muted}
 							/>
 						</View>
 
@@ -318,48 +265,39 @@ export default function Register() {
 							onFocus={() => setEmailFocused(true)}
 							onBlur={() => setEmailFocused(false)}
 							placeholder='correo@ejemplo.com'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							keyboardType='email-address'
 							autoCapitalize='none'
 							autoCorrect={false}
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 					</View>
 
 					{errors.email && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
-							{errors.email}
-						</Text>
+						<Text style={styles.fieldError}>{errors.email}</Text>
 					)}
 
-					{/* PASSWORD */}
-					<Text
-						className='mb-2 mt-5 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Contraseña
-					</Text>
+					{/* Password */}
+					<Text style={styles.label}>Contraseña</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.password
-								? '#C83B3B'
-								: passwordFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.password
+									? colors.error
+									: passwordFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={LockPasswordIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={passwordFocused ? '#087A5A' : '#6F8A7D'}
+								color={passwordFocused ? colors.primary : colors.muted}
 							/>
 						</View>
 
@@ -373,60 +311,53 @@ export default function Register() {
 							onFocus={() => setPasswordFocused(true)}
 							onBlur={() => setPasswordFocused(false)}
 							placeholder='Mínimo 8 caracteres'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							secureTextEntry={!showPassword}
 							autoCapitalize='none'
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 
 						<Pressable
 							onPress={() => setShowPassword(!showPassword)}
-							className='mr-2 items-center justify-center rounded-xl p-2'
+							style={styles.passwordToggle}
 							hitSlop={8}
 						>
 							<HugeiconsIcon
 								icon={showPassword ? ViewOffSlashIcon : ViewIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={passwordFocused ? '#087A5A' : '#6F8A7D'}
+								color={passwordFocused ? colors.primary : colors.muted}
 							/>
 						</Pressable>
 					</View>
 
 					{errors.password && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
-							{errors.password}
-						</Text>
+						<Text style={styles.fieldError}>{errors.password}</Text>
 					)}
 
-					{/* CONFIRMAR PASSWORD */}
-					<Text
-						className='mb-2 mt-5 text-sm font-semibold'
-						style={{ color: '#123C32' }}
-					>
-						Confirmar contraseña
-					</Text>
+					{/* Confirmar password */}
+					<Text style={styles.label}>Confirmar contraseña</Text>
 
 					<View
-						className='flex-row items-center rounded-xl border'
-						style={{
-							backgroundColor: '#DCEFE5',
-							borderColor: errors.password_confirmation
-								? '#C83B3B'
-								: passwordConfirmationFocused
-									? '#087A5A'
-									: '#B8DCCA',
-						}}
+						style={[
+							styles.inputContainer,
+							{
+								borderColor: errors.password_confirmation
+									? colors.error
+									: passwordConfirmationFocused
+										? colors.primary
+										: colors.border,
+							},
+						]}
 					>
-						<View className='pl-4'>
+						<View style={styles.inputIcon}>
 							<HugeiconsIcon
 								icon={LockPasswordIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={passwordConfirmationFocused ? '#087A5A' : '#6F8A7D'}
+								color={
+									passwordConfirmationFocused ? colors.primary : colors.muted
+								}
 							/>
 						</View>
 
@@ -439,108 +370,77 @@ export default function Register() {
 							onFocus={() => setPasswordConfirmationFocused(true)}
 							onBlur={() => setPasswordConfirmationFocused(false)}
 							placeholder='Repite tu contraseña'
-							placeholderTextColor='#6F8A7D'
+							placeholderTextColor={colors.muted}
 							secureTextEntry={!showPasswordConfirmation}
 							autoCapitalize='none'
-							className='flex-1 px-3 py-4 text-base'
-							style={{
-								color: '#123C32',
-							}}
+							style={styles.input}
 						/>
 
 						<Pressable
 							onPress={() =>
 								setShowPasswordConfirmation(!showPasswordConfirmation)
 							}
-							className='mr-2 items-center justify-center rounded-xl p-2'
+							style={styles.passwordToggle}
 							hitSlop={8}
 						>
 							<HugeiconsIcon
 								icon={showPasswordConfirmation ? ViewOffSlashIcon : ViewIcon}
 								size={21}
 								strokeWidth={1.8}
-								color={passwordConfirmationFocused ? '#087A5A' : '#6F8A7D'}
+								color={
+									passwordConfirmationFocused ? colors.primary : colors.muted
+								}
 							/>
 						</Pressable>
 					</View>
 
 					{errors.password_confirmation && (
-						<Text className='mt-1 text-sm' style={{ color: '#C83B3B' }}>
+						<Text style={styles.fieldError}>
 							{errors.password_confirmation}
 						</Text>
 					)}
 
-					{/* ERROR GENERAL */}
+					{/* Error general */}
 					{error !== '' && (
-						<View
-							className='mt-4 rounded-xl px-4 py-3'
-							style={{
-								backgroundColor: '#FFF1F0',
-								borderWidth: 1,
-								borderColor: '#FFE3E1',
-							}}
-						>
-							<Text className='text-sm' style={{ color: '#C83B3B' }}>
-								{error}
-							</Text>
+						<View style={styles.generalError}>
+							<Text style={styles.generalErrorText}>{error}</Text>
 						</View>
 					)}
 
-					{/* CREAR CUENTA */}
+					{/* Crear cuenta */}
 					<Pressable
 						onPress={handleRegister}
 						disabled={loading}
-						className={`mt-6 rounded-2xl ${loading ? 'opacity-60' : ''}`}
-						style={{
-							shadowColor: '#064D36',
-							shadowOffset: {
-								width: 0,
-								height: 4,
-							},
-							shadowOpacity: 0.16,
-							shadowRadius: 7,
-							elevation: 4,
-						}}
+						style={[
+							styles.registerButton,
+							loading && styles.registerButtonDisabled,
+						]}
 					>
 						{({ pressed }) => (
 							<View
-								className='w-full items-center rounded-2xl px-5 py-4'
-								style={{
-									backgroundColor: pressed ? '#064D36' : '#087A5A',
-								}}
+								style={[
+									styles.registerButtonContent,
+									pressed && styles.registerButtonPressed,
+								]}
 							>
 								{loading ? (
-									<ActivityIndicator color='#FFFFFF' />
+									<ActivityIndicator color={colors.white} />
 								) : (
-									<Text
-										className='text-base font-bold'
-										style={{
-											color: '#FFFFFF',
-										}}
-									>
-										Crear cuenta
-									</Text>
+									<Text style={styles.registerButtonText}>Crear cuenta</Text>
 								)}
 							</View>
 						)}
 					</Pressable>
 
-					{/* LOGIN */}
-					<View className='mt-8 flex-row justify-center'>
-						<Text className='text-base' style={{ color: '#6F8A7D' }}>
-							¿Ya tienes una cuenta?{' '}
-						</Text>
+					{/* Login */}
+					<View style={styles.loginRow}>
+						<Text style={styles.loginText}>¿Ya tienes una cuenta? </Text>
 
 						<Pressable
 							onPress={() => router.replace('/login')}
-							className='rounded-2xl px-1'
+							style={styles.loginButton}
 						>
-							<Text
-								className='text-base font-bold'
-								style={{ color: '#087A5A' }}
-							>
-								Inicia sesión
-							</Text>
+							<Text style={styles.loginButtonText}>Inicia sesión</Text>
 						</Pressable>
 					</View>
 				</View>

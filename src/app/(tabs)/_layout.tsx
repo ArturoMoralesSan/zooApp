@@ -4,16 +4,18 @@ import {
 	UserGroupIcon,
 	WalletIcon,
 } from '@hugeicons/core-free-icons'
+
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Tabs } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
-const colors = {
-	menuBackground: '#E2F1EA',
-	primary: '#075C3B',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
-}
+import {
+	colors,
+	tabBarContainerStyle,
+	tabBarStyle,
+	tabButtonStyle,
+	tabLabelStyle,
+} from '@/styles/tab-bar'
 
 export default function TabLayout() {
 	return (
@@ -22,38 +24,8 @@ export default function TabLayout() {
 				headerShown: false,
 			}}
 			tabBar={({ state, descriptors, navigation }) => (
-				<View
-					style={{
-						position: 'absolute',
-						bottom: 12,
-						left: 0,
-						right: 0,
-						alignItems: 'center',
-					}}
-				>
-					<View
-						style={{
-							width: '90%',
-							height: 68,
-							borderRadius: 30,
-							backgroundColor: colors.menuBackground,
-							borderWidth: 1,
-							borderColor: colors.border,
-							flexDirection: 'row',
-							alignItems: 'center',
-							paddingHorizontal: 6,
-							paddingVertical: 6,
-
-							shadowColor: colors.primary,
-							shadowOffset: {
-								width: 0,
-								height: 5,
-							},
-							shadowOpacity: 0.12,
-							shadowRadius: 10,
-							elevation: 4,
-						}}
-					>
+				<View style={tabBarContainerStyle}>
+					<View style={tabBarStyle}>
 						{state.routes
 							.filter((route) => route.name !== 'ar')
 							.map((route) => {
@@ -90,13 +62,7 @@ export default function TabLayout() {
 									<Pressable
 										key={route.key}
 										onPress={onPress}
-										style={{
-											flex: 1,
-											height: '100%',
-											alignItems: 'center',
-											justifyContent: 'center',
-											borderRadius: 20,
-										}}
+										style={tabButtonStyle}
 									>
 										<HugeiconsIcon
 											icon={icon}
@@ -104,16 +70,7 @@ export default function TabLayout() {
 											color={isFocused ? colors.primary : colors.textSecondary}
 										/>
 
-										<Text
-											style={{
-												marginTop: 3,
-												fontSize: 11,
-												fontWeight: isFocused ? '700' : '500',
-												color: isFocused
-													? colors.primary
-													: colors.textSecondary,
-											}}
-										>
+										<Text style={tabLabelStyle(isFocused)}>
 											{options.title}
 										</Text>
 									</Pressable>

@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store'
+
 import { api } from './api'
 
 const TOKEN_KEY = 'zooapp_token'

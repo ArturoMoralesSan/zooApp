@@ -1,9 +1,7 @@
 import Toast from '@/components/toast'
-
 import { API_URL, ApiValidationError, api } from '@/services/api'
-
 import { getToken, type User } from '@/services/auth'
-
+import { colors, styles } from '@/styles/profile'
 import {
 	Calendar03Icon,
 	Call02Icon,
@@ -12,19 +10,12 @@ import {
 	Mail01Icon,
 	UserIcon,
 } from '@hugeicons/core-free-icons'
-
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import DateTimePicker from '@react-native-community/datetimepicker'
-
 import * as FileSystem from 'expo-file-system'
-
 import * as ImagePicker from 'expo-image-picker'
-
 import { router } from 'expo-router'
-
 import { useCallback, useEffect, useRef, useState } from 'react'
-
 import {
 	ActivityIndicator,
 	Alert,
@@ -71,47 +62,6 @@ type ToastState = {
 	message: string
 	type: 'success' | 'error' | 'warning'
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                   COLORS                                   */
-/* -------------------------------------------------------------------------- */
-
-const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	text: '#17372C',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
-	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	overlay: 'rgba(0,0,0,0.45)',
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                   SHADOW                                   */
-/* -------------------------------------------------------------------------- */
-
-const cardShadow = {
-	shadowColor: '#075C3B',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                   HELPERS                                  */
-/* -------------------------------------------------------------------------- */
 
 function formatDateForApp(date: string | null | undefined): string {
 	if (!date) {
@@ -197,10 +147,6 @@ function getAvatarUrl(avatar: string | null | undefined): string | null {
 	return `${baseUrl}/storage/${avatar}`
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              INPUT COMPONENT                               */
-/* -------------------------------------------------------------------------- */
-
 type FieldProps = {
 	label: string
 	icon: typeof UserIcon
@@ -229,15 +175,7 @@ function ProfileField({
 	autoCorrect = true,
 }: FieldProps) {
 	const content = (
-		<View
-			className='flex-row items-center rounded-[18px] px-4'
-			style={{
-				minHeight: 56,
-				backgroundColor: colors.cardLight,
-				borderWidth: 1,
-				borderColor: error ? colors.coral : colors.border,
-			}}
-		>
+		<View style={[styles.fieldContainer, error && styles.fieldContainerError]}>
 			<HugeiconsIcon
 				icon={icon}
 				size={20}
@@ -249,49 +187,26 @@ function ProfileField({
 				value={value}
 				onChangeText={onChangeText}
 				placeholder={placeholder}
-				placeholderTextColor='#789187'
+				placeholderTextColor={colors.placeholder}
 				keyboardType={keyboardType}
 				autoCapitalize={autoCapitalize}
 				autoCorrect={autoCorrect}
 				editable={editable}
-				className='flex-1 px-3 py-3.5 text-base'
-				style={{
-					color: colors.text,
-				}}
+				style={styles.fieldInput}
 			/>
 		</View>
 	)
 
 	return (
-		<View className='mt-5'>
-			<Text
-				className='mb-2 text-xs font-bold uppercase tracking-wide'
-				style={{
-					color: colors.textSecondary,
-				}}
-			>
-				{label}
-			</Text>
+		<View style={styles.fieldWrapper}>
+			<Text style={styles.fieldLabel}>{label}</Text>
 
 			{onPress ? <Pressable onPress={onPress}>{content}</Pressable> : content}
 
-			{error && (
-				<Text
-					className='mt-1 text-xs'
-					style={{
-						color: colors.coral,
-					}}
-				>
-					{error}
-				</Text>
-			)}
+			{error && <Text style={styles.fieldError}>{error}</Text>}
 		</View>
 	)
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                COMPONENT                                   */
-/* -------------------------------------------------------------------------- */
 
 export default function ProfileScreen() {
 	const [loading, setLoading] = useState(true)
@@ -308,7 +223,6 @@ export default function ProfileScreen() {
 	const [country, setCountry] = useState('')
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
-
 	const [errors, setErrors] = useState<FormErrors>({})
 
 	const [toast, setToast] = useState<ToastState>({
@@ -318,10 +232,6 @@ export default function ProfileScreen() {
 	})
 
 	const scrollY = useRef(new Animated.Value(0)).current
-
-	/* ---------------------------------------------------------------------- */
-	/*                                TOAST                                   */
-	/* ---------------------------------------------------------------------- */
 
 	const showToast = useCallback(
 		(message: string, type: 'success' | 'error' | 'warning' = 'success') => {
@@ -333,10 +243,6 @@ export default function ProfileScreen() {
 		},
 		[],
 	)
-
-	/* ---------------------------------------------------------------------- */
-	/*                              LOAD PROFILE                               */
-	/* ---------------------------------------------------------------------- */
 
 	const loadProfile = useCallback(async () => {
 		try {
@@ -381,20 +287,12 @@ export default function ProfileScreen() {
 		void loadProfile()
 	}, [loadProfile])
 
-	/* ---------------------------------------------------------------------- */
-	/*                              FIELD ERRORS                               */
-	/* ---------------------------------------------------------------------- */
-
 	const clearFieldError = (field: keyof FormErrors) => {
 		setErrors((current) => ({
 			...current,
 			[field]: undefined,
 		}))
 	}
-
-	/* ---------------------------------------------------------------------- */
-	/*                                  DATE                                   */
-	/* ---------------------------------------------------------------------- */
 
 	const handleDateChange = (_event: unknown, selectedDate?: Date) => {
 		setShowDatePicker(false)
@@ -406,10 +304,6 @@ export default function ProfileScreen() {
 		setBirthDate(formatDateForDisplay(selectedDate))
 		clearFieldError('birth_date')
 	}
-
-	/* ---------------------------------------------------------------------- */
-	/*                                  SAVE                                   */
-	/* ---------------------------------------------------------------------- */
 
 	const handleSave = async () => {
 		const newErrors: FormErrors = {}
@@ -502,10 +396,6 @@ export default function ProfileScreen() {
 			setSaving(false)
 		}
 	}
-
-	/* ---------------------------------------------------------------------- */
-	/*                              UPLOAD AVATAR                              */
-	/* ---------------------------------------------------------------------- */
 
 	const uploadAvatar = async (asset: ImagePicker.ImagePickerAsset) => {
 		try {
@@ -608,7 +498,6 @@ export default function ProfileScreen() {
 
 			if (!permission.granted) {
 				showToast('Necesitamos permiso para seleccionar una foto.', 'warning')
-
 				return
 			}
 
@@ -652,33 +541,17 @@ export default function ProfileScreen() {
 		}
 	}
 
-	/* ---------------------------------------------------------------------- */
-	/*                                  LOADING                               */
-	/* ---------------------------------------------------------------------- */
-
 	if (loading) {
 		return (
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 items-center justify-center'
 				resizeMode='repeat'
-				imageStyle={{
-					opacity: 0.3,
-				}}
-				style={{
-					backgroundColor: colors.background,
-				}}
+				imageStyle={styles.loadingPattern}
+				style={styles.loadingContainer}
 			>
 				<ActivityIndicator size='large' color={colors.primary} />
 
-				<Text
-					className='mt-4 text-sm font-medium'
-					style={{
-						color: colors.textSecondary,
-					}}
-				>
-					Cargando perfil...
-				</Text>
+				<Text style={styles.loadingText}>Cargando perfil...</Text>
 			</ImageBackground>
 		)
 	}
@@ -695,10 +568,6 @@ export default function ProfileScreen() {
 	const pointsToNextLevel = user?.gamification?.points_to_next_level ?? 0
 
 	const nextLevel = user?.gamification?.next_level?.name || ''
-
-	/* ---------------------------------------------------------------------- */
-	/*                                ANIMATIONS                              */
-	/* ---------------------------------------------------------------------- */
 
 	const coverHeight = scrollY.interpolate({
 		inputRange: [0, 180],
@@ -742,24 +611,15 @@ export default function ProfileScreen() {
 		extrapolate: 'clamp',
 	})
 
-	/* ---------------------------------------------------------------------- */
-	/*                                    UI                                  */
-	/* ---------------------------------------------------------------------- */
-
 	return (
 		<ImageBackground
 			source={require('@/assets/images/zoo-pattern.png')}
 			resizeMode='repeat'
-			imageStyle={{
-				opacity: 0.3,
-			}}
-			style={{
-				flex: 1,
-				backgroundColor: colors.background,
-			}}
+			imageStyle={styles.backgroundPattern}
+			style={styles.container}
 		>
 			<KeyboardAvoidingView
-				className='flex-1'
+				style={styles.keyboardContainer}
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			>
 				<Toast
@@ -775,7 +635,7 @@ export default function ProfileScreen() {
 				/>
 
 				<Animated.ScrollView
-					className='flex-1'
+					style={styles.scrollView}
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 					scrollEventThrottle={16}
@@ -794,183 +654,102 @@ export default function ProfileScreen() {
 						},
 					)}
 				>
-					{/* ====================================================== */}
-					{/* HEADER                                                 */}
-					{/* ====================================================== */}
-
-					<View className='relative'>
+					{/* HEADER */}
+					<View style={styles.header}>
 						<Animated.Image
 							source={require('../../assets/images/profile-background.png')}
 							resizeMode='cover'
-							style={{
-								height: coverHeight,
-								width: '100%',
-							}}
+							style={[
+								styles.coverImage,
+								{
+									height: coverHeight,
+								},
+							]}
 						/>
 
-						{/* REGRESAR */}
-
 						<Animated.View
-							className='absolute left-5 top-14 z-20'
-							style={{
-								opacity: backButtonOpacity,
-							}}
+							style={[
+								styles.backButtonWrapper,
+								{
+									opacity: backButtonOpacity,
+								},
+							]}
 						>
 							<Pressable
 								onPress={() => router.back()}
-								className='flex-row items-center rounded-full px-3.5 py-2.5'
-								style={{
-									backgroundColor: 'rgba(255,255,255,0.92)',
-									...cardShadow,
-								}}
+								style={styles.backButton}
 							>
-								<Text
-									className='mr-1 text-xl font-bold'
-									style={{
-										color: colors.primary,
-										lineHeight: 20,
-									}}
-								>
-									‹
-								</Text>
+								<Text style={styles.backArrow}>‹</Text>
 
-								<Text
-									className='text-sm font-semibold'
-									style={{
-										color: colors.text,
-									}}
-								>
-									Regresar
-								</Text>
+								<Text style={styles.backText}>Regresar</Text>
 							</Pressable>
 						</Animated.View>
 
-						{/* PERFIL */}
-
-						<View
-							className='absolute left-0 right-0 items-center'
-							style={{
-								top: 0,
-								paddingTop: 80,
-							}}
-						>
-							{/* FOTO */}
-
+						<View style={styles.profileHeader}>
 							<Pressable onPress={handlePickAvatar} disabled={uploadingAvatar}>
 								<Animated.View
-									style={{
-										width: 112,
-										height: 112,
-										borderRadius: 56,
-										backgroundColor: colors.cardLight,
-										alignItems: 'center',
-										justifyContent: 'center',
-										overflow: 'hidden',
-										borderWidth: 5,
-										borderColor: colors.white,
-										transform: [
-											{
-												scale: avatarScale,
-											},
-											{
-												translateY: avatarTranslateY,
-											},
-										],
-										...cardShadow,
-									}}
+									style={[
+										styles.avatar,
+										{
+											transform: [
+												{
+													scale: avatarScale,
+												},
+												{
+													translateY: avatarTranslateY,
+												},
+											],
+										},
+									]}
 								>
 									{avatarUrl ? (
 										<Image
 											source={{
 												uri: avatarUrl,
 											}}
-											style={{
-												width: '100%',
-												height: '100%',
-											}}
+											style={styles.avatarImage}
 											resizeMode='cover'
 										/>
 									) : (
-										<Text
-											className='text-5xl font-bold'
-											style={{
-												color: colors.primary,
-											}}
-										>
+										<Text style={styles.avatarInitial}>
 											{user?.name?.charAt(0).toUpperCase() || '?'}
 										</Text>
 									)}
 
 									{uploadingAvatar && (
-										<View
-											style={{
-												position: 'absolute',
-												top: 0,
-												left: 0,
-												right: 0,
-												bottom: 0,
-												backgroundColor: 'rgba(7,92,59,0.52)',
-												alignItems: 'center',
-												justifyContent: 'center',
-											}}
-										>
+										<View style={styles.avatarLoading}>
 											<ActivityIndicator size='large' color={colors.white} />
 										</View>
 									)}
 								</Animated.View>
 
-								{/* CAMBIAR FOTO */}
-
-								<View
-									style={{
-										position: 'absolute',
-										right: -1,
-										bottom: -1,
-										width: 34,
-										height: 34,
-										borderRadius: 17,
-										backgroundColor: colors.primary,
-										alignItems: 'center',
-										justifyContent: 'center',
-										borderWidth: 3,
-										borderColor: colors.white,
-										...cardShadow,
-									}}
-								>
-									<Text className='text-xl font-bold text-white'>+</Text>
+								<View style={styles.changeAvatarButton}>
+									<Text style={styles.changeAvatarText}>+</Text>
 								</View>
 							</Pressable>
 
-							{/* NOMBRE */}
-
 							<Animated.Text
-								className='mt-5 text-[23px] font-bold'
-								style={{
-									color: colors.white,
-									textShadowColor: 'rgba(0,0,0,0.2)',
-									textShadowOffset: {
-										width: 0,
-										height: 1,
+								style={[
+									styles.profileName,
+									{
+										transform: [
+											{
+												translateY: nameTranslateY,
+											},
+										],
 									},
-									textShadowRadius: 4,
-									transform: [
-										{
-											translateY: nameTranslateY,
-										},
-									],
-								}}
+								]}
 							>
 								{user?.name || 'Visitante'}
 							</Animated.Text>
 
-							{/* CORREO */}
-
 							<Animated.Text
-								className='mt-1 px-8 text-center text-sm'
-								style={{
-									color: '#F7F7EE',
-									opacity: emailOpacity,
-								}}
+								style={[
+									styles.profileEmail,
+									{
+										opacity: emailOpacity,
+									},
+								]}
 								numberOfLines={1}
 							>
 								{user?.email || ''}
@@ -978,184 +757,76 @@ export default function ProfileScreen() {
 						</View>
 					</View>
 
-					{/* ====================================================== */}
-					{/* PROGRESO                                               */}
-					{/* ====================================================== */}
-
+					{/* PROGRESO */}
 					<Animated.View
-						className='relative z-10 overflow-hidden rounded-t-[30px]'
-						style={{
-							marginTop: progressMarginTop,
-							backgroundColor: 'rgba(248,244,234,0.94)',
-						}}
+						style={[
+							styles.progressContainer,
+							{
+								marginTop: progressMarginTop,
+							},
+						]}
 					>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
 							resizeMode='repeat'
-							imageStyle={{
-								opacity: 0.3,
-							}}
-							style={{
-								backgroundColor: colors.background,
-							}}
+							imageStyle={styles.progressPattern}
+							style={styles.progressBackground}
 						>
-							<View className='px-5 pb-7 pt-6'>
-								<Text
-									className='text-[21px] font-bold'
-									style={{
-										color: colors.primary,
-									}}
-								>
-									Tu progreso
-								</Text>
+							<View style={styles.progressContent}>
+								<Text style={styles.sectionTitle}>Tu progreso</Text>
 
-								<Text
-									className='mt-1 text-sm'
-									style={{
-										color: colors.textSecondary,
-									}}
-								>
+								<Text style={styles.sectionSubtitle}>
 									Sigue acumulando puntos en ZooApp.
 								</Text>
 
-								<View className='mt-5 flex-row'>
-									{/* PUNTOS */}
+								<View style={styles.statsRow}>
+									<View style={styles.pointsCard}>
+										<Text style={styles.pointsLabel}>Puntos</Text>
 
-									<View
-										className='flex-1 rounded-[22px] p-4'
-										style={{
-											backgroundColor: colors.card,
-											borderWidth: 1,
-											borderColor: colors.border,
-										}}
-									>
-										<Text
-											className='text-[11px] font-bold uppercase tracking-wider'
-											style={{
-												color: colors.primary,
-											}}
-										>
-											Puntos
-										</Text>
-
-										<Text
-											className='mt-1 text-[29px] font-bold'
-											style={{
-												color: colors.primary,
-											}}
-										>
-											{points}
-										</Text>
+										<Text style={styles.pointsValue}>{points}</Text>
 									</View>
 
-									{/* NIVEL */}
+									<View style={styles.levelCard}>
+										<Text style={styles.levelLabel}>Nivel</Text>
 
-									<View
-										className='ml-3 flex-1 rounded-[22px] p-4'
-										style={{
-											backgroundColor: colors.cardLight,
-											borderWidth: 1,
-											borderColor: colors.border,
-										}}
-									>
-										<Text
-											className='text-[11px] font-bold uppercase tracking-wider'
-											style={{
-												color: colors.textSecondary,
-											}}
-										>
-											Nivel
-										</Text>
-
-										<Text
-											className='mt-1 text-lg font-bold'
-											style={{
-												color: colors.text,
-											}}
-											numberOfLines={1}
-										>
+										<Text style={styles.levelValue} numberOfLines={1}>
 											{currentLevel}
 										</Text>
 									</View>
 								</View>
 
 								{user?.gamification?.next_level && (
-									<View
-										className='mt-5 rounded-[22px] p-4'
-										style={{
-											backgroundColor: colors.cardLight,
-											borderWidth: 1,
-											borderColor: colors.border,
-											...cardShadow,
-										}}
-									>
-										<View className='flex-row items-center justify-between'>
-											<Text
-												className='flex-1 text-sm font-semibold'
-												style={{
-													color: colors.text,
-												}}
-											>
+									<View style={styles.nextLevelCard}>
+										<View style={styles.nextLevelHeader}>
+											<Text style={styles.nextLevelTitle}>
 												Progreso al siguiente nivel
 											</Text>
 
-											<View
-												className='rounded-full px-2.5 py-1'
-												style={{
-													backgroundColor: colors.active,
-												}}
-											>
-												<Text
-													className='text-xs font-bold'
-													style={{
-														color: colors.primary,
-													}}
-												>
+											<View style={styles.progressBadge}>
+												<Text style={styles.progressBadgeText}>
 													{progress}%
 												</Text>
 											</View>
 										</View>
 
-										<View
-											className='mt-3 h-2.5 overflow-hidden rounded-full'
-											style={{
-												backgroundColor: colors.border,
-											}}
-										>
+										<View style={styles.progressTrack}>
 											<View
-												className='h-full rounded-full'
-												style={{
-													width: `${progress}%`,
-													backgroundColor: colors.primary,
-												}}
+												style={[
+													styles.progressFill,
+													{
+														width: `${progress}%`,
+													},
+												]}
 											/>
 										</View>
 
-										<Text
-											className='mt-3 text-sm leading-5'
-											style={{
-												color: colors.textSecondary,
-											}}
-										>
+										<Text style={styles.progressDescription}>
 											Te faltan{' '}
-											<Text
-												className='font-bold'
-												style={{
-													color: colors.text,
-												}}
-											>
+											<Text style={styles.progressStrongText}>
 												{pointsToNextLevel}
 											</Text>{' '}
 											puntos para{' '}
-											<Text
-												className='font-semibold'
-												style={{
-													color: colors.text,
-												}}
-											>
-												{nextLevel}
-											</Text>
-											.
+											<Text style={styles.progressLevelText}>{nextLevel}</Text>.
 										</Text>
 									</View>
 								)}
@@ -1163,49 +834,20 @@ export default function ProfileScreen() {
 						</ImageBackground>
 					</Animated.View>
 
-					{/* ====================================================== */}
-					{/* DATOS PERSONALES                                       */}
-					{/* ====================================================== */}
-
+					{/* DATOS PERSONALES */}
 					<ImageBackground
 						source={require('@/assets/images/zoo-pattern.png')}
 						resizeMode='repeat'
-						imageStyle={{
-							opacity: 0.3,
-						}}
-						style={{
-							backgroundColor: colors.background,
-						}}
+						imageStyle={styles.personalPattern}
+						style={styles.personalBackground}
 					>
-						<View className='px-5 pb-12 pt-1'>
-							<View
-								className='rounded-[28px] px-5 pb-6 pt-5'
-								style={{
-									backgroundColor: colors.card,
-									borderWidth: 1,
-									borderColor: colors.border,
-									...cardShadow,
-								}}
-							>
-								<Text
-									className='text-[21px] font-bold'
-									style={{
-										color: colors.primary,
-									}}
-								>
-									Datos personales
-								</Text>
+						<View style={styles.personalContent}>
+							<View style={styles.personalCard}>
+								<Text style={styles.sectionTitle}>Datos personales</Text>
 
-								<Text
-									className='mt-1 text-sm'
-									style={{
-										color: colors.textSecondary,
-									}}
-								>
+								<Text style={styles.sectionSubtitle}>
 									Mantén actualizada tu información.
 								</Text>
-
-								{/* NOMBRE */}
 
 								<ProfileField
 									label='Nombre'
@@ -1219,8 +861,6 @@ export default function ProfileScreen() {
 									}}
 									autoCapitalize='words'
 								/>
-
-								{/* CORREO */}
 
 								<ProfileField
 									label='Correo electrónico'
@@ -1237,8 +877,6 @@ export default function ProfileScreen() {
 									autoCorrect={false}
 								/>
 
-								{/* TELÉFONO */}
-
 								<ProfileField
 									label='Teléfono'
 									icon={Call02Icon}
@@ -1252,29 +890,15 @@ export default function ProfileScreen() {
 									keyboardType='phone-pad'
 								/>
 
-								{/* FECHA DE NACIMIENTO */}
-
-								<View className='mt-5'>
-									<Text
-										className='mb-2 text-xs font-bold uppercase tracking-wide'
-										style={{
-											color: colors.textSecondary,
-										}}
-									>
-										Fecha de nacimiento
-									</Text>
+								<View style={styles.dateFieldWrapper}>
+									<Text style={styles.fieldLabel}>Fecha de nacimiento</Text>
 
 									<Pressable
 										onPress={() => setShowDatePicker(true)}
-										className='flex-row items-center rounded-[18px] px-4'
-										style={{
-											minHeight: 56,
-											backgroundColor: colors.cardLight,
-											borderWidth: 1,
-											borderColor: errors.birth_date
-												? colors.coral
-												: colors.border,
-										}}
+										style={[
+											styles.fieldContainer,
+											errors.birth_date && styles.fieldContainerError,
+										]}
 									>
 										<HugeiconsIcon
 											icon={Calendar03Icon}
@@ -1284,10 +908,12 @@ export default function ProfileScreen() {
 										/>
 
 										<Text
-											className='ml-3 flex-1 text-base'
-											style={{
-												color: birthDate ? colors.text : '#789187',
-											}}
+											style={[
+												styles.dateValue,
+												{
+													color: birthDate ? colors.text : colors.placeholder,
+												},
+											]}
 										>
 											{birthDate || 'Seleccionar fecha'}
 										</Text>
@@ -1304,18 +930,9 @@ export default function ProfileScreen() {
 									)}
 
 									{errors.birth_date && (
-										<Text
-											className='mt-1 text-xs'
-											style={{
-												color: colors.coral,
-											}}
-										>
-											{errors.birth_date}
-										</Text>
+										<Text style={styles.fieldError}>{errors.birth_date}</Text>
 									)}
 								</View>
-
-								{/* CIUDAD */}
 
 								<ProfileField
 									label='Ciudad'
@@ -1329,8 +946,6 @@ export default function ProfileScreen() {
 									}}
 								/>
 
-								{/* PAÍS */}
-
 								<ProfileField
 									label='País'
 									icon={Globe02Icon}
@@ -1343,36 +958,25 @@ export default function ProfileScreen() {
 									}}
 								/>
 
-								{/* GUARDAR */}
-
 								<Pressable
 									onPress={handleSave}
 									disabled={saving}
-									className={`mt-7 rounded-[20px] ${
-										saving ? 'opacity-60' : ''
-									}`}
-									style={{
-										...cardShadow,
-									}}
+									style={[
+										styles.saveButton,
+										saving && styles.saveButtonDisabled,
+									]}
 								>
 									{({ pressed }) => (
 										<View
-											className='w-full items-center rounded-[20px] px-5 py-4'
-											style={{
-												backgroundColor: pressed
-													? colors.primaryLight
-													: colors.primary,
-											}}
+											style={[
+												styles.saveButtonContent,
+												pressed && styles.saveButtonPressed,
+											]}
 										>
 											{saving ? (
 												<ActivityIndicator color={colors.white} />
 											) : (
-												<Text
-													className='text-base font-bold'
-													style={{
-														color: colors.white,
-													}}
-												>
+												<Text style={styles.saveButtonText}>
 													Guardar cambios
 												</Text>
 											)}

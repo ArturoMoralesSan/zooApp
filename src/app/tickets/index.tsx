@@ -1,6 +1,3 @@
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
-
 import {
 	MinusSignIcon,
 	PlusSignIcon,
@@ -8,19 +5,61 @@ import {
 } from '@hugeicons/core-free-icons'
 
 import { HugeiconsIcon } from '@hugeicons/react-native'
+
 import { useRouter } from 'expo-router'
+
 import { useEffect, useState } from 'react'
+
 import {
 	ActivityIndicator,
 	Alert,
 	ImageBackground,
 	Pressable,
-	SafeAreaView,
 	ScrollView,
-	StyleSheet,
 	Text,
 	View,
 } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import { api } from '@/services/api'
+import { getToken } from '@/services/auth'
+
+import {
+	backButtonPressedStyle,
+	backButtonStyle,
+	backgroundImageStyle,
+	backgroundStyle,
+	backTextStyle,
+	bottomSpaceStyle,
+	cardShadow,
+	continueButtonContentStyle,
+	continueButtonDisabledStyle,
+	continueButtonPressedStyle,
+	continueButtonStyle,
+	continueButtonTextStyle,
+	continueButtonWrapperStyle,
+	footerStyle,
+	loadingContentStyle,
+	loadingTextStyle,
+	quantityButtonDisabledStyle,
+	quantityButtonStyle,
+	quantityContainerStyle,
+	quantityStyle,
+	scrollContentStyle,
+	subtitleStyle,
+	ticketCardStyle,
+	ticketCountStyle,
+	ticketDescriptionStyle,
+	ticketIconStyle,
+	ticketInfoStyle,
+	ticketNameStyle,
+	ticketPriceStyle,
+	titleStyle,
+	totalContainerStyle,
+	totalLabelStyle,
+	totalStyle,
+} from '@/styles/tickets'
 
 type TicketType = {
 	id: number
@@ -34,38 +73,6 @@ type SelectedTicket = {
 	quantity: number
 }
 
-const COLORS = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
-	white: '#FFFFFF',
-
-	coral: '#D95C4F',
-	coralLight: '#F8E1DE',
-
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-
-	footerBackground: '#F7F9F8',
-}
-
-const cardShadow = {
-	shadowColor: '#075C3B',
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
-
 export default function TicketsScreen() {
 	const router = useRouter()
 
@@ -74,11 +81,13 @@ export default function TicketsScreen() {
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		loadTicketTypes()
+		void loadTicketTypes()
 	}, [])
 
 	const loadTicketTypes = async () => {
 		try {
+			setLoading(true)
+
 			const token = await getToken()
 
 			if (!token) {
@@ -129,7 +138,7 @@ export default function TicketsScreen() {
 		.filter((ticket) => (quantities[ticket.id] ?? 0) > 0)
 		.map((ticket) => ({
 			ticket_type_id: ticket.id,
-			quantity: quantities[ticket.id],
+			quantity: quantities[ticket.id] ?? 0,
 		}))
 
 	const total = ticketTypes.reduce((sum, ticket) => {
@@ -163,20 +172,22 @@ export default function TicketsScreen() {
 
 	if (loading) {
 		return (
-			<SafeAreaView style={styles.loadingContainer}>
+			<SafeAreaView
+				className='flex-1'
+				edges={['top', 'left', 'right']}
+				style={backgroundStyle}
+			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					style={styles.loadingBackground}
 					className='flex-1'
 					resizeMode='repeat'
-					imageStyle={{
-						opacity: 0.3,
-					}}
+					imageStyle={backgroundImageStyle}
+					style={backgroundStyle}
 				>
-					<View style={styles.loadingContent}>
-						<ActivityIndicator size='large' color={COLORS.primary} />
+					<View style={loadingContentStyle}>
+						<ActivityIndicator size='large' color='#075C3B' />
 
-						<Text style={styles.loadingText}>Cargando boletos...</Text>
+						<Text style={loadingTextStyle}>Cargando boletos...</Text>
 					</View>
 				</ImageBackground>
 			</SafeAreaView>
@@ -184,102 +195,106 @@ export default function TicketsScreen() {
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView
+			className='flex-1'
+			edges={['top', 'left', 'right']}
+			style={backgroundStyle}
+		>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={styles.background}
 				className='flex-1'
 				resizeMode='repeat'
-				imageStyle={{
-					opacity: 0.3,
-				}}
+				imageStyle={backgroundImageStyle}
+				style={backgroundStyle}
 			>
-				<View style={styles.header}>
-					<View style={styles.backButtonWrapper}>
-						<Pressable
-							onPress={() => router.back()}
-							style={({ pressed }) => [
-								styles.backButton,
-								pressed && styles.backButtonPressed,
-							]}
-						>
-							<Text style={styles.backText}>‹ Regresar</Text>
-						</Pressable>
-					</View>
+				{/* HEADER */}
+				<View className='px-5 pt-0'>
+					<Pressable
+						onPress={() => router.back()}
+						className='self-start'
+						style={({ pressed }) => [
+							backButtonStyle,
+							pressed && backButtonPressedStyle,
+						]}
+					>
+						<Text style={backTextStyle}>‹ Regresar</Text>
+					</Pressable>
 
-					<View style={styles.headerTextContainer}>
-						<Text style={styles.title}>Comprar boletos</Text>
+					<View className='mt-2'>
+						<Text style={titleStyle}>Comprar boletos</Text>
 
-						<Text style={styles.subtitle}>
+						<Text style={subtitleStyle}>
 							Selecciona los boletos que necesitas
 						</Text>
 					</View>
 				</View>
 
+				{/* BOLETOS */}
 				<ScrollView
+					className='flex-1'
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={styles.scrollContent}
+					contentContainerStyle={scrollContentStyle}
 				>
 					{ticketTypes.map((ticket) => {
 						const quantity = quantities[ticket.id] ?? 0
 
 						return (
-							<View key={ticket.id} style={[styles.ticketCard, cardShadow]}>
-								<View style={styles.ticketIcon}>
+							<View key={ticket.id} style={[ticketCardStyle, cardShadow]}>
+								<View style={ticketIconStyle}>
 									<HugeiconsIcon
 										icon={Ticket01Icon}
 										size={27}
 										strokeWidth={1.8}
-										color={COLORS.primary}
+										color='#075C3B'
 									/>
 								</View>
 
-								<View style={styles.ticketInfo}>
-									<Text style={styles.ticketName}>{ticket.name}</Text>
+								<View style={ticketInfoStyle}>
+									<Text style={ticketNameStyle}>{ticket.name}</Text>
 
 									{ticket.description ? (
-										<Text style={styles.ticketDescription}>
+										<Text style={ticketDescriptionStyle}>
 											{ticket.description}
 										</Text>
 									) : null}
 
-									<Text style={styles.ticketPrice}>
+									<Text style={ticketPriceStyle}>
 										${Number(ticket.price).toFixed(2)}
 									</Text>
 								</View>
 
-								<View style={styles.quantityContainer}>
+								<View style={quantityContainerStyle}>
 									<Pressable
 										onPress={() => changeQuantity(ticket.id, quantity - 1)}
 										disabled={quantity === 0}
 										style={[
-											styles.quantityButton,
-											quantity === 0 && styles.quantityButtonDisabled,
+											quantityButtonStyle,
+											quantity === 0 && quantityButtonDisabledStyle,
 										]}
 									>
 										<HugeiconsIcon
 											icon={MinusSignIcon}
 											size={18}
 											strokeWidth={2}
-											color={quantity === 0 ? COLORS.muted : COLORS.primary}
+											color={quantity === 0 ? '#557067' : '#075C3B'}
 										/>
 									</Pressable>
 
-									<Text style={styles.quantity}>{quantity}</Text>
+									<Text style={quantityStyle}>{quantity}</Text>
 
 									<Pressable
 										onPress={() => changeQuantity(ticket.id, quantity + 1)}
 										disabled={quantity >= 20}
 										style={[
-											styles.quantityButton,
-											quantity >= 20 && styles.quantityButtonDisabled,
+											quantityButtonStyle,
+											quantity >= 20 && quantityButtonDisabledStyle,
 										]}
 									>
 										<HugeiconsIcon
 											icon={PlusSignIcon}
 											size={18}
 											strokeWidth={2}
-											color={quantity >= 20 ? COLORS.muted : COLORS.primary}
+											color={quantity >= 20 ? '#557067' : '#075C3B'}
 										/>
 									</Pressable>
 								</View>
@@ -287,37 +302,38 @@ export default function TicketsScreen() {
 						)
 					})}
 
-					<View style={styles.bottomSpace} />
+					<View style={bottomSpaceStyle} />
 				</ScrollView>
 
-				<View style={styles.footer}>
-					<View style={styles.totalContainer}>
+				{/* FOOTER */}
+				<View style={footerStyle}>
+					<View style={totalContainerStyle}>
 						<View>
-							<Text style={styles.totalLabel}>Total</Text>
+							<Text style={totalLabelStyle}>Total</Text>
 
-							<Text style={styles.ticketCount}>
+							<Text style={ticketCountStyle}>
 								{selectedQuantity}{' '}
 								{selectedQuantity === 1 ? 'boleto' : 'boletos'}
 							</Text>
 						</View>
 
-						<Text style={styles.total}>${total.toFixed(2)}</Text>
+						<Text style={totalStyle}>${total.toFixed(2)}</Text>
 					</View>
 
-					<View style={styles.continueButtonWrapper}>
+					<View style={continueButtonWrapperStyle}>
 						<Pressable
 							onPress={continuePurchase}
 							disabled={selectedTickets.length === 0}
 							style={({ pressed }) => [
-								styles.continueButton,
+								continueButtonStyle,
 								pressed &&
 									selectedTickets.length > 0 &&
-									styles.continueButtonPressed,
-								selectedTickets.length === 0 && styles.continueButtonDisabled,
+									continueButtonPressedStyle,
+								selectedTickets.length === 0 && continueButtonDisabledStyle,
 							]}
 						>
-							<View style={styles.continueButtonContent}>
-								<Text style={styles.continueButtonText}>Continuar</Text>
+							<View style={continueButtonContentStyle}>
+								<Text style={continueButtonTextStyle}>Continuar</Text>
 							</View>
 						</Pressable>
 					</View>
@@ -326,266 +342,3 @@ export default function TicketsScreen() {
 		</SafeAreaView>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: COLORS.background,
-	},
-
-	background: {
-		flex: 1,
-	},
-
-	loadingContainer: {
-		flex: 1,
-		backgroundColor: COLORS.background,
-	},
-
-	loadingBackground: {
-		flex: 1,
-	},
-
-	loadingContent: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	loadingText: {
-		marginTop: 12,
-		color: COLORS.muted,
-		fontSize: 15,
-		fontWeight: '600',
-	},
-
-	header: {
-		paddingHorizontal: 20,
-		paddingTop: 55,
-		paddingBottom: 16,
-		alignItems: 'flex-start',
-	},
-
-	backButtonWrapper: {
-		alignSelf: 'flex-start',
-	},
-
-	backButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: 'rgba(247,249,248,0.94)',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-		borderRadius: 18,
-		paddingHorizontal: 16,
-		paddingVertical: 10,
-		...cardShadow,
-	},
-
-	backButtonPressed: {
-		opacity: 0.75,
-		backgroundColor: COLORS.card,
-	},
-
-	backArrow: {
-		marginRight: 4,
-		fontSize: 22,
-		lineHeight: 22,
-		fontWeight: '800',
-		color: COLORS.primary,
-	},
-
-	backText: {
-		fontSize: 15,
-		fontWeight: '700',
-		color: COLORS.dark,
-	},
-
-	headerTextContainer: {
-		width: '100%',
-		marginTop: 17,
-	},
-
-	title: {
-		fontSize: 27,
-		fontWeight: '900',
-		color: COLORS.dark,
-	},
-
-	subtitle: {
-		marginTop: 4,
-		fontSize: 14,
-		lineHeight: 20,
-		color: COLORS.muted,
-	},
-
-	scrollContent: {
-		paddingHorizontal: 20,
-		paddingBottom: 180,
-	},
-
-	ticketCard: {
-		width: '100%',
-		backgroundColor: COLORS.cardLight,
-		borderRadius: 25,
-		padding: 16,
-		marginBottom: 15,
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	ticketIcon: {
-		width: 52,
-		height: 52,
-		borderRadius: 17,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginRight: 13,
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	ticketInfo: {
-		flex: 1,
-		minWidth: 0,
-	},
-
-	ticketName: {
-		fontSize: 16,
-		fontWeight: '900',
-		color: COLORS.dark,
-	},
-
-	ticketDescription: {
-		marginTop: 3,
-		fontSize: 12,
-		color: COLORS.muted,
-		lineHeight: 16,
-	},
-
-	ticketPrice: {
-		marginTop: 6,
-		fontSize: 17,
-		fontWeight: '900',
-		color: COLORS.primary,
-	},
-
-	quantityContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		marginLeft: 9,
-	},
-
-	quantityButton: {
-		width: 34,
-		height: 34,
-		borderRadius: 11,
-		backgroundColor: COLORS.active,
-		alignItems: 'center',
-		justifyContent: 'center',
-		borderWidth: 1,
-		borderColor: COLORS.border,
-	},
-
-	quantityButtonDisabled: {
-		backgroundColor: '#EEF3F0',
-		borderColor: COLORS.border,
-	},
-
-	quantity: {
-		marginHorizontal: 9,
-		fontSize: 16,
-		fontWeight: '900',
-		color: COLORS.dark,
-		minWidth: 18,
-		textAlign: 'center',
-	},
-
-	bottomSpace: {
-		height: 40,
-	},
-
-	footer: {
-		position: 'absolute',
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: COLORS.footerBackground,
-		paddingHorizontal: 20,
-		paddingTop: 14,
-		paddingBottom: 25,
-		borderTopWidth: 1,
-		borderTopColor: COLORS.border,
-		...cardShadow,
-	},
-
-	totalContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 12,
-	},
-
-	totalLabel: {
-		fontSize: 14,
-		fontWeight: '800',
-		color: COLORS.muted,
-	},
-
-	ticketCount: {
-		marginTop: 2,
-		fontSize: 11,
-		color: COLORS.muted,
-	},
-
-	total: {
-		fontSize: 23,
-		fontWeight: '900',
-		color: COLORS.primary,
-	},
-
-	continueButtonWrapper: {
-		width: '100%',
-		height: 54,
-		borderRadius: 17,
-		backgroundColor: COLORS.button,
-		borderWidth: 1,
-		borderColor: COLORS.button,
-		overflow: 'hidden',
-		...cardShadow,
-	},
-
-	continueButton: {
-		width: '100%',
-		height: '100%',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	continueButtonContent: {
-		width: '100%',
-		height: '100%',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-
-	continueButtonPressed: {
-		backgroundColor: COLORS.buttonPressed,
-	},
-
-	continueButtonDisabled: {
-		opacity: 0.45,
-	},
-
-	continueButtonText: {
-		color: COLORS.white,
-		fontSize: 16,
-		fontWeight: '900',
-		textAlign: 'center',
-	},
-})
