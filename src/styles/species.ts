@@ -1,24 +1,27 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+	text: '#0a2014',
+	textSecondary: '#668475',
+	muted: '#607A6A',
+	border: '#a6c1b3',
+	card: '#eef4f0',
+	cardLight: '#eef4f0',
+	active: '#d5ead9',
+	iconBackground: '#d5ead9',
 	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
+	coral: '#08783F',
+	errorBackground: '#eef4f0',
+	errorBorder: '#a6c1b3',
+	errorText: '#0a2014',
+	mapBackground: '#eef4f0',
+	mapBorder: '#a6c1b3',
+	button: '#08783F',
+	buttonPressed: '#063D22',
 } as const
 
 const cardShadow: ViewStyle = {
@@ -88,7 +91,7 @@ const styles = {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'rgba(247,249,248,0.94)',
+		backgroundColor: 'rgba(238,244,240,0.94)',
 		borderWidth: 1,
 		borderColor: colors.border,
 		borderRadius: 18,
@@ -105,7 +108,7 @@ const styles = {
 	backText: {
 		fontSize: 15,
 		fontWeight: '700',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	// Header
@@ -119,7 +122,7 @@ const styles = {
 		width: 52,
 		height: 52,
 		borderRadius: 17,
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1,
@@ -134,7 +137,7 @@ const styles = {
 	title: {
 		fontSize: 27,
 		fontWeight: '900',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	subtitle: {
@@ -153,7 +156,7 @@ const styles = {
 		marginBottom: 8,
 		fontSize: 14,
 		fontWeight: '800',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	searchContainer: {
@@ -177,7 +180,7 @@ const styles = {
 		paddingHorizontal: 12,
 		paddingVertical: 0,
 		fontSize: 15,
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	// Filtros
@@ -224,7 +227,7 @@ const styles = {
 	filterText: {
 		fontSize: 13,
 		fontWeight: '800',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	filterTextActive: {
@@ -359,7 +362,7 @@ const styles = {
 		width: 64,
 		height: 64,
 		borderRadius: 20,
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1,
@@ -370,7 +373,7 @@ const styles = {
 		marginTop: 16,
 		fontSize: 18,
 		fontWeight: '900',
-		color: colors.dark,
+		color: colors.text,
 		textAlign: 'center',
 	} satisfies TextStyle,
 
@@ -419,7 +422,7 @@ const styles = {
 		height: 210,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 	} satisfies ViewStyle,
 
 	speciesContent: {
@@ -440,21 +443,21 @@ const styles = {
 		fontSize: 20,
 		lineHeight: 25,
 		fontWeight: '900',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	scientificName: {
 		marginTop: 4,
 		fontSize: 13,
 		fontStyle: 'italic',
-		color: colors.muted,
+		color: colors.textSecondary,
 	} satisfies TextStyle,
 
 	arrowContainer: {
 		width: 42,
 		height: 42,
 		borderRadius: 15,
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 1,
@@ -467,7 +470,7 @@ const styles = {
 		paddingHorizontal: 11,
 		paddingVertical: 6,
 		borderRadius: 13,
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		borderWidth: 1,
 		borderColor: colors.border,
 	} satisfies ViewStyle,
@@ -475,14 +478,14 @@ const styles = {
 	categoryText: {
 		fontSize: 11,
 		fontWeight: '800',
-		color: colors.dark,
+		color: colors.text,
 	} satisfies TextStyle,
 
 	description: {
 		marginTop: 12,
 		fontSize: 13,
 		lineHeight: 19,
-		color: colors.muted,
+		color: colors.textSecondary,
 	} satisfies TextStyle,
 
 	viewInfo: {

@@ -1,23 +1,26 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	text: '#17372C',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+	text: '#0a2014',
+	textSecondary: '#668475',
+	muted: '#607A6A',
+	border: '#a6c1b3',
+	card: '#eef4f0',
+	cardLight: '#eef4f0',
+	active: '#d5ead9',
+	iconBackground: '#d5ead9',
 	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
-	overlay: 'rgba(0,0,0,0.45)',
+	coral: '#08783F',
+	errorBackground: '#eef4f0',
+	errorBorder: '#a6c1b3',
+	errorText: '#0a2014',
+	mapBackground: '#eef4f0',
+	mapBorder: '#a6c1b3',
+	overlay: 'rgba(6,61,34,0.55)',
 } as const
 
 const cardShadow: ViewStyle = {
@@ -113,7 +116,7 @@ const styles = {
 		borderRadius: 16,
 		borderWidth: 1,
 		borderColor: colors.errorBorder,
-		backgroundColor: colors.errorBorder,
+		backgroundColor: colors.active,
 	} satisfies ViewStyle,
 
 	errorTitle: {
@@ -145,7 +148,7 @@ const styles = {
 	} satisfies ViewStyle,
 
 	retryButtonPressed: {
-		backgroundColor: colors.primaryLight,
+		backgroundColor: colors.primaryDark,
 	} satisfies ViewStyle,
 
 	retryButtonText: {
@@ -172,7 +175,7 @@ const styles = {
 	} satisfies ViewStyle,
 
 	heroOverlay: {
-		backgroundColor: 'rgba(7,92,59,0.08)',
+		backgroundColor: 'rgba(6,61,34,0.08)',
 	} satisfies ViewStyle,
 
 	heroBackButton: {
@@ -216,7 +219,7 @@ const styles = {
 
 	// Categoría
 	categoryBadge: {
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		borderWidth: 1,
 		borderColor: colors.border,
 	} satisfies ViewStyle,
@@ -234,8 +237,11 @@ const styles = {
 		color: colors.textSecondary,
 	} satisfies TextStyle,
 
+	// Títulos de secciones:
+	// Conoce a esta especie, Datos de la especie,
+	// Etiquetas y Galería.
 	sectionTitle: {
-		color: colors.primary,
+		color: '#0a2014',
 	} satisfies TextStyle,
 
 	description: {
@@ -244,7 +250,7 @@ const styles = {
 
 	// Etiquetas
 	tag: {
-		backgroundColor: colors.active,
+		backgroundColor: colors.iconBackground,
 		borderColor: colors.border,
 	} satisfies ViewStyle,
 
@@ -274,7 +280,7 @@ const styles = {
 
 	// Modal
 	modalContainer: {
-		backgroundColor: 'rgba(23,55,44,0.95)',
+		backgroundColor: 'rgba(6,32,20,0.95)',
 	} satisfies ViewStyle,
 
 	modalCloseWrapper: {
@@ -284,17 +290,17 @@ const styles = {
 		zIndex: 10,
 		overflow: 'hidden',
 		borderRadius: 999,
-		backgroundColor: 'rgba(221,245,234,0.20)',
+		backgroundColor: 'rgba(238,244,240,0.20)',
 		borderWidth: 1,
-		borderColor: 'rgba(189,238,217,0.35)',
+		borderColor: 'rgba(166,193,179,0.35)',
 	} satisfies ViewStyle,
 
 	modalCloseButton: {
-		backgroundColor: 'rgba(221,245,234,0.20)',
+		backgroundColor: 'rgba(238,244,240,0.20)',
 	} satisfies ViewStyle,
 
 	modalCloseButtonPressed: {
-		backgroundColor: 'rgba(189,238,217,0.30)',
+		backgroundColor: 'rgba(213,234,217,0.30)',
 	} satisfies ViewStyle,
 
 	modalCloseText: {

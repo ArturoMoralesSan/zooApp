@@ -1,31 +1,16 @@
-import {
-	CheckmarkCircle02Icon,
-	Home01Icon,
-	Ticket01Icon,
-} from '@hugeicons/core-free-icons'
-
+import { CheckmarkCircle02Icon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { useLocalSearchParams, useRouter } from 'expo-router'
-
 import { useMemo } from 'react'
-
-import {
-	ImageBackground,
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-} from 'react-native'
-
+import { ImageBackground, ScrollView, Text, View } from 'react-native'
+import QRCode from 'react-native-qrcode-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import QRCode from 'react-native-qrcode-svg'
+import BackButton from '@/components/BackButton'
+import FixedFooter from '@/components/FixedFooter'
+import UserHeader from '@/components/UserHeader'
 
 import {
-	backButtonPressedStyle,
-	backButtonStyle,
-	backTextStyle,
 	backgroundImageStyle,
 	backgroundStyle,
 	bottomSpaceStyle,
@@ -35,18 +20,6 @@ import {
 	folioContainerStyle,
 	folioLabelStyle,
 	folioStyle,
-	footerAmountStyle,
-	footerInfoStyle,
-	footerLabelStyle,
-	footerStyle,
-	footerTicketCountStyle,
-	headerStyle,
-	headerTextStyle,
-	homeButtonContentStyle,
-	homeButtonPressedStyle,
-	homeButtonStyle,
-	homeButtonTextStyle,
-	homeButtonWrapperStyle,
 	infoBoxStyle,
 	infoContentStyle,
 	infoIconStyle,
@@ -63,14 +36,12 @@ import {
 	orderTitleStyle,
 	qrContainerStyle,
 	scrollContentStyle,
-	subtitleStyle,
 	successCardStyle,
 	successIconStyle,
 	successTextStyle,
 	successTitleStyle,
 	ticketContainerStyle,
 	ticketLabelStyle,
-	titleStyle,
 	totalAmountStyle,
 	totalCardStyle,
 	totalLabelStyle,
@@ -107,67 +78,132 @@ export default function TicketSuccessScreen() {
 	}, [params.order])
 
 	const tickets = order?.tickets ?? []
-
 	const total = Number(order?.total ?? 0)
 
+	const formatCurrency = (value: number) =>
+		new Intl.NumberFormat('es-MX', {
+			style: 'currency',
+			currency: 'MXN',
+			minimumFractionDigits: 2,
+		}).format(value)
+
 	return (
-		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
+		<SafeAreaView
+			style={[containerStyle, { flex: 1 }]}
+			edges={['top', 'left', 'right']}
+		>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
-				className='flex-1'
+				style={[backgroundStyle, { flex: 1 }]}
 				resizeMode='repeat'
 				imageStyle={backgroundImageStyle}
 			>
-				{/* HEADER */}
-				<View style={headerStyle}>
-					<Pressable
-						onPress={() => router.back()}
-						style={({ pressed }) => [
-							backButtonStyle,
-							pressed && backButtonPressedStyle,
+				{/* CONTENIDO DESPLAZABLE */}
+				<ScrollView
+					style={{ flex: 1, minHeight: 0 }}
+					contentContainerStyle={[
+						scrollContentStyle,
+						{
+							width: '100%',
+							paddingHorizontal: 20,
+							paddingTop: 12,
+							paddingBottom: 190,
+							flexGrow: 1,
+							alignItems: 'stretch',
+						},
+					]}
+					showsVerticalScrollIndicator={false}
+					bounces
+					nestedScrollEnabled
+				>
+					{/* BOTÓN REGRESAR Y ENCABEZADO */}
+					<View
+						style={{
+							width: '100%',
+							alignSelf: 'stretch',
+							alignItems: 'stretch',
+							paddingBottom: 16,
+						}}
+					>
+						<View
+							style={{
+								width: '100%',
+								alignItems: 'flex-start',
+								marginBottom: 12,
+							}}
+						>
+							<BackButton onPress={() => router.back()} position='relative' />
+						</View>
+
+						<View
+							style={{
+								width: '100%',
+								alignSelf: 'stretch',
+								alignItems: 'stretch',
+							}}
+						>
+							<UserHeader
+								title='¡Compra realizada!'
+								subtitle='Tus boletos están listos para usar.'
+								showRewards={false}
+							/>
+						</View>
+					</View>
+
+					{/* CONFIRMACIÓN DE COMPRA */}
+					<View
+						style={[
+							successCardStyle,
+							cardShadow,
+							{
+								backgroundColor: colors.button,
+								borderColor: colors.button,
+							},
 						]}
 					>
-						<Text style={backTextStyle}>‹ Regresar</Text>
-					</Pressable>
-
-					<View style={headerTextStyle}>
-						<Text style={titleStyle}>¡Compra realizada!</Text>
-
-						<Text style={subtitleStyle}>
-							Tus boletos están listos para usar
-						</Text>
-					</View>
-				</View>
-
-				{/* CONTENIDO */}
-				<ScrollView
-					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
-				>
-					{/* CONFIRMACIÓN */}
-					<View style={[successCardStyle, cardShadow]}>
-						<View style={successIconStyle}>
+						<View
+							style={[
+								successIconStyle,
+								{
+									backgroundColor: 'transparent',
+									borderWidth: 0,
+									elevation: 0,
+									shadowOpacity: 0,
+								},
+							]}
+						>
 							<HugeiconsIcon
 								icon={CheckmarkCircle02Icon}
 								size={56}
 								strokeWidth={1.8}
-								color={colors.primary}
+								color='#B8F35D'
 							/>
 						</View>
 
-						<Text style={successTitleStyle}>¡Compra realizada!</Text>
+						<Text style={[successTitleStyle, { color: colors.white }]}>
+							¡Compra realizada!
+						</Text>
 
-						<Text style={successTextStyle}>
+						<Text style={[successTextStyle, { color: '#EAF5EE' }]}>
 							Tu compra se realizó correctamente. Guarda tus códigos QR para
 							ingresar al zoológico.
 						</Text>
 					</View>
 
-					{/* BOLETOS */}
+					{/* BOLETOS Y CÓDIGOS QR */}
 					<View style={[orderCardStyle, cardShadow]}>
 						<View style={orderHeaderStyle}>
-							<View style={orderIconStyle}>
+							<View
+								style={[
+									orderIconStyle,
+									{
+										backgroundColor: colors.active,
+										borderColor: colors.border,
+										alignItems: 'center',
+										justifyContent: 'center',
+									},
+								]}
+							>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={25}
@@ -185,35 +221,35 @@ export default function TicketSuccessScreen() {
 							</View>
 						</View>
 
-						{tickets.map((ticket, index) => (
-							<View key={ticket.id ?? index} style={ticketContainerStyle}>
-								<Text style={ticketLabelStyle}>Boleto {index + 1}</Text>
+						{tickets.length > 0 ? (
+							tickets.map((ticket, index) => (
+								<View key={ticket.id ?? index} style={ticketContainerStyle}>
+									<Text style={ticketLabelStyle}>Boleto {index + 1}</Text>
 
-								<View style={qrContainerStyle}>
-									<QRCode
-										value={ticket.qr_token}
-										size={190}
-										backgroundColor={colors.white}
-									/>
+									<View style={qrContainerStyle}>
+										<QRCode
+											value={ticket.qr_token}
+											size={190}
+											backgroundColor={colors.white}
+										/>
+									</View>
 								</View>
-							</View>
-						))}
-
-						{tickets.length === 0 ? (
+							))
+						) : (
 							<View style={noTicketsStyle}>
 								<Text style={noTicketsTextStyle}>
 									No se encontraron boletos en esta compra.
 								</Text>
 							</View>
-						) : null}
+						)}
 					</View>
 
-					{/* TOTAL */}
+					{/* TOTAL PAGADO Y FOLIO */}
 					<View style={[totalCardStyle, cardShadow]}>
 						<View>
 							<Text style={totalLabelStyle}>Total pagado</Text>
 
-							<Text style={totalAmountStyle}>${total.toFixed(2)}</Text>
+							<Text style={totalAmountStyle}>{formatCurrency(total)}</Text>
 						</View>
 
 						<View style={folioContainerStyle}>
@@ -223,7 +259,7 @@ export default function TicketSuccessScreen() {
 						</View>
 					</View>
 
-					{/* INFORMACIÓN */}
+					{/* INFORMACIÓN IMPORTANTE */}
 					<View style={infoBoxStyle}>
 						<View style={infoIconStyle}>
 							<Text style={infoIconTextStyle}>✓</Text>
@@ -242,41 +278,16 @@ export default function TicketSuccessScreen() {
 					<View style={bottomSpaceStyle} />
 				</ScrollView>
 
-				{/* FOOTER */}
-				<View style={footerStyle}>
-					<View style={footerInfoStyle}>
-						<View>
-							<Text style={footerLabelStyle}>Compra confirmada</Text>
-
-							<Text style={footerTicketCountStyle}>
-								{tickets.length} {tickets.length === 1 ? 'boleto' : 'boletos'}
-							</Text>
-						</View>
-
-						<Text style={footerAmountStyle}>${total.toFixed(2)}</Text>
-					</View>
-
-					<View style={homeButtonWrapperStyle}>
-						<Pressable
-							onPress={() => router.replace('/')}
-							style={({ pressed }) => [
-								homeButtonStyle,
-								pressed && homeButtonPressedStyle,
-							]}
-						>
-							<View style={homeButtonContentStyle}>
-								<HugeiconsIcon
-									icon={Home01Icon}
-									size={21}
-									strokeWidth={1.8}
-									color={colors.white}
-								/>
-
-								<Text style={homeButtonTextStyle}>Ir al inicio</Text>
-							</View>
-						</Pressable>
-					</View>
-				</View>
+				{/* FOOTER FIJO */}
+				<FixedFooter
+					label='Compra confirmada'
+					description={`${tickets.length} ${
+						tickets.length === 1 ? 'boleto' : 'boletos'
+					}`}
+					amount={formatCurrency(total)}
+					buttonTitle='Ir al inicio'
+					onButtonPress={() => router.replace('/')}
+				/>
 			</ImageBackground>
 		</SafeAreaView>
 	)

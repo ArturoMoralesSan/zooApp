@@ -1,15 +1,10 @@
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	CheckmarkCircle02Icon,
-	CreditCardIcon,
-	HeartAddIcon,
-} from '@hugeicons/core-free-icons'
-
+import { CreditCardIcon, HeartAddIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -21,9 +16,10 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import BackButton from '@/components/BackButton'
+import UserHeader from '@/components/UserHeader'
+
 import {
-	backButtonStyle,
-	backTextStyle,
 	backgroundImageStyle,
 	backgroundStyle,
 	buyButtonStyle,
@@ -44,7 +40,6 @@ import {
 	emptyIconStyle,
 	emptyTextStyle,
 	emptyTitleStyle,
-	headerStyle,
 	infoBlockStyle,
 	infoLabelStyle,
 	infoRowStyle,
@@ -52,24 +47,12 @@ import {
 	loadingContainerStyle,
 	loadingTextStyle,
 	paymentRowStyle,
-	referenceContainerStyle,
-	referenceInfoStyle,
 	scrollContentStyle,
 	sectionTitleStyle,
 	statCardStyle,
-	statIconStyle,
-	statLabelStyle,
-	statNumberStyle,
 	statsContainerStyle,
 	statusBadgeStyle,
 	statusTextStyle,
-	subtitleStyle,
-	titleStyle,
-	totalAmountStyle,
-	totalCardStyle,
-	totalIconStyle,
-	totalInfoStyle,
-	totalLabelStyle,
 } from '@/styles/donation-history'
 
 type PaymentMethod = {
@@ -86,11 +69,7 @@ type Donation = {
 	payment_method?: PaymentMethod | null
 }
 
-const getDonationStatus = (donation?: Donation) => {
-	if (!donation) {
-		return 'Sin estado'
-	}
-
+function getDonationStatus(donation: Donation): string {
 	const status = String(donation.status ?? '').toLowerCase()
 
 	switch (status) {
@@ -116,42 +95,98 @@ const getDonationStatus = (donation?: Donation) => {
 			return 'Fallida'
 
 		default:
-			return donation.status ?? 'Registrada'
+			return donation.status || 'Registrada'
 	}
 }
 
-const getDonationStatusColors = (donation?: Donation) => {
-	const status = String(donation?.status ?? '').toLowerCase()
+function getDonationStatusColors(donation: Donation) {
+	const status = String(donation.status ?? '').toLowerCase()
 
 	if (
-		status === 'cancelled' ||
-		status === 'canceled' ||
-		status === 'cancelado' ||
-		status === 'cancelada' ||
-		status === 'failed' ||
-		status === 'fallida' ||
-		status === 'fallido'
+		[
+			'cancelled',
+			'canceled',
+			'cancelado',
+			'cancelada',
+			'failed',
+			'fallida',
+			'fallido',
+		].includes(status)
 	) {
 		return {
 			backgroundColor: colors.coralLight,
-			color: colors.coral,
-			borderColor: '#EFC5C0',
+			color: '#06371c',
+			borderColor: colors.border,
 		}
 	}
 
 	if (status === 'pending' || status === 'pendiente') {
 		return {
 			backgroundColor: colors.orangeLight,
-			color: colors.orange,
-			borderColor: '#E8D2A7',
+			color: '#06371c',
+			borderColor: colors.border,
 		}
 	}
 
 	return {
-		backgroundColor: colors.active,
-		color: colors.primary,
+		backgroundColor: '#b8f45d',
+		color: '#06371c',
 		borderColor: colors.border,
 	}
+}
+
+function formatAmount(amount?: number | string | null): string {
+	const value = Number(amount ?? 0)
+
+	if (!Number.isFinite(value)) {
+		return '$0.00'
+	}
+
+	return value.toLocaleString('es-MX', {
+		style: 'currency',
+		currency: 'MXN',
+	})
+}
+
+function formatDate(date?: string | null): string {
+	if (!date) {
+		return 'Fecha no disponible'
+	}
+
+	const parsedDate = new Date(date)
+
+	if (Number.isNaN(parsedDate.getTime())) {
+		return 'Fecha no disponible'
+	}
+
+	return parsedDate.toLocaleDateString('es-MX', {
+		day: '2-digit',
+		month: 'long',
+		year: 'numeric',
+	})
+}
+
+function formatTime(date?: string | null): string {
+	if (!date) {
+		return ''
+	}
+
+	const parsedDate = new Date(date)
+
+	if (Number.isNaN(parsedDate.getTime())) {
+		return ''
+	}
+
+	return parsedDate.toLocaleTimeString('es-MX', {
+		hour: '2-digit',
+		minute: '2-digit',
+	})
+}
+
+function isCompleted(donation: Donation): boolean {
+	return ['completed', 'complete', 'completada', 'completado'].includes(
+		String(donation.status ?? '').toLowerCase(),
+	)
 }
 
 export default function DonationHistoryScreen() {
@@ -160,11 +195,7 @@ export default function DonationHistoryScreen() {
 	const [donations, setDonations] = useState<Donation[]>([])
 	const [loading, setLoading] = useState(true)
 
-	useEffect(() => {
-		void loadDonations()
-	}, [])
-
-	const loadDonations = async () => {
+	const loadDonations = useCallback(async () => {
 		try {
 			setLoading(true)
 
@@ -182,33 +213,22 @@ export default function DonationHistoryScreen() {
 				},
 			})
 
-			const data = response?.data ?? response
+			let result: unknown = response?.data ?? response
 
-			let normalizedData: unknown = data
-
-			if (
-				normalizedData &&
-				typeof normalizedData === 'object' &&
-				!Array.isArray(normalizedData)
-			) {
-				const objectData = normalizedData as {
+			if (result && typeof result === 'object' && !Array.isArray(result)) {
+				const payload = result as {
 					data?: unknown
 					donations?: unknown
 				}
 
-				if (Array.isArray(objectData.data)) {
-					normalizedData = objectData.data
-				} else if (Array.isArray(objectData.donations)) {
-					normalizedData = objectData.donations
+				if (Array.isArray(payload.data)) {
+					result = payload.data
+				} else if (Array.isArray(payload.donations)) {
+					result = payload.donations
 				}
 			}
 
-			if (!Array.isArray(normalizedData)) {
-				setDonations([])
-				return
-			}
-
-			setDonations(normalizedData as Donation[])
+			setDonations(Array.isArray(result) ? (result as Donation[]) : [])
 		} catch (error) {
 			console.error('Error cargando donaciones:', error)
 
@@ -223,85 +243,36 @@ export default function DonationHistoryScreen() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [router])
+
+	useEffect(() => {
+		void loadDonations()
+	}, [loadDonations])
 
 	const sortedDonations = useMemo(() => {
 		return [...donations].sort((a, b) => {
 			const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
+
 			const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
 
 			return dateB - dateA
 		})
 	}, [donations])
 
-	const totalDonated = useMemo(() => {
-		return donations.reduce((total, donation) => {
-			const amount = Number(donation?.amount ?? 0)
+	const completedDonations = useMemo(
+		() => donations.filter(isCompleted).length,
+		[donations],
+	)
 
-			return total + (Number.isFinite(amount) ? amount : 0)
-		}, 0)
-	}, [donations])
+	const totalDonated = useMemo(
+		() =>
+			donations.reduce((total, donation) => {
+				const amount = Number(donation.amount ?? 0)
 
-	const completedDonations = useMemo(() => {
-		return donations.filter((donation) => {
-			const status = String(donation.status ?? '').toLowerCase()
-
-			return (
-				status === 'completed' ||
-				status === 'complete' ||
-				status === 'completada' ||
-				status === 'completado'
-			)
-		}).length
-	}, [donations])
-
-	const formatAmount = (amount?: number | string | null) => {
-		const value = Number(amount ?? 0)
-
-		if (!Number.isFinite(value)) {
-			return '$0.00'
-		}
-
-		return value.toLocaleString('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-		})
-	}
-
-	const formatDate = (date?: string | null) => {
-		if (!date) {
-			return 'Fecha no disponible'
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return 'Fecha no disponible'
-		}
-
-		return parsedDate.toLocaleDateString('es-MX', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric',
-		})
-	}
-
-	const formatTime = (date?: string | null) => {
-		if (!date) {
-			return ''
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return ''
-		}
-
-		return parsedDate.toLocaleTimeString('es-MX', {
-			hour: '2-digit',
-			minute: '2-digit',
-		})
-	}
+				return total + (Number.isFinite(amount) ? amount : 0)
+			}, 0),
+		[donations],
+	)
 
 	return (
 		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
@@ -311,91 +282,58 @@ export default function DonationHistoryScreen() {
 				resizeMode='repeat'
 				imageStyle={backgroundImageStyle}
 			>
-				<View style={backButtonStyle}>
-					<Pressable
-						onPress={() => router.back()}
-						style={({ pressed }) => [
-							{
-								opacity: pressed ? 0.75 : 1,
-							},
-						]}
-					>
-						<Text style={backTextStyle}>‹ Regresar</Text>
-					</Pressable>
+				{/* Encabezado */}
+				<View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+					<View style={{ marginBottom: 12 }}>
+						<BackButton onPress={() => router.back()} position='relative' />
+					</View>
+
+					<View style={{ marginBottom: 20 }}>
+						<UserHeader
+							title='Mis donaciones'
+							subtitle='Consulta el historial de tus donaciones.'
+							showRewards={false}
+						/>
+					</View>
 				</View>
 
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={scrollContentStyle}
 				>
-					<View style={headerStyle}>
-						<Text style={titleStyle}>Mis donaciones</Text>
-
-						<Text style={subtitleStyle}>
-							Consulta el historial de tus donaciones.
-						</Text>
-					</View>
-
+					{/* Estadísticas */}
 					<View style={statsContainerStyle}>
 						<View style={statCardStyle}>
-							<View style={statIconStyle}>
-								<HugeiconsIcon
-									icon={HeartAddIcon}
-									size={21}
-									strokeWidth={1.8}
-									color={colors.primary}
-								/>
-							</View>
-
-							<View>
-								<Text style={statNumberStyle}>{donations.length}</Text>
-
-								<Text style={statLabelStyle}>Donaciones</Text>
-							</View>
+							<Text style={styles.statNumber}>{donations.length}</Text>
+							<Text style={styles.statLabel}>Donaciones</Text>
 						</View>
 
 						<View style={statCardStyle}>
-							<View style={statIconStyle}>
-								<HugeiconsIcon
-									icon={CheckmarkCircle02Icon}
-									size={21}
-									strokeWidth={1.8}
-									color={colors.primary}
-								/>
-							</View>
+							<Text style={styles.statNumber}>{completedDonations}</Text>
+							<Text style={styles.statLabel}>Completadas</Text>
+						</View>
 
-							<View>
-								<Text style={statNumberStyle}>{completedDonations}</Text>
-
-								<Text style={statLabelStyle}>Completadas</Text>
-							</View>
+						<View style={[statCardStyle, { flex: 1.25 }]}>
+							<Text
+								style={[styles.statNumber, { fontSize: 16 }]}
+								numberOfLines={1}
+								adjustsFontSizeToFit
+								minimumFontScale={0.7}
+							>
+								{formatAmount(totalDonated)}
+							</Text>
+							<Text style={styles.statLabel}>Total donado</Text>
 						</View>
 					</View>
 
-					<View style={totalCardStyle}>
-						<View style={totalIconStyle}>
-							<HugeiconsIcon
-								icon={HeartAddIcon}
-								size={25}
-								strokeWidth={1.8}
-								color={colors.primary}
-							/>
-						</View>
-
-						<View style={totalInfoStyle}>
-							<Text style={totalLabelStyle}>Total donado</Text>
-
-							<Text style={totalAmountStyle}>{formatAmount(totalDonated)}</Text>
-						</View>
-					</View>
-
+					{/* Cargando */}
 					{loading ? (
 						<View style={loadingContainerStyle}>
 							<ActivityIndicator size='large' color={colors.primary} />
-
 							<Text style={loadingTextStyle}>Cargando tus donaciones...</Text>
 						</View>
 					) : sortedDonations.length === 0 ? (
+						/* Estado vacío */
 						<View style={emptyCardStyle}>
 							<View style={emptyIconStyle}>
 								<HugeiconsIcon
@@ -412,23 +350,23 @@ export default function DonationHistoryScreen() {
 								Cuando realices una donación aparecerá aquí.
 							</Text>
 
-							<View style={cardShadow}>
-								<Pressable
-									onPress={() => router.push('/donations')}
-									style={({ pressed }) => [
-										buyButtonStyle,
-										{
-											backgroundColor: pressed
-												? colors.buttonPressed
-												: colors.button,
-										},
-									]}
-								>
-									<Text style={buyButtonTextStyle}>Hacer una donación</Text>
-								</Pressable>
-							</View>
+							<Pressable
+								onPress={() => router.push('/donations')}
+								style={({ pressed }) => [
+									buyButtonStyle,
+									{
+										marginTop: 18,
+										backgroundColor: pressed
+											? colors.buttonPressed
+											: colors.button,
+									},
+								]}
+							>
+								<Text style={buyButtonTextStyle}>Hacer una donación</Text>
+							</Pressable>
 						</View>
 					) : (
+						/* Historial */
 						<View style={donationsListStyle}>
 							<Text style={sectionTitleStyle}>Historial</Text>
 
@@ -436,7 +374,10 @@ export default function DonationHistoryScreen() {
 								const statusColors = getDonationStatusColors(donation)
 
 								return (
-									<View key={donation.id} style={donationCardStyle}>
+									<View
+										key={donation.id}
+										style={[donationCardStyle, cardShadow]}
+									>
 										<View style={donationHeaderStyle}>
 											<View style={donationIconStyle}>
 												<HugeiconsIcon
@@ -487,6 +428,7 @@ export default function DonationHistoryScreen() {
 
 										<View style={dividerStyle} />
 
+										{/* Método de pago y referencia */}
 										<View style={infoRowStyle}>
 											<View style={infoBlockStyle}>
 												<Text style={infoLabelStyle}>Método de pago</Text>
@@ -499,40 +441,54 @@ export default function DonationHistoryScreen() {
 														color={colors.primary}
 													/>
 
-													<Text style={infoValueStyle}>
+													<Text style={infoValueStyle} numberOfLines={2}>
 														{donation.payment_method?.name ?? 'No especificado'}
 													</Text>
 												</View>
 											</View>
-										</View>
 
-										{donation.reference ? (
-											<View style={referenceContainerStyle}>
-												<HugeiconsIcon
-													icon={CheckmarkCircle02Icon}
-													size={17}
-													strokeWidth={1.8}
-													color={colors.primary}
-												/>
+											<View style={infoBlockStyle}>
+												<Text style={infoLabelStyle}>Referencia</Text>
 
-												<View style={referenceInfoStyle}>
-													<Text style={infoLabelStyle}>Referencia</Text>
-
-													<Text style={infoValueStyle}>
-														{donation.reference}
-													</Text>
-												</View>
+												<Text
+													style={[
+														infoValueStyle,
+														{
+															marginTop: 6,
+															marginLeft: 0,
+														},
+													]}
+													numberOfLines={2}
+												>
+													{donation.reference || 'No disponible'}
+												</Text>
 											</View>
-										) : null}
+										</View>
 									</View>
 								)
 							})}
 						</View>
 					)}
 
-					<View style={{ height: 40 }} />
+					<View style={{ height: 30 }} />
 				</ScrollView>
 			</ImageBackground>
 		</SafeAreaView>
 	)
+}
+
+const styles = {
+	statNumber: {
+		fontSize: 21,
+		fontWeight: '800' as const,
+		color: colors.primary,
+		textAlign: 'center' as const,
+	},
+	statLabel: {
+		marginTop: 6,
+		fontSize: 11,
+		fontWeight: '500' as const,
+		color: colors.muted,
+		textAlign: 'center' as const,
+	},
 }

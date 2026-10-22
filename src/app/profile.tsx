@@ -1,3 +1,5 @@
+import ActionButton from '@/components/ActionButton'
+import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
 import { API_URL, ApiValidationError, api } from '@/services/api'
 import { getToken, type User } from '@/services/auth'
@@ -64,15 +66,11 @@ type ToastState = {
 }
 
 function formatDateForApp(date: string | null | undefined): string {
-	if (!date) {
-		return ''
-	}
+	if (!date) return ''
 
 	const parts = date.split('-')
 
-	if (parts.length !== 3) {
-		return ''
-	}
+	if (parts.length !== 3) return ''
 
 	const [year, month, day] = parts
 
@@ -80,15 +78,11 @@ function formatDateForApp(date: string | null | undefined): string {
 }
 
 function formatDateForApi(date: string): string | null {
-	if (!date.trim()) {
-		return null
-	}
+	if (!date.trim()) return null
 
 	const parts = date.split('-')
 
-	if (parts.length !== 3) {
-		return null
-	}
+	if (parts.length !== 3) return null
 
 	const [day, month, year] = parts
 
@@ -100,15 +94,11 @@ function formatDateForApi(date: string): string | null {
 }
 
 function parseApiDate(date: string | null | undefined): Date {
-	if (!date) {
-		return new Date(2000, 0, 1)
-	}
+	if (!date) return new Date(2000, 0, 1)
 
 	const parts = date.split('-')
 
-	if (parts.length !== 3) {
-		return new Date(2000, 0, 1)
-	}
+	if (parts.length !== 3) return new Date(2000, 0, 1)
 
 	const year = Number(parts[0])
 	const month = Number(parts[1])
@@ -134,9 +124,7 @@ function formatDateForDisplay(date: Date): string {
 }
 
 function getAvatarUrl(avatar: string | null | undefined): string | null {
-	if (!avatar) {
-		return null
-	}
+	if (!avatar) return null
 
 	if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
 		return avatar
@@ -234,7 +222,7 @@ export default function ProfileScreen() {
 	const scrollY = useRef(new Animated.Value(0)).current
 
 	const showToast = useCallback(
-		(message: string, type: 'success' | 'error' | 'warning' = 'success') => {
+		(message: string, type: ToastState['type'] = 'success') => {
 			setToast({
 				visible: true,
 				message,
@@ -297,9 +285,7 @@ export default function ProfileScreen() {
 	const handleDateChange = (_event: unknown, selectedDate?: Date) => {
 		setShowDatePicker(false)
 
-		if (!selectedDate) {
-			return
-		}
+		if (!selectedDate) return
 
 		setBirthDate(formatDateForDisplay(selectedDate))
 		clearFieldError('birth_date')
@@ -380,9 +366,7 @@ export default function ProfileScreen() {
 				})
 
 				setErrors(validationErrors)
-
 				showToast(error.message || 'Revisa los datos ingresados.', 'warning')
-
 				return
 			}
 
@@ -415,7 +399,6 @@ export default function ProfileScreen() {
 			}
 
 			const formData = new FormData()
-
 			formData.append('avatar', file as unknown as Blob)
 
 			const response = await fetch(`${API_URL}/profile/avatar`, {
@@ -458,10 +441,7 @@ export default function ProfileScreen() {
 
 				if (errorData.errors) {
 					const firstError = Object.values(errorData.errors)[0]?.[0]
-
-					if (firstError) {
-						throw new Error(firstError)
-					}
+					if (firstError) throw new Error(firstError)
 				}
 
 				throw new Error(
@@ -471,7 +451,6 @@ export default function ProfileScreen() {
 			}
 
 			const avatarResponse = data as AvatarResponse
-
 			setUser(avatarResponse.user)
 
 			showToast(
@@ -509,9 +488,7 @@ export default function ProfileScreen() {
 				allowsMultipleSelection: false,
 			})
 
-			if (result.canceled || !result.assets || result.assets.length === 0) {
-				return
-			}
+			if (result.canceled || !result.assets?.length) return
 
 			const asset = result.assets[0]
 
@@ -519,10 +496,7 @@ export default function ProfileScreen() {
 				'Actualizar foto',
 				'¿Quieres usar esta imagen como foto de perfil?',
 				[
-					{
-						text: 'Cancelar',
-						style: 'cancel',
-					},
+					{ text: 'Cancelar', style: 'cancel' },
 					{
 						text: 'Aceptar',
 						onPress: () => {
@@ -550,23 +524,19 @@ export default function ProfileScreen() {
 				style={styles.loadingContainer}
 			>
 				<ActivityIndicator size='large' color={colors.primary} />
-
 				<Text style={styles.loadingText}>Cargando perfil...</Text>
 			</ImageBackground>
 		)
 	}
 
 	const avatarUrl = getAvatarUrl(user?.profile?.avatar)
-
 	const points = user?.gamification?.points ?? user?.points ?? 0
 
 	const currentLevel =
 		user?.gamification?.current_level?.name || user?.level?.name || 'Sin nivel'
 
 	const progress = Math.min(100, Math.max(0, user?.gamification?.progress ?? 0))
-
 	const pointsToNextLevel = user?.gamification?.points_to_next_level ?? 0
-
 	const nextLevel = user?.gamification?.next_level?.name || ''
 
 	const coverHeight = scrollY.interpolate({
@@ -615,7 +585,6 @@ export default function ProfileScreen() {
 		<ImageBackground
 			source={require('@/assets/images/zoo-pattern.png')}
 			resizeMode='repeat'
-			imageStyle={styles.backgroundPattern}
 			style={styles.container}
 		>
 			<KeyboardAvoidingView
@@ -643,15 +612,11 @@ export default function ProfileScreen() {
 						[
 							{
 								nativeEvent: {
-									contentOffset: {
-										y: scrollY,
-									},
+									contentOffset: { y: scrollY },
 								},
 							},
 						],
-						{
-							useNativeDriver: false,
-						},
+						{ useNativeDriver: false },
 					)}
 				>
 					{/* HEADER */}
@@ -659,31 +624,13 @@ export default function ProfileScreen() {
 						<Animated.Image
 							source={require('../../assets/images/profile-background.png')}
 							resizeMode='cover'
-							style={[
-								styles.coverImage,
-								{
-									height: coverHeight,
-								},
-							]}
+							style={[styles.coverImage, { height: coverHeight }]}
 						/>
 
-						<Animated.View
-							style={[
-								styles.backButtonWrapper,
-								{
-									opacity: backButtonOpacity,
-								},
-							]}
-						>
-							<Pressable
-								onPress={() => router.back()}
-								style={styles.backButton}
-							>
-								<Text style={styles.backArrow}>‹</Text>
-
-								<Text style={styles.backText}>Regresar</Text>
-							</Pressable>
-						</Animated.View>
+						<BackButton
+							onPress={() => router.back()}
+							opacity={backButtonOpacity}
+						/>
 
 						<View style={styles.profileHeader}>
 							<Pressable onPress={handlePickAvatar} disabled={uploadingAvatar}>
@@ -692,21 +639,15 @@ export default function ProfileScreen() {
 										styles.avatar,
 										{
 											transform: [
-												{
-													scale: avatarScale,
-												},
-												{
-													translateY: avatarTranslateY,
-												},
+												{ scale: avatarScale },
+												{ translateY: avatarTranslateY },
 											],
 										},
 									]}
 								>
 									{avatarUrl ? (
 										<Image
-											source={{
-												uri: avatarUrl,
-											}}
+											source={{ uri: avatarUrl }}
 											style={styles.avatarImage}
 											resizeMode='cover'
 										/>
@@ -731,25 +672,14 @@ export default function ProfileScreen() {
 							<Animated.Text
 								style={[
 									styles.profileName,
-									{
-										transform: [
-											{
-												translateY: nameTranslateY,
-											},
-										],
-									},
+									{ transform: [{ translateY: nameTranslateY }] },
 								]}
 							>
 								{user?.name || 'Visitante'}
 							</Animated.Text>
 
 							<Animated.Text
-								style={[
-									styles.profileEmail,
-									{
-										opacity: emailOpacity,
-									},
-								]}
+								style={[styles.profileEmail, { opacity: emailOpacity }]}
 								numberOfLines={1}
 							>
 								{user?.email || ''}
@@ -759,12 +689,7 @@ export default function ProfileScreen() {
 
 					{/* PROGRESO */}
 					<Animated.View
-						style={[
-							styles.progressContainer,
-							{
-								marginTop: progressMarginTop,
-							},
-						]}
+						style={[styles.progressContainer, { marginTop: progressMarginTop }]}
 					>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
@@ -782,13 +707,11 @@ export default function ProfileScreen() {
 								<View style={styles.statsRow}>
 									<View style={styles.pointsCard}>
 										<Text style={styles.pointsLabel}>Puntos</Text>
-
 										<Text style={styles.pointsValue}>{points}</Text>
 									</View>
 
 									<View style={styles.levelCard}>
 										<Text style={styles.levelLabel}>Nivel</Text>
-
 										<Text style={styles.levelValue} numberOfLines={1}>
 											{currentLevel}
 										</Text>
@@ -811,12 +734,7 @@ export default function ProfileScreen() {
 
 										<View style={styles.progressTrack}>
 											<View
-												style={[
-													styles.progressFill,
-													{
-														width: `${progress}%`,
-													},
-												]}
+												style={[styles.progressFill, { width: `${progress}%` }]}
 											/>
 										</View>
 
@@ -958,31 +876,11 @@ export default function ProfileScreen() {
 									}}
 								/>
 
-								<Pressable
+								<ActionButton
+									title={saving ? 'Guardando...' : 'Guardar cambios'}
 									onPress={handleSave}
 									disabled={saving}
-									style={[
-										styles.saveButton,
-										saving && styles.saveButtonDisabled,
-									]}
-								>
-									{({ pressed }) => (
-										<View
-											style={[
-												styles.saveButtonContent,
-												pressed && styles.saveButtonPressed,
-											]}
-										>
-											{saving ? (
-												<ActivityIndicator color={colors.white} />
-											) : (
-												<Text style={styles.saveButtonText}>
-													Guardar cambios
-												</Text>
-											)}
-										</View>
-									)}
-								</Pressable>
+								/>
 							</View>
 						</View>
 					</ImageBackground>

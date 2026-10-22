@@ -1,22 +1,18 @@
 import {
 	ArrowRight01Icon,
-	HeartAddIcon,
+	HeartIcon,
 	Location01Icon,
 	Ticket01Icon,
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
-
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { router } from 'expo-router'
-
 import { useCallback, useEffect, useState } from 'react'
 
 import {
 	ActivityIndicator,
 	Alert,
 	Image,
-	ImageBackground,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	Pressable,
@@ -25,31 +21,17 @@ import {
 	Text,
 	View,
 } from 'react-native'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
-
 import { useAuth } from '@/contexts/AuthContext'
-
 import { api } from '@/services/api'
-
 import { getToken } from '@/services/auth'
 
 import {
-	actionBottomTextStyle,
-	actionPressableStyle,
 	actionsContainerStyle,
-	actionsRowStyle,
-	backgroundImageStyle,
-	backgroundStyle,
-	cardShadow,
 	colors,
-	donationArrowStyle,
-	donationCardStyle,
-	donationDescriptionStyle,
-	donationIconBoxStyle,
-	donationTitleStyle,
 	dotStyle,
 	dotsContainerStyle,
 	errorCardStyle,
@@ -58,7 +40,6 @@ import {
 	eventCardWidth,
 	eventDescriptionStyle,
 	eventFallbackStyle,
-	eventFallbackTextStyle,
 	eventMetaStyle,
 	eventOverlayStyle,
 	eventPressableStyle,
@@ -68,22 +49,17 @@ import {
 	eventTypeTextStyle,
 	loadingCardStyle,
 	loadingTextStyle,
-	mapCardStyle,
-	mapIconContainerStyle,
-	mapIconStyle,
 	retryButtonStyle,
-	rightColumnStyle,
 	screenStyle,
 	scrollContentStyle,
 	secondaryTextStyle,
-	speciesCardStyle,
-	speciesDescriptionStyle,
-	speciesIconContainerStyle,
-	ticketBackgroundIconStyle,
-	ticketIconBoxStyle,
-	ticketsCardStyle,
 	titleTextStyle,
 } from '@/styles/explore'
+
+// Cambia este valor para personalizar el fondo de la tarjeta de donación.
+// Si no se define un color diferente, utiliza el verde predeterminado.
+const donationCardBackground = colors.primaryDark
+const donationAccentBackground = colors.primaryLight
 
 type ExploreZone = {
 	id: number
@@ -111,26 +87,26 @@ type ExploreResponse = {
 }
 
 function formatEventDate(date: string): string {
-	const eventDate = new Date(date)
+	const parsedDate = new Date(date)
 
-	if (Number.isNaN(eventDate.getTime())) {
+	if (Number.isNaN(parsedDate.getTime())) {
 		return ''
 	}
 
-	return eventDate.toLocaleDateString('es-MX', {
+	return parsedDate.toLocaleDateString('es-MX', {
 		day: 'numeric',
 		month: 'long',
 	})
 }
 
 function formatEventTime(date: string): string {
-	const eventDate = new Date(date)
+	const parsedDate = new Date(date)
 
-	if (Number.isNaN(eventDate.getTime())) {
+	if (Number.isNaN(parsedDate.getTime())) {
 		return ''
 	}
 
-	return eventDate.toLocaleTimeString('es-MX', {
+	return parsedDate.toLocaleTimeString('es-MX', {
 		hour: 'numeric',
 		minute: '2-digit',
 	})
@@ -179,14 +155,12 @@ export default function Explorar() {
 				throw new Error('No fue posible cargar la información de Explorar.')
 			}
 
-			const featuredEvents = response.data.featured_events ?? []
-
-			setEvents(featuredEvents)
+			setEvents(response.data.featured_events ?? [])
 			setActiveEventIndex(0)
-		} catch (error) {
+		} catch (err) {
 			setError(
-				error instanceof Error
-					? error.message
+				err instanceof Error
+					? err.message
 					: 'No fue posible cargar los eventos.',
 			)
 		} finally {
@@ -215,404 +189,341 @@ export default function Explorar() {
 		event: NativeSyntheticEvent<NativeScrollEvent>,
 	) => {
 		const offsetX = event.nativeEvent.contentOffset.x
+		const index = Math.round(offsetX / (eventCardWidth + 10))
 
-		const index = Math.round(offsetX / (eventCardWidth + 12))
-
-		if (index >= 0 && index < events.length && index !== activeEventIndex) {
+		if (index >= 0 && index < events.length) {
 			setActiveEventIndex(index)
 		}
 	}
 
 	return (
 		<SafeAreaView className='flex-1' edges={['top']} style={screenStyle}>
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
+			<ScrollView
 				className='flex-1'
-				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
-				style={backgroundStyle}
+				style={{ flex: 1 }}
+				contentContainerStyle={[
+					scrollContentStyle,
+					{
+						flexGrow: 1,
+						paddingBottom: 140,
+					},
+				]}
+				showsVerticalScrollIndicator
+				nestedScrollEnabled
+				bounces
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
+						tintColor={colors.primary}
+						colors={[colors.primary]}
+					/>
+				}
 			>
-				<ScrollView
-					className='flex-1'
-					contentContainerStyle={scrollContentStyle}
-					showsVerticalScrollIndicator={false}
-					refreshControl={
-						<RefreshControl
-							refreshing={refreshing}
-							onRefresh={handleRefresh}
-							tintColor={colors.primary}
-							colors={[colors.primary]}
-						/>
-					}
-				>
-					{/* HEADER */}
-					<UserHeader title='Explorar' />
+				{/* ENCABEZADO */}
+				<UserHeader title='Explorar' />
 
-					{/* EVENTOS */}
-					<View className='mt-7'>
-						{loading ? (
-							<View
-								className='items-center justify-center overflow-hidden rounded-[28px]'
-								style={loadingCardStyle}
-							>
-								<ActivityIndicator size='large' color={colors.primary} />
+				{/* EVENTOS DESTACADOS */}
+				<View className='mt-6'>
+					<Text
+						className='mb-3'
+						style={{
+							color: colors.text,
+							fontSize: 21,
+							fontWeight: '800',
+							lineHeight: 27,
+						}}
+					>
+						Eventos destacados
+					</Text>
 
-								<Text className='mt-3 text-sm' style={loadingTextStyle}>
-									Cargando eventos...
-								</Text>
-							</View>
-						) : error ? (
-							<View className='rounded-[28px] p-5' style={errorCardStyle}>
-								<Text className='text-base font-bold' style={titleTextStyle}>
-									No pudimos cargar los eventos
-								</Text>
+					{loading ? (
+						<View style={loadingCardStyle}>
+							<ActivityIndicator size='large' color={colors.primary} />
+							<Text className='mt-3' style={loadingTextStyle}>
+								Cargando eventos...
+							</Text>
+						</View>
+					) : error ? (
+						<View className='rounded-[22px] p-5' style={errorCardStyle}>
+							<Text style={titleTextStyle}>No pudimos cargar los eventos</Text>
 
-								<Text
-									className='mt-2 text-sm leading-5'
-									style={secondaryTextStyle}
-								>
-									{error}
-								</Text>
+							<Text className='mt-2' style={secondaryTextStyle}>
+								{error}
+							</Text>
 
-								<Pressable
-									className='mt-4 self-start overflow-hidden rounded-[18px]'
-									onPress={() => {
-										setLoading(true)
-										void loadExplore()
-									}}
-									style={({ pressed }) => retryButtonStyle(pressed)}
-								>
-									<View className='px-5 py-3'>
-										<Text
-											className='font-bold'
-											style={{
-												color: colors.white,
-											}}
-										>
-											Reintentar
-										</Text>
-									</View>
-								</Pressable>
-							</View>
-						) : events.length === 0 ? (
-							<View
-								className='rounded-[28px] p-6'
-								style={{
-									backgroundColor: colors.cardLight,
-									borderWidth: 1,
-									borderColor: colors.border,
-									...cardShadow,
+							<Pressable
+								className='mt-4 self-start rounded-full px-5 py-3'
+								style={({ pressed }) => retryButtonStyle(pressed)}
+								onPress={() => {
+									setLoading(true)
+									void loadExplore()
 								}}
 							>
 								<Text
-									className='text-center text-base font-bold'
-									style={titleTextStyle}
-								>
-									No hay eventos destacados
-								</Text>
-
-								<Text
-									className='mt-2 text-center text-sm leading-5'
-									style={secondaryTextStyle}
-								>
-									Pronto tendremos nuevas actividades para ti.
-								</Text>
-							</View>
-						) : (
-							<View>
-								<ScrollView
-									horizontal
-									showsHorizontalScrollIndicator={false}
-									decelerationRate='fast'
-									snapToInterval={eventCardWidth + 12}
-									snapToAlignment='start'
-									disableIntervalMomentum
-									onMomentumScrollEnd={handleCarouselScroll}
-									contentContainerStyle={{
-										paddingRight: 8,
+									style={{
+										color: colors.white,
+										fontWeight: '800',
 									}}
 								>
-									{events.map((event, index) => {
-										const imageUrl = getEventImageUrl(event.image)
-
-										return (
-											<View
-												key={event.id}
-												style={eventCardContainerStyle(index, events.length)}
-											>
-												<View
-													className='overflow-hidden rounded-[28px]'
-													style={eventCardStyle}
-												>
-													<Pressable
-														className='flex-1 overflow-hidden rounded-[28px]'
-														onPress={() =>
-															Alert.alert(
-																event.name,
-																event.description ||
-																	'Consulta próximamente todos los detalles de este evento.',
-															)
-														}
-														style={({ pressed }) =>
-															eventPressableStyle(pressed)
-														}
-													>
-														<View className='relative flex-1'>
-															{imageUrl ? (
-																<Image
-																	source={{
-																		uri: imageUrl,
-																	}}
-																	className='h-full w-full'
-																	resizeMode='cover'
-																/>
-															) : (
-																<View
-																	className='h-full w-full items-center justify-center'
-																	style={eventFallbackStyle}
-																>
-																	<Text style={eventFallbackTextStyle}>Z</Text>
-																</View>
-															)}
-
-															<View
-																className='absolute inset-x-0 bottom-0'
-																style={eventOverlayStyle}
-															/>
-
-															<View
-																className='absolute right-4 top-3 rounded-full px-4 py-1.5'
-																style={eventTypeStyle}
-															>
-																<Text style={eventTypeTextStyle}>
-																	{event.type || 'Evento'}
-																</Text>
-															</View>
-
-															<View className='absolute bottom-4 left-4 right-4'>
-																<Text style={eventTitleStyle} numberOfLines={1}>
-																	{event.name}
-																</Text>
-
-																{event.description ? (
-																	<Text
-																		className='mt-1'
-																		style={eventDescriptionStyle}
-																		numberOfLines={1}
-																	>
-																		{event.description}
-																	</Text>
-																) : null}
-
-																<View className='mt-3 flex-row items-center'>
-																	<Text style={eventMetaStyle}>
-																		{formatEventDate(event.start_at)}
-																	</Text>
-
-																	<Text
-																		className='mx-2'
-																		style={eventSeparatorStyle}
-																	>
-																		•
-																	</Text>
-
-																	<Text style={eventMetaStyle}>
-																		{formatEventTime(event.start_at)}
-																	</Text>
-																</View>
-															</View>
-														</View>
-													</Pressable>
-												</View>
-											</View>
-										)
-									})}
-								</ScrollView>
-
-								{events.length > 1 && (
-									<View style={dotsContainerStyle}>
-										{events.map((event, index) => (
-											<View
-												key={event.id}
-												style={dotStyle(index === activeEventIndex)}
-											/>
-										))}
-									</View>
-								)}
-							</View>
-						)}
-					</View>
-
-					{/* ACCIONES */}
-					<View style={actionsContainerStyle}>
-						<View style={actionsRowStyle}>
-							{/* ENTRADAS */}
-							<View
-								className='mr-2 flex-1 overflow-hidden rounded-[22px]'
-								style={ticketsCardStyle}
-							>
-								<Pressable
-									onPress={() => router.push('/tickets')}
-									className='flex-1 rounded-[22px] p-4'
-									style={({ pressed }) => actionPressableStyle(pressed)}
-								>
-									<View
-										className='h-12 w-12 items-center justify-center rounded-[16px]'
-										style={ticketIconBoxStyle}
-									>
-										<HugeiconsIcon
-											icon={Ticket01Icon}
-											size={28}
-											strokeWidth={1.8}
-											color={colors.primary}
-										/>
-									</View>
-
-									<Text className='mt-5' style={titleTextStyle}>
-										Entradas
-									</Text>
-
-									<Text
-										className='mt-1'
-										style={{
-											...secondaryTextStyle,
-											fontSize: 12,
-											lineHeight: 17,
-										}}
-									>
-										Compra tus entradas en la app y llega directo a disfrutar.
-									</Text>
-
-									<View
-										className='absolute bottom-3 right-2'
-										style={ticketBackgroundIconStyle}
-									>
-										<HugeiconsIcon
-											icon={Ticket01Icon}
-											size={100}
-											strokeWidth={1}
-											color={colors.primaryLight}
-										/>
-									</View>
-								</Pressable>
-							</View>
-
-							{/* COLUMNA DERECHA */}
-							<View style={rightColumnStyle}>
-								{/* MAPA */}
-								<View
-									className='mb-3 overflow-hidden rounded-[22px]'
-									style={mapCardStyle}
-								>
-									<Pressable
-										onPress={() => router.push('/map')}
-										className='flex-1 rounded-[22px] p-4'
-										style={({ pressed }) => actionPressableStyle(pressed)}
-									>
-										<View className='absolute' style={mapIconContainerStyle}>
-											<View style={mapIconStyle}>
-												<HugeiconsIcon
-													icon={Location01Icon}
-													size={72}
-													strokeWidth={1}
-													color={colors.coral}
-												/>
-											</View>
-										</View>
-
-										<View className='absolute bottom-3 left-4'>
-											<Text style={actionBottomTextStyle}>
-												Mapa interactivo
-											</Text>
-										</View>
-									</Pressable>
-								</View>
-
-								{/* ZOODECK */}
-								<View
-									className='overflow-hidden rounded-[22px]'
-									style={speciesCardStyle}
-								>
-									<Pressable
-										onPress={() => router.push('/species')}
-										className='flex-1 rounded-[22px] p-4'
-										style={({ pressed }) => actionPressableStyle(pressed)}
-									>
-										<View
-											className='absolute'
-											style={speciesIconContainerStyle}
-										>
-											<HugeiconsIcon
-												icon={UserGroupIcon}
-												size={78}
-												strokeWidth={1}
-												color={colors.primaryLight}
-											/>
-										</View>
-
-										<View className='absolute bottom-3 left-4 right-3'>
-											<Text style={actionBottomTextStyle}>ZooDeck</Text>
-
-											<Text
-												className='mt-1'
-												numberOfLines={2}
-												style={speciesDescriptionStyle}
-											>
-												Descubre las especies del zoológico.
-											</Text>
-										</View>
-									</Pressable>
-								</View>
-							</View>
-						</View>
-
-						{/* DONACIONES */}
-						<View
-							className='mt-3 overflow-hidden rounded-[22px]'
-							style={donationCardStyle}
-						>
-							<Pressable
-								onPress={() => router.push('/donations')}
-								className='rounded-[22px] px-4 py-4'
-								style={({ pressed }) => actionPressableStyle(pressed)}
-							>
-								<View className='flex-row items-center'>
-									<View
-										className='h-11 w-11 items-center justify-center rounded-[15px]'
-										style={donationIconBoxStyle}
-									>
-										<HugeiconsIcon
-											icon={HeartAddIcon}
-											size={23}
-											strokeWidth={1.8}
-											color={colors.primary}
-										/>
-									</View>
-
-									<View className='ml-3 flex-1'>
-										<Text style={donationTitleStyle}>Apoya al zoológico</Text>
-
-										<Text
-											className='mt-1'
-											numberOfLines={1}
-											style={donationDescriptionStyle}
-										>
-											Haz una donación y ayuda a conservar nuestra fauna.
-										</Text>
-									</View>
-
-									<HugeiconsIcon
-										icon={ArrowRight01Icon}
-										size={20}
-										strokeWidth={1.8}
-										color={donationArrowStyle.color}
-									/>
-								</View>
+									Reintentar
+								</Text>
 							</Pressable>
 						</View>
+					) : events.length === 0 ? (
+						<View
+							className='rounded-[22px] p-6'
+							style={{
+								backgroundColor: colors.cardLight,
+								borderColor: colors.border,
+								borderWidth: 1,
+							}}
+						>
+							<Text className='text-center' style={titleTextStyle}>
+								No hay eventos destacados
+							</Text>
+
+							<Text className='mt-2 text-center' style={secondaryTextStyle}>
+								Pronto tendremos nuevas actividades para ti.
+							</Text>
+						</View>
+					) : (
+						<>
+							<ScrollView
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								nestedScrollEnabled
+								decelerationRate='fast'
+								snapToInterval={eventCardWidth + 10}
+								snapToAlignment='start'
+								disableIntervalMomentum
+								onMomentumScrollEnd={handleCarouselScroll}
+								contentContainerStyle={{ paddingRight: 8 }}
+							>
+								{events.map((event, index) => {
+									const imageUrl = getEventImageUrl(event.image)
+
+									return (
+										<View
+											key={event.id}
+											style={eventCardContainerStyle(index, events.length)}
+										>
+											<View style={eventCardStyle}>
+												<Pressable
+													className='flex-1 overflow-hidden rounded-[24px]'
+													onPress={() =>
+														Alert.alert(
+															event.name,
+															event.description ||
+																'Consulta próximamente todos los detalles de este evento.',
+														)
+													}
+													style={({ pressed }) => eventPressableStyle(pressed)}
+												>
+													<View className='flex-1'>
+														{imageUrl ? (
+															<Image
+																source={{ uri: imageUrl }}
+																className='absolute inset-0 h-full w-full'
+																resizeMode='cover'
+															/>
+														) : (
+															<View
+																className='absolute inset-0'
+																style={eventFallbackStyle}
+															>
+																<View
+																	style={{
+																		position: 'absolute',
+																		top: 0,
+																		left: 0,
+																		right: 0,
+																		height: '47%',
+																		backgroundColor: '#315744',
+																	}}
+																/>
+															</View>
+														)}
+
+														<View style={eventOverlayStyle} />
+
+														<View
+															className='absolute left-3 top-3 rounded-full'
+															style={eventTypeStyle}
+														>
+															<Text style={eventTypeTextStyle}>
+																{(event.type || 'Educativo').toUpperCase()}
+															</Text>
+														</View>
+
+														<View className='absolute bottom-0 left-0 right-0 p-4'>
+															<View className='flex-row items-end'>
+																<View className='flex-1 pr-2'>
+																	<Text
+																		style={eventTitleStyle}
+																		numberOfLines={1}
+																	>
+																		{event.name}
+																	</Text>
+
+																	{event.description ? (
+																		<Text
+																			className='mt-1'
+																			style={eventDescriptionStyle}
+																			numberOfLines={1}
+																		>
+																			{event.description}
+																		</Text>
+																	) : null}
+																</View>
+
+																<Pressable
+																	accessibilityRole='button'
+																	accessibilityLabel={`Ver evento ${event.name}`}
+																	onPress={() =>
+																		Alert.alert(
+																			event.name,
+																			event.description ||
+																				'Consulta próximamente todos los detalles de este evento.',
+																		)
+																	}
+																	className='h-9 w-9 items-center justify-center rounded-full'
+																	style={{
+																		backgroundColor: colors.primaryLight,
+																	}}
+																>
+																	<HugeiconsIcon
+																		icon={ArrowRight01Icon}
+																		size={22}
+																		strokeWidth={2}
+																		color={colors.primaryDark}
+																	/>
+																</Pressable>
+															</View>
+
+															<View className='mt-3 flex-row items-center'>
+																<Text style={eventMetaStyle} numberOfLines={1}>
+																	{formatEventDate(event.start_at)}
+																</Text>
+
+																<Text
+																	className='mx-2'
+																	style={eventSeparatorStyle}
+																>
+																	•
+																</Text>
+
+																<Text style={eventMetaStyle}>
+																	{formatEventTime(event.start_at)}
+																</Text>
+															</View>
+														</View>
+													</View>
+												</Pressable>
+											</View>
+										</View>
+									)
+								})}
+							</ScrollView>
+
+							{events.length > 1 && (
+								<View style={dotsContainerStyle}>
+									{events.map((event, index) => (
+										<View
+											key={event.id}
+											style={dotStyle(index === activeEventIndex)}
+										/>
+									))}
+								</View>
+							)}
+						</>
+					)}
+				</View>
+
+				{/* ACCIONES */}
+				<View style={actionsContainerStyle}>
+					<Text
+						className='mb-3'
+						style={{
+							color: colors.text,
+							fontSize: 21,
+							fontWeight: '800',
+							lineHeight: 27,
+						}}
+					>
+						¿Qué quieres hacer?
+					</Text>
+
+					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
+					<View
+						style={{
+							flexDirection: 'row',
+							gap: 12,
+							marginBottom: 12,
+							alignItems: 'stretch',
+						}}
+					>
+						<View style={{ flex: 1, minWidth: 0 }}>
+							<AppCard
+								icon={Ticket01Icon}
+								title='Comprar boletos'
+								iconPosition='top'
+								description='Planea tu visita al zoológico.'
+								onPress={() => router.push('/tickets')}
+								backgroundColor={colors.cardLight}
+								borderColor={colors.border}
+								minHeight={130}
+								iconColor={colors.primary}
+								showArrow={false}
+							/>
+						</View>
+
+						<View style={{ flex: 1, minWidth: 0 }}>
+							<AppCard
+								icon={UserGroupIcon}
+								iconPosition='top'
+								title='Conoce las especies'
+								description='Descubre nuestros animales.'
+								onPress={() => router.push('/species')}
+								backgroundColor={colors.cardLight}
+								borderColor={colors.border}
+								minHeight={130}
+								iconColor={colors.primary}
+								showArrow={false}
+							/>
+						</View>
 					</View>
-				</ScrollView>
-			</ImageBackground>
+
+					{/* MAPA: ANCHO COMPLETO CON FLECHA */}
+					<AppCard
+						icon={Location01Icon}
+						title='Mapa del zoológico'
+						description='Explora caminos, especies y puntos de interés.'
+						onPress={() => router.push('/map')}
+						backgroundColor={colors.cardLight}
+						borderColor={colors.border}
+						iconColor={colors.primary}
+						showArrow={true}
+					/>
+
+					{/* DONACIÓN: FONDO CONFIGURABLE */}
+					<AppCard
+						title='Apoya al zoológico'
+						description='Tu donación ayuda a cuidar y proteger a nuestros animales.'
+						icon={HeartIcon}
+						onPress={() => router.push('/donations')}
+						backgroundColor={donationCardBackground ?? colors.card}
+						borderColor={colors.border}
+						iconColor={colors.primaryDark}
+						iconBackgroundColor={donationAccentBackground}
+						arrowBackgroundColor={donationAccentBackground}
+						arrowColor={colors.primaryDark}
+						textColor='#FFFFFF'
+						descriptionColor='#D4E8D9'
+						showArrow
+					/>
+				</View>
+			</ScrollView>
 		</SafeAreaView>
 	)
 }

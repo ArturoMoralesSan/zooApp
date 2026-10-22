@@ -1,6 +1,9 @@
-import { HeartAddIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
-import { useRouter } from 'expo-router'
+import AppCard from '@/components/AppCard'
+import BackButton from '@/components/BackButton'
+import FixedFooter from '@/components/FixedFooter'
+import UserHeader from '@/components/UserHeader'
+import { HeartIcon } from '@hugeicons/core-free-icons'
+import { router } from 'expo-router'
 import { useState } from 'react'
 import {
 	ImageBackground,
@@ -13,103 +16,55 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import {
-	amountCardPressedStyle,
-	amountCardSelectedStyle,
-	amountCardStyle,
-	amountGridStyle,
-	backButtonPressedStyle,
-	backButtonStyle,
-	backgroundImageStyle,
-	backgroundStyle,
-	backTextStyle,
-	bottomSpaceStyle,
-	containerStyle,
-	continueButtonContentStyle,
-	continueButtonDisabledStyle,
-	continueButtonPressedStyle,
-	continueButtonStyle,
-	continueButtonTextStyle,
-	continueButtonWrapperStyle,
-	currencyStyle,
-	customCardStyle,
-	customTitleStyle,
-	footerStyle,
-	headerStyle,
-	inputStyle,
-	inputWrapperActiveStyle,
-	inputWrapperStyle,
-	introCardStyle,
-	introContentStyle,
-	introIconStyle,
-	introTextStyle,
-	introTitleStyle,
-	minimumTextStyle,
-	paymentCardStyle,
-	paymentDescriptionStyle,
-	paymentInfoStyle,
-	paymentMethodStyle,
-	paymentNameStyle,
-	paymentTitleStyle,
-	scrollContentStyle,
-	sectionTitleStyle,
-	selectedLabelStyle,
-	subtitleStyle,
-	titleIconStyle,
-	titleRowStyle,
-	titleStyle,
-	titleTextContainerStyle,
-	totalContainerStyle,
-	totalDescriptionStyle,
-	totalLabelStyle,
-	totalStyle,
+	DONATION_AMOUNTS,
+	DONATION_COLORS,
+	DONATION_LAYOUT,
+	donationsStyles as styles,
 } from '@/styles/donations'
 
-const COLORS = {
-	primary: '#075C3B',
-	dark: '#17372C',
-	white: '#FFFFFF',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
-	muted: '#557067',
-}
-
-const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
-
 export default function DonationsIndexScreen() {
-	const router = useRouter()
-
 	const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
 	const [customAmount, setCustomAmount] = useState('')
+	const [isCustomSelected, setIsCustomSelected] = useState(false)
+	const [gridWidth, setGridWidth] = useState(0)
 
-	const customValue = Number(customAmount.replace(',', '.'))
+	const buttonWidth =
+		gridWidth > 0 ? (gridWidth - DONATION_LAYOUT.columnGap * 2) / 3 : 0
+
+	const parsedCustomAmount = Number(customAmount.replace(',', '.'))
 
 	const amount =
 		selectedAmount !== null
 			? selectedAmount
-			: Number.isFinite(customValue) && customValue > 0
-				? customValue
+			: isCustomSelected &&
+				  customAmount.trim() !== '' &&
+				  Number.isFinite(parsedCustomAmount)
+				? parsedCustomAmount
 				: 0
 
-	const hasAmount = amount >= 10
+	const hasAmount = Number.isFinite(amount) && amount >= 10
 
 	const selectAmount = (value: number) => {
 		setSelectedAmount(value)
 		setCustomAmount('')
+		setIsCustomSelected(false)
+	}
+
+	const selectCustomAmount = () => {
+		setSelectedAmount(null)
+		setIsCustomSelected(true)
 	}
 
 	const handleCustomAmount = (value: string) => {
-		const normalized = value.replace(/[^0-9.,]/g, '')
+		const sanitizedValue = value.replace(/[^0-9.,]/g, '')
 
-		setCustomAmount(normalized)
+		setCustomAmount(sanitizedValue)
 		setSelectedAmount(null)
+		setIsCustomSelected(true)
 	}
 
 	const continueDonation = () => {
-		if (!hasAmount) {
-			return
-		}
+		if (!hasAmount) return
 
 		router.push({
 			pathname: '/donations/summary',
@@ -119,180 +74,238 @@ export default function DonationsIndexScreen() {
 		})
 	}
 
-	return (
-		<SafeAreaView style={containerStyle}>
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
-				imageStyle={backgroundImageStyle}
-				resizeMode='repeat'
-			>
-				<View style={backButtonStyle}>
-					<Pressable
-						onPress={() => router.back()}
-						style={({ pressed }) => [
-							backButtonStyle,
-							pressed && backButtonPressedStyle,
+	const formatCurrency = (value: number) =>
+		new Intl.NumberFormat('es-MX', {
+			style: 'currency',
+			currency: 'MXN',
+			minimumFractionDigits: 2,
+		}).format(value)
+
+	const renderAmountButton = (
+		label: string,
+		selected: boolean,
+		onPress: () => void,
+		dashed = false,
+	) => (
+		<Pressable
+			onPress={onPress}
+			style={({ pressed }) => [
+				styles.amountButton,
+				{ opacity: pressed ? 0.84 : 1 },
+			]}
+		>
+			{dashed ? (
+				<View
+					style={[
+						styles.amountButtonDashed,
+						{
+							borderColor: selected
+								? DONATION_COLORS.green
+								: DONATION_COLORS.borderDark,
+							backgroundColor: selected
+								? DONATION_COLORS.selectedGreen
+								: DONATION_COLORS.white,
+						},
+					]}
+				>
+					<Text
+						numberOfLines={1}
+						adjustsFontSizeToFit
+						style={styles.amountButtonText}
+					>
+						{label}
+					</Text>
+				</View>
+			) : (
+				<View
+					style={[
+						styles.amountButtonOuter,
+						{
+							backgroundColor: selected
+								? DONATION_COLORS.green
+								: DONATION_COLORS.borderDark,
+						},
+					]}
+				>
+					<View
+						style={[
+							styles.amountButtonInner,
+							{
+								backgroundColor: selected
+									? DONATION_COLORS.selectedGreen
+									: DONATION_COLORS.white,
+							},
 						]}
 					>
-						<Text style={backTextStyle}>‹ Regresar</Text>
-					</Pressable>
+						<Text
+							numberOfLines={1}
+							adjustsFontSizeToFit
+							style={styles.amountButtonText}
+						>
+							{label}
+						</Text>
+					</View>
 				</View>
+			)}
+		</Pressable>
+	)
 
+	const renderAmountColumn = (value: number) => (
+		<View key={value} style={[styles.amountColumn, { width: buttonWidth }]}>
+			{renderAmountButton(
+				formatCurrency(value),
+				selectedAmount === value && !isCustomSelected,
+				() => selectAmount(value),
+			)}
+		</View>
+	)
+
+	return (
+		<SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+			<ImageBackground
+				source={require('@/assets/images/zoo-pattern.png')}
+				resizeMode='repeat'
+				imageStyle={styles.backgroundImage}
+				style={styles.background}
+			>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
+					keyboardShouldPersistTaps='handled'
+					contentContainerStyle={[styles.scrollContent, { paddingBottom: 180 }]}
 				>
-					<View style={headerStyle}>
-						<View style={titleRowStyle}>
-							<View style={titleIconStyle}>
-								<HugeiconsIcon
-									icon={HeartAddIcon}
-									size={27}
-									color={COLORS.primary}
-									strokeWidth={1.8}
+					{/* ENCABEZADO */}
+					<BackButton position='relative' onPress={() => router.back()} />
+
+					<View style={styles.headerContainer}>
+						<UserHeader
+							title='Apoya al zoológico'
+							subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+							showRewards={false}
+						/>
+					</View>
+
+					{/* TARJETA INFORMATIVA */}
+					<View style={styles.informationCardContainer}>
+						<AppCard
+							title='Haz la diferencia'
+							description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
+							icon={HeartIcon}
+							backgroundColor={DONATION_COLORS.primaryDark}
+							borderColor={DONATION_COLORS.primaryDark}
+							iconColor={DONATION_COLORS.primaryDark}
+							iconBackgroundColor={DONATION_COLORS.lime}
+							arrowBackgroundColor={DONATION_COLORS.lime}
+							arrowColor={DONATION_COLORS.primaryDark}
+							textColor={DONATION_COLORS.white}
+							descriptionColor={DONATION_COLORS.description}
+							showArrow={false}
+						/>
+					</View>
+
+					{/* SELECCIÓN DE MONTO */}
+					<View style={styles.amountSection}>
+						<Text style={styles.sectionTitle}>Selecciona un monto</Text>
+
+						<Text style={styles.sectionDescription}>
+							Elige cuánto deseas aportar al cuidado de nuestros animales.
+						</Text>
+
+						<View
+							onLayout={(event) => {
+								const width = event.nativeEvent.layout.width
+								setGridWidth((previous) =>
+									Math.abs(previous - width) > 1 ? width : previous,
+								)
+							}}
+							style={styles.amountGrid}
+						>
+							<View style={styles.amountRow}>
+								{DONATION_AMOUNTS.slice(0, 3).map(renderAmountColumn)}
+							</View>
+
+							<View style={styles.amountRow}>
+								{DONATION_AMOUNTS.slice(3).map(renderAmountColumn)}
+
+								<View style={[styles.amountColumn, { width: buttonWidth }]}>
+									{renderAmountButton(
+										'Otra cantidad',
+										isCustomSelected,
+										selectCustomAmount,
+										true,
+									)}
+								</View>
+							</View>
+						</View>
+					</View>
+
+					{/* DONACIÓN PERSONALIZADA */}
+					{isCustomSelected && (
+						<View style={styles.customAmountSection}>
+							<Text style={styles.customAmountTitle}>Ingresa tu donación</Text>
+
+							<Text style={styles.customAmountDescription}>
+								La aportación mínima es de $10.00 MXN.
+							</Text>
+
+							<View style={styles.customAmountInputContainer}>
+								<Text style={styles.currencySymbol}>$</Text>
+
+								<TextInput
+									value={customAmount}
+									onChangeText={handleCustomAmount}
+									placeholder='Ej. 150'
+									placeholderTextColor={DONATION_COLORS.placeholder}
+									keyboardType='decimal-pad'
+									returnKeyType='done'
+									style={styles.customAmountInput}
 								/>
 							</View>
 
-							<View style={titleTextContainerStyle}>
-								<Text style={titleStyle}>Apoya al zoológico</Text>
-
-								<Text style={subtitleStyle}>
-									Tu donación ayuda a conservar y proteger nuestra fauna.
+							{customAmount.trim() !== '' && !hasAmount && (
+								<Text style={styles.validationError}>
+									Ingresa una cantidad válida de al menos $10.00.
 								</Text>
-							</View>
+							)}
 						</View>
-					</View>
+					)}
 
-					<View style={introCardStyle}>
-						<View style={introIconStyle}>
-							<HugeiconsIcon
-								icon={HeartAddIcon}
-								size={27}
-								color={COLORS.primary}
-								strokeWidth={1.8}
-							/>
-						</View>
+					{/* MÉTODO DE PAGO */}
+					<View style={styles.paymentSection}>
+						<Text style={styles.paymentSectionTitle}>Método de pago</Text>
 
-						<View style={introContentStyle}>
-							<Text style={introTitleStyle}>Haz la diferencia</Text>
+						<View style={styles.paymentCard}>
+							<View style={styles.paymentRow}>
+								<View style={styles.paymentIconContainer}>
+									<Text style={styles.paymentEmoji}>💳</Text>
+								</View>
 
-							<Text style={introTextStyle}>
-								Cada aportación contribuye al cuidado de los animales y a la
-								conservación del zoológico.
-							</Text>
-						</View>
-					</View>
+								<View style={styles.paymentTextContainer}>
+									<Text style={styles.paymentTitle}>Tarjeta</Text>
 
-					<Text style={sectionTitleStyle}>Selecciona un monto</Text>
-
-					<View style={amountGridStyle}>
-						{DONATION_AMOUNTS.map((value) => {
-							const selected = selectedAmount === value
-
-							return (
-								<Pressable
-									key={value}
-									onPress={() => selectAmount(value)}
-									style={({ pressed }) => [
-										amountCardStyle,
-										selected && amountCardSelectedStyle,
-										pressed && amountCardPressedStyle,
-									]}
-								>
-									<Text
-										style={totalStyle}
-										numberOfLines={1}
-										adjustsFontSizeToFit
-									>
-										${value.toFixed(2)}
+									<Text style={styles.paymentDescription}>
+										Pago seguro con tarjeta
 									</Text>
+								</View>
 
-									{selected && (
-										<Text style={selectedLabelStyle}>Seleccionado</Text>
-									)}
-								</Pressable>
-							)
-						})}
-					</View>
-
-					<View style={customCardStyle}>
-						<Text style={customTitleStyle}>Otra cantidad</Text>
-
-						<View
-							style={[
-								inputWrapperStyle,
-								customAmount.length > 0 && inputWrapperActiveStyle,
-							]}
-						>
-							<Text style={currencyStyle}>$</Text>
-
-							<TextInput
-								value={customAmount}
-								onChangeText={handleCustomAmount}
-								placeholder='Escribe el monto'
-								placeholderTextColor={COLORS.muted}
-								keyboardType='decimal-pad'
-								style={inputStyle}
-								maxLength={8}
-							/>
-						</View>
-
-						<Text style={minimumTextStyle}>Donación mínima: $10.00 MXN</Text>
-					</View>
-
-					<View style={paymentCardStyle}>
-						<Text style={paymentTitleStyle}>Método de pago</Text>
-
-						<View style={paymentMethodStyle}>
-							<View style={paymentInfoStyle}>
-								<Text style={paymentNameStyle}>Tarjeta</Text>
-
-								<Text style={paymentDescriptionStyle}>
-									Pago seguro con tarjeta
-								</Text>
+								<View style={styles.paymentRadio} />
 							</View>
 						</View>
 					</View>
-
-					<View style={bottomSpaceStyle} />
 				</ScrollView>
 
-				<View style={footerStyle}>
-					<View style={totalContainerStyle}>
-						<View>
-							<Text style={totalLabelStyle}>Donación</Text>
-
-							<Text style={totalDescriptionStyle}>
-								{hasAmount ? 'Monto seleccionado' : 'Selecciona un monto'}
-							</Text>
-						</View>
-
-						<Text style={totalStyle} numberOfLines={1} adjustsFontSizeToFit>
-							${amount.toFixed(2)}
-						</Text>
-					</View>
-
-					<View
-						style={[
-							continueButtonWrapperStyle,
-							!hasAmount && continueButtonDisabledStyle,
-						]}
-					>
-						<Pressable
-							disabled={!hasAmount}
-							onPress={continueDonation}
-							style={({ pressed }) => [
-								continueButtonStyle,
-								pressed && hasAmount && continueButtonPressedStyle,
-							]}
-						>
-							<View style={continueButtonContentStyle}>
-								<Text style={continueButtonTextStyle}>Continuar</Text>
-							</View>
-						</Pressable>
-					</View>
-				</View>
+				{/* FOOTER FIJO */}
+				<FixedFooter
+					label='Donación'
+					description={
+						hasAmount
+							? 'Monto seleccionado'
+							: 'Selecciona un monto para continuar'
+					}
+					amount={formatCurrency(amount)}
+					buttonTitle='Continuar'
+					onButtonPress={continueDonation}
+					disabled={!hasAmount}
+				/>
 			</ImageBackground>
 		</SafeAreaView>
 	)

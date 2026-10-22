@@ -1,80 +1,86 @@
-import type { TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
+	background: '#FFFFFF',
 
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
 
-	text: '#17372C',
-	textSecondary: '#557067',
+	card: '#eef4f0',
+	cardLight: '#eef4f0',
+	active: '#d5ead9',
 
-	border: '#B8E6D3',
+	text: '#06371c',
+	textSecondary: '#06371c',
+
+	border: '#a6c1b3',
 
 	white: '#FFFFFF',
 
-	coral: '#D95C4F',
+	coral: '#08783F',
 
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
+	errorBackground: '#eef4f0',
+	errorBorder: '#a6c1b3',
+	errorText: '#06371c',
 
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
+	mapBackground: '#eef4f0',
+	mapBorder: '#a6c1b3',
 
-	overlay: 'rgba(0,0,0,0.45)',
+	overlay: 'rgba(6, 61, 34, 0.55)',
 
-	iconMuted: '#7DA996',
-	logoutIconBackground: '#FFE5E1',
-	logoutIconBorder: '#F4D2CD',
+	iconMuted: '#06371c',
+	logoutIconBackground: '#d5ead9',
+	logoutIconBorder: '#a6c1b3',
 }
+
+// PERFIL
+
 export const profileContainerStyle: ViewStyle = {
 	alignItems: 'center',
 }
 
 export const profileAvatarPlaceholderStyle: ViewStyle = {
-	backgroundColor: colors.active,
+	backgroundColor: colors.cardLight,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
 
 export const profileNameStyle: TextStyle = {
 	color: colors.text,
+	fontWeight: '800',
 }
 
 export const profileViewProfileStyle: TextStyle = {
 	color: colors.primary,
 }
 
+// SOMBRAS
+
 export const cardShadow: ViewStyle = {
-	shadowColor: '#075C3B',
+	shadowColor: '#164A2C',
 	shadowOffset: {
 		width: 0,
-		height: 5,
+		height: 2,
 	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
 }
+
+// TARJETAS DEL MENÚ
 
 export const menuItemContainerStyle: ViewStyle = {
 	backgroundColor: colors.card,
 	borderWidth: 1,
 	borderColor: colors.border,
+	borderRadius: 18,
 	...cardShadow,
 }
 
 export const menuItemStyle = (pressed: boolean): ViewStyle => ({
 	backgroundColor: colors.card,
-	opacity: pressed ? 0.96 : 1,
-	transform: [
-		{
-			scale: pressed ? 0.99 : 1,
-		},
-	],
+	opacity: pressed ? 0.84 : 1,
 })
 
 export const menuIconContainerStyle: ViewStyle = {
@@ -85,30 +91,32 @@ export const menuIconContainerStyle: ViewStyle = {
 
 export const menuTitleStyle: TextStyle = {
 	color: colors.text,
+	fontWeight: '800',
+	fontSize: 16,
 }
 
 export const menuDescriptionStyle: TextStyle = {
 	color: colors.textSecondary,
+	fontSize: 12,
+	lineHeight: 16,
 }
 
 export const menuArrowStyle: TextStyle = {
-	color: colors.iconMuted,
+	color: colors.primary,
 }
+
+// CERRAR SESIÓN
 
 export const logoutContainerStyle: ViewStyle = {
 	backgroundColor: colors.errorBackground,
 	borderWidth: 1,
 	borderColor: colors.errorBorder,
+	borderRadius: 18,
 	...cardShadow,
 }
 
 export const logoutPressableStyle = (pressed: boolean): ViewStyle => ({
-	opacity: pressed ? 0.96 : 1,
-	transform: [
-		{
-			scale: pressed ? 0.99 : 1,
-		},
-	],
+	opacity: pressed ? 0.84 : 1,
 })
 
 export const logoutIconContainerStyle: ViewStyle = {
@@ -118,34 +126,43 @@ export const logoutIconContainerStyle: ViewStyle = {
 }
 
 export const logoutTitleStyle: TextStyle = {
-	color: colors.coral,
+	color: colors.text,
+	fontWeight: '800',
 }
 
 export const logoutDescriptionStyle: TextStyle = {
 	color: colors.textSecondary,
 }
 
+// FOOTER
+
 export const footerTitleStyle: TextStyle = {
 	color: colors.textSecondary,
+	fontWeight: '800',
 }
 
 export const footerSubtitleStyle: TextStyle = {
 	color: colors.iconMuted,
 }
 
+// PANTALLA
+
 export const scrollContentStyle: ViewStyle = {
-	paddingHorizontal: 20,
-	paddingTop: 10,
+	paddingHorizontal: 12,
+	paddingTop: 8,
 	paddingBottom: 120,
 }
 
 export const backgroundStyle: ViewStyle = {
+	flex: 1,
 	backgroundColor: colors.background,
 }
 
-export const backgroundImageStyle = {
-	opacity: 0.3,
+export const backgroundImageStyle: ImageStyle = {
+	opacity: 0.025,
 }
+
+// MODAL QR
 
 export const modalOverlayStyle: ViewStyle = {
 	flex: 1,
@@ -156,10 +173,12 @@ export const modalOverlayStyle: ViewStyle = {
 }
 
 export const qrModalStyle: ViewStyle = {
+	width: '100%',
 	maxWidth: 400,
 	backgroundColor: colors.cardLight,
 	borderWidth: 1,
 	borderColor: colors.border,
+	borderRadius: 28,
 	...cardShadow,
 }
 
@@ -171,6 +190,7 @@ export const qrHeaderIconStyle: ViewStyle = {
 
 export const qrTitleStyle: TextStyle = {
 	color: colors.text,
+	fontWeight: '800',
 }
 
 export const qrDescriptionStyle: TextStyle = {
@@ -181,6 +201,7 @@ export const qrContainerStyle: ViewStyle = {
 	backgroundColor: colors.white,
 	borderWidth: 1,
 	borderColor: colors.border,
+	borderRadius: 24,
 	...cardShadow,
 }
 
@@ -198,7 +219,8 @@ export const qrInfoStyle: ViewStyle = {
 }
 
 export const qrInfoTitleStyle: TextStyle = {
-	color: colors.primary,
+	color: colors.text,
+	fontWeight: '800',
 }
 
 export const qrInfoDescriptionStyle: TextStyle = {
@@ -206,10 +228,5 @@ export const qrInfoDescriptionStyle: TextStyle = {
 }
 
 export const qrCloseStyle = (pressed: boolean): ViewStyle => ({
-	opacity: pressed ? 0.9 : 1,
-	transform: [
-		{
-			scale: pressed ? 0.98 : 1,
-		},
-	],
+	opacity: pressed ? 0.85 : 1,
 })

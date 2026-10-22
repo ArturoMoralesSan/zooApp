@@ -1,7 +1,12 @@
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import { QrCodeIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
+import {
+	Calendar03Icon,
+	Clock01Icon,
+	QrCodeIcon,
+	Ticket01Icon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
@@ -18,17 +23,14 @@ import {
 import QRCode from 'react-native-qrcode-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import ActionButton from '@/components/ActionButton'
+import BackButton from '@/components/BackButton'
+import UserHeader from '@/components/UserHeader'
+
 import {
-	backButtonPressedStyle,
-	backButtonStyle,
 	backgroundImageStyle,
 	backgroundStyle,
-	backTextStyle,
 	bottomSpaceStyle,
-	buyButtonPressedStyle,
-	buyButtonStyle,
-	buyButtonTextStyle,
-	buyButtonWrapperStyle,
 	closeButtonPressedStyle,
 	closeButtonStyle,
 	closeTextStyle,
@@ -40,7 +42,6 @@ import {
 	emptyTextStyle,
 	emptyTitleStyle,
 	folioStyle,
-	headerStyle,
 	infoBlockRightStyle,
 	infoBlockStyle,
 	infoLabelStyle,
@@ -63,11 +64,6 @@ import {
 	purchaseInfoStyle,
 	purchasesListStyle,
 	purchaseTitleStyle,
-	qrButtonContentStyle,
-	qrButtonPressedStyle,
-	qrButtonStyle,
-	qrButtonTextStyle,
-	qrButtonWrapperStyle,
 	qrErrorStyle,
 	qrErrorTextStyle,
 	qrListStyle,
@@ -89,7 +85,6 @@ import {
 	statsContainerStyle,
 	statusBadgeStyle,
 	statusTextStyle,
-	subtitleStyle,
 	tabActiveStyle,
 	tabCountActiveStyle,
 	tabCountStyle,
@@ -101,7 +96,6 @@ import {
 	tabTextStyle,
 	ticketSummaryStyle,
 	ticketSummaryTextStyle,
-	titleStyle,
 	totalValueStyle,
 } from '@/styles/my-tickets'
 
@@ -148,20 +142,16 @@ const getTicketStatus = (ticket?: Ticket) => {
 		case 'active':
 		case 'activo':
 			return 'Activa'
-
 		case 'used':
 		case 'usado':
 			return 'Usada'
-
 		case 'expired':
 		case 'expirado':
 			return 'Expirada'
-
 		case 'cancelled':
 		case 'canceled':
 		case 'cancelado':
 			return 'Cancelada'
-
 		default:
 			return ticket.status ?? 'Sin estado'
 	}
@@ -243,7 +233,6 @@ export default function MyTicketsScreen() {
 
 		return Array.from(groups.values()).sort((a, b) => {
 			const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
-
 			const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
 
 			return dateB - dateA
@@ -330,34 +319,30 @@ export default function MyTicketsScreen() {
 	}
 
 	return (
-		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
+		<SafeAreaView
+			style={[containerStyle, { flex: 1 }]}
+			edges={['top', 'left', 'right']}
+		>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
+				style={[backgroundStyle, { flex: 1 }]}
 				resizeMode='repeat'
 				imageStyle={backgroundImageStyle}
 			>
 				<ScrollView
+					style={{ flex: 1 }}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={scrollContentStyle}
 				>
-					<Pressable
-						onPress={() => router.back()}
-						style={({ pressed }) => [
-							backButtonStyle,
-							pressed && backButtonPressedStyle,
-						]}
-					>
-						<Text style={backTextStyle}>‹</Text>
-
-						<Text style={backTextStyle}>Regresar</Text>
-					</Pressable>
-
-					<View style={headerStyle}>
-						<Text style={titleStyle}>Mis entradas</Text>
-
-						<Text style={subtitleStyle}>Consulta tus compras y entradas.</Text>
+					<View style={{ marginBottom: 16 }}>
+						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
+
+					<UserHeader
+						title='Mis entradas'
+						subtitle='Consulta tus compras y entradas.'
+						showRewards={false}
+					/>
 
 					<View style={statsContainerStyle}>
 						<View style={statCardStyle}>
@@ -365,14 +350,12 @@ export default function MyTicketsScreen() {
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
-									strokeWidth={1.8}
 									color={colors.primary}
 								/>
 							</View>
 
 							<View>
 								<Text style={statNumberStyle}>{activePurchases.length}</Text>
-
 								<Text style={statLabelStyle}>Compras activas</Text>
 							</View>
 						</View>
@@ -382,14 +365,12 @@ export default function MyTicketsScreen() {
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
-									strokeWidth={1.8}
 									color={colors.muted}
 								/>
 							</View>
 
 							<View>
 								<Text style={statNumberStyle}>{historyPurchases.length}</Text>
-
 								<Text style={statLabelStyle}>Historial</Text>
 							</View>
 						</View>
@@ -439,7 +420,9 @@ export default function MyTicketsScreen() {
 								<Text
 									style={[
 										tabCountTextStyle,
-										tab === 'history' && tabCountTextActiveStyle,
+										tab === 'history' && tabCountActiveStyle
+											? tabCountTextActiveStyle
+											: null,
 									]}
 								>
 									{historyPurchases.length}
@@ -451,7 +434,6 @@ export default function MyTicketsScreen() {
 					{loading ? (
 						<View style={loadingContainerStyle}>
 							<ActivityIndicator size='large' color={colors.primary} />
-
 							<Text style={loadingTextStyle}>Cargando tus entradas...</Text>
 						</View>
 					) : visiblePurchases.length === 0 ? (
@@ -460,7 +442,6 @@ export default function MyTicketsScreen() {
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={32}
-									strokeWidth={1.8}
 									color={colors.primary}
 								/>
 							</View>
@@ -478,16 +459,11 @@ export default function MyTicketsScreen() {
 							</Text>
 
 							{tab === 'active' && (
-								<View style={buyButtonWrapperStyle}>
-									<Pressable
+								<View style={{ width: '100%', marginTop: 20 }}>
+									<ActionButton
+										title='Comprar boletos'
 										onPress={() => router.push('/tickets')}
-										style={({ pressed }) => [
-											buyButtonStyle,
-											pressed && buyButtonPressedStyle,
-										]}
-									>
-										<Text style={buyButtonTextStyle}>Comprar boletos</Text>
-									</Pressable>
+									/>
 								</View>
 							)}
 						</View>
@@ -500,7 +476,6 @@ export default function MyTicketsScreen() {
 											<HugeiconsIcon
 												icon={Ticket01Icon}
 												size={25}
-												strokeWidth={1.8}
 												color={colors.primary}
 											/>
 										</View>
@@ -509,7 +484,6 @@ export default function MyTicketsScreen() {
 											<Text style={purchaseTitleStyle}>
 												Compra #{purchase.orderId}
 											</Text>
-
 											<Text style={folioStyle}>{purchase.folio}</Text>
 										</View>
 
@@ -528,20 +502,47 @@ export default function MyTicketsScreen() {
 										<View style={infoBlockStyle}>
 											<Text style={infoLabelStyle}>Fecha de compra</Text>
 
-											<Text style={infoValueStyle}>
-												{formatPurchaseDate(purchase.createdAt)}
-											</Text>
+											<View
+												style={{
+													flexDirection: 'row',
+													alignItems: 'center',
+													gap: 5,
+													marginTop: 4,
+												}}
+											>
+												<HugeiconsIcon
+													icon={Calendar03Icon}
+													size={15}
+													color={colors.muted}
+												/>
+												<Text style={infoValueStyle}>
+													{formatPurchaseDate(purchase.createdAt)}
+												</Text>
+											</View>
 
 											{formatPurchaseTime(purchase.createdAt) ? (
-												<Text style={infoTimeStyle}>
-													{formatPurchaseTime(purchase.createdAt)}
-												</Text>
+												<View
+													style={{
+														flexDirection: 'row',
+														alignItems: 'center',
+														gap: 5,
+														marginTop: 3,
+													}}
+												>
+													<HugeiconsIcon
+														icon={Clock01Icon}
+														size={13}
+														color={colors.muted}
+													/>
+													<Text style={infoTimeStyle}>
+														{formatPurchaseTime(purchase.createdAt)}
+													</Text>
+												</View>
 											) : null}
 										</View>
 
 										<View style={infoBlockRightStyle}>
 											<Text style={infoLabelStyle}>Total</Text>
-
 											<Text style={totalValueStyle}>
 												${purchase.total.toFixed(2)}
 											</Text>
@@ -552,35 +553,17 @@ export default function MyTicketsScreen() {
 										<HugeiconsIcon
 											icon={Ticket01Icon}
 											size={17}
-											strokeWidth={1.8}
 											color={colors.primary}
 										/>
-
 										<Text style={ticketSummaryTextStyle}>
 											{getTicketSummary(purchase)}
 										</Text>
 									</View>
 
-									<View style={qrButtonWrapperStyle}>
-										<Pressable
-											onPress={() => setSelectedPurchase(purchase)}
-											style={({ pressed }) => [
-												qrButtonStyle,
-												pressed && qrButtonPressedStyle,
-											]}
-										>
-											<View style={qrButtonContentStyle}>
-												<HugeiconsIcon
-													icon={QrCodeIcon}
-													size={19}
-													strokeWidth={1.8}
-													color={colors.white}
-												/>
-
-												<Text style={qrButtonTextStyle}>VER CÓDIGOS QR</Text>
-											</View>
-										</Pressable>
-									</View>
+									<ActionButton
+										title='VER CÓDIGOS QR'
+										onPress={() => setSelectedPurchase(purchase)}
+									/>
 								</View>
 							))}
 						</View>
@@ -608,14 +591,12 @@ export default function MyTicketsScreen() {
 										<HugeiconsIcon
 											icon={QrCodeIcon}
 											size={25}
-											strokeWidth={1.8}
 											color={colors.primary}
 										/>
 									</View>
 
 									<View style={modalTitleInfoStyle}>
 										<Text style={modalTitleStyle}>Tus entradas</Text>
-
 										<Text style={modalSubtitleStyle}>
 											{selectedPurchase?.folio}
 										</Text>
@@ -654,7 +635,6 @@ export default function MyTicketsScreen() {
 												<Text style={qrTicketNameStyle}>
 													{ticket.ticket_type?.name ?? 'Entrada'}
 												</Text>
-
 												<Text style={qrTicketNumberStyle}>
 													Entrada {index + 1} de{' '}
 													{selectedPurchase.tickets.length}
@@ -682,14 +662,11 @@ export default function MyTicketsScreen() {
 													<HugeiconsIcon
 														icon={QrCodeIcon}
 														size={45}
-														strokeWidth={1.8}
 														color={colors.coral}
 													/>
-
 													<Text style={qrErrorTextStyle}>
 														Este boleto no tiene QR disponible.
 													</Text>
-
 													<Text style={qrTokenDebugStyle}>
 														Token: {String(ticket.qr_token ?? 'NULL')}
 													</Text>

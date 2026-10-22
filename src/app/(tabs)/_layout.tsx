@@ -10,6 +10,7 @@ import { Tabs } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
 import {
+	activeTabButtonStyle,
 	colors,
 	tabBarContainerStyle,
 	tabBarStyle,
@@ -58,16 +59,29 @@ export default function TabLayout() {
 									}
 								}
 
+								const onLongPress = () => {
+									navigation.emit({
+										type: 'tabLongPress',
+										target: route.key,
+									})
+								}
+
 								return (
 									<Pressable
 										key={route.key}
+										accessibilityRole='tab'
+										accessibilityState={{
+											selected: isFocused,
+										}}
+										accessibilityLabel={options.tabBarAccessibilityLabel}
 										onPress={onPress}
-										style={tabButtonStyle}
+										onLongPress={onLongPress}
+										style={[tabButtonStyle, isFocused && activeTabButtonStyle]}
 									>
 										<HugeiconsIcon
 											icon={icon}
 											size={22}
-											color={isFocused ? colors.primary : colors.textSecondary}
+											color={isFocused ? '#FFFFFF' : colors.textSecondary}
 										/>
 
 										<Text style={tabLabelStyle(isFocused)}>

@@ -1,25 +1,31 @@
-import type { TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+	text: '#0a2014',
+	textSecondary: '#668475',
+	muted: '#607A6A',
+	border: '#a6c1b3',
+	cardLight: '#eef4f0',
+	iconBackground: '#d5ead9',
 	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-	footerBackground: '#F7F9F8',
+	coral: '#08783F',
+
+	// Colores complementarios del componente
+	dark: '#0a2014',
+	card: '#eef4f0',
+	active: '#d5ead9',
+	borderLight: '#eef4f0',
+	borderStrong: '#a6c1b3',
+	yellow: '#b8f35d',
+	button: '#08783F',
+	buttonPressed: '#063D22',
+	buttonDisabled: '#a6c1b3',
+	footerBackground: '#FFFFFF',
+	price: '#12482e',
 }
 
 export const containerStyle: ViewStyle = {
@@ -29,59 +35,44 @@ export const containerStyle: ViewStyle = {
 
 export const backgroundStyle: ViewStyle = {
 	flex: 1,
+	backgroundColor: colors.background,
 }
 
-export const backgroundImageStyle = {
-	opacity: 0.3,
+export const backgroundImageStyle: ImageStyle = {
+	opacity: 0.025,
 }
+
+/* SOMBRAS SUAVES */
+
+export const cardShadow: ViewStyle = {
+	shadowColor: colors.primaryDark,
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
+}
+
+/* HEADER */
 
 export const headerStyle: ViewStyle = {
 	paddingHorizontal: 20,
 	paddingTop: 8,
-	paddingBottom: 16,
+	paddingBottom: 14,
 	alignItems: 'flex-start',
-}
-
-export const backButtonStyle: ViewStyle = {
-	flexDirection: 'row',
-	alignItems: 'center',
-	justifyContent: 'center',
-	backgroundColor: 'rgba(248,244,234,0.94)',
-	borderWidth: 1,
-	borderColor: colors.border,
-	borderRadius: 18,
-	paddingHorizontal: 16,
-	paddingVertical: 10,
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
-
-export const backButtonPressedStyle: ViewStyle = {
-	opacity: 0.75,
-	backgroundColor: colors.card,
-}
-
-export const backTextStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '700',
-	color: colors.dark,
+	backgroundColor: 'transparent',
 }
 
 export const headerTextStyle: ViewStyle = {
 	width: '100%',
-	marginTop: 14,
+	marginTop: 16,
 }
 
 export const titleStyle: TextStyle = {
 	fontSize: 27,
+	lineHeight: 34,
 	fontWeight: '900',
 	color: colors.dark,
+	letterSpacing: -0.5,
 }
 
 export const subtitleStyle: TextStyle = {
@@ -91,51 +82,71 @@ export const subtitleStyle: TextStyle = {
 	color: colors.muted,
 }
 
+/* BACK BUTTON */
+
+export const backButtonStyle: ViewStyle = {
+	alignSelf: 'flex-start',
+	minHeight: 38,
+	flexDirection: 'row',
+	alignItems: 'center',
+	justifyContent: 'center',
+	backgroundColor: colors.card,
+	borderWidth: 1,
+	borderColor: colors.border,
+	borderRadius: 12,
+	paddingHorizontal: 14,
+	paddingVertical: 8,
+}
+
+export const backButtonPressedStyle: ViewStyle = {
+	backgroundColor: colors.active,
+	opacity: 0.85,
+}
+
+export const backTextStyle: TextStyle = {
+	fontSize: 14,
+	fontWeight: '700',
+	color: colors.primaryDark,
+}
+
+/* CONTENIDO */
+
 export const scrollContentStyle: ViewStyle = {
 	paddingHorizontal: 20,
-	paddingTop: 14,
+	paddingTop: 8,
 	paddingBottom: 190,
 	alignItems: 'center',
 }
 
-export const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
+/* TARJETA DE COMPRA REALIZADA */
 
 export const successCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 26,
+	backgroundColor: colors.button,
+	borderRadius: 22,
 	padding: 22,
 	marginBottom: 15,
 	alignItems: 'center',
 	borderWidth: 1,
-	borderColor: colors.border,
+	borderColor: colors.button,
 }
 
 export const successIconStyle: ViewStyle = {
-	width: 72,
-	height: 72,
-	borderRadius: 24,
-	backgroundColor: colors.active,
+	width: 68,
+	height: 68,
+	borderRadius: 22,
+	backgroundColor: colors.white,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginBottom: 14,
 	borderWidth: 1,
-	borderColor: colors.border,
+	borderColor: colors.white,
 }
 
 export const successTitleStyle: TextStyle = {
 	fontSize: 23,
 	fontWeight: '900',
-	color: colors.primary,
+	color: colors.white,
 	textAlign: 'center',
 }
 
@@ -143,15 +154,17 @@ export const successTextStyle: TextStyle = {
 	marginTop: 7,
 	fontSize: 14,
 	lineHeight: 20,
-	color: colors.muted,
+	color: colors.cardLight,
 	textAlign: 'center',
 }
 
+/* TARJETA DE BOLETOS */
+
 export const orderCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.white,
-	borderRadius: 25,
-	padding: 18,
+	backgroundColor: colors.card,
+	borderRadius: 20,
+	padding: 16,
 	marginBottom: 15,
 	borderWidth: 1,
 	borderColor: colors.border,
@@ -164,19 +177,20 @@ export const orderHeaderStyle: ViewStyle = {
 }
 
 export const orderIconStyle: ViewStyle = {
-	width: 52,
-	height: 52,
-	borderRadius: 17,
+	width: 48,
+	height: 48,
+	borderRadius: 15,
 	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
-	marginRight: 13,
+	marginRight: 12,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
 
 export const orderHeaderInfoStyle: ViewStyle = {
 	flex: 1,
+	minWidth: 0,
 }
 
 export const orderTitleStyle: TextStyle = {
@@ -188,8 +202,11 @@ export const orderTitleStyle: TextStyle = {
 export const orderSubtitleStyle: TextStyle = {
 	marginTop: 3,
 	fontSize: 12,
+	lineHeight: 17,
 	color: colors.muted,
 }
+
+/* CÓDIGOS QR */
 
 export const ticketContainerStyle: ViewStyle = {
 	width: '100%',
@@ -208,7 +225,7 @@ export const ticketLabelStyle: TextStyle = {
 export const qrContainerStyle: ViewStyle = {
 	padding: 14,
 	backgroundColor: colors.white,
-	borderRadius: 20,
+	borderRadius: 16,
 	borderWidth: 1,
 	borderColor: colors.border,
 	alignItems: 'center',
@@ -228,11 +245,13 @@ export const noTicketsTextStyle: TextStyle = {
 	textAlign: 'center',
 }
 
+/* TOTAL Y FOLIO */
+
 export const totalCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 22,
-	padding: 17,
+	backgroundColor: colors.card,
+	borderRadius: 18,
+	padding: 16,
 	marginTop: 2,
 	marginBottom: 15,
 	borderWidth: 1,
@@ -241,7 +260,7 @@ export const totalCardStyle: ViewStyle = {
 
 export const totalLabelStyle: TextStyle = {
 	fontSize: 14,
-	fontWeight: '800',
+	fontWeight: '700',
 	color: colors.muted,
 }
 
@@ -249,7 +268,7 @@ export const totalAmountStyle: TextStyle = {
 	marginTop: 3,
 	fontSize: 25,
 	fontWeight: '900',
-	color: colors.primary,
+	color: colors.price,
 }
 
 export const folioContainerStyle: ViewStyle = {
@@ -273,11 +292,13 @@ export const folioStyle: TextStyle = {
 	color: colors.dark,
 }
 
+/* INFORMACIÓN */
+
 export const infoBoxStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: '#F0F8F4',
-	borderRadius: 20,
-	padding: 16,
+	backgroundColor: colors.card,
+	borderRadius: 16,
+	padding: 15,
 	flexDirection: 'row',
 	alignItems: 'center',
 	borderWidth: 1,
@@ -287,8 +308,8 @@ export const infoBoxStyle: ViewStyle = {
 export const infoIconStyle: ViewStyle = {
 	width: 38,
 	height: 38,
-	borderRadius: 13,
-	backgroundColor: colors.white,
+	borderRadius: 12,
+	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 12,
@@ -304,24 +325,27 @@ export const infoIconTextStyle: TextStyle = {
 
 export const infoContentStyle: ViewStyle = {
 	flex: 1,
+	minWidth: 0,
 }
 
 export const infoTitleStyle: TextStyle = {
 	fontSize: 14,
 	fontWeight: '900',
-	color: colors.primary,
+	color: colors.primaryDark,
 }
 
 export const infoTextStyle: TextStyle = {
 	marginTop: 4,
 	fontSize: 12,
-	lineHeight: 17,
+	lineHeight: 18,
 	color: colors.muted,
 }
 
 export const bottomSpaceStyle: ViewStyle = {
-	height: 40,
+	height: 0,
 }
+
+/* FOOTER */
 
 export const footerStyle: ViewStyle = {
 	position: 'absolute',
@@ -330,81 +354,73 @@ export const footerStyle: ViewStyle = {
 	bottom: 0,
 	backgroundColor: colors.footerBackground,
 	paddingHorizontal: 20,
-	paddingTop: 14,
-	paddingBottom: 25,
+	paddingTop: 13,
+	paddingBottom: 20,
 	borderTopWidth: 1,
-	borderTopColor: colors.border,
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	borderTopColor: colors.borderLight,
 }
 
 export const footerInfoStyle: ViewStyle = {
+	flexDirection: 'row',
+	alignItems: 'center',
+	justifyContent: 'space-between',
 	marginBottom: 12,
 }
 
 export const footerLabelStyle: TextStyle = {
 	fontSize: 14,
 	fontWeight: '800',
-	color: colors.muted,
+	color: colors.dark,
 }
 
 export const footerTicketCountStyle: TextStyle = {
-	marginTop: 2,
-	fontSize: 11,
+	marginTop: 3,
+	fontSize: 12,
 	color: colors.muted,
 }
 
 export const footerAmountStyle: TextStyle = {
 	fontSize: 23,
 	fontWeight: '900',
-	color: colors.primary,
+	color: colors.price,
 }
 
-export const homeButtonWrapperStyle: ViewStyle = {
+/* ACTION BUTTON: IR AL INICIO */
+
+export const actionButtonWrapperStyle: ViewStyle = {
 	width: '100%',
-	height: 54,
-	borderRadius: 17,
+	height: 50,
+	borderRadius: 14,
 	backgroundColor: colors.button,
-	borderWidth: 1,
-	borderColor: colors.button,
 	overflow: 'hidden',
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
 }
 
-export const homeButtonStyle: ViewStyle = {
+export const actionButtonStyle: ViewStyle = {
+	flex: 1,
 	width: '100%',
 	height: '100%',
 	alignItems: 'center',
 	justifyContent: 'center',
+	backgroundColor: colors.button,
+	borderRadius: 14,
 }
 
-export const homeButtonContentStyle: ViewStyle = {
+export const actionButtonContentStyle: ViewStyle = {
+	flexDirection: 'row',
 	width: '100%',
 	height: '100%',
 	alignItems: 'center',
 	justifyContent: 'center',
+	gap: 9,
 }
 
-export const homeButtonPressedStyle: ViewStyle = {
+export const actionButtonPressedStyle: ViewStyle = {
 	backgroundColor: colors.buttonPressed,
 }
 
-export const homeButtonTextStyle: TextStyle = {
+export const actionButtonTextStyle: TextStyle = {
 	color: colors.white,
-	fontSize: 16,
-	fontWeight: '900',
+	fontSize: 15,
+	fontWeight: '800',
 	textAlign: 'center',
 }

@@ -1,31 +1,36 @@
 import type { TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+	text: '#0a2014',
+	textSecondary: '#668475',
+	muted: '#607A6A',
+	border: '#a6c1b3',
+	cardLight: '#eef4f0',
+	iconBackground: '#d5ead9',
 	white: '#FFFFFF',
+	coral: '#08783F',
 
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-
-	footerBackground: '#F7F9F8',
+	// Colores adicionales para este componente
+	card: '#eef4f0',
+	cardLightActive: '#d5ead9',
+	button: '#08783F',
+	buttonPressed: '#063D22',
+	buttonDisabled: '#a6c1b3',
+	footerBackground: '#FFFFFF',
+	price: '#12482e',
 }
 
 export const backgroundStyle: ViewStyle = {
 	flex: 1,
+	backgroundColor: colors.background,
 }
 
 export const backgroundImageStyle = {
-	opacity: 0.3,
+	opacity: 0.12,
 }
 
 export const containerStyle: ViewStyle = {
@@ -47,13 +52,13 @@ export const loadingContentStyle: ViewStyle = {
 export const loadingTextStyle: TextStyle = {
 	marginTop: 12,
 	color: colors.muted,
-	fontSize: 15,
-	fontWeight: '600',
+	fontSize: 14,
+	fontWeight: '500',
 }
 
 export const headerStyle: ViewStyle = {
 	paddingHorizontal: 20,
-	paddingTop: 8,
+	paddingTop: 12,
 	paddingBottom: 16,
 	alignItems: 'flex-start',
 }
@@ -62,47 +67,38 @@ export const backButtonStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'center',
-	backgroundColor: 'rgba(248,244,234,0.94)',
+	backgroundColor: colors.card,
 	borderWidth: 1,
 	borderColor: colors.border,
-	borderRadius: 18,
-	paddingHorizontal: 16,
-	paddingVertical: 10,
-
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	borderRadius: 14,
+	paddingHorizontal: 14,
+	paddingVertical: 9,
 }
 
 export const backButtonPressedStyle: ViewStyle = {
 	opacity: 0.75,
-	backgroundColor: colors.card,
+	backgroundColor: colors.cardLightActive,
 }
 
 export const backTextStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '700',
-	color: colors.dark,
+	fontSize: 14,
+	fontWeight: '600',
+	color: colors.text,
 }
 
 export const headerTextStyle: ViewStyle = {
 	width: '100%',
-	marginTop: 14,
+	marginTop: 12,
 }
 
 export const titleStyle: TextStyle = {
-	fontSize: 27,
-	fontWeight: '900',
-	color: colors.dark,
+	fontSize: 25,
+	fontWeight: '800',
+	color: colors.text,
 }
 
 export const subtitleStyle: TextStyle = {
-	marginTop: 4,
+	marginTop: 5,
 	fontSize: 14,
 	lineHeight: 20,
 	color: colors.muted,
@@ -110,26 +106,27 @@ export const subtitleStyle: TextStyle = {
 
 export const scrollContentStyle: ViewStyle = {
 	paddingHorizontal: 20,
-	paddingBottom: 185,
+	paddingTop: 8,
+	paddingBottom: 190,
 }
 
 export const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
+	shadowColor: colors.primaryDark,
 	shadowOffset: {
 		width: 0,
-		height: 5,
+		height: 2,
 	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowOpacity: 0.05,
+	shadowRadius: 8,
+	elevation: 2,
 }
 
 export const cardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 18,
-	marginBottom: 15,
+	backgroundColor: colors.card,
+	borderRadius: 20,
+	padding: 16,
+	marginBottom: 14,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
@@ -137,7 +134,7 @@ export const cardStyle: ViewStyle = {
 export const cardHeaderStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
-	marginBottom: 18,
+	marginBottom: 16,
 }
 
 export const cardHeaderTextStyle: ViewStyle = {
@@ -145,21 +142,21 @@ export const cardHeaderTextStyle: ViewStyle = {
 }
 
 export const iconContainerStyle: ViewStyle = {
-	width: 52,
-	height: 52,
-	borderRadius: 17,
-	backgroundColor: colors.active,
+	width: 46,
+	height: 46,
+	borderRadius: 14,
+	backgroundColor: colors.iconBackground,
 	alignItems: 'center',
 	justifyContent: 'center',
-	marginRight: 13,
+	marginRight: 12,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
 
 export const cardTitleStyle: TextStyle = {
-	fontSize: 17,
-	fontWeight: '900',
-	color: colors.dark,
+	fontSize: 16,
+	fontWeight: '800',
+	color: colors.text,
 }
 
 export const cardSubtitleStyle: TextStyle = {
@@ -172,7 +169,9 @@ export const ticketRowStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'space-between',
-	paddingVertical: 11,
+	paddingVertical: 12,
+	borderBottomWidth: 1,
+	borderBottomColor: colors.cardLight,
 }
 
 export const ticketRowInfoStyle: ViewStyle = {
@@ -181,55 +180,55 @@ export const ticketRowInfoStyle: ViewStyle = {
 }
 
 export const ticketNameStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '800',
-	color: colors.dark,
+	fontSize: 14,
+	fontWeight: '700',
+	color: colors.text,
 }
 
 export const ticketQuantityStyle: TextStyle = {
 	marginTop: 4,
 	fontSize: 12,
-	lineHeight: 17,
+	lineHeight: 18,
 	color: colors.muted,
 }
 
 export const ticketSubtotalStyle: TextStyle = {
 	fontSize: 15,
-	fontWeight: '900',
-	color: colors.dark,
+	fontWeight: '800',
+	color: colors.price,
 }
 
 export const dividerStyle: ViewStyle = {
 	height: 1,
 	backgroundColor: colors.border,
-	marginVertical: 7,
+	marginVertical: 12,
 }
 
 export const totalRowStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'space-between',
-	paddingTop: 9,
+	paddingTop: 4,
 }
 
 export const totalLabelStyle: TextStyle = {
-	fontSize: 16,
-	fontWeight: '800',
-	color: colors.muted,
+	fontSize: 14,
+	fontWeight: '700',
+	color: colors.text,
 }
 
 export const totalStyle: TextStyle = {
-	fontSize: 23,
-	fontWeight: '900',
-	color: colors.primary,
+	fontSize: 22,
+	fontWeight: '800',
+	color: colors.price,
 }
 
 export const paymentCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 18,
-	marginBottom: 15,
+	backgroundColor: colors.card,
+	borderRadius: 20,
+	padding: 16,
+	marginBottom: 14,
 	flexDirection: 'row',
 	alignItems: 'center',
 	borderWidth: 1,
@@ -237,13 +236,13 @@ export const paymentCardStyle: ViewStyle = {
 }
 
 export const paymentIconStyle: ViewStyle = {
-	width: 52,
-	height: 52,
-	borderRadius: 17,
-	backgroundColor: colors.active,
+	width: 46,
+	height: 46,
+	borderRadius: 14,
+	backgroundColor: colors.iconBackground,
 	alignItems: 'center',
 	justifyContent: 'center',
-	marginRight: 13,
+	marginRight: 12,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
@@ -253,9 +252,9 @@ export const paymentInfoStyle: ViewStyle = {
 }
 
 export const paymentTitleStyle: TextStyle = {
-	fontSize: 16,
-	fontWeight: '900',
-	color: colors.dark,
+	fontSize: 15,
+	fontWeight: '800',
+	color: colors.text,
 }
 
 export const paymentTextStyle: TextStyle = {
@@ -267,9 +266,10 @@ export const paymentTextStyle: TextStyle = {
 
 export const noticeStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: '#F0F8F4',
-	borderRadius: 20,
-	padding: 16,
+	backgroundColor: colors.cardLight,
+	borderRadius: 16,
+	padding: 14,
+	marginBottom: 14,
 	flexDirection: 'row',
 	alignItems: 'center',
 	borderWidth: 1,
@@ -277,21 +277,19 @@ export const noticeStyle: ViewStyle = {
 }
 
 export const noticeIconStyle: ViewStyle = {
-	width: 38,
-	height: 38,
-	borderRadius: 13,
-	backgroundColor: colors.white,
+	width: 34,
+	height: 34,
+	borderRadius: 11,
+	backgroundColor: colors.primary,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 12,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const noticeIconTextStyle: TextStyle = {
-	fontSize: 19,
-	fontWeight: '900',
-	color: colors.primary,
+	fontSize: 18,
+	fontWeight: '800',
+	color: colors.white,
 }
 
 export const noticeContentStyle: ViewStyle = {
@@ -300,19 +298,19 @@ export const noticeContentStyle: ViewStyle = {
 
 export const noticeTitleStyle: TextStyle = {
 	fontSize: 14,
-	fontWeight: '900',
-	color: colors.primary,
+	fontWeight: '700',
+	color: colors.text,
 }
 
 export const noticeTextStyle: TextStyle = {
 	marginTop: 4,
 	fontSize: 12,
-	lineHeight: 17,
-	color: colors.muted,
+	lineHeight: 18,
+	color: colors.textSecondary,
 }
 
 export const bottomSpaceStyle: ViewStyle = {
-	height: 40,
+	height: 24,
 }
 
 export const footerStyle: ViewStyle = {
@@ -323,62 +321,53 @@ export const footerStyle: ViewStyle = {
 	backgroundColor: colors.footerBackground,
 	paddingHorizontal: 20,
 	paddingTop: 14,
-	paddingBottom: 25,
+	paddingBottom: 20,
 	borderTopWidth: 1,
-	borderTopColor: colors.border,
+	borderTopColor: colors.cardLight,
 
-	shadowColor: colors.primary,
+	shadowColor: colors.primaryDark,
 	shadowOffset: {
 		width: 0,
-		height: 5,
+		height: -2,
 	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowOpacity: 0.04,
+	shadowRadius: 8,
+	elevation: 5,
 }
 
 export const footerTotalStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'space-between',
-	marginBottom: 12,
+	marginBottom: 14,
 }
 
 export const footerTotalLabelStyle: TextStyle = {
-	fontSize: 14,
-	fontWeight: '800',
-	color: colors.muted,
+	fontSize: 13,
+	fontWeight: '700',
+	color: colors.text,
 }
 
 export const footerTicketCountStyle: TextStyle = {
-	marginTop: 2,
-	fontSize: 11,
+	marginTop: 3,
+	fontSize: 12,
 	color: colors.muted,
 }
 
 export const footerTotalAmountStyle: TextStyle = {
 	fontSize: 23,
-	fontWeight: '900',
-	color: colors.primary,
+	fontWeight: '800',
+	color: colors.price,
 }
 
 export const confirmButtonWrapperStyle: ViewStyle = {
 	width: '100%',
-	height: 54,
-	borderRadius: 17,
+	height: 52,
+	borderRadius: 14,
 	backgroundColor: colors.button,
 	borderWidth: 1,
 	borderColor: colors.button,
 	overflow: 'hidden',
-
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
 }
 
 export const confirmButtonStyle: ViewStyle = {
@@ -400,12 +389,14 @@ export const confirmButtonPressedStyle: ViewStyle = {
 }
 
 export const confirmButtonDisabledStyle: ViewStyle = {
-	opacity: 0.55,
+	backgroundColor: colors.buttonDisabled,
+	borderColor: colors.buttonDisabled,
+	opacity: 0.8,
 }
 
 export const confirmButtonTextStyle: TextStyle = {
 	color: colors.white,
-	fontSize: 16,
-	fontWeight: '900',
+	fontSize: 15,
+	fontWeight: '700',
 	textAlign: 'center',
 }

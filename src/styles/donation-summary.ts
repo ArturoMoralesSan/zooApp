@@ -1,31 +1,52 @@
 import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#B5F451',
+
+	card: '#EEF5F0',
+	cardLight: '#EEF5F0',
+	active: '#D6EBDD',
+
+	text: '#102E20',
+	textSecondary: '#315744',
+
+	border: '#B8D5C2',
+
 	white: '#FFFFFF',
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-	footerBackground: '#F7F9F8',
-	errorBackground: '#F8E1DE',
-	errorBorder: '#EABCB6',
-	errorText: '#B74439',
+
+	coral: '#C7473D',
+
+	errorBackground: '#FFF3F1',
+	errorBorder: '#F3D5D0',
+	errorText: '#8C4037',
+
+	footerBackground: '#FFFFFF',
+
+	iconMuted: '#607A6A',
+	logoutIconBackground: '#FFE5E1',
+	logoutIconBorder: '#F4D2CD',
+
+	securityIconBackground: '#042C17',
 }
 
+/* SOMBRAS */
+
 export const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
-	shadowOffset: { width: 0, height: 5 },
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowColor: '#164A2C',
+	shadowOffset: {
+		width: 0,
+		height: 2,
+	},
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
 }
+
+/* PANTALLA */
 
 export const containerStyle: ViewStyle = {
 	flex: 1,
@@ -34,34 +55,41 @@ export const containerStyle: ViewStyle = {
 
 export const backgroundStyle: ViewStyle = {
 	flex: 1,
+	backgroundColor: colors.background,
 }
 
 export const backgroundImageStyle: ImageStyle = {
-	opacity: 0.3,
+	opacity: 0.025,
 }
+
+export const scrollContentStyle: ViewStyle = {
+	paddingHorizontal: 20,
+	paddingTop: 8,
+	paddingBottom: 180,
+}
+
+export const bottomSpaceStyle: ViewStyle = {
+	height: 40,
+}
+
+/* ENCABEZADO */
 
 export const backButtonStyle: ViewStyle = {
 	position: 'absolute',
 	left: 20,
-	top: 8,
+	top: 0,
 	zIndex: 20,
 }
 
 export const backButtonPressedStyle: ViewStyle = {
 	backgroundColor: colors.card,
-	opacity: 0.75,
+	opacity: 0.84,
 }
 
 export const backTextStyle: TextStyle = {
 	fontSize: 15,
 	fontWeight: '700',
-	color: colors.dark,
-}
-
-export const scrollContentStyle: ViewStyle = {
-	paddingHorizontal: 20,
-	paddingTop: 40,
-	paddingBottom: 180,
+	color: colors.text,
 }
 
 export const headerStyle: ViewStyle = {
@@ -93,44 +121,45 @@ export const titleTextContainerStyle: ViewStyle = {
 export const titleStyle: TextStyle = {
 	fontSize: 27,
 	fontWeight: '900',
-	color: colors.dark,
+	color: colors.primaryDark,
 }
 
 export const subtitleStyle: TextStyle = {
 	marginTop: 4,
 	fontSize: 14,
 	lineHeight: 20,
-	color: colors.muted,
+	color: colors.textSecondary,
 }
+
+/* CARD DE DONACIÓN Y DETALLE DEL PAGO */
 
 export const amountCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 22,
-	marginBottom: 21,
-	alignItems: 'center',
+	backgroundColor: colors.card,
+	borderRadius: 18,
+	padding: 17,
+	marginBottom: 17,
 	borderWidth: 1,
 	borderColor: colors.border,
 	...cardShadow,
 }
 
 export const amountIconStyle: ViewStyle = {
-	width: 60,
-	height: 60,
-	borderRadius: 20,
+	width: 54,
+	height: 54,
+	borderRadius: 17,
 	backgroundColor: colors.active,
 	borderWidth: 1,
 	borderColor: colors.border,
 	alignItems: 'center',
 	justifyContent: 'center',
-	marginBottom: 12,
+	flexShrink: 0,
 }
 
 export const amountLabelStyle: TextStyle = {
 	fontSize: 14,
 	fontWeight: '800',
-	color: colors.muted,
+	color: colors.textSecondary,
 }
 
 export const amountStyle: TextStyle = {
@@ -145,26 +174,26 @@ export const amountStyle: TextStyle = {
 export const amountDescriptionStyle: TextStyle = {
 	marginTop: 5,
 	fontSize: 12,
-	color: colors.muted,
+	color: colors.textSecondary,
 	textAlign: 'center',
-}
-
-export const sectionTitleStyle: TextStyle = {
-	marginBottom: 12,
-	fontSize: 16,
-	fontWeight: '900',
-	color: colors.dark,
 }
 
 export const detailCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
+	backgroundColor: colors.card,
+	borderRadius: 18,
 	padding: 17,
 	marginBottom: 17,
 	borderWidth: 1,
 	borderColor: colors.border,
 	...cardShadow,
+}
+
+export const sectionTitleStyle: TextStyle = {
+	marginBottom: 12,
+	fontSize: 14,
+	fontWeight: '900',
+	color: colors.primaryDark,
 }
 
 export const detailRowStyle: ViewStyle = {
@@ -201,14 +230,14 @@ export const detailTextContainerStyle: ViewStyle = {
 
 export const detailTitleStyle: TextStyle = {
 	fontSize: 14,
-	fontWeight: '900',
-	color: colors.dark,
+	fontWeight: '800',
+	color: colors.text,
 }
 
 export const detailDescriptionStyle: TextStyle = {
 	marginTop: 2,
 	fontSize: 11,
-	color: colors.muted,
+	color: colors.textSecondary,
 }
 
 export const detailValueStyle: TextStyle = {
@@ -229,25 +258,28 @@ export const separatorStyle: ViewStyle = {
 	marginVertical: 7,
 }
 
+/* PAGO SEGURO */
+
 export const securityCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
+	backgroundColor: colors.card,
+	borderRadius: 18,
 	padding: 17,
 	marginBottom: 17,
 	flexDirection: 'row',
 	alignItems: 'center',
 	borderWidth: 1,
 	borderColor: colors.border,
+	...cardShadow,
 }
 
 export const securityIconStyle: ViewStyle = {
 	width: 48,
 	height: 48,
-	borderRadius: 16,
-	backgroundColor: colors.active,
+	borderRadius: 15,
+	backgroundColor: colors.securityIconBackground,
 	borderWidth: 1,
-	borderColor: colors.border,
+	borderColor: colors.securityIconBackground,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 13,
@@ -261,37 +293,42 @@ export const securityContentStyle: ViewStyle = {
 export const securityTitleStyle: TextStyle = {
 	fontSize: 15,
 	fontWeight: '900',
-	color: colors.dark,
+	color: colors.primaryDark,
 }
 
 export const securityTextStyle: TextStyle = {
 	marginTop: 3,
 	fontSize: 12,
 	lineHeight: 17,
-	color: colors.muted,
+	color: colors.textSecondary,
 }
+
+/* AGRADECIMIENTO */
 
 export const thanksCardStyle: ViewStyle = {
 	width: '100%',
 	backgroundColor: colors.active,
-	borderRadius: 25,
+	borderRadius: 18,
 	padding: 17,
 	borderWidth: 1,
 	borderColor: colors.border,
+	...cardShadow,
 }
 
 export const thanksTitleStyle: TextStyle = {
 	fontSize: 15,
 	fontWeight: '900',
-	color: colors.primary,
+	color: colors.primaryDark,
 }
 
 export const thanksTextStyle: TextStyle = {
 	marginTop: 5,
 	fontSize: 12,
 	lineHeight: 18,
-	color: colors.dark,
+	color: colors.textSecondary,
 }
+
+/* ERRORES */
 
 export const errorCardStyle: ViewStyle = {
 	width: '100%',
@@ -310,9 +347,7 @@ export const errorTextStyle: TextStyle = {
 	color: colors.errorText,
 }
 
-export const bottomSpaceStyle: ViewStyle = {
-	height: 40,
-}
+/* FOOTER Y TOTAL */
 
 export const footerStyle: ViewStyle = {
 	position: 'absolute',
@@ -325,7 +360,6 @@ export const footerStyle: ViewStyle = {
 	paddingBottom: 25,
 	borderTopWidth: 1,
 	borderTopColor: colors.border,
-	...cardShadow,
 }
 
 export const totalContainerStyle: ViewStyle = {
@@ -344,13 +378,13 @@ export const totalInfoStyle: ViewStyle = {
 export const totalLabelStyle: TextStyle = {
 	fontSize: 14,
 	fontWeight: '800',
-	color: colors.muted,
+	color: colors.textSecondary,
 }
 
 export const totalDescriptionStyle: TextStyle = {
 	marginTop: 2,
 	fontSize: 11,
-	color: colors.muted,
+	color: colors.textSecondary,
 }
 
 export const totalStyle: TextStyle = {
@@ -360,13 +394,15 @@ export const totalStyle: TextStyle = {
 	maxWidth: 150,
 }
 
+/* BOTÓN DE CONFIRMACIÓN */
+
 export const confirmButtonWrapperStyle: ViewStyle = {
 	width: '100%',
 	height: 54,
 	borderRadius: 17,
-	backgroundColor: colors.button,
+	backgroundColor: colors.primary,
 	borderWidth: 1,
-	borderColor: colors.button,
+	borderColor: colors.primary,
 	overflow: 'hidden',
 	...cardShadow,
 }
@@ -396,7 +432,7 @@ export const confirmButtonContentStyle: ViewStyle = {
 }
 
 export const confirmButtonPressedStyle: ViewStyle = {
-	backgroundColor: colors.buttonPressed,
+	backgroundColor: colors.primaryDark,
 }
 
 export const confirmButtonTextStyle: TextStyle = {

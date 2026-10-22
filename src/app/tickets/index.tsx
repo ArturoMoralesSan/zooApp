@@ -1,15 +1,7 @@
-import {
-	MinusSignIcon,
-	PlusSignIcon,
-	Ticket01Icon,
-} from '@hugeicons/core-free-icons'
-
+import { MinusSignIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { useRouter } from 'expo-router'
-
-import { useEffect, useState } from 'react'
-
+import { useCallback, useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -19,46 +11,47 @@ import {
 	Text,
 	View,
 } from 'react-native'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import BackButton from '@/components/BackButton'
+import FixedFooter from '@/components/FixedFooter'
+import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import {
-	backButtonPressedStyle,
-	backButtonStyle,
+	backButtonContainerStyle,
 	backgroundImageStyle,
 	backgroundStyle,
-	backTextStyle,
-	bottomSpaceStyle,
-	cardShadow,
-	continueButtonContentStyle,
-	continueButtonDisabledStyle,
-	continueButtonPressedStyle,
-	continueButtonStyle,
-	continueButtonTextStyle,
-	continueButtonWrapperStyle,
-	footerStyle,
+	colors,
+	emptyStateDescriptionStyle,
+	emptyStateIconContainerStyle,
+	emptyStateStyle,
+	emptyStateTitleStyle,
 	loadingContentStyle,
 	loadingTextStyle,
 	quantityButtonDisabledStyle,
 	quantityButtonStyle,
 	quantityContainerStyle,
+	quantityPlusButtonStyle,
+	quantityPlusDisabledStyle,
+	quantityPlusTextStyle,
 	quantityStyle,
+	quantityTextStyle,
+	screenHeaderStyle,
 	scrollContentStyle,
-	subtitleStyle,
+	ticketAmountStyle,
+	ticketBottomStyle,
 	ticketCardStyle,
-	ticketCountStyle,
 	ticketDescriptionStyle,
+	ticketDividerStyle,
+	ticketHeaderStyle,
 	ticketIconStyle,
 	ticketInfoStyle,
 	ticketNameStyle,
+	ticketPriceContainerStyle,
+	ticketPriceLabelStyle,
 	ticketPriceStyle,
-	titleStyle,
-	totalContainerStyle,
-	totalLabelStyle,
-	totalStyle,
 } from '@/styles/tickets'
 
 type TicketType = {
@@ -73,6 +66,8 @@ type SelectedTicket = {
 	quantity: number
 }
 
+const MAX_QUANTITY = 20
+
 export default function TicketsScreen() {
 	const router = useRouter()
 
@@ -80,11 +75,7 @@ export default function TicketsScreen() {
 	const [quantities, setQuantities] = useState<Record<number, number>>({})
 	const [loading, setLoading] = useState(true)
 
-	useEffect(() => {
-		void loadTicketTypes()
-	}, [])
-
-	const loadTicketTypes = async () => {
+	const loadTicketTypes = useCallback(async () => {
 		try {
 			setLoading(true)
 
@@ -95,14 +86,22 @@ export default function TicketsScreen() {
 				return
 			}
 
-			const response = await api<any>('/tickets/types', {
+			const response = await api<unknown>('/tickets/types', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
 
-			const types: TicketType[] = response.data ?? response
+			const data = response as {
+				data?: TicketType[]
+			}
+
+			const types: TicketType[] = Array.isArray(response)
+				? response
+				: Array.isArray(data?.data)
+					? data.data
+					: []
 
 			setTicketTypes(types)
 
@@ -125,12 +124,16 @@ export default function TicketsScreen() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [router])
+
+	useEffect(() => {
+		void loadTicketTypes()
+	}, [loadTicketTypes])
 
 	const changeQuantity = (id: number, value: number) => {
 		setQuantities((current) => ({
 			...current,
-			[id]: Math.max(0, Math.min(20, value)),
+			[id]: Math.max(0, Math.min(MAX_QUANTITY, value)),
 		}))
 	}
 
@@ -141,16 +144,25 @@ export default function TicketsScreen() {
 			quantity: quantities[ticket.id] ?? 0,
 		}))
 
-	const total = ticketTypes.reduce((sum, ticket) => {
-		const quantity = quantities[ticket.id] ?? 0
-
-		return sum + Number(ticket.price) * quantity
-	}, 0)
-
 	const selectedQuantity = selectedTickets.reduce(
 		(sum, ticket) => sum + ticket.quantity,
 		0,
 	)
+
+	const total = ticketTypes.reduce((sum, ticket) => {
+		const quantity = quantities[ticket.id] ?? 0
+		const parsedPrice = Number(ticket.price)
+		const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
+
+		return sum + price * quantity
+	}, 0)
+
+	const formatCurrency = (value: number) =>
+		new Intl.NumberFormat('es-MX', {
+			style: 'currency',
+			currency: 'MXN',
+			minimumFractionDigits: 2,
+		}).format(value)
 
 	const continuePurchase = () => {
 		if (selectedTickets.length === 0) {
@@ -158,7 +170,6 @@ export default function TicketsScreen() {
 				'Selecciona boletos',
 				'Selecciona al menos un boleto para continuar.',
 			)
-
 			return
 		}
 
@@ -172,21 +183,15 @@ export default function TicketsScreen() {
 
 	if (loading) {
 		return (
-			<SafeAreaView
-				className='flex-1'
-				edges={['top', 'left', 'right']}
-				style={backgroundStyle}
-			>
+			<SafeAreaView edges={['top', 'left', 'right']} style={backgroundStyle}>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					className='flex-1'
 					resizeMode='repeat'
 					imageStyle={backgroundImageStyle}
-					style={backgroundStyle}
+					style={{ flex: 1 }}
 				>
 					<View style={loadingContentStyle}>
-						<ActivityIndicator size='large' color='#075C3B' />
-
+						<ActivityIndicator size='large' color={colors.primary} />
 						<Text style={loadingTextStyle}>Cargando boletos...</Text>
 					</View>
 				</ImageBackground>
@@ -195,149 +200,171 @@ export default function TicketsScreen() {
 	}
 
 	return (
-		<SafeAreaView
-			className='flex-1'
-			edges={['top', 'left', 'right']}
-			style={backgroundStyle}
-		>
+		<SafeAreaView edges={['top', 'left', 'right']} style={backgroundStyle}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1'
 				resizeMode='repeat'
 				imageStyle={backgroundImageStyle}
-				style={backgroundStyle}
+				style={{ flex: 1 }}
 			>
-				{/* HEADER */}
-				<View className='px-5 pt-0'>
-					<Pressable
-						onPress={() => router.back()}
-						className='self-start'
-						style={({ pressed }) => [
-							backButtonStyle,
-							pressed && backButtonPressedStyle,
-						]}
-					>
-						<Text style={backTextStyle}>‹ Regresar</Text>
-					</Pressable>
-
-					<View className='mt-2'>
-						<Text style={titleStyle}>Comprar boletos</Text>
-
-						<Text style={subtitleStyle}>
-							Selecciona los boletos que necesitas
-						</Text>
-					</View>
-				</View>
-
-				{/* BOLETOS */}
 				<ScrollView
-					className='flex-1'
+					style={{ flex: 1, minHeight: 0 }}
+					contentContainerStyle={[
+						scrollContentStyle,
+						{
+							paddingHorizontal: 20,
+							paddingTop: 12,
+							paddingBottom: 180,
+						},
+					]}
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
+					bounces
+					nestedScrollEnabled
+					keyboardShouldPersistTaps='handled'
 				>
-					{ticketTypes.map((ticket) => {
-						const quantity = quantities[ticket.id] ?? 0
-
-						return (
-							<View key={ticket.id} style={[ticketCardStyle, cardShadow]}>
-								<View style={ticketIconStyle}>
-									<HugeiconsIcon
-										icon={Ticket01Icon}
-										size={27}
-										strokeWidth={1.8}
-										color='#075C3B'
-									/>
-								</View>
-
-								<View style={ticketInfoStyle}>
-									<Text style={ticketNameStyle}>{ticket.name}</Text>
-
-									{ticket.description ? (
-										<Text style={ticketDescriptionStyle}>
-											{ticket.description}
-										</Text>
-									) : null}
-
-									<Text style={ticketPriceStyle}>
-										${Number(ticket.price).toFixed(2)}
-									</Text>
-								</View>
-
-								<View style={quantityContainerStyle}>
-									<Pressable
-										onPress={() => changeQuantity(ticket.id, quantity - 1)}
-										disabled={quantity === 0}
-										style={[
-											quantityButtonStyle,
-											quantity === 0 && quantityButtonDisabledStyle,
-										]}
-									>
-										<HugeiconsIcon
-											icon={MinusSignIcon}
-											size={18}
-											strokeWidth={2}
-											color={quantity === 0 ? '#557067' : '#075C3B'}
-										/>
-									</Pressable>
-
-									<Text style={quantityStyle}>{quantity}</Text>
-
-									<Pressable
-										onPress={() => changeQuantity(ticket.id, quantity + 1)}
-										disabled={quantity >= 20}
-										style={[
-											quantityButtonStyle,
-											quantity >= 20 && quantityButtonDisabledStyle,
-										]}
-									>
-										<HugeiconsIcon
-											icon={PlusSignIcon}
-											size={18}
-											strokeWidth={2}
-											color={quantity >= 20 ? '#557067' : '#075C3B'}
-										/>
-									</Pressable>
-								</View>
-							</View>
-						)
-					})}
-
-					<View style={bottomSpaceStyle} />
-				</ScrollView>
-
-				{/* FOOTER */}
-				<View style={footerStyle}>
-					<View style={totalContainerStyle}>
-						<View>
-							<Text style={totalLabelStyle}>Total</Text>
-
-							<Text style={ticketCountStyle}>
-								{selectedQuantity}{' '}
-								{selectedQuantity === 1 ? 'boleto' : 'boletos'}
-							</Text>
+					{/* ENCABEZADO */}
+					<View style={screenHeaderStyle}>
+						<View style={backButtonContainerStyle}>
+							<BackButton onPress={() => router.back()} position='relative' />
 						</View>
 
-						<Text style={totalStyle}>${total.toFixed(2)}</Text>
+						<UserHeader
+							title='Comprar boletos'
+							subtitle='Selecciona los boletos que necesitas.'
+							showRewards={false}
+						/>
 					</View>
 
-					<View style={continueButtonWrapperStyle}>
-						<Pressable
-							onPress={continuePurchase}
-							disabled={selectedTickets.length === 0}
-							style={({ pressed }) => [
-								continueButtonStyle,
-								pressed &&
-									selectedTickets.length > 0 &&
-									continueButtonPressedStyle,
-								selectedTickets.length === 0 && continueButtonDisabledStyle,
-							]}
-						>
-							<View style={continueButtonContentStyle}>
-								<Text style={continueButtonTextStyle}>Continuar</Text>
+					{/* ESTADO VACÍO */}
+					{ticketTypes.length === 0 ? (
+						<View style={emptyStateStyle}>
+							<View style={emptyStateIconContainerStyle}>
+								<HugeiconsIcon
+									icon={Ticket01Icon}
+									size={30}
+									color={colors.primary}
+								/>
 							</View>
-						</Pressable>
-					</View>
-				</View>
+
+							<Text style={emptyStateTitleStyle}>
+								No hay boletos disponibles
+							</Text>
+
+							<Text style={emptyStateDescriptionStyle}>
+								Por el momento no hay tipos de boleto para mostrar.
+							</Text>
+						</View>
+					) : (
+						ticketTypes.map((ticket) => {
+							const quantity = quantities[ticket.id] ?? 0
+							const parsedPrice = Number(ticket.price)
+							const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
+							const amount = price * quantity
+							const canDecrease = quantity > 0
+							const canIncrease = quantity < MAX_QUANTITY
+
+							return (
+								<View key={ticket.id} style={ticketCardStyle}>
+									{/* INFORMACIÓN DEL BOLETO */}
+									<View style={ticketHeaderStyle}>
+										<View style={ticketIconStyle}>
+											<HugeiconsIcon
+												icon={Ticket01Icon}
+												size={25}
+												strokeWidth={1.8}
+												color={colors.primary}
+											/>
+										</View>
+
+										<View style={ticketInfoStyle}>
+											<Text style={ticketNameStyle}>{ticket.name}</Text>
+
+											{!!ticket.description && (
+												<Text style={ticketDescriptionStyle}>
+													{ticket.description}
+												</Text>
+											)}
+										</View>
+									</View>
+
+									<View style={ticketDividerStyle} />
+
+									{/* PRECIO Y CANTIDAD */}
+									<View style={ticketBottomStyle}>
+										<View style={ticketPriceContainerStyle}>
+											<Text style={ticketPriceLabelStyle}>
+												Precio por boleto
+											</Text>
+
+											<Text style={ticketPriceStyle}>
+												{formatCurrency(price)}
+											</Text>
+
+											<Text style={ticketAmountStyle}>
+												Monto: {formatCurrency(amount)}
+											</Text>
+										</View>
+
+										<View style={quantityContainerStyle}>
+											{/* RESTAR */}
+											<Pressable
+												accessibilityRole='button'
+												accessibilityLabel={`Restar boleto de ${ticket.name}`}
+												onPress={() => changeQuantity(ticket.id, quantity - 1)}
+												disabled={!canDecrease}
+												style={({ pressed }) => [
+													quantityButtonStyle,
+													!canDecrease && quantityButtonDisabledStyle,
+													pressed && canDecrease && { opacity: 0.7 },
+												]}
+											>
+												<HugeiconsIcon
+													icon={MinusSignIcon}
+													size={18}
+													strokeWidth={2}
+													color={canDecrease ? colors.primary : colors.muted}
+												/>
+											</Pressable>
+
+											{/* CANTIDAD */}
+											<View style={quantityStyle}>
+												<Text style={quantityTextStyle}>{quantity}</Text>
+											</View>
+
+											{/* SUMAR */}
+											<Pressable
+												accessibilityRole='button'
+												accessibilityLabel={`Agregar boleto de ${ticket.name}`}
+												onPress={() => changeQuantity(ticket.id, quantity + 1)}
+												disabled={!canIncrease}
+												style={[
+													quantityPlusButtonStyle,
+													!canIncrease && quantityPlusDisabledStyle,
+												]}
+											>
+												<Text style={quantityPlusTextStyle}>+</Text>
+											</Pressable>
+										</View>
+									</View>
+								</View>
+							)
+						})
+					)}
+				</ScrollView>
+
+				{/* FOOTER FIJO */}
+				<FixedFooter
+					label='Total a pagar'
+					description={`${selectedQuantity} ${
+						selectedQuantity === 1
+							? 'boleto seleccionado'
+							: 'boletos seleccionados'
+					}`}
+					amount={formatCurrency(total)}
+					buttonTitle='Continuar'
+					onButtonPress={continuePurchase}
+					disabled={selectedTickets.length === 0}
+				/>
 			</ImageBackground>
 		</SafeAreaView>
 	)

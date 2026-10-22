@@ -1,47 +1,30 @@
-import { Dimensions, type TextStyle, type ViewStyle } from 'react-native'
-
-const { width: screenWidth } = Dimensions.get('window')
-
-export const horizontalPadding = 17
-
-export const carouselGap = 12
-
-export const eventCardWidth = screenWidth - horizontalPadding * 2
+import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	text: '#17372C',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+	text: '#0a2014',
+	textSecondary: '#668475',
+	muted: '#607A6A',
+	border: '#a6c1b3',
+	cardLight: '#eef4f0',
+	iconBackground: '#d5ead9',
 	white: '#FFFFFF',
-	blue: '#48C6D1',
-	coral: '#D95C4F',
-	gold: '#E8B84A',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	mapBackground: '#F8E1DE',
-	mapBorder: '#EFC2BC',
-	eventOverlay: 'rgba(7, 92, 59, 0.84)',
-	inactiveDot: '#7C9C90',
-	whiteTransparent: 'rgba(255,255,255,0.9)',
-	whiteTransparent65: 'rgba(255,255,255,0.65)',
+	coral: '#08783F',
 }
 
+export const horizontalPadding = 12
+export const carouselGap = 10
+export const eventCardWidth = 292
+
 export const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 5,
-	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowColor: '#164A2C',
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
 }
 
 export const screenStyle: ViewStyle = {
@@ -54,67 +37,58 @@ export const backgroundStyle: ViewStyle = {
 	backgroundColor: colors.background,
 }
 
-export const backgroundImageStyle = {
-	opacity: 0.08,
+export const backgroundImageStyle: ImageStyle = {
+	opacity: 0.025,
 }
 
 export const scrollContentStyle: ViewStyle = {
 	paddingHorizontal: horizontalPadding,
-	paddingTop: 10,
-	paddingBottom: 120,
+	paddingTop: 8,
+	paddingBottom: 24,
 }
 
-export const headerTitleStyle: TextStyle = {
-	color: colors.primary,
-	fontSize: 23,
+export const titleTextStyle: TextStyle = {
+	color: colors.text,
+	fontSize: 16,
 	fontWeight: '800',
-	letterSpacing: -0.5,
+	lineHeight: 21,
 }
 
-export const badgeStyle: ViewStyle = {
-	backgroundColor: colors.card,
-}
-
-export const badgeTextStyle: TextStyle = {
-	color: colors.primary,
+export const secondaryTextStyle: TextStyle = {
+	color: colors.textSecondary,
 	fontSize: 13,
-	fontWeight: '800',
+	lineHeight: 18,
 }
 
 export const loadingCardStyle: ViewStyle = {
-	height: 214,
+	minHeight: 190,
+	alignItems: 'center',
+	justifyContent: 'center',
+	backgroundColor: colors.cardLight,
+	borderRadius: 24,
+	borderWidth: 1,
+	borderColor: colors.border,
+}
+
+export const loadingTextStyle: TextStyle = {
+	color: colors.textSecondary,
+	fontSize: 13,
+}
+
+export const errorCardStyle: ViewStyle = {
 	backgroundColor: colors.cardLight,
 	borderWidth: 1,
 	borderColor: colors.border,
 	...cardShadow,
 }
 
-export const loadingTextStyle: TextStyle = {
-	color: colors.textSecondary,
-}
-
-export const errorCardStyle: ViewStyle = {
-	backgroundColor: colors.errorBackground,
-	borderWidth: 1,
-	borderColor: colors.errorBorder,
-}
-
-export const titleTextStyle: TextStyle = {
-	color: colors.text,
-}
-
-export const secondaryTextStyle: TextStyle = {
-	color: colors.textSecondary,
-}
-
 export const retryButtonStyle = (pressed: boolean): ViewStyle => ({
-	backgroundColor: pressed ? colors.primaryLight : colors.primary,
-	transform: [
-		{
-			scale: pressed ? 0.98 : 1,
-		},
-	],
+	backgroundColor: colors.primary,
+	opacity: pressed ? 0.8 : 1,
+	borderRadius: 16,
 })
+
+/* EVENTOS */
 
 export const eventCardContainerStyle = (
 	index: number,
@@ -125,176 +99,203 @@ export const eventCardContainerStyle = (
 })
 
 export const eventCardStyle: ViewStyle = {
-	height: 214,
-	backgroundColor: colors.cardLight,
-	borderWidth: 1,
-	borderColor: colors.border,
+	height: 203,
+	backgroundColor: colors.primaryDark,
+	borderRadius: 24,
+	overflow: 'hidden',
 	...cardShadow,
 }
 
 export const eventPressableStyle = (pressed: boolean): ViewStyle => ({
-	opacity: pressed ? 0.97 : 1,
-	transform: [
-		{
-			scale: pressed ? 0.995 : 1,
-		},
-	],
+	flex: 1,
+	opacity: pressed ? 0.92 : 1,
 })
 
 export const eventFallbackStyle: ViewStyle = {
-	backgroundColor: colors.active,
+	backgroundColor: '#315744',
 }
 
 export const eventFallbackTextStyle: TextStyle = {
-	color: colors.primary,
+	color: colors.primaryLight,
 	fontSize: 64,
-	fontWeight: '800',
+	fontWeight: '900',
 }
 
 export const eventOverlayStyle: ViewStyle = {
-	height: 118,
-	backgroundColor: colors.eventOverlay,
+	position: 'absolute',
+	left: 0,
+	right: 0,
+	bottom: 0,
+	height: '55%',
+	backgroundColor: colors.primaryDark,
+	opacity: 0.98,
 }
 
 export const eventTypeStyle: ViewStyle = {
 	backgroundColor: colors.primaryLight,
+	borderRadius: 20,
+	paddingHorizontal: 12,
+	paddingVertical: 4,
 }
 
 export const eventTypeTextStyle: TextStyle = {
-	color: colors.white,
-	fontSize: 11,
+	color: colors.primaryDark,
+	fontSize: 10,
 	fontWeight: '800',
+	letterSpacing: 0.3,
 }
 
 export const eventTitleStyle: TextStyle = {
 	color: colors.white,
-	fontSize: 18,
+	fontSize: 23,
 	fontWeight: '800',
-	letterSpacing: -0.3,
+	lineHeight: 28,
 }
 
 export const eventDescriptionStyle: TextStyle = {
-	color: colors.whiteTransparent,
+	color: colors.white,
 	fontSize: 12,
+	fontWeight: '600',
 	lineHeight: 17,
 }
 
 export const eventMetaStyle: TextStyle = {
 	color: colors.white,
-	fontSize: 9,
-	fontWeight: '600',
+	fontSize: 12,
+	fontWeight: '700',
 }
 
 export const eventSeparatorStyle: TextStyle = {
-	color: colors.whiteTransparent65,
-	fontSize: 9,
+	color: colors.primaryLight,
+	fontWeight: '900',
 }
 
 export const dotsContainerStyle: ViewStyle = {
+	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'center',
-	flexDirection: 'row',
-	marginTop: 10,
+	marginTop: 12,
+	gap: 6,
 }
 
 export const dotStyle = (active: boolean): ViewStyle => ({
-	marginLeft: 4,
-	width: active ? 28 : 7,
-	height: 6,
-	borderRadius: 999,
-	backgroundColor: active ? colors.primary : colors.inactiveDot,
+	width: active ? 21 : 7,
+	height: 7,
+	borderRadius: 10,
+	backgroundColor: active ? colors.primary : colors.textSecondary,
+	opacity: active ? 1 : 0.8,
 })
 
+/* ACCIONES */
+
 export const actionsContainerStyle: ViewStyle = {
-	marginTop: 12,
+	marginTop: 20,
 }
 
 export const actionsRowStyle: ViewStyle = {
 	flexDirection: 'row',
-	alignItems: 'flex-start',
+	alignItems: 'stretch',
+	gap: 10,
 }
 
 export const ticketsCardStyle: ViewStyle = {
-	height: 258,
-	backgroundColor: colors.card,
-	borderWidth: 1,
+	flex: 1,
+	minHeight: 164,
+	backgroundColor: colors.cardLight,
 	borderColor: colors.border,
-	...cardShadow,
+	borderWidth: 1,
+	borderRadius: 18,
+	overflow: 'hidden',
 }
 
 export const rightColumnStyle: ViewStyle = {
 	flex: 1,
-	marginLeft: 8,
+	gap: 10,
 }
 
 export const mapCardStyle: ViewStyle = {
-	height: 122,
-	backgroundColor: colors.card,
-	borderWidth: 1,
+	backgroundColor: colors.cardLight,
 	borderColor: colors.border,
-	...cardShadow,
+	borderWidth: 1,
+	borderRadius: 18,
+	overflow: 'hidden',
 }
 
 export const speciesCardStyle: ViewStyle = {
-	height: 122,
+	flex: 1,
+	minHeight: 164,
 	backgroundColor: colors.cardLight,
-	borderWidth: 1,
 	borderColor: colors.border,
-	...cardShadow,
+	borderWidth: 1,
+	borderRadius: 18,
+	overflow: 'hidden',
 }
 
 export const actionPressableStyle = (pressed: boolean): ViewStyle => ({
-	opacity: pressed ? 0.95 : 1,
+	flex: 1,
+	opacity: pressed ? 0.84 : 1,
 })
 
 export const ticketIconBoxStyle: ViewStyle = {
-	backgroundColor: colors.active,
+	width: 47,
+	height: 47,
+	alignItems: 'center',
+	justifyContent: 'center',
+	backgroundColor: colors.iconBackground,
+	borderRadius: 13,
 }
 
 export const ticketBackgroundIconStyle: ViewStyle = {
-	opacity: 0.55,
-}
-
-export const mapIconStyle: ViewStyle = {
-	transform: [
-		{
-			rotate: '8deg',
-		},
-	],
+	position: 'absolute',
+	opacity: 0.07,
 }
 
 export const mapIconContainerStyle: ViewStyle = {
-	right: 12,
-	top: 4,
+	top: 10,
+	right: 10,
+	opacity: 0.18,
+}
+
+export const mapIconStyle: ViewStyle = {
+	alignItems: 'center',
+	justifyContent: 'center',
 }
 
 export const speciesIconContainerStyle: ViewStyle = {
-	right: 4,
-	top: 8,
-	opacity: 0.42,
+	top: 10,
+	right: 10,
+	opacity: 0.18,
 }
 
 export const actionBottomTextStyle: TextStyle = {
 	color: colors.text,
 	fontSize: 16,
 	fontWeight: '800',
+	lineHeight: 20,
 }
 
 export const speciesDescriptionStyle: TextStyle = {
-	color: colors.text,
-	fontSize: 11,
-	lineHeight: 15,
+	color: colors.textSecondary,
+	fontSize: 12,
+	fontWeight: '600',
+	lineHeight: 16,
 }
 
 export const donationCardStyle: ViewStyle = {
 	backgroundColor: colors.cardLight,
-	borderWidth: 1,
 	borderColor: colors.border,
-	...cardShadow,
+	borderWidth: 1,
+	borderRadius: 18,
+	overflow: 'hidden',
 }
 
 export const donationIconBoxStyle: ViewStyle = {
-	backgroundColor: colors.active,
+	width: 44,
+	height: 44,
+	alignItems: 'center',
+	justifyContent: 'center',
+	backgroundColor: colors.iconBackground,
+	borderRadius: 13,
 }
 
 export const donationTitleStyle: TextStyle = {
@@ -305,9 +306,10 @@ export const donationTitleStyle: TextStyle = {
 
 export const donationDescriptionStyle: TextStyle = {
 	color: colors.textSecondary,
-	fontSize: 11,
+	fontSize: 12,
+	lineHeight: 16,
 }
 
-export const donationArrowStyle: TextStyle = {
-	color: '#7DA996',
+export const donationArrowStyle = {
+	color: colors.white,
 }

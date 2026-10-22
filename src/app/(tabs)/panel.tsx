@@ -5,19 +5,14 @@ import {
 	QrCodeIcon,
 	Settings01Icon,
 	Ticket01Icon,
-	UserIcon,
 } from '@hugeicons/core-free-icons'
-
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { router } from 'expo-router'
-
 import { useEffect, useState } from 'react'
 
 import {
 	ActivityIndicator,
 	Alert,
-	Image,
 	ImageBackground,
 	Modal,
 	Pressable,
@@ -27,15 +22,13 @@ import {
 } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import ActionButton from '@/components/ActionButton'
+import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
-
-import { API_URL, api } from '@/services/api'
-
+import { api } from '@/services/api'
 import { getToken, logout, type User } from '@/services/auth'
-
 import {
 	backgroundImageStyle,
 	backgroundStyle,
@@ -47,18 +40,7 @@ import {
 	logoutIconContainerStyle,
 	logoutPressableStyle,
 	logoutTitleStyle,
-	menuArrowStyle,
-	menuDescriptionStyle,
-	menuIconContainerStyle,
-	menuItemContainerStyle,
-	menuItemStyle,
-	menuTitleStyle,
 	modalOverlayStyle,
-	profileAvatarPlaceholderStyle,
-	profileContainerStyle,
-	profileNameStyle,
-	profileViewProfileStyle,
-	qrCloseStyle,
 	qrContainerStyle,
 	qrDescriptionStyle,
 	qrHeaderIconStyle,
@@ -71,13 +53,6 @@ import {
 	scrollContentStyle,
 } from '@/styles/panel'
 
-type MenuItemProps = {
-	icon: typeof UserIcon
-	title: string
-	description: string
-	onPress: () => void
-}
-
 type UserWithProfile = User & {
 	profile?: {
 		avatar?: string | null
@@ -89,78 +64,33 @@ type ProfileResponse = {
 	user: UserWithProfile
 }
 
-function getAvatarUrl(avatar: string | null | undefined): string | null {
-	if (!avatar) {
-		return null
-	}
+function getAvatarUrl(avatar?: string | null): string | null {
+	if (!avatar) return null
 
-	if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+	if (avatar.startsWith('https://') || avatar.startsWith('http://')) {
 		return avatar
 	}
 
-	const baseUrl = API_URL.replace(/\/api\/?$/, '')
+	const apiUrl = process.env.EXPO_PUBLIC_API_URL?.replace(/\/+$/, '')
 
-	return `${baseUrl}/storage/${avatar}`
-}
+	if (!apiUrl) return null
 
-function MenuItem({ icon, title, description, onPress }: MenuItemProps) {
-	return (
-		<View
-			className='mb-4 overflow-hidden rounded-[28px]'
-			style={menuItemContainerStyle}
-		>
-			<Pressable
-				onPress={onPress}
-				className='flex-row items-center rounded-[28px] px-5 py-4'
-				style={({ pressed }) => menuItemStyle(pressed)}
-			>
-				<View
-					className='h-12 w-12 items-center justify-center rounded-[16px]'
-					style={menuIconContainerStyle}
-				>
-					<HugeiconsIcon
-						icon={icon}
-						size={25}
-						strokeWidth={1.8}
-						color={colors.primary}
-					/>
-				</View>
+	const baseUrl = apiUrl.replace(/\/api$/, '')
+	const imagePath = avatar.replace(/^\/?storage\//, '').replace(/^\/+/, '')
 
-				<View className='ml-4 flex-1'>
-					<Text className='text-base font-bold' style={menuTitleStyle}>
-						{title}
-					</Text>
-
-					<Text className='mt-1 text-sm leading-5' style={menuDescriptionStyle}>
-						{description}
-					</Text>
-				</View>
-
-				<HugeiconsIcon
-					icon={ArrowRight01Icon}
-					size={22}
-					strokeWidth={1.8}
-					color={menuArrowStyle.color as string}
-				/>
-			</Pressable>
-		</View>
-	)
+	return `${baseUrl}/storage/${imagePath}`
 }
 
 export default function Panel() {
 	const [loggingOut, setLoggingOut] = useState(false)
-
-	const [loadingUser, setLoadingUser] = useState(true)
-
 	const [user, setUser] = useState<UserWithProfile | null>(null)
-
 	const [showQr, setShowQr] = useState(false)
 
 	useEffect(() => {
+		let mounted = true
+
 		const loadProfile = async () => {
 			try {
-				setLoadingUser(true)
-
 				const token = await getToken()
 
 				if (!token) {
@@ -175,27 +105,28 @@ export default function Panel() {
 					},
 				})
 
-				setUser(response.user)
+				if (mounted) {
+					setUser(response.user)
+				}
 			} catch (error) {
 				console.error('LOAD PANEL PROFILE ERROR:', error)
 
-				setUser(null)
-			} finally {
-				setLoadingUser(false)
+				if (mounted) {
+					setUser(null)
+				}
 			}
 		}
 
 		void loadProfile()
+
+		return () => {
+			mounted = false
+		}
 	}, [])
 
 	const handleShowQr = () => {
-		if (loadingUser) {
-			return
-		}
-
 		if (!user?.qr_token) {
 			Alert.alert('Código QR', 'No fue posible obtener tu código QR.')
-
 			return
 		}
 
@@ -221,9 +152,7 @@ export default function Panel() {
 	const performLogout = async () => {
 		try {
 			setLoggingOut(true)
-
 			await logout()
-
 			router.replace('/login')
 		} catch {
 			router.replace('/login')
@@ -248,78 +177,33 @@ export default function Panel() {
 					contentContainerStyle={scrollContentStyle}
 					showsVerticalScrollIndicator={false}
 				>
-					{/* HEADER */}
+					{/* ENCABEZADO */}
 
-					<UserHeader title='Panel' />
+					<UserHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
 
-					{/* PERFIL */}
+					{/* TARJETA DE PERFIL */}
 
-					<Pressable
-						onPress={() => router.push('/profile')}
-						className='mt-7 items-center'
-						style={profileContainerStyle}
-					>
-						{loadingUser ? (
-							<View
-								className='h-24 w-24 items-center justify-center rounded-full'
-								style={profileAvatarPlaceholderStyle}
-							>
-								<ActivityIndicator size='small' color={colors.primary} />
-							</View>
-						) : avatarUrl ? (
-							<Image
-								source={{
-									uri: avatarUrl,
-								}}
-								className='h-24 w-24 rounded-full'
-								resizeMode='cover'
-								onError={(error) => {
-									console.error('PROFILE AVATAR ERROR:', error.nativeEvent)
-								}}
-							/>
-						) : (
-							<View
-								className='h-24 w-24 items-center justify-center rounded-full'
-								style={profileAvatarPlaceholderStyle}
-							>
-								<HugeiconsIcon
-									icon={UserIcon}
-									size={42}
-									strokeWidth={1.7}
-									color={colors.primary}
-								/>
-							</View>
-						)}
-
-						<Text
-							className='mt-4 text-2xl font-bold'
-							style={profileNameStyle}
-							numberOfLines={1}
-						>
-							{user?.name ?? 'Usuario'}
-						</Text>
-
-						<Text
-							className='mt-1 text-sm font-semibold'
-							style={profileViewProfileStyle}
-						>
-							Ver perfil
-						</Text>
-					</Pressable>
+					<View className='mt-6'>
+						<AppCard
+							avatarUrl={avatarUrl}
+							title={user?.name ?? 'Mi cuenta'}
+							description={user?.email ?? 'Consulta tus datos personales'}
+							onPress={() => router.push('/profile')}
+							showArrow
+						/>
+					</View>
 
 					{/* MI CUENTA */}
 
 					<View className='mt-7'>
 						<Text
 							className='mb-4 px-1 text-xl font-bold'
-							style={{
-								color: colors.text,
-							}}
+							style={{ color: '#06371c' }}
 						>
 							Mi cuenta
 						</Text>
 
-						<MenuItem
+						<AppCard
 							icon={QrCodeIcon}
 							title='Mi código QR'
 							description='Consulta tu código personal'
@@ -332,21 +216,19 @@ export default function Panel() {
 					<View className='mt-5'>
 						<Text
 							className='mb-4 px-1 text-xl font-bold'
-							style={{
-								color: colors.text,
-							}}
+							style={{ color: '#06371c' }}
 						>
 							Mi actividad
 						</Text>
 
-						<MenuItem
+						<AppCard
 							icon={Ticket01Icon}
 							title='Mis entradas'
 							description='Consulta tus entradas al zoológico'
 							onPress={() => router.push('/tickets/my-tickets')}
 						/>
 
-						<MenuItem
+						<AppCard
 							icon={Ticket01Icon}
 							title='Mis donaciones'
 							description='Consulta tus donaciones'
@@ -359,14 +241,12 @@ export default function Panel() {
 					<View className='mt-5'>
 						<Text
 							className='mb-4 px-1 text-xl font-bold'
-							style={{
-								color: colors.text,
-							}}
+							style={{ color: '#06371c' }}
 						>
 							Ayuda
 						</Text>
 
-						<MenuItem
+						<AppCard
 							icon={Settings01Icon}
 							title='Configuración'
 							description='Preferencias de la aplicación'
@@ -378,7 +258,7 @@ export default function Panel() {
 							}
 						/>
 
-						<MenuItem
+						<AppCard
 							icon={HelpCircleIcon}
 							title='Ayuda'
 							description='Preguntas frecuentes y soporte'
@@ -393,15 +273,18 @@ export default function Panel() {
 
 					{/* CERRAR SESIÓN */}
 
-					<View className='mt-5 overflow-hidden rounded-[28px]'>
+					<View
+						className='mt-5 overflow-hidden rounded-[18px]'
+						style={logoutContainerStyle}
+					>
 						<Pressable
 							onPress={handleLogout}
 							disabled={loggingOut}
-							className='flex-row items-center rounded-[28px] px-5 py-4'
-							style={({ pressed }) => ({
-								...logoutContainerStyle,
-								...logoutPressableStyle(pressed),
-							})}
+							className='flex-row items-center px-3.5 py-3'
+							style={({ pressed }) => [
+								logoutPressableStyle(pressed),
+								{ minHeight: 80 },
+							]}
 						>
 							<View
 								className='h-12 w-12 items-center justify-center rounded-[16px]'
@@ -411,11 +294,11 @@ export default function Panel() {
 									icon={Logout01Icon}
 									size={23}
 									strokeWidth={1.8}
-									color={colors.coral}
+									color='#08783F'
 								/>
 							</View>
 
-							<View className='ml-4 flex-1'>
+							<View className='ml-3 flex-1'>
 								<Text className='text-base font-bold' style={logoutTitleStyle}>
 									{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 								</Text>
@@ -428,13 +311,25 @@ export default function Panel() {
 								</Text>
 							</View>
 
-							{loggingOut && (
-								<ActivityIndicator size='small' color={colors.coral} />
+							{loggingOut ? (
+								<ActivityIndicator size='small' color='#08783F' />
+							) : (
+								<View
+									className='ml-2 h-8 w-8 items-center justify-center rounded-full'
+									style={{ backgroundColor: '#08783F' }}
+								>
+									<HugeiconsIcon
+										icon={ArrowRight01Icon}
+										size={20}
+										strokeWidth={2}
+										color={colors.white}
+									/>
+								</View>
 							)}
 						</Pressable>
 					</View>
 
-					{/* FOOTER */}
+					{/* PIE DE PÁGINA */}
 
 					<View className='mt-8 items-center'>
 						<Text className='text-xs' style={footerTitleStyle}>
@@ -447,98 +342,145 @@ export default function Panel() {
 					</View>
 				</ScrollView>
 
-				{/* MODAL QR */}
+				{/* MODAL DEL CÓDIGO QR */}
 
 				<Modal
 					visible={showQr}
 					transparent
 					animationType='fade'
+					statusBarTranslucent
 					onRequestClose={() => setShowQr(false)}
 				>
-					<View style={modalOverlayStyle}>
+					{/* Overlay */}
+
+					<View
+						style={[
+							modalOverlayStyle,
+							{
+								backgroundColor: 'rgba(6, 61, 34, 0.55)',
+								justifyContent: 'center',
+								alignItems: 'center',
+								padding: 20,
+							},
+						]}
+					>
+						{/* Modal */}
+
 						<View
-							className='w-full overflow-hidden rounded-[28px] px-6 py-7'
-							style={qrModalStyle}
+							style={[
+								qrModalStyle,
+								{
+									backgroundColor: '#FFFFFF',
+									width: '100%',
+									maxWidth: 380,
+									padding: 20,
+									borderRadius: 24,
+								},
+							]}
 						>
 							{/* ENCABEZADO */}
 
 							<View className='items-center'>
 								<View
-									className='h-14 w-14 items-center justify-center rounded-[16px]'
-									style={qrHeaderIconStyle}
+									className='h-12 w-12 items-center justify-center rounded-[14px]'
+									style={[qrHeaderIconStyle, { backgroundColor: '#d5ead9' }]}
 								>
 									<HugeiconsIcon
 										icon={QrCodeIcon}
-										size={28}
+										size={26}
 										strokeWidth={1.8}
-										color={colors.primary}
+										color='#08783F'
 									/>
 								</View>
 
-								<Text className='mt-4 text-2xl font-bold' style={qrTitleStyle}>
+								<Text
+									className='mt-3 text-center text-[22px]'
+									style={[qrTitleStyle, { color: '#06371c' }]}
+								>
 									Mi código QR
 								</Text>
 
 								<Text
-									className='mt-2 text-center text-sm leading-5'
-									style={qrDescriptionStyle}
+									className='mt-1 text-center text-[13px] leading-[19px]'
+									style={[qrDescriptionStyle, { color: '#06371c' }]}
 								>
-									Presenta este código en taquilla para identificar tu cuenta y
-									acumular tus beneficios.
+									Presenta este código en taquilla para identificar tu cuenta.
 								</Text>
 							</View>
 
-							{/* QR */}
+							{/* CÓDIGO QR */}
 
-							<View className='mt-6 items-center'>
-								<View className='rounded-[24px] p-4' style={qrContainerStyle}>
-									{user?.qr_token ? (
-										<QRCode
-											value={user.qr_token}
-											size={240}
-											backgroundColor='#ffffff'
-											color='#000000'
-											eQuietZone={4}
-										/>
-									) : (
-										<View style={qrLoadingStyle}>
-											<ActivityIndicator size='large' color={colors.primary} />
-										</View>
-									)}
-								</View>
+							<View
+								style={[
+									qrContainerStyle,
+									{
+										alignSelf: 'center',
+										marginTop: 18,
+										padding: 12,
+										backgroundColor: '#FFFFFF',
+										borderColor: '#a6c1b3',
+									},
+								]}
+							>
+								{user?.qr_token ? (
+									<QRCode
+										value={user.qr_token}
+										size={180}
+										backgroundColor='#FFFFFF'
+										color='#063D22'
+										eQuietZone={4}
+									/>
+								) : (
+									<View
+										style={[
+											qrLoadingStyle,
+											{
+												width: 180,
+												height: 180,
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor: '#FFFFFF',
+											},
+										]}
+									>
+										<ActivityIndicator size='large' color='#08783F' />
+									</View>
+								)}
 							</View>
 
 							{/* INFORMACIÓN */}
 
 							<View
-								className='mt-6 rounded-[20px] px-4 py-4'
-								style={qrInfoStyle}
+								className='mt-4 rounded-xl p-3'
+								style={[
+									qrInfoStyle,
+									{
+										backgroundColor: '#eef4f0',
+										borderWidth: 1,
+										borderColor: '#a6c1b3',
+									},
+								]}
 							>
 								<Text
-									className='text-center text-sm font-bold'
-									style={qrInfoTitleStyle}
+									className='text-sm font-extrabold'
+									style={[qrInfoTitleStyle, { color: '#06371c' }]}
 								>
 									Código personal
 								</Text>
 
 								<Text
-									className='mt-1 text-center text-xs leading-5'
-									style={qrInfoDescriptionStyle}
+									className='mt-1 text-xs leading-[18px]'
+									style={[qrInfoDescriptionStyle, { color: '#06371c' }]}
 								>
-									Este código está asociado permanentemente a tu cuenta de
-									ZooApp.
+									Este código está asociado a tu cuenta de ZooApp.
 								</Text>
 							</View>
 
-							{/* CERRAR */}
+							{/* BOTÓN CERRAR */}
 
-							<Pressable
-								onPress={() => setShowQr(false)}
-								className='mt-6 w-full items-center justify-center rounded-[20px] bg-[#075C3B] px-5 py-4'
-								style={({ pressed }) => qrCloseStyle(pressed)}
-							>
-								<Text className='text-base font-bold text-white'>Cerrar</Text>
-							</Pressable>
+							<View className='mt-4'>
+								<ActionButton title='Cerrar' onPress={() => setShowQr(false)} />
+							</View>
 						</View>
 					</View>
 				</Modal>

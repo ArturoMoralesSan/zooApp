@@ -3,33 +3,45 @@ import { Dimensions, StyleSheet } from 'react-native'
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	text: '#17372C',
-	textSecondary: '#557067',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+
+	primary: '#08783F',
+	primaryDark: '#063D22',
+	primaryLight: '#b8f35d',
+
+	card: '#eef4f0',
+	cardLight: '#eef4f0',
+
+	active: '#d5ead9',
+	text: '#06371c',
+	textSecondary: '#06371c',
+	border: '#a6c1b3',
 	white: '#FFFFFF',
-	coral: '#D95C4F',
-	errorBackground: '#FFF3F1',
-	errorBorder: '#F3D5D0',
-	errorText: '#8C4037',
-	overlay: 'rgba(0,0,0,0.45)',
-	placeholder: '#789187',
+
+	coral: '#08783F',
+	errorBackground: '#eef4f0',
+	errorBorder: '#a6c1b3',
+	errorText: '#06371c',
+
+	overlay: 'rgba(6, 61, 34, 0.55)',
+	placeholder: '#06371c',
+
+	lime: '#b8f35d',
+
+	// Solo la tarjeta de puntos va en verde
+	pointsGreen: '#08783F',
+	pointsGreenDark: '#063D22',
 }
 
 const cardShadow = {
-	shadowColor: '#075C3B',
+	shadowColor: '#164A2C',
 	shadowOffset: {
 		width: 0,
-		height: 5,
+		height: 2,
 	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
 }
 
 export const styles = StyleSheet.create({
@@ -54,7 +66,7 @@ export const styles = StyleSheet.create({
 	},
 
 	loadingPattern: {
-		opacity: 0.3,
+		opacity: 0.2,
 	},
 
 	loadingText: {
@@ -65,13 +77,10 @@ export const styles = StyleSheet.create({
 	},
 
 	backgroundPattern: {
-		opacity: 0.3,
+		opacity: 0.2,
 	},
 
-	/*
-	 * HEADER
-	 */
-
+	// HEADER
 	header: {
 		position: 'relative',
 	},
@@ -93,7 +102,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 999,
 		paddingHorizontal: 14,
 		paddingVertical: 10,
-		backgroundColor: 'rgba(255,255,255,0.92)',
+		backgroundColor: 'rgba(255,255,255,0.95)',
 		...cardShadow,
 	},
 
@@ -129,7 +138,7 @@ export const styles = StyleSheet.create({
 		overflow: 'hidden',
 		borderWidth: 5,
 		borderColor: colors.white,
-		backgroundColor: colors.cardLight,
+		backgroundColor: colors.card,
 		...cardShadow,
 	},
 
@@ -152,7 +161,7 @@ export const styles = StyleSheet.create({
 		bottom: 0,
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: 'rgba(7,92,59,0.52)',
+		backgroundColor: 'rgba(8,120,63,0.55)',
 	},
 
 	changeAvatarButton: {
@@ -166,14 +175,14 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		borderWidth: 3,
 		borderColor: colors.white,
-		backgroundColor: colors.primary,
+		backgroundColor: colors.lime,
 		...cardShadow,
 	},
 
 	changeAvatarText: {
 		fontSize: 20,
 		fontWeight: '700',
-		color: colors.white,
+		color: colors.text,
 	},
 
 	profileName: {
@@ -197,17 +206,14 @@ export const styles = StyleSheet.create({
 		color: '#F7F7EE',
 	},
 
-	/*
-	 * PROGRESO
-	 */
-
+	// PROGRESO
 	progressContainer: {
 		position: 'relative',
 		zIndex: 10,
 		overflow: 'hidden',
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
-		backgroundColor: 'rgba(248,244,234,0.94)',
+		backgroundColor: colors.background,
 	},
 
 	progressBackground: {
@@ -215,7 +221,7 @@ export const styles = StyleSheet.create({
 	},
 
 	progressPattern: {
-		opacity: 0.3,
+		opacity: 0.12,
 	},
 
 	progressContent: {
@@ -227,7 +233,7 @@ export const styles = StyleSheet.create({
 	sectionTitle: {
 		fontSize: 21,
 		fontWeight: '700',
-		color: colors.primary,
+		color: colors.text,
 	},
 
 	sectionSubtitle: {
@@ -241,23 +247,25 @@ export const styles = StyleSheet.create({
 		marginTop: 20,
 	},
 
+	// SOLO LA TARJETA DE PUNTOS ES VERDE
 	pointsCard: {
 		flex: 1,
-		borderRadius: 22,
+		borderRadius: 18,
 		padding: 16,
-		backgroundColor: colors.card,
+		backgroundColor: colors.pointsGreen,
 		borderWidth: 1,
-		borderColor: colors.border,
+		borderColor: colors.pointsGreenDark,
 	},
 
 	levelCard: {
 		flex: 1,
 		marginLeft: 12,
-		borderRadius: 22,
+		borderRadius: 18,
 		padding: 16,
-		backgroundColor: colors.cardLight,
+		backgroundColor: colors.card,
 		borderWidth: 1,
 		borderColor: colors.border,
+		...cardShadow,
 	},
 
 	pointsLabel: {
@@ -265,14 +273,14 @@ export const styles = StyleSheet.create({
 		fontWeight: '700',
 		textTransform: 'uppercase',
 		letterSpacing: 1.2,
-		color: colors.primary,
+		color: '#E1F3E7',
 	},
 
 	pointsValue: {
 		marginTop: 4,
 		fontSize: 29,
-		fontWeight: '700',
-		color: colors.primary,
+		fontWeight: '800',
+		color: colors.white,
 	},
 
 	levelLabel: {
@@ -292,9 +300,9 @@ export const styles = StyleSheet.create({
 
 	nextLevelCard: {
 		marginTop: 20,
-		borderRadius: 22,
+		borderRadius: 18,
 		padding: 16,
-		backgroundColor: colors.cardLight,
+		backgroundColor: colors.card,
 		borderWidth: 1,
 		borderColor: colors.border,
 		...cardShadow,
@@ -314,16 +322,17 @@ export const styles = StyleSheet.create({
 	},
 
 	progressBadge: {
+		alignSelf: 'flex-start',
 		borderRadius: 999,
 		paddingHorizontal: 10,
 		paddingVertical: 4,
-		backgroundColor: colors.active,
+		backgroundColor: colors.lime,
 	},
 
 	progressBadgeText: {
 		fontSize: 12,
-		fontWeight: '700',
-		color: colors.primary,
+		fontWeight: '800',
+		color: colors.text,
 	},
 
 	progressTrack: {
@@ -357,16 +366,13 @@ export const styles = StyleSheet.create({
 		color: colors.text,
 	},
 
-	/*
-	 * DATOS PERSONALES
-	 */
-
+	// DATOS PERSONALES
 	personalBackground: {
 		backgroundColor: colors.background,
 	},
 
 	personalPattern: {
-		opacity: 0.3,
+		opacity: 0.12,
 	},
 
 	personalContent: {
@@ -376,8 +382,8 @@ export const styles = StyleSheet.create({
 	},
 
 	personalCard: {
-		borderRadius: 28,
-		paddingHorizontal: 20,
+		borderRadius: 22,
+		paddingHorizontal: 18,
 		paddingTop: 20,
 		paddingBottom: 24,
 		backgroundColor: colors.card,
@@ -386,10 +392,7 @@ export const styles = StyleSheet.create({
 		...cardShadow,
 	},
 
-	/*
-	 * CAMPOS
-	 */
-
+	// CAMPOS
 	fieldWrapper: {
 		marginTop: 20,
 	},
@@ -401,25 +404,26 @@ export const styles = StyleSheet.create({
 	fieldLabel: {
 		marginBottom: 8,
 		fontSize: 12,
-		fontWeight: '700',
+		fontWeight: '800',
 		textTransform: 'uppercase',
 		letterSpacing: 0.8,
-		color: colors.textSecondary,
+		color: colors.text,
 	},
 
 	fieldContainer: {
 		minHeight: 56,
 		flexDirection: 'row',
 		alignItems: 'center',
-		borderRadius: 18,
+		borderRadius: 14,
 		paddingHorizontal: 16,
-		backgroundColor: colors.cardLight,
+		backgroundColor: colors.white,
 		borderWidth: 1,
-		borderColor: colors.border,
+		borderColor: colors.primary,
 	},
 
 	fieldContainerError: {
 		borderColor: colors.coral,
+		backgroundColor: colors.errorBackground,
 	},
 
 	fieldInput: {
@@ -440,15 +444,13 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		marginLeft: 12,
 		fontSize: 16,
+		color: colors.text,
 	},
 
-	/*
-	 * GUARDAR
-	 */
-
+	// BOTÓN GUARDAR: SE CONSERVA POR COMPATIBILIDAD
 	saveButton: {
 		marginTop: 28,
-		borderRadius: 20,
+		borderRadius: 10,
 		overflow: 'hidden',
 		...cardShadow,
 	},
@@ -461,7 +463,7 @@ export const styles = StyleSheet.create({
 		width: '100%',
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderRadius: 20,
+		borderRadius: 10,
 		paddingHorizontal: 20,
 		paddingVertical: 16,
 		backgroundColor: colors.primary,

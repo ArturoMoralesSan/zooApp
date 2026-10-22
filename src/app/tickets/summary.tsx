@@ -1,32 +1,27 @@
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
-
 import { CreditCardIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
-
 import { HugeiconsIcon } from '@hugeicons/react-native'
-
 import { useLocalSearchParams, useRouter } from 'expo-router'
-
-import { useEffect, useMemo, useState } from 'react'
-
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
 	ImageBackground,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
 } from 'react-native'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import BackButton from '@/components/BackButton'
+import FixedFooter from '@/components/FixedFooter'
+import UserHeader from '@/components/UserHeader'
+
+import { api } from '@/services/api'
+import { getToken } from '@/services/auth'
+
 import {
-	backButtonPressedStyle,
-	backButtonStyle,
 	backgroundImageStyle,
 	backgroundStyle,
-	backTextStyle,
 	bottomSpaceStyle,
 	cardHeaderStyle,
 	cardHeaderTextStyle,
@@ -34,21 +29,8 @@ import {
 	cardStyle,
 	cardSubtitleStyle,
 	cardTitleStyle,
-	confirmButtonContentStyle,
-	confirmButtonDisabledStyle,
-	confirmButtonPressedStyle,
-	confirmButtonStyle,
-	confirmButtonTextStyle,
-	confirmButtonWrapperStyle,
 	containerStyle,
 	dividerStyle,
-	footerStyle,
-	footerTicketCountStyle,
-	footerTotalAmountStyle,
-	footerTotalLabelStyle,
-	footerTotalStyle,
-	headerStyle,
-	headerTextStyle,
 	iconContainerStyle,
 	loadingContainerStyle,
 	loadingContentStyle,
@@ -65,13 +47,11 @@ import {
 	paymentTextStyle,
 	paymentTitleStyle,
 	scrollContentStyle,
-	subtitleStyle,
 	ticketNameStyle,
 	ticketQuantityStyle,
 	ticketRowInfoStyle,
 	ticketRowStyle,
 	ticketSubtotalStyle,
-	titleStyle,
 	totalLabelStyle,
 	totalRowStyle,
 	totalStyle,
@@ -107,20 +87,19 @@ export default function TicketSummaryScreen() {
 	const [loading, setLoading] = useState(true)
 	const [purchasing, setPurchasing] = useState(false)
 
-	const selectedTickets: SelectedTicket[] = useMemo(() => {
+	const selectedTickets = useMemo<SelectedTicket[]>(() => {
 		try {
-			return params.items ? JSON.parse(params.items) : []
+			const parsed = params.items ? JSON.parse(params.items) : []
+			return Array.isArray(parsed) ? parsed : []
 		} catch {
 			return []
 		}
 	}, [params.items])
 
-	useEffect(() => {
-		void loadTicketTypes()
-	}, [])
-
-	const loadTicketTypes = async () => {
+	const loadTicketTypes = useCallback(async () => {
 		try {
+			setLoading(true)
+
 			const token = await getToken()
 
 			if (!token) {
@@ -135,7 +114,11 @@ export default function TicketSummaryScreen() {
 				},
 			})
 
-			const types: TicketType[] = response.data ?? response
+			const types: TicketType[] = Array.isArray(response)
+				? response
+				: Array.isArray(response?.data)
+					? response.data
+					: []
 
 			setTicketTypes(types)
 		} catch (error) {
@@ -150,42 +133,51 @@ export default function TicketSummaryScreen() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [router])
 
-	const summary = useMemo(() => {
-		return selectedTickets
-			.map((item) => {
-				const ticket = ticketTypes.find(
-					(type) => type.id === item.ticket_type_id,
-				)
+	useEffect(() => {
+		void loadTicketTypes()
+	}, [loadTicketTypes])
 
-				if (!ticket) {
-					return null
-				}
+	const summary = useMemo<TicketSummaryItem[]>(() => {
+		return selectedTickets.flatMap((item) => {
+			const ticket = ticketTypes.find((type) => type.id === item.ticket_type_id)
 
-				return {
+			if (!ticket) return []
+
+			const price = Number(ticket.price)
+			const quantity = Math.max(0, Number(item.quantity) || 0)
+
+			return [
+				{
 					...item,
+					quantity,
 					ticket,
-					subtotal: Number(ticket.price) * item.quantity,
-				}
-			})
-			.filter(Boolean) as TicketSummaryItem[]
+					subtotal: (Number.isFinite(price) ? price : 0) * quantity,
+				},
+			]
+		})
 	}, [selectedTickets, ticketTypes])
 
 	const total = summary.reduce((sum, item) => sum + item.subtotal, 0)
 
-	const totalTickets = selectedTickets.reduce(
-		(sum, item) => sum + item.quantity,
-		0,
-	)
+	const totalTickets = summary.reduce((sum, item) => sum + item.quantity, 0)
+
+	const formatCurrency = (value: number) =>
+		new Intl.NumberFormat('es-MX', {
+			style: 'currency',
+			currency: 'MXN',
+			minimumFractionDigits: 2,
+		}).format(value)
 
 	const confirmPurchase = async () => {
-		if (selectedTickets.length === 0) {
+		if (purchasing) return
+
+		if (summary.length === 0) {
 			Alert.alert(
 				'Sin boletos',
 				'No hay boletos seleccionados para realizar la compra.',
 			)
-
 			return
 		}
 
@@ -205,11 +197,14 @@ export default function TicketSummaryScreen() {
 					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
-					items: selectedTickets,
+					items: summary.map((item) => ({
+						ticket_type_id: item.ticket_type_id,
+						quantity: item.quantity,
+					})),
 				}),
 			})
 
-			const order = response.data ?? response
+			const order = response?.data ?? response
 
 			router.replace({
 				pathname: '/tickets/success',
@@ -234,19 +229,17 @@ export default function TicketSummaryScreen() {
 	if (loading) {
 		return (
 			<SafeAreaView
-				style={loadingContainerStyle}
+				style={[loadingContainerStyle, { flex: 1 }]}
 				edges={['top', 'left', 'right']}
 			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					style={backgroundStyle}
-					className='flex-1'
+					style={[backgroundStyle, { flex: 1 }]}
 					resizeMode='repeat'
 					imageStyle={backgroundImageStyle}
 				>
 					<View style={loadingContentStyle}>
-						<ActivityIndicator size='large' color='#075C3B' />
-
+						<ActivityIndicator size='large' color='#187744' />
 						<Text style={loadingTextStyle}>Cargando resumen...</Text>
 					</View>
 				</ImageBackground>
@@ -255,41 +248,46 @@ export default function TicketSummaryScreen() {
 	}
 
 	return (
-		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
+		<SafeAreaView
+			style={[containerStyle, { flex: 1 }]}
+			edges={['top', 'left', 'right']}
+		>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
-				className='flex-1'
+				style={[backgroundStyle, { flex: 1 }]}
 				resizeMode='repeat'
 				imageStyle={backgroundImageStyle}
 			>
-				{/* HEADER */}
-				<View style={headerStyle}>
-					<Pressable
-						onPress={() => router.back()}
-						style={({ pressed }) => [
-							backButtonStyle,
-							pressed && backButtonPressedStyle,
-						]}
-					>
-						<Text style={backTextStyle}>‹ Regresar</Text>
-					</Pressable>
-
-					<View style={headerTextStyle}>
-						<Text style={titleStyle}>Resumen de compra</Text>
-
-						<Text style={subtitleStyle}>
-							Revisa tus boletos antes de continuar
-						</Text>
-					</View>
-				</View>
-
-				{/* CONTENIDO */}
 				<ScrollView
+					style={{ flex: 1, minHeight: 0 }}
+					contentContainerStyle={[
+						scrollContentStyle,
+						{
+							paddingHorizontal: 20,
+							paddingTop: 12,
+							paddingBottom: 180,
+							flexGrow: 1,
+						},
+					]}
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
+					bounces
+					nestedScrollEnabled
+					keyboardShouldPersistTaps='handled'
 				>
-					{/* BOLETOS */}
+					{/* ENCABEZADO */}
+					<View style={{ paddingBottom: 12 }}>
+						<View style={{ marginBottom: 12 }}>
+							<BackButton onPress={() => router.back()} position='relative' />
+						</View>
+
+						<UserHeader
+							title='Resumen de compra'
+							subtitle='Revisa tus boletos antes de continuar.'
+							showRewards={false}
+						/>
+					</View>
+
+					{/* DETALLE DE BOLETOS */}
 					<View style={[cardStyle, cardShadow]}>
 						<View style={cardHeaderStyle}>
 							<View style={iconContainerStyle}>
@@ -297,41 +295,45 @@ export default function TicketSummaryScreen() {
 									icon={Ticket01Icon}
 									size={25}
 									strokeWidth={1.8}
-									color='#075C3B'
+									color='#187744'
 								/>
 							</View>
 
 							<View style={cardHeaderTextStyle}>
 								<Text style={cardTitleStyle}>Tus boletos</Text>
-
 								<Text style={cardSubtitleStyle}>Detalle de la compra</Text>
 							</View>
 						</View>
 
-						{summary.map((item) => (
-							<View key={item.ticket_type_id} style={ticketRowStyle}>
-								<View style={ticketRowInfoStyle}>
-									<Text style={ticketNameStyle}>{item.ticket.name}</Text>
+						{summary.length === 0 ? (
+							<Text style={ticketQuantityStyle}>
+								No hay boletos seleccionados.
+							</Text>
+						) : (
+							summary.map((item) => (
+								<View key={item.ticket_type_id} style={ticketRowStyle}>
+									<View style={ticketRowInfoStyle}>
+										<Text style={ticketNameStyle}>{item.ticket.name}</Text>
 
-									<Text style={ticketQuantityStyle}>
-										{item.quantity} boleto
-										{item.quantity !== 1 ? 's' : ''} × $
-										{Number(item.ticket.price).toFixed(2)}
+										<Text style={ticketQuantityStyle}>
+											{item.quantity}{' '}
+											{item.quantity === 1 ? 'boleto' : 'boletos'} ×{' '}
+											{formatCurrency(Number(item.ticket.price) || 0)}
+										</Text>
+									</View>
+
+									<Text style={ticketSubtotalStyle}>
+										{formatCurrency(item.subtotal)}
 									</Text>
 								</View>
-
-								<Text style={ticketSubtotalStyle}>
-									${item.subtotal.toFixed(2)}
-								</Text>
-							</View>
-						))}
+							))
+						)}
 
 						<View style={dividerStyle} />
 
 						<View style={totalRowStyle}>
 							<Text style={totalLabelStyle}>Total</Text>
-
-							<Text style={totalStyle}>${total.toFixed(2)}</Text>
+							<Text style={totalStyle}>{formatCurrency(total)}</Text>
 						</View>
 					</View>
 
@@ -342,18 +344,17 @@ export default function TicketSummaryScreen() {
 								icon={CreditCardIcon}
 								size={25}
 								strokeWidth={1.8}
-								color='#075C3B'
+								color='#187744'
 							/>
 						</View>
 
 						<View style={paymentInfoStyle}>
 							<Text style={paymentTitleStyle}>Método de pago</Text>
-
 							<Text style={paymentTextStyle}>Tarjeta de crédito o débito</Text>
 						</View>
 					</View>
 
-					{/* AVISO */}
+					{/* AVISO DE COMPRA SEGURA */}
 					<View style={noticeStyle}>
 						<View style={noticeIconStyle}>
 							<Text style={noticeIconTextStyle}>✓</Text>
@@ -361,7 +362,6 @@ export default function TicketSummaryScreen() {
 
 						<View style={noticeContentStyle}>
 							<Text style={noticeTitleStyle}>Compra segura</Text>
-
 							<Text style={noticeTextStyle}>
 								Al confirmar recibirás tus boletos digitales con su código QR.
 							</Text>
@@ -371,40 +371,47 @@ export default function TicketSummaryScreen() {
 					<View style={bottomSpaceStyle} />
 				</ScrollView>
 
-				{/* FOOTER */}
-				<View style={footerStyle}>
-					<View style={footerTotalStyle}>
-						<View>
-							<Text style={footerTotalLabelStyle}>Total a pagar</Text>
-
-							<Text style={footerTicketCountStyle}>
-								{totalTickets} {totalTickets === 1 ? 'boleto' : 'boletos'}
-							</Text>
-						</View>
-
-						<Text style={footerTotalAmountStyle}>${total.toFixed(2)}</Text>
+				{/* FOOTER FIJO */}
+				{purchasing ? (
+					<View
+						style={{
+							position: 'absolute',
+							bottom: 0,
+							left: 0,
+							right: 0,
+							backgroundColor: '#FFFFFF',
+							borderTopWidth: 1,
+							borderTopColor: '#BDCCC3',
+							paddingHorizontal: 20,
+							paddingTop: 20,
+							paddingBottom: 28,
+							alignItems: 'center',
+							justifyContent: 'center',
+							flexDirection: 'row',
+							gap: 10,
+							elevation: 15,
+							zIndex: 999,
+						}}
+					>
+						<ActivityIndicator size='small' color='#08783F' />
+						<Text style={{ color: '#08783F', fontWeight: '800' }}>
+							Procesando compra...
+						</Text>
 					</View>
-
-					<View style={confirmButtonWrapperStyle}>
-						<Pressable
-							onPress={confirmPurchase}
-							disabled={purchasing}
-							style={({ pressed }) => [
-								confirmButtonStyle,
-								pressed && !purchasing && confirmButtonPressedStyle,
-								purchasing && confirmButtonDisabledStyle,
-							]}
-						>
-							<View style={confirmButtonContentStyle}>
-								{purchasing ? (
-									<ActivityIndicator size='small' color='#FFFFFF' />
-								) : (
-									<Text style={confirmButtonTextStyle}>Aceptar y comprar</Text>
-								)}
-							</View>
-						</Pressable>
-					</View>
-				</View>
+				) : (
+					<FixedFooter
+						label='Total a pagar'
+						description={`${totalTickets} ${
+							totalTickets === 1
+								? 'boleto seleccionado'
+								: 'boletos seleccionados'
+						}`}
+						amount={formatCurrency(total)}
+						buttonTitle='Aceptar y comprar'
+						onButtonPress={confirmPurchase}
+						disabled={summary.length === 0}
+					/>
+				)}
 			</ImageBackground>
 		</SafeAreaView>
 	)

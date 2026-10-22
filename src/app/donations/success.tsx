@@ -1,340 +1,218 @@
-import {
-	CheckmarkCircle02Icon,
-	CreditCardIcon,
-	HeartAddIcon,
-	Home01Icon,
-} from '@hugeicons/core-free-icons'
+import { CheckmarkCircle02Icon, StarIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo } from 'react'
-import {
-	ImageBackground,
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-} from 'react-native'
+import { ImageBackground, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import {
-	amountCardStyle,
-	amountIconStyle,
-	amountInfoStyle,
-	amountLabelStyle,
-	amountStyle,
-	backButtonPressedStyle,
-	backButtonStyle,
-	backgroundImageStyle,
-	backgroundStyle,
-	backTextStyle,
-	bottomSpaceStyle,
-	cardShadow,
-	containerStyle,
-	detailCardStyle,
-	detailDescriptionStyle,
-	detailIconStyle,
-	detailLeftStyle,
-	detailRowStyle,
-	detailTextContainerStyle,
-	detailTitleStyle,
-	detailValueStyle,
-	folioStyle,
-	footerAmountStyle,
-	footerDescriptionStyle,
-	footerInfoStyle,
-	footerLabelStyle,
-	footerStyle,
-	headerStyle,
-	headerTextStyle,
-	homeButtonContentStyle,
-	homeButtonPressedStyle,
-	homeButtonStyle,
-	homeButtonTextStyle,
-	homeButtonWrapperStyle,
-	infoBoxStyle,
-	infoContentStyle,
-	infoIconStyle,
-	infoIconTextStyle,
-	infoTextStyle,
-	infoTitleStyle,
-	paymentValueStyle,
-	receiptIconTextStyle,
-	scrollContentStyle,
-	sectionTitleStyle,
-	separatorStyle,
-	subtitleStyle,
-	successCardStyle,
-	successIconStyle,
-	successTextStyle,
-	successTitleStyle,
-	thanksCardStyle,
-	thanksContentStyle,
-	thanksIconStyle,
-	thanksTextStyle,
-	thanksTitleStyle,
-	titleStyle,
-} from '@/styles/donation-success'
+import BackButton from '@/components/BackButton'
+import FixedFooter from '@/components/FixedFooter'
+import UserHeader from '@/components/UserHeader'
+import { COLORS, styles } from '@/styles/donation-success'
 
-const COLORS = {
-	primary: '#075C3B',
-	white: '#FFFFFF',
+type PaymentMethodData = {
+	id?: number | string
+	name?: string | null
+	code?: string | null
+}
+
+type DonationData = {
+	id?: number | string | null
+	amount?: number | string | null
+	payment_method?: string | PaymentMethodData | null
+	paymentMethod?: string | PaymentMethodData | null
+	status?: string | null
+	created_at?: string | null
+	createdAt?: string | null
+	reference?: string | null
+	folio?: string | null
+}
+
+function formatCurrency(value: number | string | null | undefined) {
+	const amount = Number(value ?? 0)
+
+	return new Intl.NumberFormat('es-MX', {
+		style: 'currency',
+		currency: 'MXN',
+		minimumFractionDigits: 2,
+	}).format(Number.isFinite(amount) ? amount : 0)
+}
+
+function getPaymentMethod(
+	method: string | PaymentMethodData | null | undefined,
+) {
+	if (!method) return 'Tarjeta'
+
+	if (typeof method === 'string') return method
+
+	return method.name || method.code || 'Tarjeta'
 }
 
 export default function DonationSuccessScreen() {
-	const router = useRouter()
-
 	const params = useLocalSearchParams<{
-		amount?: string
 		donation?: string
+		amount?: string
+		id?: string
+		folio?: string
+		reference?: string
 	}>()
 
-	const donation = useMemo(() => {
-		try {
-			return params.donation ? JSON.parse(params.donation) : null
-		} catch {
-			return null
-		}
-	}, [params.donation])
+	const donation = useMemo<DonationData>(() => {
+		if (params.donation) {
+			try {
+				const parsed = JSON.parse(params.donation)
 
-	const amount = useMemo(() => {
-		const value = Number(
-			String(donation?.amount ?? params.amount ?? '0').replace(',', '.'),
-		)
-
-		if (!Number.isFinite(value) || value < 0) {
-			return 0
+				if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+					return parsed as DonationData
+				}
+			} catch {
+				// Si el parámetro no es JSON válido, usamos los parámetros individuales.
+			}
 		}
 
-		return value
-	}, [donation?.amount, params.amount])
+		return {
+			amount: params.amount,
+			id: params.id,
+			folio: params.folio,
+			reference: params.reference,
+		}
+	}, [
+		params.donation,
+		params.amount,
+		params.id,
+		params.folio,
+		params.reference,
+	])
 
-	const donationId = donation?.id ?? null
+	const amount = donation.amount ?? params.amount ?? 0
+
+	const donationReference =
+		donation.folio ||
+		donation.reference ||
+		donation.id ||
+		params.folio ||
+		params.reference ||
+		params.id ||
+		'Registrada correctamente'
+
+	const paymentMethod = getPaymentMethod(
+		donation.payment_method ?? donation.paymentMethod,
+	)
+
+	const handleGoHome = () => {
+		router.replace('/')
+	}
 
 	return (
-		<SafeAreaView style={containerStyle}>
+		<SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
+				style={styles.background}
+				imageStyle={styles.backgroundImage}
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
 			>
-				<View style={headerStyle}>
-					<View>
-						<Pressable
-							onPress={() => router.back()}
-							style={({ pressed }) => [
-								backButtonStyle,
-								pressed && backButtonPressedStyle,
-							]}
-						>
-							<Text style={backTextStyle}>‹ Regresar</Text>
-						</Pressable>
-					</View>
-
-					<View style={headerTextStyle}>
-						<Text style={titleStyle}>¡Donación realizada!</Text>
-
-						<Text style={subtitleStyle}>
-							Gracias por apoyar al Zoológico Sahuatoba
-						</Text>
-					</View>
-				</View>
-
 				<ScrollView
+					style={styles.scrollView}
+					contentContainerStyle={styles.scrollContent}
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
 				>
-					<View style={[successCardStyle, cardShadow]}>
-						<View style={successIconStyle}>
+					<View style={styles.headerContainer}>
+						<BackButton position='relative' onPress={() => router.back()} />
+
+						<UserHeader
+							title='Donación realizada'
+							subtitle='Gracias por apoyar el cuidado de las especies.'
+							showRewards={false}
+						/>
+					</View>
+
+					{/* CONFIRMACIÓN DE DONACIÓN */}
+					<View style={styles.successCard}>
+						<View style={styles.successIconContainer}>
 							<HugeiconsIcon
 								icon={CheckmarkCircle02Icon}
-								size={56}
-								strokeWidth={1.8}
-								color={COLORS.primary}
+								size={46}
+								color={COLORS.successIcon}
 							/>
 						</View>
 
-						<Text style={successTitleStyle}>¡Gracias por tu donación!</Text>
+						<Text style={styles.successTitle}>¡Donación realizada!</Text>
 
-						<Text style={successTextStyle}>
-							Tu aportación se realizó correctamente y ayudará al cuidado de los
-							animales y a la conservación del zoológico.
+						<Text style={styles.successDescription}>
+							Gracias por apoyar al Zoológico Sahuatoba.
 						</Text>
 					</View>
 
-					<View style={[amountCardStyle, cardShadow]}>
-						<View style={amountIconStyle}>
-							<HugeiconsIcon
-								icon={HeartAddIcon}
-								size={29}
-								strokeWidth={1.8}
-								color={COLORS.primary}
-							/>
+					{/* MONTO DONADO Y DETALLE */}
+					<View style={styles.amountCard}>
+						<View style={styles.amountHeader}>
+							<Text style={styles.amountLabel}>Monto donado</Text>
 						</View>
 
-						<View style={amountInfoStyle}>
-							<Text style={amountLabelStyle}>Monto donado</Text>
+						<Text style={styles.amountValue}>{formatCurrency(amount)}</Text>
 
-							<Text style={amountStyle} numberOfLines={1} adjustsFontSizeToFit>
-								${amount.toFixed(2)}
+						<View style={styles.detailDivider} />
+
+						<View style={styles.sectionHeading}>
+							<Text style={styles.sectionTitle}>Detalle de la donación</Text>
+						</View>
+
+						<View style={styles.detailRow}>
+							<Text style={styles.detailLabel}>Donación</Text>
+
+							<Text style={styles.detailValue} numberOfLines={1}>
+								Aportación al zoológico
+							</Text>
+						</View>
+
+						<View style={styles.detailDivider} />
+
+						<View style={styles.detailRow}>
+							<Text style={styles.detailLabel}>Método de pago</Text>
+
+							<Text style={styles.detailValue} numberOfLines={1}>
+								{paymentMethod}
+							</Text>
+						</View>
+
+						<View style={styles.detailDivider} />
+
+						<View style={styles.detailRow}>
+							<Text style={styles.detailLabel}>Folio</Text>
+
+							<Text style={styles.detailValue} numberOfLines={1} selectable>
+								#{String(donationReference).replace(/^#/, '')}
 							</Text>
 						</View>
 					</View>
 
-					<Text style={sectionTitleStyle}>Detalle de la donación</Text>
-
-					<View style={[detailCardStyle, cardShadow]}>
-						<View style={detailRowStyle}>
-							<View style={detailLeftStyle}>
-								<View style={detailIconStyle}>
-									<HugeiconsIcon
-										icon={HeartAddIcon}
-										size={20}
-										strokeWidth={1.8}
-										color={COLORS.primary}
-									/>
-								</View>
-
-								<View style={detailTextContainerStyle}>
-									<Text style={detailTitleStyle}>Donación</Text>
-
-									<Text style={detailDescriptionStyle}>
-										Aportación al zoológico
-									</Text>
-								</View>
-							</View>
-
-							<Text style={detailValueStyle}>${amount.toFixed(2)}</Text>
+					{/* AGRADECIMIENTO */}
+					<View style={styles.thanksInfoCard}>
+						<View style={styles.thanksInfoIconContainer}>
+							<HugeiconsIcon icon={StarIcon} size={24} color={COLORS.white} />
 						</View>
 
-						<View style={separatorStyle} />
+						<View style={styles.thanksInfoContent}>
+							<Text style={styles.thanksInfoTitle}>¡Tu apoyo cuenta!</Text>
 
-						<View style={detailRowStyle}>
-							<View style={detailLeftStyle}>
-								<View style={detailIconStyle}>
-									<HugeiconsIcon
-										icon={CreditCardIcon}
-										size={20}
-										strokeWidth={1.8}
-										color={COLORS.primary}
-									/>
-								</View>
-
-								<View style={detailTextContainerStyle}>
-									<Text style={detailTitleStyle}>Método de pago</Text>
-
-									<Text style={detailDescriptionStyle}>Pago con tarjeta</Text>
-								</View>
-							</View>
-
-							<Text style={paymentValueStyle}>Tarjeta</Text>
-						</View>
-
-						{donationId !== null && (
-							<>
-								<View style={separatorStyle} />
-
-								<View style={detailRowStyle}>
-									<View style={detailLeftStyle}>
-										<View style={detailIconStyle}>
-											<Text style={receiptIconTextStyle}>#</Text>
-										</View>
-
-										<View style={detailTextContainerStyle}>
-											<Text style={detailTitleStyle}>Folio</Text>
-
-											<Text style={detailDescriptionStyle}>
-												Comprobante de donación
-											</Text>
-										</View>
-									</View>
-
-									<Text style={folioStyle}>#{donationId}</Text>
-								</View>
-							</>
-						)}
-					</View>
-
-					<View style={infoBoxStyle}>
-						<View style={infoIconStyle}>
-							<Text style={infoIconTextStyle}>✓</Text>
-						</View>
-
-						<View style={infoContentStyle}>
-							<Text style={infoTitleStyle}>¡Tu apoyo cuenta!</Text>
-
-							<Text style={infoTextStyle}>
+							<Text style={styles.thanksInfoDescription}>
 								Gracias a personas como tú podemos seguir trabajando en el
 								bienestar de los animales y en la conservación de nuestra fauna.
 							</Text>
 						</View>
 					</View>
 
-					<View style={thanksCardStyle}>
-						<View style={thanksIconStyle}>
-							<HugeiconsIcon
-								icon={HeartAddIcon}
-								size={23}
-								strokeWidth={1.8}
-								color={COLORS.primary}
-							/>
-						</View>
-
-						<View style={thanksContentStyle}>
-							<Text style={thanksTitleStyle}>
-								Gracias por ser parte de esta causa
-							</Text>
-
-							<Text style={thanksTextStyle}>
-								Tu donación se suma a los esfuerzos para mantener y mejorar los
-								espacios del Zoológico Sahuatoba.
-							</Text>
-						</View>
-					</View>
-
-					<View style={bottomSpaceStyle} />
+					<View style={styles.bottomSpace} />
 				</ScrollView>
 
-				<View style={footerStyle}>
-					<View style={footerInfoStyle}>
-						<View>
-							<Text style={footerLabelStyle}>Donación confirmada</Text>
-
-							<Text style={footerDescriptionStyle}>
-								Gracias por tu aportación
-							</Text>
-						</View>
-
-						<Text
-							style={footerAmountStyle}
-							numberOfLines={1}
-							adjustsFontSizeToFit
-						>
-							${amount.toFixed(2)}
-						</Text>
-					</View>
-
-					<View style={homeButtonWrapperStyle}>
-						<Pressable
-							onPress={() => router.replace('/')}
-							style={({ pressed }) => [
-								homeButtonStyle,
-								pressed && homeButtonPressedStyle,
-							]}
-						>
-							<View style={homeButtonContentStyle}>
-								<HugeiconsIcon
-									icon={Home01Icon}
-									size={21}
-									strokeWidth={1.8}
-									color={COLORS.white}
-								/>
-
-								<Text style={homeButtonTextStyle}>Ir al inicio</Text>
-							</View>
-						</Pressable>
-					</View>
-				</View>
+				{/* FOOTER FIJO */}
+				<FixedFooter
+					label='Donación confirmada'
+					description='Gracias por tu aportación'
+					amount={formatCurrency(amount)}
+					buttonTitle='Ir al inicio'
+					onButtonPress={handleGoHome}
+				/>
 			</ImageBackground>
 		</SafeAreaView>
 	)

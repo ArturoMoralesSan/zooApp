@@ -1,34 +1,36 @@
 import type { TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+	background: '#FFFFFF',
+	primary: '#187744',
+	primaryLight: '#23965A',
+	dark: '#244334',
+	muted: '#718477',
+	card: '#F2F7F4',
+	cardLight: '#F8FAF8',
+	active: '#E4F2E8',
+	border: '#DCE7DF',
 	white: '#FFFFFF',
 	coral: '#D95C4F',
-	coralLight: '#F8E1DE',
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-	modalBackground: '#F7F9F8',
-	overlay: 'rgba(0,0,0,0.45)',
+	coralLight: '#FCEDEA',
+	button: '#187744',
+	buttonPressed: '#125D35',
+	modalBackground: '#FFFFFF',
+	overlay: 'rgba(24, 40, 30, 0.48)',
 }
 
 const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
+	shadowColor: '#244334',
 	shadowOffset: {
 		width: 0,
-		height: 5,
+		height: 3,
 	},
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
+	shadowOpacity: 0.055,
+	shadowRadius: 8,
+	elevation: 2,
 }
+
+/* Container */
 
 export const containerStyle: ViewStyle = {
 	flex: 1,
@@ -37,10 +39,11 @@ export const containerStyle: ViewStyle = {
 
 export const backgroundStyle: ViewStyle = {
 	flex: 1,
+	backgroundColor: colors.background,
 }
 
 export const backgroundImageStyle = {
-	opacity: 0.3,
+	opacity: 0.12,
 }
 
 export const scrollContentStyle: ViewStyle = {
@@ -49,37 +52,33 @@ export const scrollContentStyle: ViewStyle = {
 	paddingBottom: 40,
 }
 
+/* Back button */
+
 export const backButtonStyle: ViewStyle = {
 	alignSelf: 'flex-start',
 	flexDirection: 'row',
 	alignItems: 'center',
-	backgroundColor: colors.cardLight,
+	backgroundColor: colors.card,
 	borderWidth: 1,
 	borderColor: colors.border,
-	borderRadius: 18,
-	paddingHorizontal: 16,
-	paddingVertical: 10,
-	shadowColor: colors.primary,
-	shadowOffset: {
-		width: 0,
-		height: 3,
-	},
-	shadowOpacity: 0.1,
-	shadowRadius: 7,
-	elevation: 3,
+	borderRadius: 15,
+	paddingHorizontal: 14,
+	paddingVertical: 9,
 }
 
 export const backButtonPressedStyle: ViewStyle = {
-	backgroundColor: colors.card,
-	opacity: 0.75,
+	backgroundColor: colors.active,
+	opacity: 0.8,
 }
 
 export const backTextStyle: TextStyle = {
-	fontSize: 15,
+	fontSize: 14,
 	fontWeight: '700',
 	color: colors.dark,
 	marginRight: 5,
 }
+
+/* Header */
 
 export const headerStyle: ViewStyle = {
 	marginTop: 18,
@@ -88,28 +87,31 @@ export const headerStyle: ViewStyle = {
 
 export const titleStyle: TextStyle = {
 	fontSize: 27,
-	fontWeight: '900',
+	fontWeight: '800',
 	color: colors.dark,
+	letterSpacing: -0.5,
 }
 
 export const subtitleStyle: TextStyle = {
-	marginTop: 4,
+	marginTop: 5,
 	fontSize: 14,
-	lineHeight: 20,
+	lineHeight: 21,
 	color: colors.muted,
 }
+
+/* Statistics */
 
 export const statsContainerStyle: ViewStyle = {
 	flexDirection: 'row',
 	gap: 12,
-	marginBottom: 18,
+	marginBottom: 20,
 }
 
 export const statCardStyle: ViewStyle = {
 	flex: 1,
 	backgroundColor: colors.card,
-	borderRadius: 22,
-	padding: 14,
+	borderRadius: 20,
+	padding: 13,
 	flexDirection: 'row',
 	alignItems: 'center',
 	borderWidth: 1,
@@ -118,43 +120,44 @@ export const statCardStyle: ViewStyle = {
 }
 
 export const statIconStyle: ViewStyle = {
-	width: 42,
-	height: 42,
-	borderRadius: 15,
+	width: 40,
+	height: 40,
+	borderRadius: 14,
 	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 10,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const statNumberStyle: TextStyle = {
 	fontSize: 20,
-	fontWeight: '900',
+	fontWeight: '800',
 	color: colors.dark,
 }
 
 export const statLabelStyle: TextStyle = {
-	marginTop: 1,
+	marginTop: 3,
 	fontSize: 11,
+	fontWeight: '500',
 	color: colors.muted,
 }
+
+/* Tabs */
 
 export const tabsContainerStyle: ViewStyle = {
 	flexDirection: 'row',
 	backgroundColor: colors.card,
-	borderRadius: 18,
+	borderRadius: 16,
 	padding: 4,
-	marginBottom: 16,
+	marginBottom: 18,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
 
 export const tabStyle: ViewStyle = {
 	flex: 1,
-	height: 45,
-	borderRadius: 14,
+	minHeight: 44,
+	borderRadius: 12,
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'center',
@@ -162,18 +165,19 @@ export const tabStyle: ViewStyle = {
 }
 
 export const tabActiveStyle: ViewStyle = {
-	backgroundColor: colors.white,
-	...cardShadow,
+	backgroundColor: colors.button,
+	borderRadius: 12,
 }
 
 export const tabTextStyle: TextStyle = {
-	fontSize: 14,
-	fontWeight: '700',
+	fontSize: 13,
+	fontWeight: '600',
 	color: colors.muted,
 }
 
 export const tabTextActiveStyle: TextStyle = {
-	color: colors.primary,
+	color: colors.white,
+	fontWeight: '800',
 }
 
 export const tabCountStyle: ViewStyle = {
@@ -187,18 +191,20 @@ export const tabCountStyle: ViewStyle = {
 }
 
 export const tabCountActiveStyle: ViewStyle = {
-	backgroundColor: colors.primary,
+	backgroundColor: colors.white,
 }
 
 export const tabCountTextStyle: TextStyle = {
 	fontSize: 11,
-	fontWeight: '800',
-	color: colors.muted,
+	fontWeight: '700',
+	color: colors.dark,
 }
 
 export const tabCountTextActiveStyle: TextStyle = {
-	color: colors.white,
+	color: colors.primary,
 }
+
+/* Loading */
 
 export const loadingContainerStyle: ViewStyle = {
 	paddingVertical: 60,
@@ -212,11 +218,13 @@ export const loadingTextStyle: TextStyle = {
 	color: colors.muted,
 }
 
+/* Empty state */
+
 export const emptyCardStyle: ViewStyle = {
-	backgroundColor: colors.cardLight,
-	borderRadius: 28,
-	paddingHorizontal: 25,
-	paddingVertical: 35,
+	backgroundColor: colors.card,
+	borderRadius: 24,
+	paddingHorizontal: 24,
+	paddingVertical: 32,
 	alignItems: 'center',
 	borderWidth: 1,
 	borderColor: colors.border,
@@ -224,20 +232,18 @@ export const emptyCardStyle: ViewStyle = {
 }
 
 export const emptyIconStyle: ViewStyle = {
-	width: 68,
-	height: 68,
-	borderRadius: 22,
+	width: 66,
+	height: 66,
+	borderRadius: 21,
 	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginBottom: 16,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const emptyTitleStyle: TextStyle = {
 	fontSize: 18,
-	fontWeight: '900',
+	fontWeight: '800',
 	color: colors.dark,
 	textAlign: 'center',
 }
@@ -245,23 +251,24 @@ export const emptyTitleStyle: TextStyle = {
 export const emptyTextStyle: TextStyle = {
 	marginTop: 7,
 	fontSize: 13,
-	lineHeight: 19,
+	lineHeight: 20,
 	color: colors.muted,
 	textAlign: 'center',
 }
 
+/* Buy button */
+
 export const buyButtonWrapperStyle: ViewStyle = {
 	width: '100%',
 	marginTop: 20,
-	borderRadius: 17,
+	borderRadius: 15,
 	overflow: 'hidden',
 	backgroundColor: colors.button,
-	...cardShadow,
 }
 
 export const buyButtonStyle: ViewStyle = {
 	width: '100%',
-	height: 48,
+	minHeight: 48,
 	alignItems: 'center',
 	justifyContent: 'center',
 }
@@ -273,8 +280,10 @@ export const buyButtonPressedStyle: ViewStyle = {
 export const buyButtonTextStyle: TextStyle = {
 	color: colors.white,
 	fontSize: 14,
-	fontWeight: '800',
+	fontWeight: '700',
 }
+
+/* Purchases list */
 
 export const purchasesListStyle: ViewStyle = {
 	width: '100%',
@@ -282,10 +291,10 @@ export const purchasesListStyle: ViewStyle = {
 
 export const purchaseCardStyle: ViewStyle = {
 	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 28,
-	padding: 17,
-	marginBottom: 16,
+	backgroundColor: colors.card,
+	borderRadius: 22,
+	padding: 16,
+	marginBottom: 14,
 	borderWidth: 1,
 	borderColor: colors.border,
 	...cardShadow,
@@ -297,15 +306,13 @@ export const purchaseHeaderStyle: ViewStyle = {
 }
 
 export const purchaseIconStyle: ViewStyle = {
-	width: 50,
-	height: 50,
-	borderRadius: 17,
+	width: 46,
+	height: 46,
+	borderRadius: 15,
 	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 12,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const purchaseInfoStyle: ViewStyle = {
@@ -314,7 +321,7 @@ export const purchaseInfoStyle: ViewStyle = {
 }
 
 export const purchaseTitleStyle: TextStyle = {
-	fontSize: 16,
+	fontSize: 15,
 	fontWeight: '800',
 	color: colors.dark,
 }
@@ -326,30 +333,29 @@ export const folioStyle: TextStyle = {
 }
 
 export const statusBadgeStyle: ViewStyle = {
-	borderRadius: 12,
-	paddingHorizontal: 10,
-	paddingVertical: 6,
+	borderRadius: 10,
+	paddingHorizontal: 9,
+	paddingVertical: 5,
 	marginLeft: 8,
 	backgroundColor: colors.active,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const statusTextStyle: TextStyle = {
 	fontSize: 11,
-	fontWeight: '800',
+	fontWeight: '700',
 	color: colors.primary,
 }
 
 export const dividerStyle: ViewStyle = {
 	height: 1,
 	backgroundColor: colors.border,
-	marginVertical: 14,
+	marginVertical: 13,
 }
 
 export const infoRowStyle: ViewStyle = {
 	flexDirection: 'row',
 	justifyContent: 'space-between',
+	gap: 12,
 }
 
 export const infoBlockStyle: ViewStyle = {
@@ -366,56 +372,58 @@ export const infoLabelStyle: TextStyle = {
 }
 
 export const infoValueStyle: TextStyle = {
-	marginTop: 3,
+	marginTop: 4,
 	fontSize: 13,
 	fontWeight: '700',
 	color: colors.dark,
 }
 
 export const infoTimeStyle: TextStyle = {
-	marginTop: 2,
+	marginTop: 3,
 	fontSize: 11,
 	color: colors.muted,
 }
 
 export const totalValueStyle: TextStyle = {
-	marginTop: 3,
+	marginTop: 4,
 	fontSize: 17,
-	fontWeight: '900',
+	fontWeight: '800',
 	color: colors.primary,
 }
 
+/* Ticket summary badge */
+
 export const ticketSummaryStyle: ViewStyle = {
-	width: '100%',
-	marginTop: 15,
+	alignSelf: 'flex-start',
+	maxWidth: '100%',
+	marginTop: 14,
 	flexDirection: 'row',
 	alignItems: 'center',
 	paddingHorizontal: 12,
-	paddingVertical: 10,
-	borderRadius: 16,
+	paddingVertical: 8,
+	borderRadius: 12,
 	backgroundColor: colors.active,
 	borderWidth: 1,
 	borderColor: colors.border,
 }
 
 export const ticketSummaryTextStyle: TextStyle = {
-	flex: 1,
+	flexShrink: 1,
 	marginLeft: 8,
 	fontSize: 12,
 	fontWeight: '700',
-	color: colors.dark,
+	color: colors.primary,
 }
+
+/* QR button */
 
 export const qrButtonWrapperStyle: ViewStyle = {
 	width: '100%',
-	height: 50,
-	marginTop: 14,
-	borderRadius: 17,
+	height: 48,
+	marginTop: 13,
+	borderRadius: 15,
 	overflow: 'hidden',
 	backgroundColor: colors.button,
-	borderWidth: 1,
-	borderColor: colors.button,
-	...cardShadow,
 }
 
 export const qrButtonStyle: ViewStyle = {
@@ -431,6 +439,7 @@ export const qrButtonContentStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'center',
+	gap: 8,
 }
 
 export const qrButtonPressedStyle: ViewStyle = {
@@ -438,12 +447,13 @@ export const qrButtonPressedStyle: ViewStyle = {
 }
 
 export const qrButtonTextStyle: TextStyle = {
-	marginLeft: 8,
 	fontSize: 13,
-	fontWeight: '800',
+	fontWeight: '700',
 	color: colors.white,
 	textAlign: 'center',
 }
+
+/* QR modal */
 
 export const modalOverlayStyle: ViewStyle = {
 	flex: 1,
@@ -454,8 +464,8 @@ export const modalOverlayStyle: ViewStyle = {
 export const qrModalCardStyle: ViewStyle = {
 	maxHeight: '90%',
 	backgroundColor: colors.modalBackground,
-	borderTopLeftRadius: 30,
-	borderTopRightRadius: 30,
+	borderTopLeftRadius: 26,
+	borderTopRightRadius: 26,
 	paddingHorizontal: 20,
 	paddingTop: 20,
 	paddingBottom: 25,
@@ -465,7 +475,7 @@ export const qrModalCardStyle: ViewStyle = {
 }
 
 export const qrModalPatternStyle = {
-	opacity: 0.6,
+	opacity: 0.3,
 }
 
 export const modalHeaderStyle: ViewStyle = {
@@ -481,15 +491,13 @@ export const modalTitleContainerStyle: ViewStyle = {
 }
 
 export const modalIconStyle: ViewStyle = {
-	width: 46,
-	height: 46,
-	borderRadius: 16,
+	width: 44,
+	height: 44,
+	borderRadius: 14,
 	backgroundColor: colors.active,
 	alignItems: 'center',
 	justifyContent: 'center',
 	marginRight: 11,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const modalTitleInfoStyle: ViewStyle = {
@@ -498,20 +506,20 @@ export const modalTitleInfoStyle: ViewStyle = {
 
 export const modalTitleStyle: TextStyle = {
 	fontSize: 19,
-	fontWeight: '900',
+	fontWeight: '800',
 	color: colors.dark,
 }
 
 export const modalSubtitleStyle: TextStyle = {
-	marginTop: 3,
+	marginTop: 4,
 	fontSize: 11,
 	color: colors.muted,
 }
 
 export const closeButtonStyle: ViewStyle = {
-	width: 40,
-	height: 40,
-	borderRadius: 20,
+	width: 38,
+	height: 38,
+	borderRadius: 13,
 	backgroundColor: colors.card,
 	alignItems: 'center',
 	justifyContent: 'center',
@@ -521,11 +529,12 @@ export const closeButtonStyle: ViewStyle = {
 }
 
 export const closeButtonPressedStyle: ViewStyle = {
-	opacity: 0.7,
+	opacity: 0.65,
+	backgroundColor: colors.active,
 }
 
 export const closeTextStyle: TextStyle = {
-	fontSize: 25,
+	fontSize: 24,
 	lineHeight: 28,
 	color: colors.dark,
 }
@@ -537,14 +546,16 @@ export const modalDateStyle: TextStyle = {
 	color: colors.muted,
 }
 
+/* Individual QR tickets */
+
 export const qrListStyle: ViewStyle = {
 	paddingBottom: 5,
 }
 
 export const qrTicketCardStyle: ViewStyle = {
-	backgroundColor: colors.cardLight,
-	borderRadius: 24,
-	padding: 15,
+	backgroundColor: colors.card,
+	borderRadius: 20,
+	padding: 14,
 	marginBottom: 12,
 	borderWidth: 1,
 	borderColor: colors.border,
@@ -555,6 +566,7 @@ export const qrTicketHeaderStyle: ViewStyle = {
 	flexDirection: 'row',
 	alignItems: 'center',
 	justifyContent: 'space-between',
+	gap: 10,
 }
 
 export const qrTicketNameStyle: TextStyle = {
@@ -564,7 +576,7 @@ export const qrTicketNameStyle: TextStyle = {
 }
 
 export const qrTicketNumberStyle: TextStyle = {
-	marginTop: 3,
+	marginTop: 4,
 	fontSize: 11,
 	color: colors.muted,
 }
@@ -572,23 +584,23 @@ export const qrTicketNumberStyle: TextStyle = {
 export const qrTicketStatusStyle: ViewStyle = {
 	paddingHorizontal: 9,
 	paddingVertical: 5,
-	borderRadius: 10,
+	borderRadius: 9,
 	backgroundColor: colors.active,
-	borderWidth: 1,
-	borderColor: colors.border,
 }
 
 export const qrTicketStatusTextStyle: TextStyle = {
 	fontSize: 10,
-	fontWeight: '800',
+	fontWeight: '700',
 	color: colors.primary,
 }
+
+/* QR image container */
 
 export const qrWrapperStyle: ViewStyle = {
 	alignSelf: 'center',
 	marginTop: 14,
 	padding: 12,
-	borderRadius: 20,
+	borderRadius: 18,
 	backgroundColor: colors.white,
 	borderWidth: 1,
 	borderColor: colors.border,

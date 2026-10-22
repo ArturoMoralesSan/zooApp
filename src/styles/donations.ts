@@ -1,401 +1,315 @@
-import type { ImageStyle, TextStyle, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native'
 
-export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
-	primaryLight: '#16845D',
-	dark: '#17372C',
-	muted: '#557067',
-	card: '#DDF5EA',
-	cardLight: '#E8F7F0',
-	active: '#BDEED9',
-	border: '#B8E6D3',
+export const DONATION_COLORS = {
+	green: '#08783F',
+	lightGreen: '#EEF5F0',
+	selectedGreen: '#D6EBDD',
+	lime: '#B5F451',
 	white: '#FFFFFF',
-	button: '#246F4C',
-	buttonPressed: '#1D5C3F',
-	footerBackground: '#F7F9F8',
-}
+	muted: '#315744',
+	border: '#B8D5C2',
+	borderDark: '#527764',
+	text: '#102E20',
+	primaryDark: '#063D22',
+	placeholder: '#9AAEA2',
+	error: '#B42318',
+	description: '#D4E8D9',
+	shadow: '#164A2C',
+} as const
 
-export const cardShadow: ViewStyle = {
-	shadowColor: colors.primary,
-	shadowOffset: { width: 0, height: 5 },
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
+export const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
 
-export const containerStyle: ViewStyle = {
-	flex: 1,
-	backgroundColor: colors.background,
-}
+export const DONATION_LAYOUT = {
+	buttonHeight: 100,
+	buttonRadius: 16,
+	buttonBorderWidth: 2,
+	columnGap: 10,
+	horizontalPadding: 20,
+} as const
 
-export const backgroundStyle: ViewStyle = {
-	flex: 1,
-}
+export const donationsStyles = StyleSheet.create({
+	screen: {
+		flex: 1,
+		backgroundColor: DONATION_COLORS.white,
+	},
 
-export const backgroundImageStyle: ImageStyle = {
-	opacity: 0.3,
-}
+	background: {
+		flex: 1,
+		backgroundColor: DONATION_COLORS.white,
+	},
 
-export const backButtonStyle: ViewStyle = {
-	position: 'absolute',
-	left: 20,
-	top: 8,
-	zIndex: 20,
-}
+	backgroundImage: {
+		opacity: 0.025,
+	},
 
-export const backButtonPressedStyle: ViewStyle = {
-	backgroundColor: colors.card,
-	opacity: 0.75,
-}
+	scrollContent: {
+		paddingHorizontal: DONATION_LAYOUT.horizontalPadding,
+		paddingTop: 12,
+		paddingBottom: 28,
+	},
 
-export const backTextStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '700',
-	color: colors.dark,
-}
+	headerContainer: {
+		marginTop: 12,
+	},
 
-export const scrollContentStyle: ViewStyle = {
-	paddingHorizontal: 20,
-	paddingTop: 40,
-	paddingBottom: 180,
-}
+	informationCardContainer: {
+		marginTop: 20,
+	},
 
-export const headerStyle: ViewStyle = {
-	marginBottom: 10,
-}
+	amountSection: {
+		marginTop: 28,
+	},
 
-export const titleRowStyle: ViewStyle = {
-	flexDirection: 'row',
-	alignItems: 'center',
-}
+	sectionTitle: {
+		fontSize: 20,
+		fontWeight: '800',
+		color: DONATION_COLORS.primaryDark,
+	},
 
-export const titleIconStyle: ViewStyle = {
-	width: 52,
-	height: 52,
-	borderRadius: 17,
-	backgroundColor: colors.active,
-	borderWidth: 1,
-	borderColor: colors.border,
-	alignItems: 'center',
-	justifyContent: 'center',
-	marginRight: 13,
-}
+	sectionDescription: {
+		fontSize: 13,
+		color: DONATION_COLORS.muted,
+		marginTop: 5,
+		marginBottom: 16,
+	},
 
-export const titleTextContainerStyle: ViewStyle = {
-	flex: 1,
-	minWidth: 0,
-}
+	amountGrid: {
+		width: '100%',
+		alignSelf: 'stretch',
+		alignItems: 'center',
+		gap: DONATION_LAYOUT.columnGap,
+	},
 
-export const titleStyle: TextStyle = {
-	fontSize: 27,
-	fontWeight: '900',
-	color: colors.dark,
-}
+	amountRow: {
+		width: '100%',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: DONATION_LAYOUT.columnGap,
+	},
 
-export const subtitleStyle: TextStyle = {
-	marginTop: 4,
-	fontSize: 14,
-	lineHeight: 20,
-	color: colors.muted,
-}
+	amountColumn: {
+		flexShrink: 0,
+	},
 
-export const introCardStyle: ViewStyle = {
-	width: '100%',
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 17,
-	marginBottom: 20,
-	flexDirection: 'row',
-	alignItems: 'center',
-	borderWidth: 1,
-	borderColor: colors.border,
-	...cardShadow,
-}
+	amountButton: {
+		width: '100%',
+		height: DONATION_LAYOUT.buttonHeight,
+		borderRadius: DONATION_LAYOUT.buttonRadius,
+	},
 
-export const introIconStyle: ViewStyle = {
-	width: 54,
-	height: 54,
-	borderRadius: 18,
-	backgroundColor: colors.active,
-	alignItems: 'center',
-	justifyContent: 'center',
-	borderWidth: 1,
-	borderColor: colors.border,
-	marginRight: 14,
-}
+	amountButtonContent: {
+		flex: 1,
+		borderRadius: DONATION_LAYOUT.buttonRadius,
+		borderWidth: DONATION_LAYOUT.buttonBorderWidth,
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: 6,
+		paddingVertical: 12,
+	},
 
-export const introContentStyle: ViewStyle = {
-	flex: 1,
-	minWidth: 0,
-}
+	amountButtonDashed: {
+		flex: 1,
+		borderRadius: DONATION_LAYOUT.buttonRadius,
+		borderWidth: 2,
+		borderStyle: 'dashed',
+		alignItems: 'center',
+		justifyContent: 'center',
+		paddingHorizontal: 6,
+		paddingVertical: 12,
+	},
 
-export const introTitleStyle: TextStyle = {
-	fontSize: 17,
-	fontWeight: '900',
-	color: colors.dark,
-}
+	amountButtonOuter: {
+		flex: 1,
+		padding: DONATION_LAYOUT.buttonBorderWidth,
+		borderRadius: DONATION_LAYOUT.buttonRadius,
+	},
 
-export const introTextStyle: TextStyle = {
-	marginTop: 4,
-	fontSize: 13,
-	lineHeight: 18,
-	color: colors.muted,
-}
+	amountButtonInner: {
+		flex: 1,
+		paddingHorizontal: 6,
+		paddingVertical: 12,
+		borderRadius:
+			DONATION_LAYOUT.buttonRadius - DONATION_LAYOUT.buttonBorderWidth,
+		backgroundColor: DONATION_COLORS.white,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 
-export const sectionTitleStyle: TextStyle = {
-	marginBottom: 12,
-	fontSize: 16,
-	fontWeight: '900',
-	color: colors.dark,
-}
+	amountButtonText: {
+		color: DONATION_COLORS.text,
+		fontSize: 16,
+		fontWeight: '800',
+		textAlign: 'center',
+		includeFontPadding: false,
+	},
 
-export const amountGridStyle: ViewStyle = {
-	flexDirection: 'row',
-	flexWrap: 'wrap',
-	justifyContent: 'space-between',
-	marginBottom: 17,
-}
+	customAmountSection: {
+		marginTop: 18,
+	},
 
-export const amountCardStyle: ViewStyle = {
-	width: '31.5%',
-	minHeight: 82,
-	marginBottom: 11,
-	borderRadius: 21,
-	backgroundColor: colors.cardLight,
-	borderWidth: 1,
-	borderColor: colors.border,
-	alignItems: 'center',
-	justifyContent: 'center',
-	paddingHorizontal: 8,
-	...cardShadow,
-}
+	customAmountTitle: {
+		color: DONATION_COLORS.text,
+		fontSize: 15,
+		fontWeight: '800',
+		marginBottom: 8,
+	},
 
-export const amountCardSelectedStyle: ViewStyle = {
-	backgroundColor: colors.active,
-	borderColor: colors.primary,
-	borderWidth: 2,
-}
+	customAmountDescription: {
+		color: DONATION_COLORS.muted,
+		fontSize: 12,
+		marginBottom: 12,
+	},
 
-export const amountCardPressedStyle: ViewStyle = {
-	opacity: 0.75,
-}
+	customAmountInputContainer: {
+		height: 52,
+		flexDirection: 'row',
+		alignItems: 'center',
+		borderWidth: 1.5,
+		borderColor: DONATION_COLORS.green,
+		borderRadius: 12,
+		paddingHorizontal: 14,
+		backgroundColor: DONATION_COLORS.white,
+	},
 
-export const selectedLabelStyle: TextStyle = {
-	marginTop: 3,
-	fontSize: 9,
-	fontWeight: '800',
-	color: colors.primary,
-}
+	currencySymbol: {
+		fontSize: 18,
+		fontWeight: '800',
+		color: DONATION_COLORS.green,
+		marginRight: 8,
+	},
 
-export const customCardStyle: ViewStyle = {
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 17,
-	marginBottom: 17,
-	borderWidth: 1,
-	borderColor: colors.border,
-}
+	customAmountInput: {
+		flex: 1,
+		height: '100%',
+		color: DONATION_COLORS.text,
+		fontSize: 16,
+		fontWeight: '700',
+		paddingVertical: 0,
+	},
 
-export const customTitleStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '900',
-	color: colors.dark,
-	marginBottom: 11,
-}
+	validationError: {
+		color: DONATION_COLORS.error,
+		fontSize: 12,
+		marginTop: 8,
+	},
 
-export const inputWrapperStyle: ViewStyle = {
-	height: 52,
-	flexDirection: 'row',
-	alignItems: 'center',
-	backgroundColor: colors.white,
-	borderWidth: 1,
-	borderColor: colors.border,
-	borderRadius: 16,
-	paddingHorizontal: 15,
-}
+	paymentSection: {
+		marginTop: 26,
+		marginBottom: 20,
+	},
 
-export const inputWrapperActiveStyle: ViewStyle = {
-	borderColor: colors.primary,
-	borderWidth: 2,
-}
+	paymentSectionTitle: {
+		marginBottom: 14,
+		paddingHorizontal: 4,
+		fontSize: 20,
+		fontWeight: '800',
+		color: DONATION_COLORS.primaryDark,
+	},
 
-export const currencyStyle: TextStyle = {
-	fontSize: 18,
-	fontWeight: '900',
-	color: colors.primary,
-	marginRight: 7,
-}
+	paymentCard: {
+		backgroundColor: DONATION_COLORS.lightGreen,
+		borderWidth: 1,
+		borderColor: DONATION_COLORS.border,
+		borderRadius: 18,
+		overflow: 'hidden',
+		shadowColor: DONATION_COLORS.shadow,
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.04,
+		shadowRadius: 4,
+		elevation: 1,
+	},
 
-export const inputStyle: TextStyle = {
-	flex: 1,
-	height: '100%',
-	fontSize: 16,
-	fontWeight: '700',
-	color: colors.dark,
-}
+	paymentRow: {
+		minHeight: 80,
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 14,
+		paddingVertical: 12,
+		backgroundColor: DONATION_COLORS.lightGreen,
+	},
 
-export const minimumTextStyle: TextStyle = {
-	marginTop: 7,
-	fontSize: 11,
-	color: colors.muted,
-}
+	paymentIconContainer: {
+		width: 48,
+		height: 48,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 16,
+		backgroundColor: DONATION_COLORS.selectedGreen,
+		borderWidth: 1,
+		borderColor: DONATION_COLORS.border,
+	},
 
-export const paymentCardStyle: ViewStyle = {
-	backgroundColor: colors.cardLight,
-	borderRadius: 25,
-	padding: 17,
-	borderWidth: 1,
-	borderColor: colors.border,
-}
+	paymentEmoji: {
+		fontSize: 23,
+	},
 
-export const paymentTitleStyle: TextStyle = {
-	fontSize: 15,
-	fontWeight: '900',
-	color: colors.dark,
-	marginBottom: 12,
-}
+	paymentTextContainer: {
+		flex: 1,
+		marginLeft: 12,
+	},
 
-export const paymentMethodStyle: ViewStyle = {
-	minHeight: 64,
-	flexDirection: 'row',
-	alignItems: 'center',
-	backgroundColor: colors.white,
-	borderRadius: 18,
-	borderWidth: 1,
-	borderColor: colors.border,
-	paddingHorizontal: 12,
-	paddingVertical: 10,
-}
+	paymentTitle: {
+		color: DONATION_COLORS.text,
+		fontSize: 16,
+		fontWeight: '800',
+	},
 
-export const paymentIconStyle: ViewStyle = {
-	width: 42,
-	height: 42,
-	borderRadius: 13,
-	backgroundColor: colors.active,
-	alignItems: 'center',
-	justifyContent: 'center',
-	marginRight: 11,
-}
+	paymentDescription: {
+		color: DONATION_COLORS.muted,
+		fontSize: 12,
+		lineHeight: 16,
+		marginTop: 4,
+	},
 
-export const paymentIconTextStyle: TextStyle = {
-	fontSize: 20,
-}
+	paymentRadio: {
+		width: 22,
+		height: 22,
+		borderRadius: 11,
+		borderWidth: 6,
+		borderColor: DONATION_COLORS.green,
+		backgroundColor: DONATION_COLORS.white,
+	},
 
-export const paymentInfoStyle: ViewStyle = {
-	flex: 1,
-	minWidth: 0,
-}
+	footer: {
+		paddingHorizontal: DONATION_LAYOUT.horizontalPadding,
+		paddingTop: 14,
+		paddingBottom: 12,
+		backgroundColor: DONATION_COLORS.white,
+		borderTopWidth: 1,
+		borderTopColor: DONATION_COLORS.border,
+	},
 
-export const paymentNameStyle: TextStyle = {
-	fontSize: 14,
-	fontWeight: '900',
-	color: colors.dark,
-}
+	summaryRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginBottom: 12,
+	},
 
-export const paymentDescriptionStyle: TextStyle = {
-	marginTop: 2,
-	fontSize: 11,
-	color: colors.muted,
-}
+	summaryTextContainer: {
+		flex: 1,
+		marginRight: 12,
+	},
 
-export const paymentCheckStyle: ViewStyle = {
-	width: 28,
-	height: 28,
-	borderRadius: 14,
-	backgroundColor: colors.primary,
-	alignItems: 'center',
-	justifyContent: 'center',
-}
+	summaryTitle: {
+		color: DONATION_COLORS.text,
+		fontSize: 14,
+		fontWeight: '800',
+	},
 
-export const paymentCheckTextStyle: TextStyle = {
-	color: colors.white,
-	fontSize: 16,
-	fontWeight: '900',
-}
+	summaryDescription: {
+		color: DONATION_COLORS.muted,
+		fontSize: 12,
+		marginTop: 3,
+	},
 
-export const bottomSpaceStyle: ViewStyle = {
-	height: 40,
-}
-
-export const footerStyle: ViewStyle = {
-	position: 'absolute',
-	left: 0,
-	right: 0,
-	bottom: 0,
-	backgroundColor: colors.footerBackground,
-	paddingHorizontal: 20,
-	paddingTop: 14,
-	paddingBottom: 25,
-	borderTopWidth: 1,
-	borderTopColor: colors.border,
-	...cardShadow,
-}
-
-export const totalContainerStyle: ViewStyle = {
-	flexDirection: 'row',
-	justifyContent: 'space-between',
-	alignItems: 'center',
-	marginBottom: 12,
-}
-
-export const totalLabelStyle: TextStyle = {
-	fontSize: 14,
-	fontWeight: '800',
-	color: colors.muted,
-}
-
-export const totalDescriptionStyle: TextStyle = {
-	marginTop: 2,
-	fontSize: 11,
-	color: colors.muted,
-}
-
-export const totalStyle: TextStyle = {
-	fontSize: 23,
-	fontWeight: '900',
-	color: colors.primary,
-	maxWidth: 150,
-}
-
-export const continueButtonWrapperStyle: ViewStyle = {
-	width: '100%',
-	height: 54,
-	borderRadius: 17,
-	backgroundColor: colors.button,
-	borderWidth: 1,
-	borderColor: colors.button,
-	overflow: 'hidden',
-	...cardShadow,
-}
-
-export const continueButtonStyle: ViewStyle = {
-	width: '100%',
-	height: '100%',
-	alignItems: 'center',
-	justifyContent: 'center',
-}
-
-export const continueButtonContentStyle: ViewStyle = {
-	width: '100%',
-	height: '100%',
-	flexDirection: 'row',
-	alignItems: 'center',
-	justifyContent: 'center',
-	gap: 8,
-}
-
-export const continueButtonPressedStyle: ViewStyle = {
-	backgroundColor: colors.buttonPressed,
-}
-
-export const continueButtonDisabledStyle: ViewStyle = {
-	opacity: 0.45,
-}
-
-export const continueButtonTextStyle: TextStyle = {
-	color: colors.white,
-	fontSize: 16,
-	fontWeight: '900',
-	textAlign: 'center',
-}
+	summaryAmount: {
+		color: DONATION_COLORS.green,
+		fontSize: 22,
+		fontWeight: '900',
+	},
+})

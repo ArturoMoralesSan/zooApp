@@ -1,10 +1,11 @@
 import type { TextStyle, ViewStyle } from 'react-native'
 
 export const colors = {
-	background: '#F7F9F8',
-	primary: '#075C3B',
+	background: '#FFFFFF',
+	primary: '#075C2B',
 	textSecondary: '#557067',
-	border: '#B8E6D3',
+	border: '#A7C9B1',
+	activeBackground: '#075C2B',
 }
 
 export const tabBarContainerStyle: ViewStyle = {
@@ -12,45 +13,57 @@ export const tabBarContainerStyle: ViewStyle = {
 	bottom: 0,
 	left: 0,
 	right: 0,
+	paddingHorizontal: 12,
+	paddingBottom: 22,
+	backgroundColor: 'transparent',
 }
 
 export const tabBarStyle: ViewStyle = {
 	width: '100%',
-	height: 76,
-
+	minHeight: 72,
 	backgroundColor: colors.background,
 
-	borderTopWidth: 1,
-	borderTopColor: colors.border,
+	// Borde verde fino en los cuatro lados
+	borderWidth: 0.8,
+	borderTopWidth: 0.8,
+	borderBottomWidth: 0.8,
+	borderLeftWidth: 0.8,
+	borderRightWidth: 0.8,
+	borderColor: colors.border,
+	borderRadius: 22,
 
 	flexDirection: 'row',
 	alignItems: 'center',
+	paddingHorizontal: 6,
+	paddingVertical: 6,
 
-	paddingHorizontal: 8,
-	paddingTop: 6,
-	paddingBottom: 6,
-
-	shadowColor: colors.primary,
+	// Sin sombra
+	elevation: 0,
+	shadowColor: 'transparent',
 	shadowOffset: {
 		width: 0,
-		height: -4,
+		height: 0,
 	},
-	shadowOpacity: 0.1,
-	shadowRadius: 10,
-
-	elevation: 12,
+	shadowOpacity: 0,
+	shadowRadius: 0,
 }
 
 export const tabButtonStyle: ViewStyle = {
 	flex: 1,
-	height: '100%',
+	minWidth: 0,
+	height: 58,
+	borderRadius: 16,
 	alignItems: 'center',
 	justifyContent: 'center',
 }
 
+export const activeTabButtonStyle: ViewStyle = {
+	backgroundColor: colors.activeBackground,
+}
+
 export const tabLabelStyle = (focused: boolean): TextStyle => ({
-	marginTop: 3,
+	marginTop: 4,
 	fontSize: 11,
 	fontWeight: focused ? '700' : '500',
-	color: focused ? colors.primary : colors.textSecondary,
+	color: focused ? '#FFFFFF' : colors.textSecondary,
 })

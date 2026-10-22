@@ -1,9 +1,17 @@
+import AppCard from '@/components/AppCard'
+import BackButton from '@/components/BackButton'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
-import { UserGroupIcon } from '@hugeicons/core-free-icons'
+import {
+	Leaf01Icon,
+	Location01Icon,
+	Plant01Icon,
+	Shield01Icon,
+	UserGroupIcon,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
@@ -17,6 +25,7 @@ import {
 	View,
 } from 'react-native'
 
+import { colors as panelColors } from '@/styles/panel'
 import styles, { colors } from '@/styles/species-detail'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
@@ -64,10 +73,7 @@ type SpeciesResponse = {
 
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
-
-	const params = useLocalSearchParams<{
-		id: string
-	}>()
+	const params = useLocalSearchParams<{ id: string }>()
 
 	const scrollY = useRef(new Animated.Value(0)).current
 
@@ -76,11 +82,7 @@ export default function SpeciesDetailScreen() {
 	const [error, setError] = useState<string | null>(null)
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
 
-	useEffect(() => {
-		void loadSpecies()
-	}, [params.id])
-
-	async function loadSpecies() {
+	const loadSpecies = useCallback(async () => {
 		try {
 			setLoading(true)
 			setError(null)
@@ -106,11 +108,19 @@ export default function SpeciesDetailScreen() {
 			setSpecies(response.data.species)
 		} catch (err) {
 			console.error(err)
-			setError('No fue posible cargar la información de la especie.')
+			setError(
+				err instanceof Error
+					? err.message
+					: 'No fue posible cargar la información de la especie.',
+			)
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [params.id, router])
+
+	useEffect(() => {
+		void loadSpecies()
+	}, [loadSpecies])
 
 	const cardMarginTop = scrollY.interpolate({
 		inputRange: [0, 180],
@@ -125,9 +135,7 @@ export default function SpeciesDetailScreen() {
 	})
 
 	const heroImage = useMemo(() => {
-		if (!species) {
-			return null
-		}
+		if (!species) return null
 
 		return (
 			species.images.find((image) => image.type === 'main') ??
@@ -138,9 +146,7 @@ export default function SpeciesDetailScreen() {
 	}, [species])
 
 	const galleryImages = useMemo(() => {
-		if (!species) {
-			return []
-		}
+		if (!species) return []
 
 		return species.images.filter(
 			(image) => image.type === 'gallery' && image.url !== heroImage?.url,
@@ -174,19 +180,8 @@ export default function SpeciesDetailScreen() {
 				imageStyle={styles.patternImage}
 				style={styles.errorBackground}
 			>
-				<View style={styles.errorBackWrapper}>
-					<Pressable
-						onPress={() => router.back()}
-						className='flex-row items-center rounded-2xl px-4 py-3'
-						style={({ pressed }) => [
-							styles.errorBackButton,
-							pressed && styles.errorBackButtonPressed,
-						]}
-					>
-						<Text style={styles.errorBackArrow}>‹</Text>
-
-						<Text style={styles.errorBackText}>Regresar</Text>
-					</Pressable>
+				<View style={{ zIndex: 100, elevation: 100 }}>
+					<BackButton onPress={() => router.back()} />
 				</View>
 
 				<View style={styles.errorCard}>
@@ -207,25 +202,23 @@ export default function SpeciesDetailScreen() {
 						{error ?? 'La información no está disponible en este momento.'}
 					</Text>
 
-					<View style={styles.retryButtonWrapper}>
-						<Pressable
-							onPress={loadSpecies}
-							className='rounded-[20px] px-6 py-3.5'
-							style={({ pressed }) => [
-								styles.retryButton,
-								pressed && styles.retryButtonPressed,
-							]}
-						>
-							<Text style={styles.retryButtonText}>Intentar nuevamente</Text>
-						</Pressable>
-					</View>
+					<Pressable
+						onPress={() => void loadSpecies()}
+						className='mt-4 self-start rounded-[20px] px-6 py-3.5'
+						style={({ pressed }) => [
+							styles.retryButton,
+							pressed && styles.retryButtonPressed,
+						]}
+					>
+						<Text style={styles.retryButtonText}>Intentar nuevamente</Text>
+					</Pressable>
 				</View>
 			</ImageBackground>
 		)
 	}
 
 	return (
-		<>
+		<View style={{ flex: 1, position: 'relative' }}>
 			<Animated.ScrollView
 				className='flex-1'
 				style={styles.scrollView}
@@ -235,19 +228,15 @@ export default function SpeciesDetailScreen() {
 					[
 						{
 							nativeEvent: {
-								contentOffset: {
-									y: scrollY,
-								},
+								contentOffset: { y: scrollY },
 							},
 						},
 					],
-					{
-						useNativeDriver: false,
-					},
+					{ useNativeDriver: false },
 				)}
 			>
 				<View className='relative' style={styles.mainBackground}>
-					{/* HERO */}
+					{/* IMAGEN PRINCIPAL */}
 					<View
 						className='h-[470px] w-full overflow-hidden'
 						style={styles.heroContainer}
@@ -258,9 +247,7 @@ export default function SpeciesDetailScreen() {
 								className='h-full w-full'
 							>
 								<Image
-									source={{
-										uri: heroImage.url,
-									}}
+									source={{ uri: heroImage.url }}
 									className='h-full w-full'
 									resizeMode='cover'
 									accessibilityLabel={heroImage.alt_text || species.common_name}
@@ -285,40 +272,13 @@ export default function SpeciesDetailScreen() {
 							pointerEvents='none'
 							style={styles.heroOverlay}
 						/>
-
-						{/* REGRESAR */}
-						<Animated.View
-							className='absolute left-5 top-14 z-20'
-							style={{
-								opacity: backButtonOpacity,
-							}}
-						>
-							<Pressable
-								onPress={() => router.back()}
-								className='flex-row items-center rounded-full px-3.5 py-2.5'
-								style={({ pressed }) => [
-									styles.heroBackButton,
-									pressed && styles.heroBackButtonPressed,
-								]}
-							>
-								<Text style={styles.heroBackArrow}>‹</Text>
-
-								<Text style={styles.heroBackText}>Regresar</Text>
-							</Pressable>
-						</Animated.View>
 					</View>
 
-					{/* CARD PRINCIPAL */}
+					{/* CONTENIDO */}
 					<Animated.View
 						className='relative z-10 w-full overflow-hidden rounded-t-[30px]'
-						style={[
-							styles.mainCard,
-							{
-								marginTop: cardMarginTop,
-							},
-						]}
+						style={[styles.mainCard, { marginTop: cardMarginTop }]}
 					>
-						{/* ZOO PATTERN */}
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
 							resizeMode='repeat'
@@ -349,7 +309,6 @@ export default function SpeciesDetailScreen() {
 									{species.common_name}
 								</Text>
 
-								{/* NOMBRE CIENTÍFICO */}
 								{species.scientific_name && (
 									<Text
 										className='mt-1.5 text-base italic'
@@ -378,7 +337,7 @@ export default function SpeciesDetailScreen() {
 									</View>
 								)}
 
-								{/* DATOS */}
+								{/* DATOS DE LA ESPECIE */}
 								<View className='mt-8'>
 									<Text
 										className='text-[21px] font-bold'
@@ -387,31 +346,84 @@ export default function SpeciesDetailScreen() {
 										Datos de la especie
 									</Text>
 
-									<View className='mt-4 gap-3'>
+									<View
+										className='mt-4'
+										style={{
+											flexDirection: 'row',
+											flexWrap: 'wrap',
+											justifyContent: 'space-between',
+										}}
+									>
 										{species.habitat && (
-											<SpeciesDataCard
-												label='Hábitat'
-												value={species.habitat}
-											/>
+											<View style={{ width: '48.5%', marginBottom: 12 }}>
+												<AppCard
+													icon={Location01Icon}
+													iconPosition='top'
+													title='Hábitat'
+													description={species.habitat}
+													backgroundColor={panelColors.card}
+													borderColor={panelColors.border}
+													iconColor={panelColors.primary}
+													iconBackgroundColor={panelColors.active}
+													textColor={panelColors.primaryDark}
+													descriptionColor={panelColors.textSecondary}
+													showArrow={false}
+												/>
+											</View>
 										)}
 
 										{species.origin && (
-											<SpeciesDataCard label='Origen' value={species.origin} />
+											<View style={{ width: '48.5%', marginBottom: 12 }}>
+												<AppCard
+													icon={Plant01Icon}
+													iconPosition='top'
+													title='Origen'
+													description={species.origin}
+													backgroundColor={panelColors.card}
+													borderColor={panelColors.border}
+													iconColor={panelColors.primary}
+													iconBackgroundColor={panelColors.active}
+													textColor={panelColors.primaryDark}
+													descriptionColor={panelColors.textSecondary}
+													showArrow={false}
+												/>
+											</View>
 										)}
 
 										{species.diet && (
-											<SpeciesDataCard
-												label='Alimentación'
-												value={species.diet}
-											/>
+											<View style={{ width: '48.5%', marginBottom: 12 }}>
+												<AppCard
+													icon={Leaf01Icon}
+													title='Alimentación'
+													iconPosition='top'
+													description={species.diet}
+													backgroundColor={panelColors.card}
+													borderColor={panelColors.border}
+													iconColor={panelColors.primary}
+													iconBackgroundColor={panelColors.active}
+													textColor={panelColors.primaryDark}
+													descriptionColor={panelColors.textSecondary}
+													showArrow={false}
+												/>
+											</View>
 										)}
 
 										{species.conservation_status && (
-											<SpeciesDataCard
-												label='Conservación'
-												value={species.conservation_status}
-												accent
-											/>
+											<View style={{ width: '48.5%', marginBottom: 12 }}>
+												<AppCard
+													icon={Shield01Icon}
+													iconPosition='top'
+													title='Conservación'
+													description={species.conservation_status}
+													backgroundColor={panelColors.active}
+													borderColor={panelColors.border}
+													iconColor={panelColors.primary}
+													iconBackgroundColor={panelColors.card}
+													textColor={panelColors.primaryDark}
+													descriptionColor={panelColors.textSecondary}
+													showArrow={false}
+												/>
+											</View>
 										)}
 									</View>
 								</View>
@@ -431,11 +443,14 @@ export default function SpeciesDetailScreen() {
 												<View
 													key={tag.id}
 													className='rounded-full border px-4 py-2.5'
-													style={styles.tag}
+													style={{
+														backgroundColor: panelColors.primary,
+														borderColor: panelColors.border,
+													}}
 												>
 													<Text
 														className='text-sm font-semibold'
-														style={styles.tagText}
+														style={{ color: panelColors.white }}
 													>
 														{tag.name}
 													</Text>
@@ -482,9 +497,7 @@ export default function SpeciesDetailScreen() {
 														]}
 													>
 														<Image
-															source={{
-																uri: image.url,
-															}}
+															source={{ uri: image.url }}
 															className='h-full w-full'
 															resizeMode='cover'
 															accessibilityLabel={
@@ -505,7 +518,22 @@ export default function SpeciesDetailScreen() {
 				</View>
 			</Animated.ScrollView>
 
-			{/* VISOR DE IMAGEN */}
+			{/* BOTÓN REGRESAR SOBRE LA IMAGEN */}
+			<Animated.View
+				pointerEvents='box-none'
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					zIndex: 9999,
+					elevation: 9999,
+					opacity: backButtonOpacity,
+				}}
+			>
+				<BackButton onPress={() => router.back()} />
+			</Animated.View>
+
+			{/* VISOR DE IMÁGENES */}
 			<Modal
 				visible={selectedImage !== null}
 				transparent
@@ -531,9 +559,7 @@ export default function SpeciesDetailScreen() {
 
 					{selectedImage && (
 						<Image
-							source={{
-								uri: selectedImage.url,
-							}}
+							source={{ uri: selectedImage.url }}
 							className='h-[75%] w-full'
 							resizeMode='contain'
 							accessibilityLabel={selectedImage.alt_text || species.common_name}
@@ -541,37 +567,6 @@ export default function SpeciesDetailScreen() {
 					)}
 				</View>
 			</Modal>
-		</>
-	)
-}
-
-function SpeciesDataCard({
-	label,
-	value,
-	accent = false,
-}: {
-	label: string
-	value: string
-	accent?: boolean
-}) {
-	return (
-		<View
-			className='rounded-[22px] border p-4'
-			style={[styles.dataCard, accent && styles.dataCardAccent]}
-		>
-			<Text
-				className='text-[11px] font-bold uppercase tracking-wider'
-				style={[styles.dataLabel, accent && styles.dataLabelAccent]}
-			>
-				{label}
-			</Text>
-
-			<Text
-				className='mt-1.5 text-base font-medium leading-6'
-				style={styles.dataValue}
-			>
-				{value}
-			</Text>
 		</View>
 	)
 }

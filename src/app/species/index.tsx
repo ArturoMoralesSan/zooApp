@@ -1,14 +1,9 @@
-import {
-	ArrowRight01Icon,
-	Search01Icon,
-	UserGroupIcon,
-} from '@hugeicons/core-free-icons'
+import { Search01Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
-	Image,
 	ImageBackground,
 	Pressable,
 	ScrollView,
@@ -16,10 +11,20 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
+import AppCard from '@/components/AppCard'
+import BackButton from '@/components/BackButton'
+import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
-import styles, { colors } from '@/styles/species'
+import {
+	backgroundImageStyle,
+	backgroundStyle,
+	colors,
+	scrollContentStyle,
+} from '@/styles/panel'
+import styles from '@/styles/species'
 
 type SpeciesCategory = {
 	id: number
@@ -114,81 +119,81 @@ export default function SpeciesScreen() {
 
 	if (loading) {
 		return (
-			<View style={styles.loadingContainer}>
+			<SafeAreaView
+				edges={['top', 'left', 'right']}
+				style={{ flex: 1, backgroundColor: colors.background }}
+			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					style={styles.loadingBackground}
 					resizeMode='repeat'
-					imageStyle={styles.patternImage}
+					imageStyle={backgroundImageStyle}
+					style={[backgroundStyle, { flex: 1 }]}
 				>
-					<View style={styles.loadingContent}>
+					<View
+						style={[
+							styles.loadingContainer,
+							{ flex: 1, backgroundColor: 'transparent' },
+						]}
+					>
 						<ActivityIndicator size='large' color={colors.primary} />
-
-						<Text style={styles.loadingText}>Cargando especies...</Text>
+						<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+							Cargando especies...
+						</Text>
 					</View>
 				</ImageBackground>
-			</View>
+			</SafeAreaView>
 		)
 	}
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView
+			edges={['top', 'left', 'right']}
+			style={{ flex: 1, backgroundColor: colors.background }}
+		>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={styles.background}
 				resizeMode='repeat'
-				imageStyle={styles.patternImage}
+				imageStyle={backgroundImageStyle}
+				style={[backgroundStyle, { flex: 1 }]}
 			>
 				<ScrollView
-					style={styles.scrollView}
-					contentContainerStyle={styles.scrollContent}
+					className='flex-1'
+					contentContainerStyle={[scrollContentStyle, { flexGrow: 1 }]}
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 				>
-					{/* Regresar */}
-					<View style={styles.backButtonWrapper}>
-						<Pressable
-							onPress={() => router.back()}
-							style={({ pressed }) => [
-								styles.backButton,
-								pressed && styles.backButtonPressed,
-							]}
-						>
-							<Text style={styles.backText}>‹ Regresar</Text>
-						</Pressable>
+					<View style={{ marginBottom: 16 }}>
+						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					{/* Header */}
-					<View style={styles.header}>
-						<View style={styles.headerIcon}>
-							<HugeiconsIcon
-								icon={UserGroupIcon}
-								size={26}
-								strokeWidth={1.8}
-								color={colors.primary}
-							/>
-						</View>
-
-						<View style={styles.headerText}>
-							<Text style={styles.title}>Especies</Text>
-
-							<Text style={styles.subtitle}>
-								Conoce a los habitantes del zoológico.
-							</Text>
-						</View>
-					</View>
+					<UserHeader
+						title='Especies'
+						subtitle='Conoce a los habitantes del zoológico.'
+						showRewards={false}
+					/>
 
 					{/* Buscador */}
-					<View style={styles.searchSection}>
-						<Text style={styles.searchLabel}>Buscar especie</Text>
+					<View style={[styles.searchSection, { marginTop: 16 }]}>
+						<Text style={[styles.searchLabel, { color: colors.text }]}>
+							Buscar especie
+						</Text>
 
-						<View style={styles.searchContainer}>
+						<View
+							style={[
+								styles.searchContainer,
+								{
+									backgroundColor: colors.white,
+									borderColor: colors.border,
+									borderWidth: 1,
+								},
+							]}
+						>
 							<View style={styles.searchIcon}>
 								<HugeiconsIcon
 									icon={Search01Icon}
 									size={21}
 									strokeWidth={1.8}
-									color={colors.muted}
+									color={colors.primary}
 								/>
 							</View>
 
@@ -196,10 +201,11 @@ export default function SpeciesScreen() {
 								value={search}
 								onChangeText={setSearch}
 								placeholder='Buscar especie...'
-								placeholderTextColor={colors.muted}
+								placeholderTextColor={colors.textSecondary}
 								autoCapitalize='none'
 								autoCorrect={false}
-								style={styles.searchInput}
+								style={[styles.searchInput, { color: colors.text }]}
+								selectionColor={colors.primary}
 							/>
 						</View>
 					</View>
@@ -219,6 +225,10 @@ export default function SpeciesScreen() {
 									key={item}
 									style={[
 										styles.filterWrapper,
+										{
+											backgroundColor: active ? colors.primary : colors.white,
+											borderColor: active ? colors.primary : colors.border,
+										},
 										active && styles.filterWrapperActive,
 									]}
 								>
@@ -233,6 +243,9 @@ export default function SpeciesScreen() {
 										<Text
 											style={[
 												styles.filterText,
+												{
+													color: active ? colors.white : colors.text,
+												},
 												active && styles.filterTextActive,
 											]}
 										>
@@ -246,12 +259,14 @@ export default function SpeciesScreen() {
 
 					{/* Resultados */}
 					<View style={styles.resultsHeader}>
-						<Text style={styles.resultsCount}>
+						<Text
+							style={[styles.resultsCount, { color: colors.textSecondary }]}
+						>
 							{filteredSpecies.length}{' '}
 							{filteredSpecies.length === 1 ? 'especie' : 'especies'}
 						</Text>
 
-						{search.trim() && (
+						{search.trim() !== '' && (
 							<Pressable
 								onPress={() => setSearch('')}
 								style={({ pressed }) => [
@@ -259,25 +274,56 @@ export default function SpeciesScreen() {
 									pressed && styles.clearButtonPressed,
 								]}
 							>
-								<Text style={styles.clearText}>Limpiar</Text>
+								<Text style={[styles.clearText, { color: colors.primary }]}>
+									Limpiar
+								</Text>
 							</Pressable>
 						)}
 					</View>
 
-					{/* Error */}
+					{/* Error de carga */}
 					{error ? (
-						<View style={styles.errorCard}>
-							<View style={styles.errorIcon}>
-								<Text style={styles.errorIconText}>!</Text>
+						<View
+							style={[
+								styles.errorCard,
+								{
+									backgroundColor: colors.errorBackground,
+									borderColor: colors.errorBorder,
+								},
+							]}
+						>
+							<View
+								style={[
+									styles.errorIcon,
+									{
+										borderColor: colors.errorBorder,
+									},
+								]}
+							>
+								<Text
+									style={[styles.errorIconText, { color: colors.errorText }]}
+								>
+									!
+								</Text>
 							</View>
 
-							<Text style={styles.errorTitle}>
+							<Text style={[styles.errorTitle, { color: colors.errorText }]}>
 								No fue posible cargar las especies.
 							</Text>
 
-							<Text style={styles.errorText}>{error}</Text>
+							<Text style={[styles.errorText, { color: colors.textSecondary }]}>
+								{error}
+							</Text>
 
-							<View style={styles.retryButtonWrapper}>
+							<View
+								style={[
+									styles.retryButtonWrapper,
+									{
+										backgroundColor: colors.button,
+										borderColor: colors.button,
+									},
+								]}
+							>
 								<Pressable
 									onPress={() => void loadSpecies()}
 									style={({ pressed }) => [
@@ -295,8 +341,24 @@ export default function SpeciesScreen() {
 						</View>
 					) : filteredSpecies.length === 0 ? (
 						/* Sin resultados */
-						<View style={styles.emptyCard}>
-							<View style={styles.emptyIcon}>
+						<View
+							style={[
+								styles.emptyCard,
+								{
+									backgroundColor: colors.card,
+									borderColor: colors.border,
+								},
+							]}
+						>
+							<View
+								style={[
+									styles.emptyIcon,
+									{
+										backgroundColor: colors.active,
+										borderColor: colors.border,
+									},
+								]}
+							>
 								<HugeiconsIcon
 									icon={UserGroupIcon}
 									size={30}
@@ -305,85 +367,45 @@ export default function SpeciesScreen() {
 								/>
 							</View>
 
-							<Text style={styles.emptyTitle}>No encontramos especies</Text>
+							<Text style={[styles.emptyTitle, { color: colors.text }]}>
+								No encontramos especies
+							</Text>
 
-							<Text style={styles.emptyText}>
+							<Text style={[styles.emptyText, { color: colors.textSecondary }]}>
 								Intenta con otro nombre o cambia el filtro.
 							</Text>
 						</View>
 					) : (
-						/* Lista */
+						/* Tarjetas de especies */
 						<View style={styles.speciesList}>
 							{filteredSpecies.map((item) => (
-								<View key={item.id} style={styles.speciesCard}>
-									<Pressable
-										onPress={() => openSpecies(item.id)}
-										style={({ pressed }) => [
-											styles.speciesPressable,
-											pressed && styles.speciesPressed,
-										]}
-									>
-										{item.image ? (
-											<Image
-												source={{
-													uri: item.image,
-												}}
-												style={styles.speciesImage}
-												resizeMode='cover'
-											/>
-										) : (
-											<View style={styles.speciesImagePlaceholder}>
-												<HugeiconsIcon
-													icon={UserGroupIcon}
-													size={48}
-													strokeWidth={1.8}
-													color={colors.primary}
-												/>
-											</View>
-										)}
-
-										<View style={styles.speciesContent}>
-											<View style={styles.speciesTitleRow}>
-												<View style={styles.speciesNameContainer}>
-													<Text style={styles.speciesName} numberOfLines={2}>
-														{item.common_name}
-													</Text>
-
-													<Text style={styles.scientificName} numberOfLines={1}>
-														{item.scientific_name}
-													</Text>
-												</View>
-
-												<View style={styles.arrowContainer}>
-													<HugeiconsIcon
-														icon={ArrowRight01Icon}
-														size={20}
-														strokeWidth={1.8}
-														color={colors.primary}
-													/>
-												</View>
-											</View>
-
-											{/* Categoría */}
-											{item.category?.name && (
-												<View style={styles.categoryBadge}>
-													<Text style={styles.categoryText}>
-														{item.category.name}
-													</Text>
-												</View>
-											)}
-
-											{/* Descripción */}
-											{item.description && (
-												<Text style={styles.description} numberOfLines={3}>
-													{item.description}
-												</Text>
-											)}
-
-											<Text style={styles.viewInfo}>Ver información</Text>
-										</View>
-									</Pressable>
-								</View>
+								<AppCard
+									key={item.id}
+									onPress={() => openSpecies(item.id)}
+									image={item.image ? { uri: item.image } : undefined}
+									imageHeight={210}
+									title={item.common_name}
+									description={[
+										item.scientific_name,
+										item.category?.name
+											? `Categoría: ${item.category.name}`
+											: null,
+										item.description,
+									]
+										.filter(Boolean)
+										.join('\n')}
+									icon={!item.image ? UserGroupIcon : undefined}
+									backgroundColor={colors.card}
+									borderColor={colors.border}
+									iconColor={colors.primary}
+									iconBackgroundColor={colors.active}
+									arrowColor={colors.white}
+									arrowBackgroundColor={colors.primary}
+									textColor={colors.text}
+									descriptionColor={colors.textSecondary}
+									showArrow
+									style={{ marginBottom: 15 }}
+								/>
 							))}
 						</View>
 					)}
@@ -391,6 +413,6 @@ export default function SpeciesScreen() {
 					<View style={styles.bottomSpace} />
 				</ScrollView>
 			</ImageBackground>
-		</View>
+		</SafeAreaView>
 	)
 }
