@@ -1,6 +1,6 @@
+import ActionButton from '@/components/ActionButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import { colors, styles } from '@/styles/login'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -13,6 +13,7 @@ import { useState } from 'react'
 import {
 	ActivityIndicator,
 	Image,
+	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -25,6 +26,16 @@ import {
 type FormErrors = {
 	email?: string
 	password?: string
+}
+
+const palette = {
+	label: '#132519',
+	border: '#3f775e',
+	forgot: '#1b7747',
+	register: '#3b543e',
+	title: '#26523f',
+	muted: '#6F8A7D',
+	error: '#C83B3B',
 }
 
 export default function Login() {
@@ -44,7 +55,6 @@ export default function Login() {
 			...current,
 			[field]: undefined,
 		}))
-
 		setError('')
 	}
 
@@ -76,26 +86,29 @@ export default function Login() {
 			})
 
 			router.replace('/(tabs)')
-		} catch (error) {
-			if (error instanceof ApiValidationError) {
+		} catch (err) {
+			if (err instanceof ApiValidationError) {
 				const apiErrors: FormErrors = {}
 
-				if (error.errors.email?.[0]) {
-					apiErrors.email = error.errors.email[0]
+				if (err.errors.email?.[0]) {
+					apiErrors.email = err.errors.email[0]
 				}
 
-				if (error.errors.password?.[0]) {
-					apiErrors.password = error.errors.password[0]
+				if (err.errors.password?.[0]) {
+					apiErrors.password = err.errors.password[0]
 				}
 
-				setErrors(apiErrors)
+				if (Object.keys(apiErrors).length > 0) {
+					setErrors(apiErrors)
+				} else {
+					setError('Revisa tus datos e inténtalo de nuevo.')
+				}
+
 				return
 			}
 
 			setError(
-				error instanceof Error
-					? error.message
-					: 'No fue posible iniciar sesión.',
+				err instanceof Error ? err.message : 'No fue posible iniciar sesión.',
 			)
 		} finally {
 			setLoading(false)
@@ -104,195 +117,205 @@ export default function Login() {
 
 	return (
 		<KeyboardAvoidingView
-			style={styles.container}
+			className='flex-1'
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 		>
-			<View style={styles.background}>
-				<Image
-					source={require('../../assets/images/login-background.png')}
-					style={styles.backgroundImage}
-					resizeMode='cover'
-				/>
-			</View>
-
-			<ScrollView
-				style={styles.scrollView}
-				contentContainerStyle={styles.scrollContent}
-				keyboardShouldPersistTaps='handled'
-				keyboardDismissMode='on-drag'
-				showsVerticalScrollIndicator={false}
+			<ImageBackground
+				source={require('../../assets/images/login-background.png')}
+				resizeMode='cover'
+				className='flex-1'
 			>
-				<View style={styles.logoContainer}>
-					<Image
-						source={require('../../assets/images/zooapp-logo.png')}
-						style={styles.logo}
-						resizeMode='contain'
-					/>
-				</View>
+				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
 
-				<View style={styles.card}>
-					<View style={styles.header}>
-						<Text style={styles.title}>¡Bienvenido a ZooApp!</Text>
+				<ScrollView
+					className='flex-1'
+					contentContainerStyle={{
+						flexGrow: 1,
+						paddingHorizontal: 24,
+						paddingTop: 36,
+						paddingBottom: 48,
+					}}
+					keyboardShouldPersistTaps='handled'
+					keyboardDismissMode='on-drag'
+					showsVerticalScrollIndicator={false}
+				>
+					<View className='mt-24 items-center'>
+						<Image
+							source={require('../../assets/images/zooapp-logo.png')}
+							resizeMode='contain'
+							accessibilityLabel='Logo de ZooApp'
+							className='h-32 w-36'
+						/>
+					</View>
 
-						<Text style={styles.subtitle}>
-							Inicia sesión para continuar tu aventura.
+					<View className='mt-6 rounded-3xl bg-white p-5'>
+						<View className='items-center'>
+							<Text
+								className='text-center text-3xl font-bold'
+								style={{ color: palette.title }}
+							>
+								¡Bienvenido a ZooApp!
+							</Text>
+
+							<Text className='mt-2 text-center text-base text-[#3b543e]'>
+								Inicia sesión para continuar tu aventura.
+							</Text>
+						</View>
+
+						<Text
+							className='mb-2 mt-8 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Correo electrónico
 						</Text>
-					</View>
 
-					<Text style={styles.labelFirst}>Correo electrónico</Text>
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.email ? palette.error : palette.border,
+								borderWidth: emailFocused ? 2 : 1,
+							}}
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Mail01Icon}
+									size={20}
+									strokeWidth={1.8}
+									color={errors.email ? palette.error : palette.border}
+								/>
+							</View>
 
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.email
-									? colors.error
-									: emailFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={Mail01Icon}
-								size={20}
-								strokeWidth={1.8}
-								color={
-									errors.email
-										? colors.error
-										: emailFocused
-											? colors.primary
-											: colors.muted
-								}
+							<TextInput
+								value={email}
+								onChangeText={(value) => {
+									setEmail(value)
+									clearFieldError('email')
+								}}
+								onFocus={() => setEmailFocused(true)}
+								onBlur={() => setEmailFocused(false)}
+								placeholder='correo@ejemplo.com'
+								placeholderTextColor='#84958A'
+								autoCapitalize='none'
+								autoCorrect={false}
+								keyboardType='email-address'
+								textContentType='emailAddress'
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
 							/>
 						</View>
 
-						<TextInput
-							value={email}
-							onChangeText={(value) => {
-								setEmail(value)
-								clearFieldError('email')
+						{errors.email && (
+							<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+						)}
+
+						<Text
+							className='mb-2 mt-5 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Contraseña
+						</Text>
+
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.password ? palette.error : palette.border,
+								borderWidth: passwordFocused ? 2 : 1,
 							}}
-							onFocus={() => setEmailFocused(true)}
-							onBlur={() => setEmailFocused(false)}
-							placeholder='correo@ejemplo.com'
-							placeholderTextColor={colors.muted}
-							autoCapitalize='none'
-							autoCorrect={false}
-							keyboardType='email-address'
-							style={styles.input}
-						/>
-					</View>
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={LockPasswordIcon}
+									size={20}
+									strokeWidth={1.8}
+									color={errors.password ? palette.error : palette.border}
+								/>
+							</View>
 
-					{errors.email && (
-						<Text style={styles.fieldError}>{errors.email}</Text>
-					)}
-
-					<Text style={styles.label}>Contraseña</Text>
-
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.password
-									? colors.error
-									: passwordFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={LockPasswordIcon}
-								size={20}
-								strokeWidth={1.8}
-								color={
-									errors.password
-										? colors.error
-										: passwordFocused
-											? colors.primary
-											: colors.muted
-								}
+							<TextInput
+								value={password}
+								onChangeText={(value) => {
+									setPassword(value)
+									clearFieldError('password')
+								}}
+								onFocus={() => setPasswordFocused(true)}
+								onBlur={() => setPasswordFocused(false)}
+								placeholder='Tu contraseña'
+								placeholderTextColor='#84958A'
+								secureTextEntry={!showPassword}
+								autoCapitalize='none'
+								textContentType='password'
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
 							/>
+
+							<Pressable
+								onPress={() => setShowPassword((value) => !value)}
+								className='mr-2 items-center justify-center rounded-xl p-2'
+								hitSlop={8}
+								accessibilityRole='button'
+								accessibilityLabel={
+									showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+								}
+							>
+								<HugeiconsIcon
+									icon={showPassword ? ViewOffSlashIcon : ViewIcon}
+									size={21}
+									strokeWidth={1.8}
+									color={palette.border}
+								/>
+							</Pressable>
 						</View>
 
-						<TextInput
-							value={password}
-							onChangeText={(value) => {
-								setPassword(value)
-								clearFieldError('password')
-							}}
-							onFocus={() => setPasswordFocused(true)}
-							onBlur={() => setPasswordFocused(false)}
-							placeholder='Tu contraseña'
-							placeholderTextColor={colors.muted}
-							secureTextEntry={!showPassword}
-							autoCapitalize='none'
-							style={styles.input}
-						/>
+						{errors.password && (
+							<Text className='mt-1 text-sm text-red-600'>
+								{errors.password}
+							</Text>
+						)}
+
+						{error !== '' && (
+							<View className='mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3'>
+								<Text className='text-sm text-red-700'>{error}</Text>
+							</View>
+						)}
 
 						<Pressable
-							onPress={() => setShowPassword(!showPassword)}
-							style={styles.passwordToggle}
-							hitSlop={8}
+							onPress={() => router.push('/forgot-password')}
+							className='mt-4 self-end rounded-lg py-1'
 						>
-							<HugeiconsIcon
-								icon={showPassword ? ViewOffSlashIcon : ViewIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={passwordFocused ? colors.primary : colors.muted}
-							/>
+							<Text
+								className='text-sm font-semibold'
+								style={{ color: palette.forgot }}
+							>
+								¿Olvidaste tu contraseña?
+							</Text>
 						</Pressable>
-					</View>
 
-					{errors.password && (
-						<Text style={styles.fieldError}>{errors.password}</Text>
-					)}
-
-					{error !== '' && (
-						<View style={styles.generalError}>
-							<Text style={styles.generalErrorText}>{error}</Text>
-						</View>
-					)}
-
-					<Pressable
-						onPress={() => router.push('/forgot-password')}
-						style={styles.forgotPassword}
-					>
-						<Text style={styles.forgotPasswordText}>
-							¿Olvidaste tu contraseña?
-						</Text>
-					</Pressable>
-
-					<Pressable
-						onPress={handleLogin}
-						disabled={loading}
-						style={[styles.loginButton, loading && styles.loginButtonDisabled]}
-					>
-						<View style={styles.loginButtonContent}>
+						<View className='mt-5'>
 							{loading ? (
-								<ActivityIndicator color={colors.white} />
+								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-[#8BA997]'>
+									<ActivityIndicator color='#FFFFFF' />
+								</View>
 							) : (
-								<Text style={styles.loginButtonText}>Iniciar sesión</Text>
+								<ActionButton title='Iniciar sesión' onPress={handleLogin} />
 							)}
 						</View>
-					</Pressable>
 
-					<View style={styles.registerRow}>
-						<Text style={styles.registerText}>¿No tienes una cuenta? </Text>
+						<View className='mt-7 flex-row flex-wrap items-center justify-center'>
+							<Text className='text-base' style={{ color: palette.register }}>
+								¿No tienes una cuenta?{' '}
+							</Text>
 
-						<Pressable
-							onPress={() => router.push('/register')}
-							style={styles.registerButton}
-						>
-							<Text style={styles.registerButtonText}>Regístrate</Text>
-						</Pressable>
+							<Pressable
+								onPress={() => router.push('/register')}
+								className='rounded-lg py-1'
+							>
+								<Text className='text-base font-bold text-[#1b7747]'>
+									Regístrate
+								</Text>
+							</Pressable>
+						</View>
 					</View>
-				</View>
-			</ScrollView>
+				</ScrollView>
+			</ImageBackground>
 		</KeyboardAvoidingView>
 	)
 }

@@ -1,6 +1,7 @@
+import ActionButton from '@/components/ActionButton'
+import BackButton from '@/components/BackButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import { colors, styles } from '@/styles/register'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -14,6 +15,7 @@ import { useState } from 'react'
 import {
 	ActivityIndicator,
 	Image,
+	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
@@ -28,6 +30,17 @@ type FormErrors = {
 	email?: string
 	password?: string
 	password_confirmation?: string
+}
+
+const palette = {
+	label: '#132519',
+	border: '#3f775e',
+	primary: '#1b7747',
+	register: '#3b543e',
+	title: '#26523f',
+	muted: '#6F8A7D',
+	error: '#C83B3B',
+	white: '#FFFFFF',
 }
 
 export default function Register() {
@@ -57,11 +70,12 @@ export default function Register() {
 			...current,
 			[field]: undefined,
 		}))
-
 		setError('')
 	}
 
 	const handleRegister = async () => {
+		if (loading) return
+
 		setError('')
 		setErrors({})
 
@@ -103,35 +117,37 @@ export default function Register() {
 			})
 
 			router.replace('/(tabs)')
-		} catch (error) {
-			if (error instanceof ApiValidationError) {
+		} catch (err) {
+			if (err instanceof ApiValidationError) {
 				const apiErrors: FormErrors = {}
 
-				if (error.errors.name?.[0]) {
-					apiErrors.name = error.errors.name[0]
+				if (err.errors.name?.[0]) {
+					apiErrors.name = err.errors.name[0]
 				}
 
-				if (error.errors.email?.[0]) {
-					apiErrors.email = error.errors.email[0]
+				if (err.errors.email?.[0]) {
+					apiErrors.email = err.errors.email[0]
 				}
 
-				if (error.errors.password?.[0]) {
-					apiErrors.password = error.errors.password[0]
+				if (err.errors.password?.[0]) {
+					apiErrors.password = err.errors.password[0]
 				}
 
-				if (error.errors.password_confirmation?.[0]) {
-					apiErrors.password_confirmation =
-						error.errors.password_confirmation[0]
+				if (err.errors.password_confirmation?.[0]) {
+					apiErrors.password_confirmation = err.errors.password_confirmation[0]
 				}
 
-				setErrors(apiErrors)
+				if (Object.keys(apiErrors).length > 0) {
+					setErrors(apiErrors)
+				} else {
+					setError('Revisa tus datos e inténtalo de nuevo.')
+				}
+
 				return
 			}
 
 			setError(
-				error instanceof Error
-					? error.message
-					: 'No fue posible crear la cuenta.',
+				err instanceof Error ? err.message : 'No fue posible crear la cuenta.',
 			)
 		} finally {
 			setLoading(false)
@@ -140,311 +156,351 @@ export default function Register() {
 
 	return (
 		<KeyboardAvoidingView
-			style={styles.container}
+			className='flex-1'
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
 		>
-			{/* Fondo */}
-			<View style={styles.background}>
-				<Image
-					source={require('../../assets/images/login-background.png')}
-					style={styles.backgroundImage}
-					resizeMode='cover'
-				/>
-			</View>
-
-			<ScrollView
-				style={styles.scrollView}
-				contentContainerStyle={styles.scrollContent}
-				keyboardShouldPersistTaps='handled'
-				keyboardDismissMode='on-drag'
-				showsVerticalScrollIndicator={false}
+			<ImageBackground
+				source={require('../../assets/images/login-background.png')}
+				resizeMode='cover'
+				className='flex-1'
 			>
-				{/* Volver */}
-				<Pressable
-					onPress={() => router.back()}
-					style={({ pressed }) => [
-						styles.backButton,
-						pressed && styles.backButtonPressed,
-					]}
+				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
+
+				<ScrollView
+					className='flex-1'
+					contentContainerStyle={{
+						flexGrow: 1,
+						paddingHorizontal: 24,
+						paddingTop: 36,
+						paddingBottom: 48,
+					}}
+					keyboardShouldPersistTaps='handled'
+					keyboardDismissMode='on-drag'
+					showsVerticalScrollIndicator={false}
 				>
-					<Text style={styles.backText}>‹ Regresar</Text>
-				</Pressable>
+					{/* REGRESAR */}
+					<BackButton onPress={() => router.back()} />
 
-				{/* Logo */}
-				<View style={styles.logoContainer}>
-					<Image
-						source={require('../../assets/images/zooapp-logo.png')}
-						style={styles.logo}
-						resizeMode='contain'
-					/>
-				</View>
-
-				{/* Card */}
-				<View style={styles.card}>
-					{/* Encabezado */}
-					<View style={styles.header}>
-						<Text style={styles.title}>Crea tu cuenta</Text>
-
-						<Text style={styles.subtitle}>
-							Únete a ZooApp y comienza a descubrir el zoológico.
-						</Text>
-					</View>
-
-					{/* Nombre */}
-					<Text style={styles.labelFirst}>Nombre completo</Text>
-
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.name
-									? colors.error
-									: nameFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={UserIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={nameFocused ? colors.primary : colors.muted}
-							/>
-						</View>
-
-						<TextInput
-							value={name}
-							onChangeText={(value) => {
-								setName(value)
-								clearFieldError('name')
-							}}
-							onFocus={() => setNameFocused(true)}
-							onBlur={() => setNameFocused(false)}
-							placeholder='Tu nombre'
-							placeholderTextColor={colors.muted}
-							autoCapitalize='words'
-							style={styles.input}
+					{/* LOGO */}
+					<View className='mt-8 items-center'>
+						<Image
+							source={require('../../assets/images/zooapp-logo.png')}
+							resizeMode='contain'
+							accessibilityLabel='Logo de ZooApp'
+							className='h-32 w-36'
 						/>
 					</View>
 
-					{errors.name && <Text style={styles.fieldError}>{errors.name}</Text>}
-
-					{/* Email */}
-					<Text style={styles.label}>Correo electrónico</Text>
-
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.email
-									? colors.error
-									: emailFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={Mail01Icon}
-								size={21}
-								strokeWidth={1.8}
-								color={emailFocused ? colors.primary : colors.muted}
-							/>
-						</View>
-
-						<TextInput
-							value={email}
-							onChangeText={(value) => {
-								setEmail(value)
-								clearFieldError('email')
-							}}
-							onFocus={() => setEmailFocused(true)}
-							onBlur={() => setEmailFocused(false)}
-							placeholder='correo@ejemplo.com'
-							placeholderTextColor={colors.muted}
-							keyboardType='email-address'
-							autoCapitalize='none'
-							autoCorrect={false}
-							style={styles.input}
-						/>
-					</View>
-
-					{errors.email && (
-						<Text style={styles.fieldError}>{errors.email}</Text>
-					)}
-
-					{/* Password */}
-					<Text style={styles.label}>Contraseña</Text>
-
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.password
-									? colors.error
-									: passwordFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={LockPasswordIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={passwordFocused ? colors.primary : colors.muted}
-							/>
-						</View>
-
-						<TextInput
-							value={password}
-							onChangeText={(value) => {
-								setPassword(value)
-								clearFieldError('password')
-								clearFieldError('password_confirmation')
-							}}
-							onFocus={() => setPasswordFocused(true)}
-							onBlur={() => setPasswordFocused(false)}
-							placeholder='Mínimo 8 caracteres'
-							placeholderTextColor={colors.muted}
-							secureTextEntry={!showPassword}
-							autoCapitalize='none'
-							style={styles.input}
-						/>
-
-						<Pressable
-							onPress={() => setShowPassword(!showPassword)}
-							style={styles.passwordToggle}
-							hitSlop={8}
-						>
-							<HugeiconsIcon
-								icon={showPassword ? ViewOffSlashIcon : ViewIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={passwordFocused ? colors.primary : colors.muted}
-							/>
-						</Pressable>
-					</View>
-
-					{errors.password && (
-						<Text style={styles.fieldError}>{errors.password}</Text>
-					)}
-
-					{/* Confirmar password */}
-					<Text style={styles.label}>Confirmar contraseña</Text>
-
-					<View
-						style={[
-							styles.inputContainer,
-							{
-								borderColor: errors.password_confirmation
-									? colors.error
-									: passwordConfirmationFocused
-										? colors.primary
-										: colors.border,
-							},
-						]}
-					>
-						<View style={styles.inputIcon}>
-							<HugeiconsIcon
-								icon={LockPasswordIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={
-									passwordConfirmationFocused ? colors.primary : colors.muted
-								}
-							/>
-						</View>
-
-						<TextInput
-							value={passwordConfirmation}
-							onChangeText={(value) => {
-								setPasswordConfirmation(value)
-								clearFieldError('password_confirmation')
-							}}
-							onFocus={() => setPasswordConfirmationFocused(true)}
-							onBlur={() => setPasswordConfirmationFocused(false)}
-							placeholder='Repite tu contraseña'
-							placeholderTextColor={colors.muted}
-							secureTextEntry={!showPasswordConfirmation}
-							autoCapitalize='none'
-							style={styles.input}
-						/>
-
-						<Pressable
-							onPress={() =>
-								setShowPasswordConfirmation(!showPasswordConfirmation)
-							}
-							style={styles.passwordToggle}
-							hitSlop={8}
-						>
-							<HugeiconsIcon
-								icon={showPasswordConfirmation ? ViewOffSlashIcon : ViewIcon}
-								size={21}
-								strokeWidth={1.8}
-								color={
-									passwordConfirmationFocused ? colors.primary : colors.muted
-								}
-							/>
-						</Pressable>
-					</View>
-
-					{errors.password_confirmation && (
-						<Text style={styles.fieldError}>
-							{errors.password_confirmation}
-						</Text>
-					)}
-
-					{/* Error general */}
-					{error !== '' && (
-						<View style={styles.generalError}>
-							<Text style={styles.generalErrorText}>{error}</Text>
-						</View>
-					)}
-
-					{/* Crear cuenta */}
-					<Pressable
-						onPress={handleRegister}
-						disabled={loading}
-						style={[
-							styles.registerButton,
-							loading && styles.registerButtonDisabled,
-						]}
-					>
-						{({ pressed }) => (
-							<View
-								style={[
-									styles.registerButtonContent,
-									pressed && styles.registerButtonPressed,
-								]}
+					{/* TARJETA */}
+					<View className='mt-6 rounded-3xl bg-white p-5'>
+						{/* ENCABEZADO */}
+						<View className='items-center'>
+							<Text
+								className='text-center text-3xl font-bold'
+								style={{ color: palette.title }}
 							>
-								{loading ? (
-									<ActivityIndicator color={colors.white} />
-								) : (
-									<Text style={styles.registerButtonText}>Crear cuenta</Text>
-								)}
+								Crea tu cuenta
+							</Text>
+
+							<Text
+								className='mt-2 text-center text-base'
+								style={{ color: palette.register }}
+							>
+								Únete a ZooApp y comienza a descubrir el zoológico.
+							</Text>
+						</View>
+
+						{/* NOMBRE */}
+						<Text
+							className='mb-2 mt-8 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Nombre completo
+						</Text>
+
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.name
+									? palette.error
+									: nameFocused
+										? palette.primary
+										: palette.border,
+								borderWidth: nameFocused ? 2 : 1,
+							}}
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={UserIcon}
+									size={20}
+									strokeWidth={1.8}
+									color={nameFocused ? palette.primary : palette.muted}
+								/>
+							</View>
+
+							<TextInput
+								value={name}
+								onChangeText={(value) => {
+									setName(value)
+									clearFieldError('name')
+								}}
+								onFocus={() => setNameFocused(true)}
+								onBlur={() => setNameFocused(false)}
+								placeholder='Tu nombre'
+								placeholderTextColor='#84958A'
+								autoCapitalize='words'
+								autoCorrect={false}
+								returnKeyType='next'
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+							/>
+						</View>
+
+						{errors.name && (
+							<Text className='mt-1 text-sm text-red-600'>{errors.name}</Text>
+						)}
+
+						{/* CORREO */}
+						<Text
+							className='mb-2 mt-5 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Correo electrónico
+						</Text>
+
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.email
+									? palette.error
+									: emailFocused
+										? palette.primary
+										: palette.border,
+								borderWidth: emailFocused ? 2 : 1,
+							}}
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={Mail01Icon}
+									size={20}
+									strokeWidth={1.8}
+									color={emailFocused ? palette.primary : palette.muted}
+								/>
+							</View>
+
+							<TextInput
+								value={email}
+								onChangeText={(value) => {
+									setEmail(value)
+									clearFieldError('email')
+								}}
+								onFocus={() => setEmailFocused(true)}
+								onBlur={() => setEmailFocused(false)}
+								placeholder='correo@ejemplo.com'
+								placeholderTextColor='#84958A'
+								keyboardType='email-address'
+								autoCapitalize='none'
+								autoCorrect={false}
+								textContentType='emailAddress'
+								autoComplete='email'
+								returnKeyType='next'
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+							/>
+						</View>
+
+						{errors.email && (
+							<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+						)}
+
+						{/* CONTRASEÑA */}
+						<Text
+							className='mb-2 mt-5 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Contraseña
+						</Text>
+
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.password
+									? palette.error
+									: passwordFocused
+										? palette.primary
+										: palette.border,
+								borderWidth: passwordFocused ? 2 : 1,
+							}}
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={LockPasswordIcon}
+									size={20}
+									strokeWidth={1.8}
+									color={passwordFocused ? palette.primary : palette.muted}
+								/>
+							</View>
+
+							<TextInput
+								value={password}
+								onChangeText={(value) => {
+									setPassword(value)
+									clearFieldError('password')
+									clearFieldError('password_confirmation')
+								}}
+								onFocus={() => setPasswordFocused(true)}
+								onBlur={() => setPasswordFocused(false)}
+								placeholder='Mínimo 8 caracteres'
+								placeholderTextColor='#84958A'
+								secureTextEntry={!showPassword}
+								autoCapitalize='none'
+								autoCorrect={false}
+								textContentType='newPassword'
+								autoComplete='new-password'
+								returnKeyType='next'
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+							/>
+
+							<Pressable
+								onPress={() => setShowPassword((value) => !value)}
+								className='mr-2 items-center justify-center rounded-xl p-2'
+								hitSlop={8}
+								accessibilityRole='button'
+								accessibilityLabel={
+									showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+								}
+							>
+								<HugeiconsIcon
+									icon={showPassword ? ViewOffSlashIcon : ViewIcon}
+									size={21}
+									strokeWidth={1.8}
+									color={passwordFocused ? palette.primary : palette.muted}
+								/>
+							</Pressable>
+						</View>
+
+						{errors.password && (
+							<Text className='mt-1 text-sm text-red-600'>
+								{errors.password}
+							</Text>
+						)}
+
+						{/* CONFIRMAR CONTRASEÑA */}
+						<Text
+							className='mb-2 mt-5 text-sm font-semibold'
+							style={{ color: palette.label }}
+						>
+							Confirmar contraseña
+						</Text>
+
+						<View
+							className='flex-row items-center rounded-xl border bg-white'
+							style={{
+								borderColor: errors.password_confirmation
+									? palette.error
+									: passwordConfirmationFocused
+										? palette.primary
+										: palette.border,
+								borderWidth: passwordConfirmationFocused ? 2 : 1,
+							}}
+						>
+							<View className='pl-4'>
+								<HugeiconsIcon
+									icon={LockPasswordIcon}
+									size={20}
+									strokeWidth={1.8}
+									color={
+										passwordConfirmationFocused
+											? palette.primary
+											: palette.muted
+									}
+								/>
+							</View>
+
+							<TextInput
+								value={passwordConfirmation}
+								onChangeText={(value) => {
+									setPasswordConfirmation(value)
+									clearFieldError('password_confirmation')
+								}}
+								onFocus={() => setPasswordConfirmationFocused(true)}
+								onBlur={() => setPasswordConfirmationFocused(false)}
+								placeholder='Repite tu contraseña'
+								placeholderTextColor='#84958A'
+								secureTextEntry={!showPasswordConfirmation}
+								autoCapitalize='none'
+								autoCorrect={false}
+								textContentType='newPassword'
+								autoComplete='new-password'
+								returnKeyType='done'
+								onSubmitEditing={handleRegister}
+								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+							/>
+
+							<Pressable
+								onPress={() => setShowPasswordConfirmation((value) => !value)}
+								className='mr-2 items-center justify-center rounded-xl p-2'
+								hitSlop={8}
+								accessibilityRole='button'
+								accessibilityLabel={
+									showPasswordConfirmation
+										? 'Ocultar confirmación de contraseña'
+										: 'Mostrar confirmación de contraseña'
+								}
+							>
+								<HugeiconsIcon
+									icon={showPasswordConfirmation ? ViewOffSlashIcon : ViewIcon}
+									size={21}
+									strokeWidth={1.8}
+									color={
+										passwordConfirmationFocused
+											? palette.primary
+											: palette.muted
+									}
+								/>
+							</Pressable>
+						</View>
+
+						{errors.password_confirmation && (
+							<Text className='mt-1 text-sm text-red-600'>
+								{errors.password_confirmation}
+							</Text>
+						)}
+
+						{/* ERROR GENERAL */}
+						{error !== '' && (
+							<View className='mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3'>
+								<Text className='text-sm text-red-700'>{error}</Text>
 							</View>
 						)}
-					</Pressable>
 
-					{/* Login */}
-					<View style={styles.loginRow}>
-						<Text style={styles.loginText}>¿Ya tienes una cuenta? </Text>
+						{/* BOTÓN CREAR CUENTA */}
+						{loading ? (
+							<View className='mt-4 h-[50px] w-full items-center justify-center rounded-xl bg-[#8BA997]'>
+								<ActivityIndicator color={palette.white} />
+							</View>
+						) : (
+							<ActionButton title='Crear cuenta' onPress={handleRegister} />
+						)}
 
-						<Pressable
-							onPress={() => router.replace('/login')}
-							style={styles.loginButton}
-						>
-							<Text style={styles.loginButtonText}>Inicia sesión</Text>
-						</Pressable>
+						{/* INICIAR SESIÓN */}
+						<View className='mt-7 flex-row flex-wrap items-center justify-center'>
+							<Text className='text-base' style={{ color: palette.register }}>
+								¿Ya tienes una cuenta?{' '}
+							</Text>
+
+							<Pressable
+								onPress={() => router.replace('/login')}
+								className='rounded-lg py-1'
+								accessibilityRole='button'
+							>
+								<Text className='text-base font-bold text-[#1b7747]'>
+									Inicia sesión
+								</Text>
+							</Pressable>
+						</View>
 					</View>
-				</View>
-			</ScrollView>
+				</ScrollView>
+			</ImageBackground>
 		</KeyboardAvoidingView>
 	)
 }
