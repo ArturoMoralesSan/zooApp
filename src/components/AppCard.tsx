@@ -121,7 +121,9 @@ export default function AppCard({
 	) : null
 
 	const textElement = (
-		<View className='min-w-0 flex-1'>
+		// Inline on purpose: NativeWind's flex-1 expands to grow/shrink/basis,
+		// which collapses this block when iconPosition is 'top' (column layout).
+		<View style={{ flex: 1, minWidth: 0 }}>
 			{title ? (
 				<Text
 					className='shrink text-[16px] font-extrabold'
