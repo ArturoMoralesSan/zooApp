@@ -19,11 +19,23 @@ import * as Location from 'expo-location'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+import {
+	ActivityIndicator,
+	Pressable,
+	Text,
+	View,
+	type ViewStyle,
+} from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { styles } from '@/styles/map'
+const mapShadow: ViewStyle = {
+	shadowColor: '#000000',
+	shadowOffset: { width: 0, height: 5 },
+	shadowOpacity: 0.18,
+	shadowRadius: 8,
+	elevation: 1,
+}
 
 type Coordinate = [number, number]
 
@@ -1757,11 +1769,16 @@ export default function MapScreen() {
 
 	if (loading) {
 		return (
-			<SafeAreaView style={styles.loadingContainer}>
-				<View style={styles.loadingCard}>
+			<SafeAreaView className='flex-1 items-center justify-center bg-[#F7F8F3] px-6'>
+				<View
+					className='w-full max-w-[320px] items-center justify-center rounded-3xl bg-[#F7F7EE] px-6 py-[30px]'
+					style={mapShadow}
+				>
 					<ActivityIndicator size='large' color='#087A5A' />
 
-					<Text style={styles.loadingText}>Cargando mapa...</Text>
+					<Text className='mt-3.5 text-[15px] font-semibold text-[#6F8A7D]'>
+						Cargando mapa...
+					</Text>
 				</View>
 			</SafeAreaView>
 		)
@@ -1769,25 +1786,32 @@ export default function MapScreen() {
 
 	if (error) {
 		return (
-			<SafeAreaView style={styles.loadingContainer}>
-				<View style={styles.errorCard}>
-					<View style={styles.errorIconContainer}>
-						<Text style={styles.errorIcon}>!</Text>
+			<SafeAreaView className='flex-1 items-center justify-center bg-[#F7F8F3] px-6'>
+				<View
+					className='w-full max-w-[360px] items-center rounded-3xl border border-[#FFE3E1] bg-[#FFF1F0] px-6 py-7'
+					style={mapShadow}
+				>
+					<View className='mb-3.5 h-[52px] w-[52px] items-center justify-center rounded-[18px] bg-[#FFE3E1]'>
+						<Text className='text-[28px] font-extrabold text-[#C24141]'>!</Text>
 					</View>
 
-					<Text style={styles.errorTitle}>No fue posible cargar el mapa</Text>
+					<Text className='mb-2 text-center text-[20px] font-extrabold text-[#123C32]'>
+						No fue posible cargar el mapa
+					</Text>
 
-					<Text style={styles.errorText}>{error}</Text>
+					<Text className='text-center text-[14px] leading-[21px] text-[#6F8A7D]'>
+						{error}
+					</Text>
 				</View>
 			</SafeAreaView>
 		)
 	}
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView className='flex-1 bg-[#F7F8F3]'>
 			<MapView
 				ref={mapRef}
-				style={styles.map}
+				style={{ flex: 1 }}
 				mapStyle={{
 					version: 8,
 					sources: {},
@@ -1941,11 +1965,10 @@ export default function MapScreen() {
 							onPress={() => selectItem(item)}
 						>
 							<View
+								className='h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-[19px] border-[3px] border-[#F7F7EE]'
 								style={[
-									styles.mapMarker,
-									{
-										backgroundColor: item.color ?? '#087A5A',
-									},
+									mapShadow,
+									{ backgroundColor: item.color ?? '#087A5A' },
 								]}
 							>
 								{item.iconImage ? (
@@ -1953,12 +1976,12 @@ export default function MapScreen() {
 										source={{
 											uri: item.iconImage,
 										}}
-										style={styles.mapMarkerImage}
+										style={{ width: 30, height: 30, borderRadius: 15 }}
 										contentFit='contain'
 										cachePolicy='memory-disk'
 									/>
 								) : (
-									<Text style={styles.mapMarkerIcon}>{item.icon ?? '📍'}</Text>
+									<Text className='text-[18px]'>{item.icon ?? '📍'}</Text>
 								)}
 							</View>
 						</Marker>
@@ -1973,11 +1996,10 @@ export default function MapScreen() {
 							onPress={() => selectItem(item)}
 						>
 							<View
+								className='h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-[21px] border-[3px] border-[#F7F7EE]'
 								style={[
-									styles.speciesMarker,
-									{
-										backgroundColor: item.color ?? '#064D36',
-									},
+									mapShadow,
+									{ backgroundColor: item.color ?? '#064D36' },
 								]}
 							>
 								{item.thumbnail ? (
@@ -1985,12 +2007,12 @@ export default function MapScreen() {
 										source={{
 											uri: item.thumbnail,
 										}}
-										style={styles.speciesMarkerImage}
+										style={{ width: 36, height: 36, borderRadius: 18 }}
 										contentFit='cover'
 										cachePolicy='memory-disk'
 									/>
 								) : (
-									<Text style={styles.mapMarkerIcon}>{item.icon ?? '🦁'}</Text>
+									<Text className='text-[18px]'>{item.icon ?? '🦁'}</Text>
 								)}
 							</View>
 						</Marker>
@@ -1998,8 +2020,11 @@ export default function MapScreen() {
 
 				{userLocation && (
 					<Marker lngLat={userLocation}>
-						<View style={styles.userLocationOuter}>
-							<View style={styles.userLocationInner} />
+						<View className='h-[46px] w-[46px] items-center justify-center rounded-[23px] border border-[rgba(8,121,141,0.4)] bg-[rgba(8,118,161,0.2)]'>
+							<View
+								className='h-[17px] w-[17px] rounded-[9px] border-[3px] border-[#F7F7EE] bg-[#0977B8]'
+								style={mapShadow}
+							/>
 						</View>
 					</Marker>
 				)}
@@ -2007,23 +2032,24 @@ export default function MapScreen() {
 				{selectedItem && (
 					<Marker lngLat={selectedItem.coordinate}>
 						<View
-							style={
+							className={
 								selectedItem.type === 'species'
-									? styles.destinationSpecies
-									: [
-											styles.destinationMarker,
-											{
-												backgroundColor: selectedItem.color ?? '#064D36',
-											},
-										]
+									? 'h-12 w-12 items-center justify-center overflow-hidden rounded-3xl border-4 border-[#F7F7EE] bg-[#087A5A]'
+									: 'h-[46px] w-[46px] items-center justify-center overflow-hidden rounded-[23px] border-4 border-[#F7F7EE]'
 							}
+							style={[
+								mapShadow,
+								selectedItem.type === 'marker' && {
+									backgroundColor: selectedItem.color ?? '#064D36',
+								},
+							]}
 						>
 							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
 								<Image
 									source={{
 										uri: selectedItem.thumbnail,
 									}}
-									style={styles.destinationSpeciesImage}
+									style={{ width: 40, height: 40, borderRadius: 20 }}
 									contentFit='cover'
 									cachePolicy='memory-disk'
 								/>
@@ -2032,12 +2058,12 @@ export default function MapScreen() {
 									source={{
 										uri: selectedItem.iconImage,
 									}}
-									style={styles.destinationMarkerImage}
+									style={{ width: 36, height: 36, borderRadius: 18 }}
 									contentFit='contain'
 									cachePolicy='memory-disk'
 								/>
 							) : (
-								<Text style={styles.destinationIcon}>
+								<Text className='text-[20px]'>
 									{selectedItem.type === 'species'
 										? (selectedItem.icon ?? '🦁')
 										: (selectedItem.icon ?? '📍')}
@@ -2048,27 +2074,27 @@ export default function MapScreen() {
 				)}
 			</MapView>
 
-			<View style={styles.topPanel}>
-				<View style={styles.headerRow}>
-					<View style={styles.headerTextContainer}>
-						<Text style={styles.title}>Mapa del zoológico</Text>
+			<View
+				className='absolute left-3 right-3 top-[60px] rounded-[22px] bg-[#F7F7EE] p-4'
+				style={mapShadow}
+			>
+				<View className='flex-row items-center justify-between'>
+					<View className='flex-1 pr-2.5'>
+						<Text className='text-[19px] font-extrabold text-[#123C32]'>
+							Mapa del zoológico
+						</Text>
 
-						<Text style={styles.subtitle}>
+						<Text className='mt-[3px] text-[12px] text-[#6F8A7D]'>
 							Explora zonas, caminos y especies
 						</Text>
 					</View>
 
-					<View style={styles.statusBadge}>
+					<View className='flex-row items-center rounded-2xl bg-[#DCEFE5] px-2.5 py-[7px]'>
 						<View
-							style={[
-								styles.statusDot,
-								{
-									backgroundColor: isUserInsideZoo ? '#087A5A' : '#B8DCCA',
-								},
-							]}
+							className={`mr-[5px] h-2 w-2 rounded ${isUserInsideZoo ? 'bg-[#087A5A]' : 'bg-[#B8DCCA]'}`}
 						/>
 
-						<Text style={styles.statusText}>
+						<Text className='text-[11px] font-bold text-[#123C32]'>
 							{isUserInsideZoo ? 'Dentro' : 'Fuera'}
 						</Text>
 					</View>
@@ -2076,14 +2102,19 @@ export default function MapScreen() {
 			</View>
 
 			{userLocation && (
-				<View style={styles.locationBadge}>
-					<View style={styles.locationBadgeDot} />
+				<View
+					className='absolute right-3.5 top-[150px] flex-row items-center rounded-2xl bg-[#F7F7EE] px-[11px] py-2'
+					style={mapShadow}
+				>
+					<View className='mr-[7px] h-[9px] w-[9px] rounded-[5px] bg-[#0977B8]' />
 
 					<View>
-						<Text style={styles.locationBadgeTitle}>Tu ubicación</Text>
+						<Text className='text-[11px] font-bold text-[#123C32]'>
+							Tu ubicación
+						</Text>
 
 						{locationAccuracy !== null && (
-							<Text style={styles.locationBadgeText}>
+							<Text className='mt-px text-[9px] text-[#6F8A7D]'>
 								Precisión ±{Math.round(locationAccuracy)}m
 							</Text>
 						)}
@@ -2092,25 +2123,25 @@ export default function MapScreen() {
 			)}
 
 			{selectedItem && !routeCardCollapsed && (
-				<View style={styles.bottomCard}>
-					<View style={styles.bottomCardHeader}>
+				<View
+					className='absolute bottom-[15px] left-3 right-3 rounded-[22px] bg-[#F7F7EE] p-4'
+					style={mapShadow}
+				>
+					<View className='flex-row items-center'>
 						<View
-							style={[
-								styles.itemIcon,
-								selectedItem.type === 'species'
-									? styles.itemIconSpecies
-									: styles.itemIconMarker,
+							className='h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-2xl bg-[#DCEFE5]'
+							style={
 								selectedItem.type === 'marker' && {
 									backgroundColor: selectedItem.color ?? '#DCEFE5',
-								},
-							]}
+								}
+							}
 						>
 							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
 								<Image
 									source={{
 										uri: selectedItem.thumbnail,
 									}}
-									style={styles.itemSpeciesImage}
+									style={{ width: 42, height: 42, borderRadius: 16 }}
 									contentFit='cover'
 									cachePolicy='memory-disk'
 								/>
@@ -2119,7 +2150,7 @@ export default function MapScreen() {
 									source={{
 										uri: selectedItem.iconImage,
 									}}
-									style={styles.itemMarkerImage}
+									style={{ width: 34, height: 34, borderRadius: 12 }}
 									contentFit='contain'
 									cachePolicy='memory-disk'
 								/>
@@ -2132,12 +2163,15 @@ export default function MapScreen() {
 							)}
 						</View>
 
-						<View style={styles.itemTextContainer}>
-							<Text style={styles.itemTitle} numberOfLines={1}>
+						<View className='mx-2.5 min-w-0 flex-1'>
+							<Text
+								className='text-[16px] font-extrabold text-[#123C32]'
+								numberOfLines={1}
+							>
 								{selectedItem.name}
 							</Text>
 
-							<Text style={styles.itemType}>
+							<Text className='mt-0.5 text-[11px] text-[#6F8A7D]'>
 								{selectedItem.type === 'species'
 									? 'Especie'
 									: 'Punto de interés'}
@@ -2146,103 +2180,101 @@ export default function MapScreen() {
 
 						<Pressable
 							onPress={() => setRouteCardCollapsed(true)}
-							style={({ pressed }) => ({
-								...styles.closeButton,
-								opacity: pressed ? 0.7 : 1,
-							})}
+							className='h-[34px] w-[34px] items-center justify-center rounded-2xl bg-[#DCEFE5] active:opacity-70'
 						>
-							<Text style={styles.closeButtonText}>×</Text>
+							<Text className='text-[23px] leading-[25px] text-[#123C32]'>
+								×
+							</Text>
 						</Pressable>
 					</View>
 
 					{selectedItem.type === 'species' &&
 						selectedItem.species?.scientific_name && (
-							<Text style={styles.scientificName}>
+							<Text className='mt-2 text-[12px] italic text-[#6F8A7D]'>
 								{selectedItem.species.scientific_name}
 							</Text>
 						)}
 
 					{selectedItem.description && (
-						<Text style={styles.itemDescription} numberOfLines={3}>
+						<Text
+							className='mt-3 text-[13px] leading-[19px] text-[#6F8A7D]'
+							numberOfLines={3}
+						>
 							{selectedItem.description}
 						</Text>
 					)}
 
-					<View style={styles.actionRow}>
+					<View className='mt-3.5 w-full'>
 						<View
-							style={[
-								styles.howToButtonContainer,
-								{
-									backgroundColor:
-										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#087A5A',
-
-									borderColor:
-										!userLocation || !isUserInsideZoo ? '#B8DCCA' : '#064D36',
-								},
-							]}
+							className={`h-14 w-full overflow-hidden rounded-2xl border ${!userLocation || !isUserInsideZoo ? 'border-[#B8DCCA] bg-[#B8DCCA]' : 'border-[#064D36] bg-[#087A5A]'}`}
+							style={mapShadow}
 						>
 							<Pressable
 								onPress={handleHowToGetThere}
 								disabled={!userLocation || !isUserInsideZoo}
-								style={({ pressed }) => ({
-									flex: 1,
-									alignItems: 'center',
-									justifyContent: 'center',
-									backgroundColor: 'transparent',
-									opacity: pressed ? 0.7 : 1,
-								})}
+								className='flex-1 items-center justify-center bg-transparent active:opacity-70'
 							>
-								<Text style={styles.howToButtonText}>Cómo llegar ➜</Text>
+								<Text
+									className='m-0 p-0 text-center text-[16px] font-extrabold leading-[56px] text-blanco'
+									style={{
+										includeFontPadding: false,
+										textAlignVertical: 'center',
+									}}
+								>
+									Cómo llegar ➜
+								</Text>
 							</Pressable>
 						</View>
 					</View>
 
 					{!isUserInsideZoo && userLocation && (
-						<Text style={styles.outsideZooText}>
+						<Text className='mt-2.5 text-[11px] leading-[17px] text-[#6F8A7D]'>
 							Debes estar dentro del zoológico para calcular una ruta por los
 							caminos internos.
 						</Text>
 					)}
 
 					{route && (
-						<View style={styles.routeInfo}>
-							<View style={styles.routeSummary}>
-								<Text style={styles.routeLabel}>Ruta por caminos</Text>
+						<View className='mt-3.5 flex-row items-center justify-between gap-2.5 border-t border-t-[#B8DCCA] pt-[13px]'>
+							<View className='min-w-0 flex-1'>
+								<Text className='text-[11px] text-[#6F8A7D]'>
+									Ruta por caminos
+								</Text>
 
-								<Text style={styles.routeDistance}>
+								<Text className='mt-0.5 text-[17px] font-extrabold text-[#064D36]'>
 									{formatDistance(route.distance)}
 								</Text>
 							</View>
 
-							<View style={styles.routeTimeBox}>
-								<Text style={styles.routeTime}>
+							<View className='min-w-12 items-center'>
+								<Text className='text-[13px] font-extrabold text-[#123C32]'>
 									{formatMinutes(route.distance / 80)}
 								</Text>
 
-								<Text style={styles.routeTimeLabel}>caminando</Text>
+								<Text className='text-[9px] text-[#6F8A7D]'>caminando</Text>
 							</View>
 
 							<Pressable
-								style={({ pressed }) => ({
-									...styles.routeButton,
-									opacity: pressed ? 0.7 : 1,
-								})}
+								className='rounded-2xl bg-[#064D36] px-[15px] py-2.5 active:opacity-70'
+								style={mapShadow}
 								onPress={() => flyToDestination(selectedItem.coordinate, 500)}
 							>
-								<Text style={styles.routeButtonText}>Ver destino</Text>
+								<Text className='text-[11px] font-bold text-blanco'>
+									Ver destino
+								</Text>
 							</Pressable>
 						</View>
 					)}
 
 					{!route && userLocation && isUserInsideZoo && (
-						<Text style={styles.routeHint}>
+						<Text className='mt-2.5 text-[11px] leading-[17px] text-[#6F8A7D]'>
 							Presiona "Cómo llegar" para calcular la ruta por los caminos del
 							zoológico.
 						</Text>
 					)}
 
 					{!userLocation && (
-						<Text style={styles.noRouteText}>
+						<Text className='mt-3 text-[12px] leading-[18px] text-[#6F8A7D]'>
 							No tenemos acceso a tu ubicación para calcular la ruta.
 						</Text>
 					)}
@@ -2250,28 +2282,28 @@ export default function MapScreen() {
 			)}
 
 			{selectedItem && routeCardCollapsed && (
-				<View style={styles.collapsedCardShadow}>
+				<View
+					className='absolute bottom-[15px] left-3 right-3 h-[72px] rounded-[20px] bg-[#F7F7EE]'
+					style={mapShadow}
+				>
 					<Pressable
 						onPress={() => setRouteCardCollapsed(false)}
-						style={({ pressed }) => ({
-							...styles.collapsedRouteCard,
-							opacity: pressed ? 0.7 : 1,
-						})}
+						className='relative h-[72px] w-full justify-center rounded-[20px] bg-[#F7F7EE] px-3 active:opacity-70'
 					>
 						<View
-							style={[
-								styles.collapsedRouteIcon,
+							className='absolute left-3 top-[15px] h-[35px] w-[35px] items-center justify-center overflow-hidden rounded-[14px] bg-[#087A5A]'
+							style={
 								selectedItem.type === 'marker' && {
 									backgroundColor: selectedItem.color ?? '#087A5A',
-								},
-							]}
+								}
+							}
 						>
 							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
 								<Image
 									source={{
 										uri: selectedItem.thumbnail,
 									}}
-									style={styles.collapsedSpeciesImage}
+									style={{ width: 35, height: 35, borderRadius: 14 }}
 									contentFit='cover'
 									cachePolicy='memory-disk'
 								/>
@@ -2280,12 +2312,12 @@ export default function MapScreen() {
 									source={{
 										uri: selectedItem.iconImage,
 									}}
-									style={styles.collapsedMarkerImage}
+									style={{ width: 30, height: 30, borderRadius: 12 }}
 									contentFit='contain'
 									cachePolicy='memory-disk'
 								/>
 							) : (
-								<Text style={styles.collapsedRouteIconText}>
+								<Text className='text-[18px]'>
 									{selectedItem.type === 'species'
 										? (selectedItem.icon ?? '🦁')
 										: (selectedItem.icon ?? '📍')}
@@ -2293,41 +2325,48 @@ export default function MapScreen() {
 							)}
 						</View>
 
-						<View style={styles.collapsedRouteMain}>
-							<View style={styles.collapsedRouteName}>
-								<Text style={styles.collapsedRouteTitle} numberOfLines={1}>
+						<View className='absolute left-[59px] right-[92px] top-3 h-12 justify-center'>
+							<View className='w-full justify-center'>
+								<Text
+									className='text-[14px] font-extrabold leading-[18px] text-[#123C32]'
+									numberOfLines={1}
+								>
 									{selectedItem.name}
 								</Text>
 
-								<Text style={styles.collapsedRouteSubtitle}>
+								<Text className='mt-0.5 text-[9px] leading-3 text-[#6F8A7D]'>
 									Ruta por caminos
 								</Text>
 							</View>
 
 							{route && (
-								<View style={styles.collapsedRouteStats}>
-									<View style={styles.collapsedRouteStat}>
-										<Text style={styles.collapsedRouteDistance}>
+								<View className='absolute -right-[30px] top-0 h-12 w-[125px] flex-row items-center justify-end'>
+									<View className='w-[52px] items-center justify-center'>
+										<Text className='text-center text-[14px] font-extrabold leading-[17px] text-[#064D36]'>
 											{formatDistance(route.distance)}
 										</Text>
 
-										<Text style={styles.collapsedRouteLabel}>distancia</Text>
+										<Text className='mt-px text-center text-[7px] leading-[9px] text-[#6F8A7D]'>
+											distancia
+										</Text>
 									</View>
 
-									<View style={styles.collapsedRouteSeparator} />
+									<View className='mx-[5px] h-6 w-px bg-[#B8DCCA]' />
 
-									<View style={styles.collapsedRouteStat}>
-										<Text style={styles.collapsedRouteTime}>
+									<View className='w-[52px] items-center justify-center'>
+										<Text className='text-center text-[13px] font-extrabold leading-4 text-[#123C32]'>
 											{formatMinutes(route.distance / 80)}
 										</Text>
 
-										<Text style={styles.collapsedRouteLabel}>caminando</Text>
+										<Text className='mt-px text-center text-[7px] leading-[9px] text-[#6F8A7D]'>
+											caminando
+										</Text>
 									</View>
 								</View>
 							)}
 						</View>
 
-						<View style={styles.collapsedRouteExpand}>
+						<View className='absolute right-3 top-5 h-8 w-8 items-center justify-center rounded-2xl bg-[#DCEFE5]'>
 							<HugeiconsIcon icon={ArrowUp01Icon} size={18} color='#087A5A' />
 						</View>
 					</Pressable>
