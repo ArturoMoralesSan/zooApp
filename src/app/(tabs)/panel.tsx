@@ -29,29 +29,8 @@ import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken, logout, type User } from '@/services/auth'
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	colors,
-	footerSubtitleStyle,
-	footerTitleStyle,
-	logoutContainerStyle,
-	logoutDescriptionStyle,
-	logoutIconContainerStyle,
-	logoutPressableStyle,
-	logoutTitleStyle,
-	modalOverlayStyle,
-	qrContainerStyle,
-	qrDescriptionStyle,
-	qrHeaderIconStyle,
-	qrInfoDescriptionStyle,
-	qrInfoStyle,
-	qrInfoTitleStyle,
-	qrLoadingStyle,
-	qrModalStyle,
-	qrTitleStyle,
-	scrollContentStyle,
-} from '@/styles/panel'
+import colors from '@/theme/colors'
+import { cardShadow } from '@/theme/shadows'
 
 type UserWithProfile = User & {
 	profile?: {
@@ -167,14 +146,13 @@ export default function Panel() {
 		<SafeAreaView className='flex-1' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1'
+				className='flex-1 bg-blanco'
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
-				style={backgroundStyle}
+				imageClassName='opacity-[0.025]'
 			>
 				<ScrollView
 					className='flex-1'
-					contentContainerStyle={scrollContentStyle}
+					contentContainerClassName='px-3 pb-[120px] pt-2'
 					showsVerticalScrollIndicator={false}
 				>
 					{/* ENCABEZADO */}
@@ -196,10 +174,7 @@ export default function Panel() {
 					{/* MI CUENTA */}
 
 					<View className='mt-[24.5px]'>
-						<Text
-							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
-							style={{ color: '#06371c' }}
-						>
+						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-[#06371c]'>
 							Mi cuenta
 						</Text>
 
@@ -214,10 +189,7 @@ export default function Panel() {
 					{/* MI ACTIVIDAD */}
 
 					<View className='mt-[17.5px]'>
-						<Text
-							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
-							style={{ color: '#06371c' }}
-						>
+						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-[#06371c]'>
 							Mi actividad
 						</Text>
 
@@ -239,10 +211,7 @@ export default function Panel() {
 					{/* AYUDA */}
 
 					<View className='mt-[17.5px]'>
-						<Text
-							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
-							style={{ color: '#06371c' }}
-						>
+						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-[#06371c]'>
 							Ayuda
 						</Text>
 
@@ -274,22 +243,15 @@ export default function Panel() {
 					{/* CERRAR SESIÓN */}
 
 					<View
-						className='mt-[17.5px] overflow-hidden rounded-[18px]'
-						style={logoutContainerStyle}
+						className='mt-[17.5px] overflow-hidden rounded-[18px] border border-[#a6c1b3] bg-niebla'
+						style={cardShadow}
 					>
 						<Pressable
 							onPress={handleLogout}
 							disabled={loggingOut}
-							className='flex-row items-center px-[12.25px] py-[10.5px]'
-							style={({ pressed }) => [
-								logoutPressableStyle(pressed),
-								{ minHeight: 80 },
-							]}
+							className='min-h-20 flex-row items-center px-[12.25px] py-[10.5px] active:opacity-[0.84]'
 						>
-							<View
-								className='h-[42px] w-[42px] items-center justify-center rounded-[16px]'
-								style={logoutIconContainerStyle}
-							>
+							<View className='h-[42px] w-[42px] items-center justify-center rounded-[16px] border border-[#a6c1b3] bg-[#d5ead9]'>
 								<HugeiconsIcon
 									icon={Logout01Icon}
 									size={23}
@@ -299,17 +261,11 @@ export default function Panel() {
 							</View>
 
 							<View className='ml-[10.5px] flex-1'>
-								<Text
-									className='text-[14px] font-bold leading-[21px]'
-									style={logoutTitleStyle}
-								>
+								<Text className='text-[14px] font-extrabold leading-[21px] text-[#06371c]'>
 									{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 								</Text>
 
-								<Text
-									className='mt-[3.5px] text-[12.25px] leading-[17.5px]'
-									style={logoutDescriptionStyle}
-								>
+								<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-[#06371c]'>
 									Salir de tu cuenta
 								</Text>
 							</View>
@@ -317,15 +273,12 @@ export default function Panel() {
 							{loggingOut ? (
 								<ActivityIndicator size='small' color='#08783F' />
 							) : (
-								<View
-									className='ml-[7px] h-7 w-7 items-center justify-center rounded-full'
-									style={{ backgroundColor: '#08783F' }}
-								>
+								<View className='ml-[7px] h-7 w-7 items-center justify-center rounded-full bg-[#08783F]'>
 									<HugeiconsIcon
 										icon={ArrowRight01Icon}
 										size={20}
 										strokeWidth={2}
-										color={colors.white}
+										color={colors.blanco}
 									/>
 								</View>
 							)}
@@ -335,17 +288,11 @@ export default function Panel() {
 					{/* PIE DE PÁGINA */}
 
 					<View className='mt-7 items-center'>
-						<Text
-							className='text-[10.5px] leading-[14px]'
-							style={footerTitleStyle}
-						>
+						<Text className='text-[10.5px] font-extrabold leading-[14px] text-[#06371c]'>
 							ZooApp
 						</Text>
 
-						<Text
-							className='mt-[3.5px] text-[10.5px] leading-[14px]'
-							style={footerSubtitleStyle}
-						>
+						<Text className='mt-[3.5px] text-[10.5px] leading-[14px] text-[#06371c]'>
 							Sahuatoba
 						</Text>
 					</View>
@@ -362,38 +309,17 @@ export default function Panel() {
 				>
 					{/* Overlay */}
 
-					<View
-						style={[
-							modalOverlayStyle,
-							{
-								backgroundColor: 'rgba(6, 61, 34, 0.55)',
-								justifyContent: 'center',
-								alignItems: 'center',
-								padding: 20,
-							},
-						]}
-					>
+					<View className='flex-1 items-center justify-center bg-[rgba(6,61,34,0.55)] px-6 py-5'>
 						{/* Modal */}
 
 						<View
-							style={[
-								qrModalStyle,
-								{
-									backgroundColor: '#FFFFFF',
-									width: '100%',
-									maxWidth: 380,
-									padding: 20,
-									borderRadius: 24,
-								},
-							]}
+							className='w-full max-w-[380px] rounded-3xl border border-[#a6c1b3] bg-blanco p-5'
+							style={cardShadow}
 						>
 							{/* ENCABEZADO */}
 
 							<View className='items-center'>
-								<View
-									className='h-[42px] w-[42px] items-center justify-center rounded-[14px]'
-									style={[qrHeaderIconStyle, { backgroundColor: '#d5ead9' }]}
-								>
+								<View className='h-[42px] w-[42px] items-center justify-center rounded-[14px] border border-[#a6c1b3] bg-[#d5ead9]'>
 									<HugeiconsIcon
 										icon={QrCodeIcon}
 										size={26}
@@ -402,17 +328,11 @@ export default function Panel() {
 									/>
 								</View>
 
-								<Text
-									className='mt-[10.5px] text-center text-[22px]'
-									style={[qrTitleStyle, { color: '#06371c' }]}
-								>
+								<Text className='mt-[10.5px] text-center text-[22px] font-extrabold text-[#06371c]'>
 									Mi código QR
 								</Text>
 
-								<Text
-									className='mt-[3.5px] text-center text-[13px] leading-[19px]'
-									style={[qrDescriptionStyle, { color: '#06371c' }]}
-								>
+								<Text className='mt-[3.5px] text-center text-[13px] leading-[19px] text-[#06371c]'>
 									Presenta este código en taquilla para identificar tu cuenta.
 								</Text>
 							</View>
@@ -420,16 +340,8 @@ export default function Panel() {
 							{/* CÓDIGO QR */}
 
 							<View
-								style={[
-									qrContainerStyle,
-									{
-										alignSelf: 'center',
-										marginTop: 18,
-										padding: 12,
-										backgroundColor: '#FFFFFF',
-										borderColor: '#a6c1b3',
-									},
-								]}
+								className='mt-[18px] self-center rounded-3xl border border-[#a6c1b3] bg-blanco p-3'
+								style={cardShadow}
 							>
 								{user?.qr_token ? (
 									<QRCode
@@ -440,18 +352,7 @@ export default function Panel() {
 										eQuietZone={4}
 									/>
 								) : (
-									<View
-										style={[
-											qrLoadingStyle,
-											{
-												width: 180,
-												height: 180,
-												alignItems: 'center',
-												justifyContent: 'center',
-												backgroundColor: '#FFFFFF',
-											},
-										]}
-									>
+									<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
 										<ActivityIndicator size='large' color='#08783F' />
 									</View>
 								)}
@@ -459,28 +360,12 @@ export default function Panel() {
 
 							{/* INFORMACIÓN */}
 
-							<View
-								className='mt-3.5 rounded-[10.5px] p-[10.5px]'
-								style={[
-									qrInfoStyle,
-									{
-										backgroundColor: '#eef4f0',
-										borderWidth: 1,
-										borderColor: '#a6c1b3',
-									},
-								]}
-							>
-								<Text
-									className='text-[12.25px] font-extrabold leading-[17.5px]'
-									style={[qrInfoTitleStyle, { color: '#06371c' }]}
-								>
+							<View className='mt-3.5 rounded-[10.5px] border border-[#a6c1b3] bg-niebla p-[10.5px]'>
+								<Text className='text-[12.25px] font-extrabold leading-[17.5px] text-[#06371c]'>
 									Código personal
 								</Text>
 
-								<Text
-									className='mt-[3.5px] text-[10.5px] leading-[18px]'
-									style={[qrInfoDescriptionStyle, { color: '#06371c' }]}
-								>
+								<Text className='mt-[3.5px] text-[10.5px] leading-[18px] text-[#06371c]'>
 									Este código está asociado a tu cuenta de ZooApp.
 								</Text>
 							</View>
