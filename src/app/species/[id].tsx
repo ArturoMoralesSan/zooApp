@@ -23,10 +23,26 @@ import {
 	ScrollView,
 	Text,
 	View,
+	type ViewStyle,
 } from 'react-native'
 
-import { colors as panelColors } from '@/styles/panel'
-import styles, { colors } from '@/styles/species-detail'
+import colors from '@/theme/colors'
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#08783F',
+	shadowOffset: { width: 0, height: 5 },
+	shadowOpacity: 0.12,
+	shadowRadius: 10,
+	elevation: 4,
+}
+
+const subtleShadow: ViewStyle = {
+	shadowColor: '#08783F',
+	shadowOffset: { width: 0, height: 3 },
+	shadowOpacity: 0.08,
+	shadowRadius: 7,
+	elevation: 2,
+}
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -157,17 +173,13 @@ export default function SpeciesDetailScreen() {
 		return (
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 items-center justify-center'
+				className='flex-1 items-center justify-center bg-blanco'
 				resizeMode='repeat'
-				imageStyle={styles.patternImage}
-				style={styles.loadingBackground}
+				imageClassName='opacity-90'
 			>
-				<ActivityIndicator size='large' color={colors.primary} />
+				<ActivityIndicator size='large' color='#08783F' />
 
-				<Text
-					className='mt-3.5 text-[12.25px] font-medium leading-[17.5px]'
-					style={styles.loadingText}
-				>
+				<Text className='mt-3.5 text-[12.25px] font-medium leading-[17.5px] text-[#668475]'>
 					Cargando especie...
 				</Text>
 			</ImageBackground>
@@ -178,42 +190,40 @@ export default function SpeciesDetailScreen() {
 		return (
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 px-[17.5px] pt-14'
+				className='flex-1 bg-blanco px-[17.5px] pt-14'
 				resizeMode='repeat'
-				imageStyle={styles.patternImage}
-				style={styles.errorBackground}
+				imageClassName='opacity-90'
 			>
-				<View style={{ zIndex: 100, elevation: 100 }}>
+				<View className='z-[100]' style={{ elevation: 100 }}>
 					<BackButton onPress={() => router.back()} />
 				</View>
 
-				<View style={styles.errorCard}>
-					<View style={styles.errorIcon}>
+				<View
+					className='items-center rounded-[28px] border border-[#a6c1b3] bg-niebla px-6 py-10'
+					style={cardShadow}
+				>
+					<View className='h-16 w-16 items-center justify-center rounded-2xl border border-[#a6c1b3] bg-[#d5ead9]'>
 						<HugeiconsIcon
 							icon={UserGroupIcon}
 							size={34}
 							strokeWidth={1.8}
-							color={colors.errorText}
+							color='#0a2014'
 						/>
 					</View>
 
-					<Text style={styles.errorTitle}>
+					<Text className='mt-5 text-center text-[18px] font-bold text-[#0a2014]'>
 						No fue posible cargar la especie
 					</Text>
 
-					<Text style={styles.errorMessage}>
+					<Text className='mt-2 text-center text-[14px] leading-5 text-[#668475]'>
 						{error ?? 'La información no está disponible en este momento.'}
 					</Text>
 
 					<Pressable
 						onPress={() => void loadSpecies()}
-						className='mt-3.5 self-start rounded-[20px] px-[21px] py-[12.25px]'
-						style={({ pressed }) => [
-							styles.retryButton,
-							pressed && styles.retryButtonPressed,
-						]}
+						className='mt-3.5 self-start rounded-[20px] bg-[#08783F] px-[21px] py-[12.25px] active:bg-[#063D22]'
 					>
-						<Text style={styles.retryButtonText}>Intentar nuevamente</Text>
+						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
 					</Pressable>
 				</View>
 			</ImageBackground>
@@ -221,10 +231,9 @@ export default function SpeciesDetailScreen() {
 	}
 
 	return (
-		<View style={{ flex: 1, position: 'relative' }}>
+		<View className='relative flex-1'>
 			<Animated.ScrollView
-				className='flex-1'
-				style={styles.scrollView}
+				className='flex-1 bg-blanco'
 				showsVerticalScrollIndicator={false}
 				scrollEventThrottle={16}
 				onScroll={Animated.event(
@@ -238,12 +247,9 @@ export default function SpeciesDetailScreen() {
 					{ useNativeDriver: false },
 				)}
 			>
-				<View className='relative' style={styles.mainBackground}>
+				<View className='relative bg-blanco'>
 					{/* IMAGEN PRINCIPAL */}
-					<View
-						className='h-[470px] w-full overflow-hidden'
-						style={styles.heroContainer}
-					>
+					<View className='h-[470px] w-full overflow-hidden bg-niebla'>
 						{heroImage ? (
 							<Pressable
 								onPress={() => setSelectedImage(heroImage)}
@@ -257,66 +263,50 @@ export default function SpeciesDetailScreen() {
 								/>
 							</Pressable>
 						) : (
-							<View
-								className='h-full w-full items-center justify-center'
-								style={styles.heroPlaceholder}
-							>
+							<View className='h-full w-full items-center justify-center bg-niebla'>
 								<HugeiconsIcon
 									icon={UserGroupIcon}
 									size={80}
 									strokeWidth={1.8}
-									color={colors.primary}
+									color='#08783F'
 								/>
 							</View>
 						)}
 
 						<View
-							className='absolute inset-0'
+							className='absolute inset-0 bg-[rgba(6,61,34,0.08)]'
 							pointerEvents='none'
-							style={styles.heroOverlay}
 						/>
 					</View>
 
 					{/* CONTENIDO */}
 					<Animated.View
-						className='relative z-10 w-full overflow-hidden rounded-t-[30px]'
-						style={[styles.mainCard, { marginTop: cardMarginTop }]}
+						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border border-[#a6c1b3] bg-niebla'
+						style={[cardShadow, { marginTop: cardMarginTop }]}
 					>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
 							resizeMode='repeat'
-							imageStyle={styles.cardPatternImage}
-							style={styles.cardBackground}
+							imageClassName='opacity-30'
+							className='bg-blanco'
 						>
 							<View className='px-[17.5px] pb-7 pt-[24.5px]'>
 								{/* CATEGORÍA */}
 								{species.category && (
-									<View
-										className='self-start rounded-full px-[12.25px] py-[5.25px]'
-										style={styles.categoryBadge}
-									>
-										<Text
-											className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide'
-											style={styles.categoryText}
-										>
+									<View className='self-start rounded-full border border-[#a6c1b3] bg-[#d5ead9] px-[12.25px] py-[5.25px]'>
+										<Text className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide text-[#08783F]'>
 											{species.category.name}
 										</Text>
 									</View>
 								)}
 
 								{/* NOMBRE */}
-								<Text
-									className='mt-3.5 text-[30px] font-bold leading-[31.5px]'
-									style={styles.speciesName}
-								>
+								<Text className='mt-3.5 text-[30px] font-bold leading-[31.5px] text-[#0a2014]'>
 									{species.common_name}
 								</Text>
 
 								{species.scientific_name && (
-									<Text
-										className='mt-[5.25px] text-[14px] italic leading-[21px]'
-										style={styles.scientificName}
-									>
+									<Text className='mt-[5.25px] text-[14px] italic leading-[21px] text-[#668475]'>
 										{species.scientific_name}
 									</Text>
 								)}
@@ -324,17 +314,11 @@ export default function SpeciesDetailScreen() {
 								{/* DESCRIPCIÓN */}
 								{species.description && (
 									<View className='mt-7'>
-										<Text
-											className='text-[21px] font-bold'
-											style={styles.sectionTitle}
-										>
+										<Text className='text-[21px] font-bold text-[#0a2014]'>
 											Conoce a esta especie
 										</Text>
 
-										<Text
-											className='mt-[7px] text-[15px] leading-[24.5px]'
-											style={styles.description}
-										>
+										<Text className='mt-[7px] text-[15px] leading-[24.5px] text-[#668475]'>
 											{species.description}
 										</Text>
 									</View>
@@ -342,88 +326,78 @@ export default function SpeciesDetailScreen() {
 
 								{/* DATOS DE LA ESPECIE */}
 								<View className='mt-7'>
-									<Text
-										className='text-[21px] font-bold'
-										style={styles.sectionTitle}
-									>
+									<Text className='text-[21px] font-bold text-[#0a2014]'>
 										Datos de la especie
 									</Text>
 
-									<View
-										className='mt-3.5'
-										style={{
-											flexDirection: 'row',
-											flexWrap: 'wrap',
-											justifyContent: 'space-between',
-										}}
-									>
+									<View className='mt-3.5 flex-row flex-wrap justify-between'>
 										{species.habitat && (
-											<View style={{ width: '48.5%', marginBottom: 12 }}>
+											<View className='mb-3 w-[48.5%]'>
 												<AppCard
 													icon={Location01Icon}
 													iconPosition='top'
 													title='Hábitat'
 													description={species.habitat}
-													backgroundColor={panelColors.card}
-													borderColor={panelColors.border}
-													iconColor={panelColors.primary}
-													iconBackgroundColor={panelColors.active}
-													textColor={panelColors.primaryDark}
-													descriptionColor={panelColors.textSecondary}
+													backgroundColor={colors.niebla}
+													borderColor='#a6c1b3'
+													iconColor='#08783F'
+													iconBackgroundColor='#d5ead9'
+													textColor='#063D22'
+													descriptionColor='#06371c'
 													showArrow={false}
 												/>
 											</View>
 										)}
 
 										{species.origin && (
-											<View style={{ width: '48.5%', marginBottom: 12 }}>
+											<View className='mb-3 w-[48.5%]'>
 												<AppCard
 													icon={Plant01Icon}
 													iconPosition='top'
 													title='Origen'
 													description={species.origin}
-													backgroundColor={panelColors.card}
-													borderColor={panelColors.border}
-													iconColor={panelColors.primary}
-													iconBackgroundColor={panelColors.active}
-													textColor={panelColors.primaryDark}
-													descriptionColor={panelColors.textSecondary}
+													backgroundColor={colors.niebla}
+													borderColor='#a6c1b3'
+													iconColor='#08783F'
+													iconBackgroundColor='#d5ead9'
+													textColor='#063D22'
+													descriptionColor='#06371c'
 													showArrow={false}
 												/>
 											</View>
 										)}
 
 										{species.diet && (
-											<View style={{ width: '48.5%', marginBottom: 12 }}>
+											<View className='mb-3 w-[48.5%]'>
 												<AppCard
 													icon={Leaf01Icon}
 													title='Alimentación'
 													iconPosition='top'
 													description={species.diet}
-													backgroundColor={panelColors.card}
-													borderColor={panelColors.border}
-													iconColor={panelColors.primary}
-													iconBackgroundColor={panelColors.active}
-													textColor={panelColors.primaryDark}
-													descriptionColor={panelColors.textSecondary}
+													backgroundColor={colors.niebla}
+													borderColor='#a6c1b3'
+													iconColor='#08783F'
+													iconBackgroundColor='#d5ead9'
+													textColor='#063D22'
+													descriptionColor='#06371c'
 													showArrow={false}
 												/>
 											</View>
 										)}
 
 										{species.conservation_status && (
-											<View style={{ width: '48.5%', marginBottom: 12 }}>
+											<View className='mb-3 w-[48.5%]'>
 												<AppCard
 													icon={Shield01Icon}
 													iconPosition='top'
 													title='Conservación'
 													description={species.conservation_status}
-													backgroundColor={panelColors.active}
-													borderColor={panelColors.border}
-													iconColor={panelColors.primary}
-													iconBackgroundColor={panelColors.card}
-													textColor={panelColors.primaryDark}
-													descriptionColor={panelColors.textSecondary}
+													backgroundColor='#d5ead9'
+													borderColor='#a6c1b3'
+													iconColor='#08783F'
+													iconBackgroundColor={colors.niebla}
+													textColor='#063D22'
+													descriptionColor='#06371c'
 													showArrow={false}
 												/>
 											</View>
@@ -434,10 +408,7 @@ export default function SpeciesDetailScreen() {
 								{/* ETIQUETAS */}
 								{species.tags.length > 0 && (
 									<View className='mt-7'>
-										<Text
-											className='text-[21px] font-bold'
-											style={styles.sectionTitle}
-										>
+										<Text className='text-[21px] font-bold text-[#0a2014]'>
 											Etiquetas
 										</Text>
 
@@ -445,16 +416,9 @@ export default function SpeciesDetailScreen() {
 											{species.tags.map((tag) => (
 												<View
 													key={tag.id}
-													className='rounded-full border px-3.5 py-[8.75px]'
-													style={{
-														backgroundColor: panelColors.primary,
-														borderColor: panelColors.border,
-													}}
+													className='rounded-full border border-[#a6c1b3] bg-[#08783F] px-3.5 py-[8.75px]'
 												>
-													<Text
-														className='text-[12.25px] font-semibold leading-[17.5px]'
-														style={{ color: panelColors.white }}
-													>
+													<Text className='text-[12.25px] font-semibold leading-[17.5px] text-blanco'>
 														{tag.name}
 													</Text>
 												</View>
@@ -466,10 +430,7 @@ export default function SpeciesDetailScreen() {
 								{/* GALERÍA */}
 								{galleryImages.length > 0 && (
 									<View className='mt-7'>
-										<Text
-											className='text-[21px] font-bold'
-											style={styles.sectionTitle}
-										>
+										<Text className='text-[21px] font-bold text-[#0a2014]'>
 											Galería
 										</Text>
 
@@ -477,14 +438,14 @@ export default function SpeciesDetailScreen() {
 											horizontal
 											showsHorizontalScrollIndicator={false}
 											className='-mx-[17.5px] mt-3.5'
-											contentContainerStyle={styles.galleryContent}
+											contentContainerClassName='px-5'
 										>
 											{galleryImages.map((image) => (
 												<View
 													key={image.id}
-													className='mr-[10.5px] overflow-hidden rounded-[22px]'
+													className='mr-[10.5px] overflow-hidden rounded-[22px] border border-[#a6c1b3] bg-niebla'
 													style={[
-														styles.galleryItem,
+														subtleShadow,
 														{
 															width: SCREEN_WIDTH * 0.68,
 															height: SCREEN_WIDTH * 0.48,
@@ -493,11 +454,7 @@ export default function SpeciesDetailScreen() {
 												>
 													<Pressable
 														onPress={() => setSelectedImage(image)}
-														className='h-full w-full'
-														style={({ pressed }) => [
-															styles.galleryPressable,
-															pressed && styles.galleryPressed,
-														]}
+														className='h-full w-full active:opacity-[0.88]'
 													>
 														<Image
 															source={{ uri: image.url }}
@@ -543,20 +500,13 @@ export default function SpeciesDetailScreen() {
 				animationType='fade'
 				onRequestClose={() => setSelectedImage(null)}
 			>
-				<View
-					className='flex-1 items-center justify-center'
-					style={styles.modalContainer}
-				>
-					<View style={styles.modalCloseWrapper}>
+				<View className='flex-1 items-center justify-center bg-[rgba(6,32,20,0.95)]'>
+					<View className='absolute right-5 top-14 z-10 overflow-hidden rounded-full border border-[rgba(166,193,179,0.35)] bg-[rgba(238,244,240,0.20)]'>
 						<Pressable
 							onPress={() => setSelectedImage(null)}
-							className='rounded-full px-3.5 py-[8.75px]'
-							style={({ pressed }) => [
-								styles.modalCloseButton,
-								pressed && styles.modalCloseButtonPressed,
-							]}
+							className='rounded-full bg-[rgba(238,244,240,0.20)] px-3.5 py-[8.75px] active:bg-[rgba(213,234,217,0.30)]'
 						>
-							<Text style={styles.modalCloseText}>Cerrar</Text>
+							<Text className='text-[14px] font-bold text-blanco'>Cerrar</Text>
 						</Pressable>
 					</View>
 
