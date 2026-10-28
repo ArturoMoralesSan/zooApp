@@ -9,6 +9,7 @@ import {
 	ScrollView,
 	Text,
 	View,
+	type ViewStyle,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -19,43 +20,15 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	bottomSpaceStyle,
-	cardHeaderStyle,
-	cardHeaderTextStyle,
-	cardShadow,
-	cardStyle,
-	cardSubtitleStyle,
-	cardTitleStyle,
-	containerStyle,
-	dividerStyle,
-	iconContainerStyle,
-	loadingContainerStyle,
-	loadingContentStyle,
-	loadingTextStyle,
-	noticeContentStyle,
-	noticeIconStyle,
-	noticeIconTextStyle,
-	noticeStyle,
-	noticeTextStyle,
-	noticeTitleStyle,
-	paymentCardStyle,
-	paymentIconStyle,
-	paymentInfoStyle,
-	paymentTextStyle,
-	paymentTitleStyle,
-	scrollContentStyle,
-	ticketNameStyle,
-	ticketQuantityStyle,
-	ticketRowInfoStyle,
-	ticketRowStyle,
-	ticketSubtotalStyle,
-	totalLabelStyle,
-	totalRowStyle,
-	totalStyle,
-} from '@/styles/ticket-summary'
+const ICON_COLOR = '#187744'
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#063D22',
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.05,
+	shadowRadius: 8,
+	elevation: 2,
+}
 
 type TicketType = {
 	id: number
@@ -229,18 +202,20 @@ export default function TicketSummaryScreen() {
 	if (loading) {
 		return (
 			<SafeAreaView
-				style={[loadingContainerStyle, { flex: 1 }]}
+				className='flex-1 bg-blanco'
 				edges={['top', 'left', 'right']}
 			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					style={[backgroundStyle, { flex: 1 }]}
+					className='flex-1 bg-blanco'
 					resizeMode='repeat'
-					imageStyle={backgroundImageStyle}
+					imageClassName='opacity-[0.12]'
 				>
-					<View style={loadingContentStyle}>
-						<ActivityIndicator size='large' color='#187744' />
-						<Text style={loadingTextStyle}>Cargando resumen...</Text>
+					<View className='flex-1 items-center justify-center'>
+						<ActivityIndicator size='large' color={ICON_COLOR} />
+						<Text className='mt-3 text-[14px] font-medium text-[#607A6A]'>
+							Cargando resumen...
+						</Text>
 					</View>
 				</ImageBackground>
 			</SafeAreaView>
@@ -248,35 +223,24 @@ export default function TicketSummaryScreen() {
 	}
 
 	return (
-		<SafeAreaView
-			style={[containerStyle, { flex: 1 }]}
-			edges={['top', 'left', 'right']}
-		>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={[backgroundStyle, { flex: 1 }]}
+				className='flex-1 bg-blanco'
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
+				imageClassName='opacity-[0.12]'
 			>
 				<ScrollView
-					style={{ flex: 1, minHeight: 0 }}
-					contentContainerStyle={[
-						scrollContentStyle,
-						{
-							paddingHorizontal: 20,
-							paddingTop: 12,
-							paddingBottom: 180,
-							flexGrow: 1,
-						},
-					]}
+					className='min-h-0 flex-1'
+					contentContainerClassName='grow px-5 pb-[180px] pt-3'
 					showsVerticalScrollIndicator={false}
 					bounces
 					nestedScrollEnabled
 					keyboardShouldPersistTaps='handled'
 				>
 					{/* ENCABEZADO */}
-					<View style={{ paddingBottom: 12 }}>
-						<View style={{ marginBottom: 12 }}>
+					<View className='pb-3'>
+						<View className='mb-3'>
 							<BackButton onPress={() => router.back()} position='relative' />
 						</View>
 
@@ -288,113 +252,122 @@ export default function TicketSummaryScreen() {
 					</View>
 
 					{/* DETALLE DE BOLETOS */}
-					<View style={[cardStyle, cardShadow]}>
-						<View style={cardHeaderStyle}>
-							<View style={iconContainerStyle}>
+					<View
+						className='mb-3.5 w-full rounded-[20px] border border-[#a6c1b3] bg-niebla p-4'
+						style={cardShadow}
+					>
+						<View className='mb-4 flex-row items-center'>
+							<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[14px] border border-[#a6c1b3] bg-[#d5ead9]'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={25}
 									strokeWidth={1.8}
-									color='#187744'
+									color={ICON_COLOR}
 								/>
 							</View>
 
-							<View style={cardHeaderTextStyle}>
-								<Text style={cardTitleStyle}>Tus boletos</Text>
-								<Text style={cardSubtitleStyle}>Detalle de la compra</Text>
+							<View className='flex-1'>
+								<Text className='text-[16px] font-extrabold text-[#0a2014]'>
+									Tus boletos
+								</Text>
+								<Text className='mt-[3px] text-[12px] text-[#607A6A]'>
+									Detalle de la compra
+								</Text>
 							</View>
 						</View>
 
 						{summary.length === 0 ? (
-							<Text style={ticketQuantityStyle}>
+							<Text className='mt-1 text-[12px] leading-[18px] text-[#607A6A]'>
 								No hay boletos seleccionados.
 							</Text>
 						) : (
 							summary.map((item) => (
-								<View key={item.ticket_type_id} style={ticketRowStyle}>
-									<View style={ticketRowInfoStyle}>
-										<Text style={ticketNameStyle}>{item.ticket.name}</Text>
+								<View
+									key={item.ticket_type_id}
+									className='flex-row items-center justify-between border-b border-b-niebla py-3'
+								>
+									<View className='flex-1 pr-3'>
+										<Text className='text-[14px] font-bold text-[#0a2014]'>
+											{item.ticket.name}
+										</Text>
 
-										<Text style={ticketQuantityStyle}>
+										<Text className='mt-1 text-[12px] leading-[18px] text-[#607A6A]'>
 											{item.quantity}{' '}
 											{item.quantity === 1 ? 'boleto' : 'boletos'} ×{' '}
 											{formatCurrency(Number(item.ticket.price) || 0)}
 										</Text>
 									</View>
 
-									<Text style={ticketSubtotalStyle}>
+									<Text className='text-[15px] font-extrabold text-[#12482e]'>
 										{formatCurrency(item.subtotal)}
 									</Text>
 								</View>
 							))
 						)}
 
-						<View style={dividerStyle} />
+						<View className='my-3 h-px bg-[#a6c1b3]' />
 
-						<View style={totalRowStyle}>
-							<Text style={totalLabelStyle}>Total</Text>
-							<Text style={totalStyle}>{formatCurrency(total)}</Text>
+						<View className='flex-row items-center justify-between pt-1'>
+							<Text className='text-[14px] font-bold text-[#0a2014]'>
+								Total
+							</Text>
+							<Text className='text-[22px] font-extrabold text-[#12482e]'>
+								{formatCurrency(total)}
+							</Text>
 						</View>
 					</View>
 
 					{/* MÉTODO DE PAGO */}
-					<View style={[paymentCardStyle, cardShadow]}>
-						<View style={paymentIconStyle}>
+					<View
+						className='mb-3.5 w-full flex-row items-center rounded-[20px] border border-[#a6c1b3] bg-niebla p-4'
+						style={cardShadow}
+					>
+						<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[14px] border border-[#a6c1b3] bg-[#d5ead9]'>
 							<HugeiconsIcon
 								icon={CreditCardIcon}
 								size={25}
 								strokeWidth={1.8}
-								color='#187744'
+								color={ICON_COLOR}
 							/>
 						</View>
 
-						<View style={paymentInfoStyle}>
-							<Text style={paymentTitleStyle}>Método de pago</Text>
-							<Text style={paymentTextStyle}>Tarjeta de crédito o débito</Text>
+						<View className='flex-1'>
+							<Text className='text-[15px] font-extrabold text-[#0a2014]'>
+								Método de pago
+							</Text>
+							<Text className='mt-1 text-[13px] leading-[18px] text-[#607A6A]'>
+								Tarjeta de crédito o débito
+							</Text>
 						</View>
 					</View>
 
 					{/* AVISO DE COMPRA SEGURA */}
-					<View style={noticeStyle}>
-						<View style={noticeIconStyle}>
-							<Text style={noticeIconTextStyle}>✓</Text>
+					<View className='mb-3.5 w-full flex-row items-center rounded-2xl border border-[#a6c1b3] bg-niebla p-3.5'>
+						<View className='mr-3 h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[#08783F]'>
+							<Text className='text-[18px] font-extrabold text-blanco'>✓</Text>
 						</View>
 
-						<View style={noticeContentStyle}>
-							<Text style={noticeTitleStyle}>Compra segura</Text>
-							<Text style={noticeTextStyle}>
+						<View className='flex-1'>
+							<Text className='text-[14px] font-bold text-[#0a2014]'>
+								Compra segura
+							</Text>
+							<Text className='mt-1 text-[12px] leading-[18px] text-[#668475]'>
 								Al confirmar recibirás tus boletos digitales con su código QR.
 							</Text>
 						</View>
 					</View>
 
-					<View style={bottomSpaceStyle} />
+					<View className='h-6' />
 				</ScrollView>
 
 				{/* FOOTER FIJO */}
 				{purchasing ? (
 					<View
-						style={{
-							position: 'absolute',
-							bottom: 0,
-							left: 0,
-							right: 0,
-							backgroundColor: '#FFFFFF',
-							borderTopWidth: 1,
-							borderTopColor: '#BDCCC3',
-							paddingHorizontal: 20,
-							paddingTop: 20,
-							paddingBottom: 28,
-							alignItems: 'center',
-							justifyContent: 'center',
-							flexDirection: 'row',
-							gap: 10,
-							elevation: 15,
-							zIndex: 999,
-						}}
+						className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t border-t-[#BDCCC3] bg-blanco px-5 pb-7 pt-5'
+						style={{ elevation: 15 }}
 					>
 						<ActivityIndicator size='small' color='#08783F' />
-						<Text style={{ color: '#08783F', fontWeight: '800' }}>
+						<Text className='font-extrabold text-[#08783F]'>
 							Procesando compra...
 						</Text>
 					</View>
