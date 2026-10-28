@@ -2,7 +2,13 @@ import { CheckmarkCircle02Icon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo } from 'react'
-import { ImageBackground, ScrollView, Text, View } from 'react-native'
+import {
+	ImageBackground,
+	ScrollView,
+	Text,
+	View,
+	type ViewStyle,
+} from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -10,42 +16,15 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	bottomSpaceStyle,
-	cardShadow,
-	colors,
-	containerStyle,
-	folioContainerStyle,
-	folioLabelStyle,
-	folioStyle,
-	infoBoxStyle,
-	infoContentStyle,
-	infoIconStyle,
-	infoIconTextStyle,
-	infoTextStyle,
-	infoTitleStyle,
-	noTicketsStyle,
-	noTicketsTextStyle,
-	orderCardStyle,
-	orderHeaderInfoStyle,
-	orderHeaderStyle,
-	orderIconStyle,
-	orderSubtitleStyle,
-	orderTitleStyle,
-	qrContainerStyle,
-	scrollContentStyle,
-	successCardStyle,
-	successIconStyle,
-	successTextStyle,
-	successTitleStyle,
-	ticketContainerStyle,
-	ticketLabelStyle,
-	totalAmountStyle,
-	totalCardStyle,
-	totalLabelStyle,
-} from '@/styles/ticket-success'
+import colors from '@/theme/colors'
+
+const cardShadow: ViewStyle = {
+	shadowColor: colors.bosque,
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
+}
 
 type Ticket = {
 	id: number
@@ -88,60 +67,28 @@ export default function TicketSuccessScreen() {
 		}).format(value)
 
 	return (
-		<SafeAreaView
-			style={[containerStyle, { flex: 1 }]}
-			edges={['top', 'left', 'right']}
-		>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={[backgroundStyle, { flex: 1 }]}
+				className='flex-1 bg-blanco'
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
+				imageClassName='opacity-[0.025]'
 			>
 				{/* CONTENIDO DESPLAZABLE */}
 				<ScrollView
-					style={{ flex: 1, minHeight: 0 }}
-					contentContainerStyle={[
-						scrollContentStyle,
-						{
-							width: '100%',
-							paddingHorizontal: 20,
-							paddingTop: 12,
-							paddingBottom: 190,
-							flexGrow: 1,
-							alignItems: 'stretch',
-						},
-					]}
+					className='min-h-0 flex-1'
+					contentContainerClassName='w-full grow items-stretch px-5 pb-[190px] pt-3'
 					showsVerticalScrollIndicator={false}
 					bounces
 					nestedScrollEnabled
 				>
 					{/* BOTÓN REGRESAR Y ENCABEZADO */}
-					<View
-						style={{
-							width: '100%',
-							alignSelf: 'stretch',
-							alignItems: 'stretch',
-							paddingBottom: 16,
-						}}
-					>
-						<View
-							style={{
-								width: '100%',
-								alignItems: 'flex-start',
-								marginBottom: 12,
-							}}
-						>
+					<View className='w-full items-stretch self-stretch pb-4'>
+						<View className='mb-3 w-full items-start'>
 							<BackButton onPress={() => router.back()} position='relative' />
 						</View>
 
-						<View
-							style={{
-								width: '100%',
-								alignSelf: 'stretch',
-								alignItems: 'stretch',
-							}}
-						>
+						<View className='w-full items-stretch self-stretch'>
 							<UserHeader
 								title='¡Compra realizada!'
 								subtitle='Tus boletos están listos para usar.'
@@ -152,70 +99,49 @@ export default function TicketSuccessScreen() {
 
 					{/* CONFIRMACIÓN DE COMPRA */}
 					<View
-						style={[
-							successCardStyle,
-							cardShadow,
-							{
-								backgroundColor: colors.button,
-								borderColor: colors.button,
-							},
-						]}
+						className='mb-[15px] w-full items-center rounded-[22px] border border-esmeralda bg-esmeralda p-[22px]'
+						style={cardShadow}
 					>
-						<View
-							style={[
-								successIconStyle,
-								{
-									backgroundColor: 'transparent',
-									borderWidth: 0,
-									elevation: 0,
-									shadowOpacity: 0,
-								},
-							]}
-						>
+						<View className='mb-3.5 h-[68px] w-[68px] items-center justify-center rounded-[22px] border-0 bg-transparent'>
 							<HugeiconsIcon
 								icon={CheckmarkCircle02Icon}
 								size={56}
 								strokeWidth={1.8}
-								color='#B8F35D'
+								color={colors.lima}
 							/>
 						</View>
 
-						<Text style={[successTitleStyle, { color: colors.white }]}>
+						<Text className='text-center text-[23px] font-black text-blanco'>
 							¡Compra realizada!
 						</Text>
 
-						<Text style={[successTextStyle, { color: '#EAF5EE' }]}>
+						<Text className='mt-[7px] text-center text-[14px] leading-5 text-hoja'>
 							Tu compra se realizó correctamente. Guarda tus códigos QR para
 							ingresar al zoológico.
 						</Text>
 					</View>
 
 					{/* BOLETOS Y CÓDIGOS QR */}
-					<View style={[orderCardStyle, cardShadow]}>
-						<View style={orderHeaderStyle}>
-							<View
-								style={[
-									orderIconStyle,
-									{
-										backgroundColor: colors.active,
-										borderColor: colors.border,
-										alignItems: 'center',
-										justifyContent: 'center',
-									},
-								]}
-							>
+					<View
+						className='mb-[15px] w-full rounded-[20px] border border-card-border bg-niebla p-4'
+						style={cardShadow}
+					>
+						<View className='mb-[17px] flex-row items-center'>
+							<View className='mr-3 h-12 w-12 items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={25}
 									strokeWidth={1.8}
-									color={colors.primary}
+									color={colors.esmeralda}
 								/>
 							</View>
 
-							<View style={orderHeaderInfoStyle}>
-								<Text style={orderTitleStyle}>Tus boletos</Text>
+							<View className='min-w-0 flex-1'>
+								<Text className='text-[17px] font-black text-tinta'>
+									Tus boletos
+								</Text>
 
-								<Text style={orderSubtitleStyle}>
+								<Text className='mt-[3px] text-[12px] leading-[17px] text-tinta-2'>
 									Presenta el código QR en la entrada
 								</Text>
 							</View>
@@ -223,21 +149,26 @@ export default function TicketSuccessScreen() {
 
 						{tickets.length > 0 ? (
 							tickets.map((ticket, index) => (
-								<View key={ticket.id ?? index} style={ticketContainerStyle}>
-									<Text style={ticketLabelStyle}>Boleto {index + 1}</Text>
+								<View
+									key={ticket.id ?? index}
+									className='mb-[15px] w-full items-center'
+								>
+									<Text className='mb-[9px] self-start text-[13px] font-extrabold text-tinta'>
+										Boleto {index + 1}
+									</Text>
 
-									<View style={qrContainerStyle}>
+									<View className='items-center justify-center rounded-2xl border border-card-border bg-blanco p-3.5'>
 										<QRCode
 											value={ticket.qr_token}
 											size={190}
-											backgroundColor={colors.white}
+											backgroundColor={colors.blanco}
 										/>
 									</View>
 								</View>
 							))
 						) : (
-							<View style={noTicketsStyle}>
-								<Text style={noTicketsTextStyle}>
+							<View className='w-full items-center justify-center py-[25px]'>
+								<Text className='text-center text-[14px] text-tinta-2'>
 									No se encontraron boletos en esta compra.
 								</Text>
 							</View>
@@ -245,37 +176,50 @@ export default function TicketSuccessScreen() {
 					</View>
 
 					{/* TOTAL PAGADO Y FOLIO */}
-					<View style={[totalCardStyle, cardShadow]}>
+					<View
+						className='mb-[15px] mt-0.5 w-full rounded-[18px] border border-card-border bg-niebla p-4'
+						style={cardShadow}
+					>
 						<View>
-							<Text style={totalLabelStyle}>Total pagado</Text>
+							<Text className='text-[14px] font-bold text-tinta-2'>
+								Total pagado
+							</Text>
 
-							<Text style={totalAmountStyle}>{formatCurrency(total)}</Text>
+							<Text className='mt-[3px] text-[25px] font-black text-bosque'>
+								{formatCurrency(total)}
+							</Text>
 						</View>
 
-						<View style={folioContainerStyle}>
-							<Text style={folioLabelStyle}>Folio</Text>
+						<View className='mt-[13px] border-t border-t-card-border pt-[13px]'>
+							<Text className='text-[11px] font-extrabold uppercase text-tinta-2'>
+								Folio
+							</Text>
 
-							<Text style={folioStyle}>#{order?.id ?? '---'}</Text>
+							<Text className='mt-[3px] text-[14px] font-extrabold text-tinta'>
+								#{order?.id ?? '---'}
+							</Text>
 						</View>
 					</View>
 
 					{/* INFORMACIÓN IMPORTANTE */}
-					<View style={infoBoxStyle}>
-						<View style={infoIconStyle}>
-							<Text style={infoIconTextStyle}>✓</Text>
+					<View className='w-full flex-row items-center rounded-2xl border border-card-border bg-niebla p-[15px]'>
+						<View className='mr-3 h-[38px] w-[38px] items-center justify-center rounded-xl border border-card-border bg-hoja'>
+							<Text className='text-[19px] font-black text-esmeralda'>✓</Text>
 						</View>
 
-						<View style={infoContentStyle}>
-							<Text style={infoTitleStyle}>Importante</Text>
+						<View className='min-w-0 flex-1'>
+							<Text className='text-[14px] font-black text-bosque'>
+								Importante
+							</Text>
 
-							<Text style={infoTextStyle}>
+							<Text className='mt-1 text-[12px] leading-[18px] text-tinta-2'>
 								Los códigos QR son tus boletos de entrada. Puedes mostrarlos
 								directamente desde tu celular al llegar al zoológico.
 							</Text>
 						</View>
 					</View>
 
-					<View style={bottomSpaceStyle} />
+					<View className='h-0' />
 				</ScrollView>
 
 				{/* FOOTER FIJO */}

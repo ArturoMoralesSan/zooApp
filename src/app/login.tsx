@@ -1,6 +1,7 @@
 import ActionButton from '@/components/ActionButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
+import colors from '@/theme/colors'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -29,13 +30,8 @@ type FormErrors = {
 }
 
 const palette = {
-	label: '#132519',
-	border: '#3f775e',
-	forgot: '#1b7747',
-	register: '#3b543e',
-	title: '#26523f',
-	muted: '#6F8A7D',
-	error: '#C83B3B',
+	border: colors.inputBorder,
+	error: colors.error,
 }
 
 export default function Login() {
@@ -126,7 +122,7 @@ export default function Login() {
 				resizeMode='cover'
 				className='flex-1'
 			>
-				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
+				<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
 				<ScrollView
 					className='flex-1'
@@ -140,44 +136,34 @@ export default function Login() {
 					keyboardDismissMode='on-drag'
 					showsVerticalScrollIndicator={false}
 				>
-					<View className='mt-24 items-center'>
+					<View className='mt-20 items-center'>
 						<Image
 							source={require('../../assets/images/zooapp-logo.png')}
 							resizeMode='contain'
 							accessibilityLabel='Logo de ZooApp'
-							className='h-32 w-36'
+							className='h-28 w-32'
 						/>
 					</View>
 
-					<View className='mt-6 rounded-3xl bg-white p-5'>
+					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						<View className='items-center'>
-							<Text
-								className='text-center text-3xl font-bold'
-								style={{ color: palette.title }}
-							>
+							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
 								¡Bienvenido a ZooApp!
 							</Text>
 
-							<Text className='mt-2 text-center text-base text-[#3b543e]'>
+							<Text className='mt-2 text-center text-sm text-tinta-2'>
 								Inicia sesión para continuar tu aventura.
 							</Text>
 						</View>
 
-						<Text
-							className='mb-2 mt-8 text-sm font-semibold'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-2 mt-7 text-xs font-semibold text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-xl border bg-white'
-							style={{
-								borderColor: errors.email ? palette.error : palette.border,
-								borderWidth: emailFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-xl bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : 'border-input-border'}`}
 						>
-							<View className='pl-4'>
+							<View className='pl-3.5'>
 								<HugeiconsIcon
 									icon={Mail01Icon}
 									size={20}
@@ -195,34 +181,27 @@ export default function Login() {
 								onFocus={() => setEmailFocused(true)}
 								onBlur={() => setEmailFocused(false)}
 								placeholder='correo@ejemplo.com'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								autoCapitalize='none'
 								autoCorrect={false}
 								keyboardType='email-address'
 								textContentType='emailAddress'
-								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
 							/>
 						</View>
 
 						{errors.email && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+							<Text className='mt-1 text-xs text-error'>{errors.email}</Text>
 						)}
 
-						<Text
-							className='mb-2 mt-5 text-sm font-semibold'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-2 mt-4 text-xs font-semibold text-tinta'>
 							Contraseña
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-xl border bg-white'
-							style={{
-								borderColor: errors.password ? palette.error : palette.border,
-								borderWidth: passwordFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-xl bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : 'border-input-border'}`}
 						>
-							<View className='pl-4'>
+							<View className='pl-3.5'>
 								<HugeiconsIcon
 									icon={LockPasswordIcon}
 									size={20}
@@ -240,11 +219,11 @@ export default function Login() {
 								onFocus={() => setPasswordFocused(true)}
 								onBlur={() => setPasswordFocused(false)}
 								placeholder='Tu contraseña'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 								textContentType='password'
-								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
 							/>
 
 							<Pressable
@@ -266,41 +245,36 @@ export default function Login() {
 						</View>
 
 						{errors.password && (
-							<Text className='mt-1 text-sm text-red-600'>
-								{errors.password}
-							</Text>
+							<Text className='mt-1 text-xs text-error'>{errors.password}</Text>
 						)}
 
 						{error !== '' && (
-							<View className='mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3'>
-								<Text className='text-sm text-red-700'>{error}</Text>
+							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
+								<Text className='text-xs text-error'>{error}</Text>
 							</View>
 						)}
 
 						<Pressable
 							onPress={() => router.push('/forgot-password')}
-							className='mt-4 self-end rounded-lg py-1'
+							className='mt-3.5 self-end rounded-lg py-1'
 						>
-							<Text
-								className='text-sm font-semibold'
-								style={{ color: palette.forgot }}
-							>
+							<Text className='text-xs font-semibold text-esmeralda'>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
 
-						<View className='mt-5'>
+						<View className='mt-4'>
 							{loading ? (
-								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-[#8BA997]'>
-									<ActivityIndicator color='#FFFFFF' />
+								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-apagado'>
+									<ActivityIndicator color={colors.blanco} />
 								</View>
 							) : (
 								<ActionButton title='Iniciar sesión' onPress={handleLogin} />
 							)}
 						</View>
 
-						<View className='mt-7 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-base' style={{ color: palette.register }}>
+						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
+							<Text className='text-sm text-tinta-2'>
 								¿No tienes una cuenta?{' '}
 							</Text>
 
@@ -308,7 +282,7 @@ export default function Login() {
 								onPress={() => router.push('/register')}
 								className='rounded-lg py-1'
 							>
-								<Text className='text-base font-bold text-[#1b7747]'>
+								<Text className='text-sm font-bold text-esmeralda'>
 									Regístrate
 								</Text>
 							</Pressable>

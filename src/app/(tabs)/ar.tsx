@@ -21,6 +21,7 @@ function ArSceme() {
 			onAnchorUpdated={(a) => selectorRef.current?.handleAnchorUpdated(a)}
 			onAnchorRemoved={(a) => a && selectorRef.current?.handleAnchorRemoved(a)}
 		>
+			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
 			<ViroAmbientLight color='#fff' intensity={250} />
 
 			{!placed && (

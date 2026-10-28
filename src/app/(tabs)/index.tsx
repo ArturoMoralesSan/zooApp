@@ -21,7 +21,7 @@ import {
 	Text,
 	View,
 } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
@@ -29,37 +29,18 @@ import { useAuth } from '@/contexts/AuthContext'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	actionsContainerStyle,
-	colors,
-	dotStyle,
-	dotsContainerStyle,
-	errorCardStyle,
-	eventCardContainerStyle,
-	eventCardStyle,
-	eventCardWidth,
-	eventDescriptionStyle,
-	eventFallbackStyle,
-	eventMetaStyle,
-	eventOverlayStyle,
-	eventPressableStyle,
-	eventSeparatorStyle,
-	eventTitleStyle,
-	eventTypeStyle,
-	eventTypeTextStyle,
-	loadingCardStyle,
-	loadingTextStyle,
-	retryButtonStyle,
-	screenStyle,
-	scrollContentStyle,
-	secondaryTextStyle,
-	titleTextStyle,
-} from '@/styles/explore'
+import colors from '@/theme/colors'
+import { getTabBarExtraSpace } from '@/theme/layout'
+import { cardShadow } from '@/theme/shadows'
+
+const PRIMARY = colors.esmeralda
+const EVENT_CARD_WIDTH = 292
+const CAROUSEL_GAP = 10
 
 // Cambia este valor para personalizar el fondo de la tarjeta de donación.
 // Si no se define un color diferente, utiliza el verde predeterminado.
-const donationCardBackground = colors.primaryDark
-const donationAccentBackground = colors.primaryLight
+const donationCardBackground = colors.bosque
+const donationAccentBackground = colors.lima
 
 type ExploreZone = {
 	id: number
@@ -125,6 +106,8 @@ function getEventImageUrl(image: string | null): string | null {
 }
 
 export default function Explorar() {
+	const insets = useSafeAreaInsets()
+
 	const { loading: authLoading, refreshUser } = useAuth()
 
 	const [events, setEvents] = useState<ExploreEvent[]>([])
@@ -189,7 +172,7 @@ export default function Explorar() {
 		event: NativeSyntheticEvent<NativeScrollEvent>,
 	) => {
 		const offsetX = event.nativeEvent.contentOffset.x
-		const index = Math.round(offsetX / (eventCardWidth + 10))
+		const index = Math.round(offsetX / (EVENT_CARD_WIDTH + CAROUSEL_GAP))
 
 		if (index >= 0 && index < events.length) {
 			setActiveEventIndex(index)
@@ -197,17 +180,13 @@ export default function Explorar() {
 	}
 
 	return (
-		<SafeAreaView className='flex-1' edges={['top']} style={screenStyle}>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
 			<ScrollView
 				className='flex-1'
-				style={{ flex: 1 }}
-				contentContainerStyle={[
-					scrollContentStyle,
-					{
-						flexGrow: 1,
-						paddingBottom: 140,
-					},
-				]}
+				contentContainerClassName='grow px-3 pt-2'
+				contentContainerStyle={{
+					paddingBottom: 140 + getTabBarExtraSpace(insets.bottom),
+				}}
 				showsVerticalScrollIndicator
 				nestedScrollEnabled
 				bounces
@@ -215,8 +194,8 @@ export default function Explorar() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor={colors.primary}
-						colors={[colors.primary]}
+						tintColor={PRIMARY}
+						colors={[PRIMARY]}
 					/>
 				}
 			>
@@ -224,66 +203,48 @@ export default function Explorar() {
 				<UserHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-6'>
-					<Text
-						className='mb-3'
-						style={{
-							color: colors.text,
-							fontSize: 21,
-							fontWeight: '800',
-							lineHeight: 27,
-						}}
-					>
+				<View className='mt-5'>
+					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
 						Eventos destacados
 					</Text>
 
 					{loading ? (
-						<View style={loadingCardStyle}>
-							<ActivityIndicator size='large' color={colors.primary} />
-							<Text className='mt-3' style={loadingTextStyle}>
+						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
+							<ActivityIndicator size='large' color={PRIMARY} />
+							<Text className='mt-2.5 text-[13px] text-tinta-2'>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
-						<View className='rounded-[22px] p-5' style={errorCardStyle}>
-							<Text style={titleTextStyle}>No pudimos cargar los eventos</Text>
+						<View
+							className='rounded-[22px] border border-card-border bg-niebla p-4'
+							style={cardShadow}
+						>
+							<Text className='text-[16px] font-extrabold leading-[21px] text-tinta'>
+								No pudimos cargar los eventos
+							</Text>
 
-							<Text className='mt-2' style={secondaryTextStyle}>
+							<Text className='mt-2 text-[13px] leading-[18px] text-tinta-2'>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-4 self-start rounded-full px-5 py-3'
-								style={({ pressed }) => retryButtonStyle(pressed)}
+								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
 								}}
 							>
-								<Text
-									style={{
-										color: colors.white,
-										fontWeight: '800',
-									}}
-								>
-									Reintentar
-								</Text>
+								<Text className='font-extrabold text-blanco'>Reintentar</Text>
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						<View
-							className='rounded-[22px] p-6'
-							style={{
-								backgroundColor: colors.cardLight,
-								borderColor: colors.border,
-								borderWidth: 1,
-							}}
-						>
-							<Text className='text-center' style={titleTextStyle}>
+						<View className='rounded-[22px] border border-card-border bg-niebla p-5'>
+							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-tinta'>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-2 text-center' style={secondaryTextStyle}>
+							<Text className='mt-2 text-center text-[13px] leading-[18px] text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -294,11 +255,11 @@ export default function Explorar() {
 								showsHorizontalScrollIndicator={false}
 								nestedScrollEnabled
 								decelerationRate='fast'
-								snapToInterval={eventCardWidth + 10}
+								snapToInterval={EVENT_CARD_WIDTH + CAROUSEL_GAP}
 								snapToAlignment='start'
 								disableIntervalMomentum
 								onMomentumScrollEnd={handleCarouselScroll}
-								contentContainerStyle={{ paddingRight: 8 }}
+								contentContainerClassName='pr-2'
 							>
 								{events.map((event, index) => {
 									const imageUrl = getEventImageUrl(event.image)
@@ -306,11 +267,14 @@ export default function Explorar() {
 									return (
 										<View
 											key={event.id}
-											style={eventCardContainerStyle(index, events.length)}
+											className={`w-[292px] ${index === events.length - 1 ? '' : 'mr-2.5'}`}
 										>
-											<View style={eventCardStyle}>
+											<View
+												className='h-[203px] overflow-hidden rounded-3xl bg-bosque'
+												style={cardShadow}
+											>
 												<Pressable
-													className='flex-1 overflow-hidden rounded-[24px]'
+													className='flex-1 overflow-hidden rounded-[24px] active:opacity-[0.92]'
 													onPress={() =>
 														Alert.alert(
 															event.name,
@@ -318,7 +282,6 @@ export default function Explorar() {
 																'Consulta próximamente todos los detalles de este evento.',
 														)
 													}
-													style={({ pressed }) => eventPressableStyle(pressed)}
 												>
 													<View className='flex-1'>
 														{imageUrl ? (
@@ -328,39 +291,24 @@ export default function Explorar() {
 																resizeMode='cover'
 															/>
 														) : (
-															<View
-																className='absolute inset-0'
-																style={eventFallbackStyle}
-															>
-																<View
-																	style={{
-																		position: 'absolute',
-																		top: 0,
-																		left: 0,
-																		right: 0,
-																		height: '47%',
-																		backgroundColor: '#315744',
-																	}}
-																/>
+															<View className='absolute inset-0 bg-tinta-2'>
+																<View className='absolute left-0 right-0 top-0 h-[47%] bg-tinta-2' />
 															</View>
 														)}
 
-														<View style={eventOverlayStyle} />
+														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
 
-														<View
-															className='absolute left-3 top-3 rounded-full'
-															style={eventTypeStyle}
-														>
-															<Text style={eventTypeTextStyle}>
+														<View className='absolute left-2.5 top-2.5 rounded-[20px] bg-lima px-3 py-1'>
+															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-bosque'>
 																{(event.type || 'Educativo').toUpperCase()}
 															</Text>
 														</View>
 
-														<View className='absolute bottom-0 left-0 right-0 p-4'>
+														<View className='absolute bottom-0 left-0 right-0 p-3.5'>
 															<View className='flex-row items-end'>
 																<View className='flex-1 pr-2'>
 																	<Text
-																		style={eventTitleStyle}
+																		className='text-[23px] font-extrabold leading-7 text-blanco'
 																		numberOfLines={1}
 																	>
 																		{event.name}
@@ -368,8 +316,7 @@ export default function Explorar() {
 
 																	{event.description ? (
 																		<Text
-																			className='mt-1'
-																			style={eventDescriptionStyle}
+																			className='mt-1 text-[12px] font-semibold leading-[17px] text-blanco'
 																			numberOfLines={1}
 																		>
 																			{event.description}
@@ -387,33 +334,30 @@ export default function Explorar() {
 																				'Consulta próximamente todos los detalles de este evento.',
 																		)
 																	}
-																	className='h-9 w-9 items-center justify-center rounded-full'
-																	style={{
-																		backgroundColor: colors.primaryLight,
-																	}}
+																	className='h-8 w-8 items-center justify-center rounded-full bg-lima'
 																>
 																	<HugeiconsIcon
 																		icon={ArrowRight01Icon}
 																		size={22}
 																		strokeWidth={2}
-																		color={colors.primaryDark}
+																		color={colors.bosque}
 																	/>
 																</Pressable>
 															</View>
 
-															<View className='mt-3 flex-row items-center'>
-																<Text style={eventMetaStyle} numberOfLines={1}>
+															<View className='mt-2.5 flex-row items-center'>
+																<Text
+																	className='text-[12px] font-bold text-blanco'
+																	numberOfLines={1}
+																>
 																	{formatEventDate(event.start_at)}
 																</Text>
 
-																<Text
-																	className='mx-2'
-																	style={eventSeparatorStyle}
-																>
+																<Text className='mx-2 font-black text-lima'>
 																	•
 																</Text>
 
-																<Text style={eventMetaStyle}>
+																<Text className='text-[12px] font-bold text-blanco'>
 																	{formatEventTime(event.start_at)}
 																</Text>
 															</View>
@@ -427,11 +371,11 @@ export default function Explorar() {
 							</ScrollView>
 
 							{events.length > 1 && (
-								<View style={dotsContainerStyle}>
+								<View className='mt-3 flex-row items-center justify-center gap-1.5'>
 									{events.map((event, index) => (
 										<View
 											key={event.id}
-											style={dotStyle(index === activeEventIndex)}
+											className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-esmeralda' : 'w-[7px] bg-tinta-2 opacity-80'}`}
 										/>
 									))}
 								</View>
@@ -441,54 +385,39 @@ export default function Explorar() {
 				</View>
 
 				{/* ACCIONES */}
-				<View style={actionsContainerStyle}>
-					<Text
-						className='mb-3'
-						style={{
-							color: colors.text,
-							fontSize: 21,
-							fontWeight: '800',
-							lineHeight: 27,
-						}}
-					>
+				<View className='mt-5'>
+					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
 						¿Qué quieres hacer?
 					</Text>
 
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
-					<View
-						style={{
-							flexDirection: 'row',
-							gap: 12,
-							marginBottom: 12,
-							alignItems: 'stretch',
-						}}
-					>
-						<View style={{ flex: 1, minWidth: 0 }}>
+					<View className='mb-3 flex-row items-stretch gap-3'>
+						<View className='min-w-0 flex-1'>
 							<AppCard
 								icon={Ticket01Icon}
 								title='Comprar boletos'
 								iconPosition='top'
 								description='Planea tu visita al zoológico.'
 								onPress={() => router.push('/tickets')}
-								backgroundColor={colors.cardLight}
-								borderColor={colors.border}
+								backgroundColor={colors.niebla}
+								borderColor={colors.cardBorder}
 								minHeight={130}
-								iconColor={colors.primary}
+								iconColor={PRIMARY}
 								showArrow={false}
 							/>
 						</View>
 
-						<View style={{ flex: 1, minWidth: 0 }}>
+						<View className='min-w-0 flex-1'>
 							<AppCard
 								icon={UserGroupIcon}
 								iconPosition='top'
 								title='Conoce las especies'
 								description='Descubre nuestros animales.'
 								onPress={() => router.push('/species')}
-								backgroundColor={colors.cardLight}
-								borderColor={colors.border}
+								backgroundColor={colors.niebla}
+								borderColor={colors.cardBorder}
 								minHeight={130}
-								iconColor={colors.primary}
+								iconColor={PRIMARY}
 								showArrow={false}
 							/>
 						</View>
@@ -500,9 +429,9 @@ export default function Explorar() {
 						title='Mapa del zoológico'
 						description='Explora caminos, especies y puntos de interés.'
 						onPress={() => router.push('/map')}
-						backgroundColor={colors.cardLight}
-						borderColor={colors.border}
-						iconColor={colors.primary}
+						backgroundColor={colors.niebla}
+						borderColor={colors.cardBorder}
+						iconColor={PRIMARY}
 						showArrow={true}
 					/>
 
@@ -512,14 +441,14 @@ export default function Explorar() {
 						description='Tu donación ayuda a cuidar y proteger a nuestros animales.'
 						icon={HeartIcon}
 						onPress={() => router.push('/donations')}
-						backgroundColor={donationCardBackground ?? colors.card}
-						borderColor={colors.border}
-						iconColor={colors.primaryDark}
+						backgroundColor={donationCardBackground}
+						borderColor={colors.cardBorder}
+						iconColor={colors.bosque}
 						iconBackgroundColor={donationAccentBackground}
 						arrowBackgroundColor={donationAccentBackground}
-						arrowColor={colors.primaryDark}
-						textColor='#FFFFFF'
-						descriptionColor='#D4E8D9'
+						arrowColor={colors.bosque}
+						textColor={colors.blanco}
+						descriptionColor={colors.hoja}
 						showArrow
 					/>
 				</View>

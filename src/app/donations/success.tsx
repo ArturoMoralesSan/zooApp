@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { COLORS, styles } from '@/styles/donation-success'
+import colors from '@/theme/colors'
 
 type PaymentMethodData = {
 	id?: number | string
@@ -104,19 +104,19 @@ export default function DonationSuccessScreen() {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={styles.background}
-				imageStyle={styles.backgroundImage}
+				className='flex-1 bg-blanco'
+				imageClassName='opacity-[0.13]'
 				resizeMode='repeat'
 			>
 				<ScrollView
-					style={styles.scrollView}
-					contentContainerStyle={styles.scrollContent}
+					className='flex-1'
+					contentContainerClassName='px-5 pb-6 pt-2.5'
 					showsVerticalScrollIndicator={false}
 				>
-					<View style={styles.headerContainer}>
+					<View className='mb-5 gap-3'>
 						<BackButton position='relative' onPress={() => router.back()} />
 
 						<UserHeader
@@ -127,82 +127,106 @@ export default function DonationSuccessScreen() {
 					</View>
 
 					{/* CONFIRMACIÓN DE DONACIÓN */}
-					<View style={styles.successCard}>
-						<View style={styles.successIconContainer}>
+					<View className='mb-4 items-center justify-center rounded-3xl bg-bosque px-[22px] py-[30px]'>
+						<View className='mb-[18px] h-[78px] w-[78px] items-center justify-center rounded-[39px] bg-lima/[0.13]'>
 							<HugeiconsIcon
 								icon={CheckmarkCircle02Icon}
 								size={46}
-								color={COLORS.successIcon}
+								color={colors.lima}
 							/>
 						</View>
 
-						<Text style={styles.successTitle}>¡Donación realizada!</Text>
+						<Text className='mb-2.5 text-center text-[25px] font-extrabold text-blanco'>
+							¡Donación realizada!
+						</Text>
 
-						<Text style={styles.successDescription}>
+						<Text className='text-center text-[14px] leading-[22px] text-blanco opacity-[0.94]'>
 							Gracias por apoyar al Zoológico Sahuatoba.
 						</Text>
 					</View>
 
 					{/* MONTO DONADO Y DETALLE */}
-					<View style={styles.amountCard}>
-						<View style={styles.amountHeader}>
-							<Text style={styles.amountLabel}>Monto donado</Text>
+					<View className='mb-4 rounded-[22px] border border-card-border bg-niebla p-5'>
+						<View className='mb-2'>
+							<Text className='text-[14px] font-semibold text-tinta-2'>
+								Monto donado
+							</Text>
 						</View>
 
-						<Text style={styles.amountValue}>{formatCurrency(amount)}</Text>
+						<Text className='text-[34px] font-extrabold tracking-[-0.7px] text-tinta-2'>
+							{formatCurrency(amount)}
+						</Text>
 
-						<View style={styles.detailDivider} />
+						<View className='my-2.5 h-px bg-card-border' />
 
-						<View style={styles.sectionHeading}>
-							<Text style={styles.sectionTitle}>Detalle de la donación</Text>
+						<View className='mb-3'>
+							<Text className='text-[18px] font-extrabold text-tinta-2'>
+								Detalle de la donación
+							</Text>
 						</View>
 
-						<View style={styles.detailRow}>
-							<Text style={styles.detailLabel}>Donación</Text>
+						<View className='flex-row items-center justify-between gap-3 py-2'>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>
+								Donación
+							</Text>
 
-							<Text style={styles.detailValue} numberOfLines={1}>
+							<Text
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+								numberOfLines={1}
+							>
 								Aportación al zoológico
 							</Text>
 						</View>
 
-						<View style={styles.detailDivider} />
+						<View className='my-2.5 h-px bg-card-border' />
 
-						<View style={styles.detailRow}>
-							<Text style={styles.detailLabel}>Método de pago</Text>
+						<View className='flex-row items-center justify-between gap-3 py-2'>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>
+								Método de pago
+							</Text>
 
-							<Text style={styles.detailValue} numberOfLines={1}>
+							<Text
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+								numberOfLines={1}
+							>
 								{paymentMethod}
 							</Text>
 						</View>
 
-						<View style={styles.detailDivider} />
+						<View className='my-2.5 h-px bg-card-border' />
 
-						<View style={styles.detailRow}>
-							<Text style={styles.detailLabel}>Folio</Text>
+						<View className='flex-row items-center justify-between gap-3 py-2'>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>Folio</Text>
 
-							<Text style={styles.detailValue} numberOfLines={1} selectable>
+							<Text
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+								numberOfLines={1}
+								selectable
+							>
 								#{String(donationReference).replace(/^#/, '')}
 							</Text>
 						</View>
 					</View>
 
 					{/* AGRADECIMIENTO */}
-					<View style={styles.thanksInfoCard}>
-						<View style={styles.thanksInfoIconContainer}>
-							<HugeiconsIcon icon={StarIcon} size={24} color={COLORS.white} />
+					<View className='mb-4 flex-row items-start gap-[13px] rounded-[20px] bg-hoja p-[18px]'>
+						<View className='h-[38px] w-[38px] items-center justify-center rounded-xl bg-esmeralda'>
+							<HugeiconsIcon icon={StarIcon} size={24} color={colors.blanco} />
 						</View>
 
-						<View style={styles.thanksInfoContent}>
-							<Text style={styles.thanksInfoTitle}>¡Tu apoyo cuenta!</Text>
+						<View className='flex-1'>
+							<Text className='mb-1.5 text-[15px] font-extrabold text-tinta-2'>
+								¡Tu apoyo cuenta!
+							</Text>
 
-							<Text style={styles.thanksInfoDescription}>
+							<Text className='text-[13px] leading-5 text-tinta-2'>
 								Gracias a personas como tú podemos seguir trabajando en el
 								bienestar de los animales y en la conservación de nuestra fauna.
 							</Text>
 						</View>
 					</View>
 
-					<View style={styles.bottomSpace} />
+					<View className='h-3' />
 				</ScrollView>
 
 				{/* FOOTER FIJO */}

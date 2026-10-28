@@ -1,3 +1,4 @@
+import colors from '@/theme/colors'
 import { ArrowLeft01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Animated, Pressable } from 'react-native'
@@ -15,13 +16,15 @@ type BackButtonProps = {
 export default function BackButton({
 	onPress,
 	opacity = 1,
-	backgroundColor = '#EEF4F0',
-	iconColor = '#1E4930',
+	backgroundColor = colors.niebla,
+	iconColor = colors.tinta2,
 	position = 'absolute',
 	top = 56,
 	left = 20,
 }: BackButtonProps) {
 	return (
+		// Animated.View keeps inline styles: opacity is animated and
+		// position/top/left come from props.
 		<Animated.View
 			style={{
 				position,
@@ -33,18 +36,9 @@ export default function BackButton({
 			<Pressable
 				onPress={onPress}
 				hitSlop={8}
-				android_ripple={{ color: '#DCE7DF' }}
-				style={{
-					width: 44,
-					height: 44,
-					alignItems: 'center',
-					justifyContent: 'center',
-					backgroundColor,
-					borderRadius: 12,
-					borderWidth: 1,
-					borderColor: '#DCE7DF',
-					overflow: 'hidden',
-				}}
+				android_ripple={{ color: colors.cardBorder }}
+				className='h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-card-border'
+				style={{ backgroundColor }}
 			>
 				<HugeiconsIcon
 					icon={ArrowLeft01Icon}

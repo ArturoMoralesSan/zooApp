@@ -9,14 +9,10 @@ import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Tabs } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
-import {
-	activeTabButtonStyle,
-	colors,
-	tabBarContainerStyle,
-	tabBarStyle,
-	tabButtonStyle,
-	tabLabelStyle,
-} from '@/styles/tab-bar'
+import colors from '@/theme/colors'
+import { getTabBarBottomPadding } from '@/theme/layout'
+
+const INACTIVE_COLOR = colors.apagado
 
 export default function TabLayout() {
 	return (
@@ -24,9 +20,12 @@ export default function TabLayout() {
 			screenOptions={{
 				headerShown: false,
 			}}
-			tabBar={({ state, descriptors, navigation }) => (
-				<View style={tabBarContainerStyle}>
-					<View style={tabBarStyle}>
+			tabBar={({ state, descriptors, navigation, insets }) => (
+				<View
+					className='absolute bottom-0 left-0 right-0 bg-transparent px-3'
+					style={{ paddingBottom: getTabBarBottomPadding(insets.bottom) }}
+				>
+					<View className='min-h-[72px] w-full flex-row items-center rounded-[22px] border-[0.8px] border-card-border bg-blanco p-1.5'>
 						{state.routes
 							.filter((route) => route.name !== 'ar')
 							.map((route) => {
@@ -76,15 +75,17 @@ export default function TabLayout() {
 										accessibilityLabel={options.tabBarAccessibilityLabel}
 										onPress={onPress}
 										onLongPress={onLongPress}
-										style={[tabButtonStyle, isFocused && activeTabButtonStyle]}
+										className={`h-[58px] min-w-0 flex-1 items-center justify-center rounded-2xl ${isFocused ? 'bg-esmeralda' : ''}`}
 									>
 										<HugeiconsIcon
 											icon={icon}
 											size={22}
-											color={isFocused ? '#FFFFFF' : colors.textSecondary}
+											color={isFocused ? colors.blanco : INACTIVE_COLOR}
 										/>
 
-										<Text style={tabLabelStyle(isFocused)}>
+										<Text
+											className={`mt-1 text-[11px] ${isFocused ? 'font-bold text-blanco' : 'font-medium text-apagado'}`}
+										>
 											{options.title}
 										</Text>
 									</Pressable>

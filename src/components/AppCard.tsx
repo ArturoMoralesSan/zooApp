@@ -1,4 +1,4 @@
-import { colors } from '@/styles/panel'
+import colors from '@/theme/colors'
 import { ArrowRight01Icon, UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import type { ReactNode } from 'react'
@@ -81,17 +81,17 @@ export default function AppCard({
 	showArrow = true,
 	children,
 
-	backgroundColor = colors.card,
-	borderColor = colors.border,
+	backgroundColor = colors.niebla,
+	borderColor = colors.cardBorder,
 
-	iconColor = colors.primary,
-	iconBackgroundColor = colors.active,
+	iconColor = colors.esmeralda,
+	iconBackgroundColor = colors.hoja,
 
-	arrowColor = colors.white,
-	arrowBackgroundColor = colors.primary,
+	arrowColor = colors.blanco,
+	arrowBackgroundColor = colors.esmeralda,
 
-	textColor = colors.text,
-	descriptionColor = colors.textSecondary,
+	textColor = colors.tinta,
+	descriptionColor = colors.tinta,
 
 	imageHeight = 150,
 	minHeight,
@@ -103,27 +103,13 @@ export default function AppCard({
 		<Image
 			source={{ uri: avatarUrl }}
 			resizeMode='cover'
-			style={{
-				width: 48,
-				height: 48,
-				borderRadius: 24,
-				borderWidth: 1,
-				borderColor,
-				backgroundColor: iconBackgroundColor,
-			}}
+			className='h-12 w-12 rounded-3xl border'
+			style={{ borderColor, backgroundColor: iconBackgroundColor }}
 		/>
 	) : icon ? (
 		<View
-			style={{
-				width: 48,
-				height: 48,
-				borderRadius: 16,
-				backgroundColor: iconBackgroundColor,
-				borderWidth: 1,
-				borderColor,
-				alignItems: 'center',
-				justifyContent: 'center',
-			}}
+			className='h-12 w-12 items-center justify-center rounded-2xl border'
+			style={{ backgroundColor: iconBackgroundColor, borderColor }}
 		>
 			<HugeiconsIcon
 				icon={icon}
@@ -135,15 +121,13 @@ export default function AppCard({
 	) : null
 
 	const textElement = (
+		// Inline on purpose: NativeWind's flex-1 expands to grow/shrink/basis,
+		// which collapses this block when iconPosition is 'top' (column layout).
 		<View style={{ flex: 1, minWidth: 0 }}>
 			{title ? (
 				<Text
-					style={{
-						color: textColor,
-						fontWeight: '800',
-						fontSize: 16,
-						flexShrink: 1,
-					}}
+					className='shrink text-[16px] font-extrabold'
+					style={{ color: textColor }}
 				>
 					{title}
 				</Text>
@@ -151,13 +135,8 @@ export default function AppCard({
 
 			{description ? (
 				<Text
-					style={{
-						marginTop: title ? 4 : 0,
-						color: descriptionColor,
-						fontSize: 12,
-						lineHeight: 18,
-						flexShrink: 1,
-					}}
+					className={`shrink text-[12px] leading-[18px] ${title ? 'mt-1' : ''}`}
+					style={{ color: descriptionColor }}
 				>
 					{description}
 				</Text>
@@ -167,16 +146,8 @@ export default function AppCard({
 
 	const arrowElement = showArrow ? (
 		<View
-			style={{
-				width: 32,
-				height: 32,
-				borderRadius: 16,
-				backgroundColor: arrowBackgroundColor,
-				alignItems: 'center',
-				justifyContent: 'center',
-				flexShrink: 0,
-				marginLeft: 10,
-			}}
+			className='ml-2.5 h-8 w-8 shrink-0 items-center justify-center rounded-2xl'
+			style={{ backgroundColor: arrowBackgroundColor }}
 		>
 			<HugeiconsIcon
 				icon={ArrowRight01Icon}
@@ -189,14 +160,11 @@ export default function AppCard({
 
 	return (
 		<View
+			className='mb-3 overflow-hidden rounded-[18px] border-1.5'
 			style={[
 				{
 					backgroundColor,
 					borderColor,
-					borderWidth: 1.5,
-					borderRadius: 18,
-					marginBottom: 12,
-					overflow: 'hidden',
 					...(minHeight !== undefined ? { minHeight } : {}),
 				},
 				style,
@@ -219,34 +187,27 @@ export default function AppCard({
 					<Image
 						source={image}
 						resizeMode='cover'
-						style={{ width: '100%', height: imageHeight }}
+						className='w-full'
+						style={{ height: imageHeight }}
 					/>
 				) : null}
 
 				<View
-					style={{
-						flexDirection: iconPosition === 'top' ? 'column' : 'row',
-						alignItems: iconPosition === 'top' ? 'stretch' : 'center',
-						paddingHorizontal: 16,
-						paddingVertical: 14,
-						minHeight: 78,
-					}}
+					className={`min-h-[78px] px-4 py-3.5 ${iconPosition === 'top' ? 'flex-col items-stretch' : 'flex-row items-center'}`}
 				>
 					{iconPosition === 'top' && iconElement ? (
-						<View style={{ marginBottom: 12, alignSelf: 'flex-start' }}>
-							{iconElement}
-						</View>
+						<View className='mb-3 self-start'>{iconElement}</View>
 					) : null}
 
 					{iconPosition === 'left' && iconElement ? (
-						<View style={{ marginRight: 14 }}>{iconElement}</View>
+						<View className='mr-3.5'>{iconElement}</View>
 					) : null}
 
 					{iconPosition === 'right' ? (
 						<>
 							{textElement}
 							{iconElement ? (
-								<View style={{ marginLeft: 14 }}>{iconElement}</View>
+								<View className='ml-3.5'>{iconElement}</View>
 							) : null}
 						</>
 					) : (
@@ -256,11 +217,7 @@ export default function AppCard({
 					{arrowElement}
 				</View>
 
-				{children ? (
-					<View style={{ paddingHorizontal: 14, paddingBottom: 14 }}>
-						{children}
-					</View>
-				) : null}
+				{children ? <View className='px-3.5 pb-3.5'>{children}</View> : null}
 			</Pressable>
 		</View>
 	)
