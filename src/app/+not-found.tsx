@@ -6,7 +6,7 @@ export default function NotFoundScreen() {
 		<>
 			<Stack.Screen options={{ title: 'Página no encontrada.' }} />
 			<View className='flex-1 items-center justify-center'>
-				<View className='text-[17.5px] leading-[24.5px] underline'>
+				<View className='text-lg leading-6 underline'>
 					<Link href='/'>Regresar a página de inicio.</Link>
 				</View>
 			</View>

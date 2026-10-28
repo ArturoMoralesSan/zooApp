@@ -75,36 +75,36 @@ export default function ForgotPassword() {
 					<BackButton onPress={() => router.back()} />
 
 					{/* LOGO */}
-					<View className='mt-[84px] items-center'>
+					<View className='mt-20 items-center'>
 						<Image
 							source={require('../../assets/images/zooapp-logo.png')}
 							resizeMode='contain'
 							accessibilityLabel='Logo de ZooApp'
-							className='h-28 w-[126px]'
+							className='h-28 w-32'
 						/>
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-[21px] rounded-[21px] bg-blanco p-[17.5px]'>
+					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-bosque'>
+							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
 								¿Olvidaste tu contraseña?
 							</Text>
 
-							<Text className='mt-[10.5px] text-center text-[14px] leading-[21px] text-tinta-2'>
+							<Text className='mt-2.5 text-center text-sm text-tinta-2'>
 								Ingresa tu correo electrónico y te enviaremos instrucciones para
 								recuperar el acceso a tu cuenta.
 							</Text>
 						</View>
 
 						{/* CORREO */}
-						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
+						<Text className='mb-2 mt-7 text-xs font-semibold text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-blanco ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
+							className={`flex-row items-center rounded-xl bg-blanco ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -138,16 +138,14 @@ export default function ForgotPassword() {
 								autoComplete='email'
 								returnKeyType='done'
 								onSubmitEditing={handleRecover}
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
+								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
 							/>
 						</View>
 
 						{/* ERROR */}
 						{error !== '' && (
-							<View className='mt-[10.5px] rounded-[10.5px] border border-error-border bg-error-bg px-3.5 py-[10.5px]'>
-								<Text className='text-[12.25px] leading-[17.5px] text-error'>
-									{error}
-								</Text>
+							<View className='mt-2.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
+								<Text className='text-xs text-error'>{error}</Text>
 							</View>
 						)}
 
@@ -158,17 +156,17 @@ export default function ForgotPassword() {
 						/>
 
 						{/* VOLVER AL LOGIN */}
-						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text className='text-[14px] leading-[21px] text-tinta-2'>
+						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
+							<Text className='text-sm text-tinta-2'>
 								¿Recuerdas tu contraseña?{' '}
 							</Text>
 
 							<Pressable
 								onPress={() => router.replace('/login')}
-								className='rounded-[7px] py-[3.5px]'
+								className='rounded-lg py-1'
 								accessibilityRole='button'
 							>
-								<Text className='text-[14px] font-bold leading-[21px] text-esmeralda'>
+								<Text className='text-sm font-bold text-esmeralda'>
 									Iniciar sesión
 								</Text>
 							</Pressable>

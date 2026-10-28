@@ -136,32 +136,32 @@ export default function Login() {
 					keyboardDismissMode='on-drag'
 					showsVerticalScrollIndicator={false}
 				>
-					<View className='mt-[84px] items-center'>
+					<View className='mt-20 items-center'>
 						<Image
 							source={require('../../assets/images/zooapp-logo.png')}
 							resizeMode='contain'
 							accessibilityLabel='Logo de ZooApp'
-							className='h-28 w-[126px]'
+							className='h-28 w-32'
 						/>
 					</View>
 
-					<View className='mt-[21px] rounded-[21px] bg-blanco p-[17.5px]'>
+					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						<View className='items-center'>
-							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-bosque'>
+							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
 								¡Bienvenido a ZooApp!
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-tinta-2'>
+							<Text className='mt-2 text-center text-sm text-tinta-2'>
 								Inicia sesión para continuar tu aventura.
 							</Text>
 						</View>
 
-						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
+						<Text className='mb-2 mt-7 text-xs font-semibold text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : 'border-input-border'}`}
+							className={`flex-row items-center rounded-xl bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -186,22 +186,20 @@ export default function Login() {
 								autoCorrect={false}
 								keyboardType='email-address'
 								textContentType='emailAddress'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
+								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
 							/>
 						</View>
 
 						{errors.email && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
-								{errors.email}
-							</Text>
+							<Text className='mt-1 text-xs text-error'>{errors.email}</Text>
 						)}
 
-						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
+						<Text className='mb-2 mt-4 text-xs font-semibold text-tinta'>
 							Contraseña
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : 'border-input-border'}`}
+							className={`flex-row items-center rounded-xl bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -225,12 +223,12 @@ export default function Login() {
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 								textContentType='password'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
+								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
 							/>
 
 							<Pressable
 								onPress={() => setShowPassword((value) => !value)}
-								className='mr-[7px] items-center justify-center rounded-[10.5px] p-[7px]'
+								className='mr-2 items-center justify-center rounded-xl p-2'
 								hitSlop={8}
 								accessibilityRole='button'
 								accessibilityLabel={
@@ -247,31 +245,27 @@ export default function Login() {
 						</View>
 
 						{errors.password && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
-								{errors.password}
-							</Text>
+							<Text className='mt-1 text-xs text-error'>{errors.password}</Text>
 						)}
 
 						{error !== '' && (
-							<View className='mt-3.5 rounded-[10.5px] border border-error-border bg-error-bg px-3.5 py-[10.5px]'>
-								<Text className='text-[12.25px] leading-[17.5px] text-error'>
-									{error}
-								</Text>
+							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
+								<Text className='text-xs text-error'>{error}</Text>
 							</View>
 						)}
 
 						<Pressable
 							onPress={() => router.push('/forgot-password')}
-							className='mt-3.5 self-end rounded-[7px] py-[3.5px]'
+							className='mt-3.5 self-end rounded-lg py-1'
 						>
-							<Text className='text-[12.25px] font-semibold leading-[17.5px] text-esmeralda'>
+							<Text className='text-xs font-semibold text-esmeralda'>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
 
-						<View className='mt-[17.5px]'>
+						<View className='mt-4'>
 							{loading ? (
-								<View className='h-[50px] w-full items-center justify-center rounded-[10.5px] bg-apagado'>
+								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-apagado'>
 									<ActivityIndicator color={colors.blanco} />
 								</View>
 							) : (
@@ -279,16 +273,16 @@ export default function Login() {
 							)}
 						</View>
 
-						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text className='text-[14px] leading-[21px] text-tinta-2'>
+						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
+							<Text className='text-sm text-tinta-2'>
 								¿No tienes una cuenta?{' '}
 							</Text>
 
 							<Pressable
 								onPress={() => router.push('/register')}
-								className='rounded-[7px] py-[3.5px]'
+								className='rounded-lg py-1'
 							>
-								<Text className='text-[14px] font-bold leading-[21px] text-esmeralda'>
+								<Text className='text-sm font-bold text-esmeralda'>
 									Regístrate
 								</Text>
 							</Pressable>

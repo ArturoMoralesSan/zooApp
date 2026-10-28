@@ -161,7 +161,7 @@ export default function Panel() {
 
 					{/* TARJETA DE PERFIL */}
 
-					<View className='mt-[21px]'>
+					<View className='mt-5'>
 						<AppCard
 							avatarUrl={avatarUrl}
 							title={user?.name ?? 'Mi cuenta'}
@@ -173,8 +173,8 @@ export default function Panel() {
 
 					{/* MI CUENTA */}
 
-					<View className='mt-[24.5px]'>
-						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-tinta'>
+					<View className='mt-6'>
+						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
 							Mi cuenta
 						</Text>
 
@@ -188,8 +188,8 @@ export default function Panel() {
 
 					{/* MI ACTIVIDAD */}
 
-					<View className='mt-[17.5px]'>
-						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-tinta'>
+					<View className='mt-4'>
+						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
 							Mi actividad
 						</Text>
 
@@ -210,8 +210,8 @@ export default function Panel() {
 
 					{/* AYUDA */}
 
-					<View className='mt-[17.5px]'>
-						<Text className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px] text-tinta'>
+					<View className='mt-4'>
+						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
 							Ayuda
 						</Text>
 
@@ -243,15 +243,15 @@ export default function Panel() {
 					{/* CERRAR SESIÓN */}
 
 					<View
-						className='mt-[17.5px] overflow-hidden rounded-[18px] border border-card-border bg-niebla'
+						className='mt-4 overflow-hidden rounded-[18px] border border-card-border bg-niebla'
 						style={cardShadow}
 					>
 						<Pressable
 							onPress={handleLogout}
 							disabled={loggingOut}
-							className='min-h-20 flex-row items-center px-[12.25px] py-[10.5px] active:opacity-[0.84]'
+							className='min-h-20 flex-row items-center px-3 py-2.5 active:opacity-[0.84]'
 						>
-							<View className='h-[42px] w-[42px] items-center justify-center rounded-[16px] border border-card-border bg-hoja'>
+							<View className='h-11 w-11 items-center justify-center rounded-[16px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={Logout01Icon}
 									size={23}
@@ -260,12 +260,12 @@ export default function Panel() {
 								/>
 							</View>
 
-							<View className='ml-[10.5px] flex-1'>
-								<Text className='text-[14px] font-extrabold leading-[21px] text-tinta'>
+							<View className='ml-2.5 flex-1'>
+								<Text className='text-sm font-extrabold text-tinta'>
 									{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 								</Text>
 
-								<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-tinta'>
+								<Text className='mt-1 text-xs text-tinta'>
 									Salir de tu cuenta
 								</Text>
 							</View>
@@ -273,7 +273,7 @@ export default function Panel() {
 							{loggingOut ? (
 								<ActivityIndicator size='small' color={colors.esmeralda} />
 							) : (
-								<View className='ml-[7px] h-7 w-7 items-center justify-center rounded-full bg-esmeralda'>
+								<View className='ml-2 h-7 w-7 items-center justify-center rounded-full bg-esmeralda'>
 									<HugeiconsIcon
 										icon={ArrowRight01Icon}
 										size={20}
@@ -288,11 +288,11 @@ export default function Panel() {
 					{/* PIE DE PÁGINA */}
 
 					<View className='mt-7 items-center'>
-						<Text className='text-[10.5px] font-extrabold leading-[14px] text-tinta'>
+						<Text className='text-[11px] font-extrabold leading-4 text-tinta'>
 							ZooApp
 						</Text>
 
-						<Text className='mt-[3.5px] text-[10.5px] leading-[14px] text-tinta'>
+						<Text className='mt-1 text-[11px] leading-4 text-tinta'>
 							Sahuatoba
 						</Text>
 					</View>
@@ -319,7 +319,7 @@ export default function Panel() {
 							{/* ENCABEZADO */}
 
 							<View className='items-center'>
-								<View className='h-[42px] w-[42px] items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
+								<View className='h-11 w-11 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
 									<HugeiconsIcon
 										icon={QrCodeIcon}
 										size={26}
@@ -328,11 +328,11 @@ export default function Panel() {
 									/>
 								</View>
 
-								<Text className='mt-[10.5px] text-center text-[22px] font-extrabold text-tinta'>
+								<Text className='mt-2.5 text-center text-[22px] font-extrabold text-tinta'>
 									Mi código QR
 								</Text>
 
-								<Text className='mt-[3.5px] text-center text-[13px] leading-[19px] text-tinta'>
+								<Text className='mt-1 text-center text-[13px] leading-[19px] text-tinta'>
 									Presenta este código en taquilla para identificar tu cuenta.
 								</Text>
 							</View>
@@ -360,12 +360,12 @@ export default function Panel() {
 
 							{/* INFORMACIÓN */}
 
-							<View className='mt-3.5 rounded-[10.5px] border border-card-border bg-niebla p-[10.5px]'>
-								<Text className='text-[12.25px] font-extrabold leading-[17.5px] text-tinta'>
+							<View className='mt-3.5 rounded-xl border border-card-border bg-niebla p-2.5'>
+								<Text className='text-xs font-extrabold text-tinta'>
 									Código personal
 								</Text>
 
-								<Text className='mt-[3.5px] text-[10.5px] leading-[18px] text-tinta'>
+								<Text className='mt-1 text-[11px] leading-[18px] text-tinta'>
 									Este código está asociado a tu cuenta de ZooApp.
 								</Text>
 							</View>

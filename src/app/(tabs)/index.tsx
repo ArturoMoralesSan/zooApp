@@ -197,33 +197,33 @@ export default function Explorar() {
 				<UserHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-[21px]'>
-					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-tinta'>
+				<View className='mt-5'>
+					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
 						Eventos destacados
 					</Text>
 
 					{loading ? (
 						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
 							<ActivityIndicator size='large' color={PRIMARY} />
-							<Text className='mt-[10.5px] text-[13px] text-tinta-2'>
+							<Text className='mt-2.5 text-[13px] text-tinta-2'>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
 						<View
-							className='rounded-[22px] border border-card-border bg-niebla p-[17.5px]'
+							className='rounded-[22px] border border-card-border bg-niebla p-4'
 							style={cardShadow}
 						>
 							<Text className='text-[16px] font-extrabold leading-[21px] text-tinta'>
 								No pudimos cargar los eventos
 							</Text>
 
-							<Text className='mt-[7px] text-[13px] leading-[18px] text-tinta-2'>
+							<Text className='mt-2 text-[13px] leading-[18px] text-tinta-2'>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-[17.5px] py-[10.5px] active:opacity-80'
+								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
@@ -233,12 +233,12 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						<View className='rounded-[22px] border border-card-border bg-niebla p-[21px]'>
+						<View className='rounded-[22px] border border-card-border bg-niebla p-5'>
 							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-tinta'>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[13px] leading-[18px] text-tinta-2'>
+							<Text className='mt-2 text-center text-[13px] leading-[18px] text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -292,7 +292,7 @@ export default function Explorar() {
 
 														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
 
-														<View className='absolute left-[10.5px] top-[10.5px] rounded-[20px] bg-lima px-3 py-1'>
+														<View className='absolute left-2.5 top-2.5 rounded-[20px] bg-lima px-3 py-1'>
 															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-bosque'>
 																{(event.type || 'Educativo').toUpperCase()}
 															</Text>
@@ -300,7 +300,7 @@ export default function Explorar() {
 
 														<View className='absolute bottom-0 left-0 right-0 p-3.5'>
 															<View className='flex-row items-end'>
-																<View className='flex-1 pr-[7px]'>
+																<View className='flex-1 pr-2'>
 																	<Text
 																		className='text-[23px] font-extrabold leading-7 text-blanco'
 																		numberOfLines={1}
@@ -310,7 +310,7 @@ export default function Explorar() {
 
 																	{event.description ? (
 																		<Text
-																			className='mt-[3.5px] text-[12px] font-semibold leading-[17px] text-blanco'
+																			className='mt-1 text-[12px] font-semibold leading-[17px] text-blanco'
 																			numberOfLines={1}
 																		>
 																			{event.description}
@@ -328,7 +328,7 @@ export default function Explorar() {
 																				'Consulta próximamente todos los detalles de este evento.',
 																		)
 																	}
-																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full bg-lima'
+																	className='h-8 w-8 items-center justify-center rounded-full bg-lima'
 																>
 																	<HugeiconsIcon
 																		icon={ArrowRight01Icon}
@@ -339,7 +339,7 @@ export default function Explorar() {
 																</Pressable>
 															</View>
 
-															<View className='mt-[10.5px] flex-row items-center'>
+															<View className='mt-2.5 flex-row items-center'>
 																<Text
 																	className='text-[12px] font-bold text-blanco'
 																	numberOfLines={1}
@@ -347,7 +347,7 @@ export default function Explorar() {
 																	{formatEventDate(event.start_at)}
 																</Text>
 
-																<Text className='mx-[7px] font-black text-lima'>
+																<Text className='mx-2 font-black text-lima'>
 																	•
 																</Text>
 
@@ -380,7 +380,7 @@ export default function Explorar() {
 
 				{/* ACCIONES */}
 				<View className='mt-5'>
-					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-tinta'>
+					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
 						¿Qué quieres hacer?
 					</Text>
 

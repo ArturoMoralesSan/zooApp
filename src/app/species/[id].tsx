@@ -179,7 +179,7 @@ export default function SpeciesDetailScreen() {
 			>
 				<ActivityIndicator size='large' color={colors.esmeralda} />
 
-				<Text className='mt-3.5 text-[12.25px] font-medium leading-[17.5px] text-tinta-2'>
+				<Text className='mt-3.5 text-xs font-medium text-tinta-2'>
 					Cargando especie...
 				</Text>
 			</ImageBackground>
@@ -190,7 +190,7 @@ export default function SpeciesDetailScreen() {
 		return (
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 bg-blanco px-[17.5px] pt-14'
+				className='flex-1 bg-blanco px-4 pt-14'
 				resizeMode='repeat'
 				imageClassName='opacity-90'
 			>
@@ -215,13 +215,13 @@ export default function SpeciesDetailScreen() {
 						No fue posible cargar la especie
 					</Text>
 
-					<Text className='mt-2 text-center text-[14px] leading-5 text-tinta-2'>
+					<Text className='mt-2 text-center text-sm leading-5 text-tinta-2'>
 						{error ?? 'La información no está disponible en este momento.'}
 					</Text>
 
 					<Pressable
 						onPress={() => void loadSpecies()}
-						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-[21px] py-[12.25px] active:bg-bosque'
+						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
 					>
 						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
 					</Pressable>
@@ -290,23 +290,23 @@ export default function SpeciesDetailScreen() {
 							imageClassName='opacity-30'
 							className='bg-blanco'
 						>
-							<View className='px-[17.5px] pb-7 pt-[24.5px]'>
+							<View className='px-4 pb-7 pt-6'>
 								{/* CATEGORÍA */}
 								{species.category && (
-									<View className='self-start rounded-full border border-card-border bg-hoja px-[12.25px] py-[5.25px]'>
-										<Text className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide text-esmeralda'>
+									<View className='self-start rounded-full border border-card-border bg-hoja px-3 py-1.5'>
+										<Text className='text-[11px] font-bold uppercase leading-4 tracking-wide text-esmeralda'>
 											{species.category.name}
 										</Text>
 									</View>
 								)}
 
 								{/* NOMBRE */}
-								<Text className='mt-3.5 text-[30px] font-bold leading-[31.5px] text-tinta'>
+								<Text className='mt-3.5 text-[30px] font-bold leading-8 text-tinta'>
 									{species.common_name}
 								</Text>
 
 								{species.scientific_name && (
-									<Text className='mt-[5.25px] text-[14px] italic leading-[21px] text-tinta-2'>
+									<Text className='mt-1.5 text-sm italic text-tinta-2'>
 										{species.scientific_name}
 									</Text>
 								)}
@@ -318,7 +318,7 @@ export default function SpeciesDetailScreen() {
 											Conoce a esta especie
 										</Text>
 
-										<Text className='mt-[7px] text-[15px] leading-[24.5px] text-tinta-2'>
+										<Text className='mt-2 text-[15px] leading-6 text-tinta-2'>
 											{species.description}
 										</Text>
 									</View>
@@ -412,13 +412,13 @@ export default function SpeciesDetailScreen() {
 											Etiquetas
 										</Text>
 
-										<View className='mt-3.5 flex-row flex-wrap gap-[7px]'>
+										<View className='mt-3.5 flex-row flex-wrap gap-2'>
 											{species.tags.map((tag) => (
 												<View
 													key={tag.id}
-													className='rounded-full border border-card-border bg-esmeralda px-3.5 py-[8.75px]'
+													className='rounded-full border border-card-border bg-esmeralda px-3.5 py-2'
 												>
-													<Text className='text-[12.25px] font-semibold leading-[17.5px] text-blanco'>
+													<Text className='text-xs font-semibold text-blanco'>
 														{tag.name}
 													</Text>
 												</View>
@@ -437,13 +437,13 @@ export default function SpeciesDetailScreen() {
 										<ScrollView
 											horizontal
 											showsHorizontalScrollIndicator={false}
-											className='-mx-[17.5px] mt-3.5'
+											className='-mx-4 mt-3.5'
 											contentContainerClassName='px-5'
 										>
 											{galleryImages.map((image) => (
 												<View
 													key={image.id}
-													className='mr-[10.5px] overflow-hidden rounded-[22px] border border-card-border bg-niebla'
+													className='mr-2.5 overflow-hidden rounded-[22px] border border-card-border bg-niebla'
 													style={[
 														subtleShadow,
 														{
@@ -471,7 +471,7 @@ export default function SpeciesDetailScreen() {
 									</View>
 								)}
 
-								<View className='h-[7px]' />
+								<View className='h-2' />
 							</View>
 						</ImageBackground>
 					</Animated.View>
@@ -504,7 +504,7 @@ export default function SpeciesDetailScreen() {
 					<View className='absolute right-5 top-14 z-10 overflow-hidden rounded-full border border-card-border/35 bg-niebla/20'>
 						<Pressable
 							onPress={() => setSelectedImage(null)}
-							className='rounded-full bg-niebla/20 px-3.5 py-[8.75px] active:bg-hoja/30'
+							className='rounded-full bg-niebla/20 px-3.5 py-2 active:bg-hoja/30'
 						>
 							<Text className='text-[14px] font-bold text-blanco'>Cerrar</Text>
 						</Pressable>
