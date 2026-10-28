@@ -3,7 +3,6 @@ import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
 
 import { useAuth } from '@/contexts/AuthContext'
-import { colors } from '@/styles/explore'
 
 type UserHeaderProps = {
 	title?: string
@@ -23,77 +22,35 @@ export default function UserHeader({
 
 	return (
 		<View>
-			<View
-				style={{
-					flexDirection: 'row',
-					alignItems: 'flex-start',
-					justifyContent: 'space-between',
-				}}
-			>
-				<View style={{ marginRight: 8, flex: 1 }}>
+			<View className='flex-row items-start justify-between'>
+				<View className='mr-2 flex-1'>
 					<Text
-						style={{
-							color: colors.primaryDark,
-							fontSize: 25,
-							fontWeight: '900',
-							lineHeight: 32,
-							letterSpacing: -0.8,
-						}}
+						className='text-[25px] font-black leading-8 tracking-[-0.8px] text-[#063D22]'
 						numberOfLines={1}
 					>
 						{title}
 					</Text>
 
 					{subtitle ? (
-						<Text
-							style={{
-								marginTop: 1,
-								color: colors.textSecondary,
-								fontSize: 12,
-								fontWeight: '600',
-								lineHeight: 17,
-							}}
-						>
+						<Text className='mt-px text-[12px] font-semibold leading-[17px] text-[#668475]'>
 							{subtitle}
 						</Text>
 					) : null}
 				</View>
 
 				{showRewards ? (
-					<View
-						style={{
-							flexDirection: 'row',
-							alignItems: 'center',
-							gap: 8,
-						}}
-					>
+					<View className='flex-row items-center gap-2'>
 						{/* NIVEL */}
-						<View
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								borderRadius: 999,
-								paddingHorizontal: 10,
-								paddingVertical: 8,
-								backgroundColor: colors.cardLight,
-								borderWidth: 1,
-								borderColor: colors.border,
-							}}
-						>
+						<View className='flex-row items-center rounded-full border border-[#a6c1b3] bg-niebla px-2.5 py-2'>
 							<HugeiconsIcon
 								icon={Crown02Icon}
 								size={15}
 								strokeWidth={1.8}
-								color={colors.primary}
+								color='#08783F'
 							/>
 
 							<Text
-								style={{
-									marginLeft: 4,
-									color: colors.primaryDark,
-									fontSize: 11,
-									fontWeight: '800',
-								}}
+								className='ml-1 text-[11px] font-extrabold text-[#063D22]'
 								numberOfLines={1}
 							>
 								{userLevel}
@@ -101,32 +58,16 @@ export default function UserHeader({
 						</View>
 
 						{/* PUNTOS */}
-						<View
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								borderRadius: 999,
-								paddingHorizontal: 10,
-								paddingVertical: 8,
-								backgroundColor: colors.cardLight,
-								borderWidth: 1,
-								borderColor: colors.border,
-							}}
-						>
+						<View className='flex-row items-center rounded-full border border-[#a6c1b3] bg-niebla px-2.5 py-2'>
 							<HugeiconsIcon
 								icon={Coins01Icon}
 								size={15}
 								strokeWidth={1.8}
-								color={colors.primary}
+								color='#08783F'
 							/>
 
 							<Text
-								style={{
-									marginLeft: 4,
-									color: colors.primaryDark,
-									fontSize: 11,
-									fontWeight: '800',
-								}}
+								className='ml-1 text-[11px] font-extrabold text-[#063D22]'
 								numberOfLines={1}
 							>
 								{userPoints.toLocaleString('es-MX')}
