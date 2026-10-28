@@ -3,7 +3,8 @@ import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
 import { API_URL, ApiValidationError, api } from '@/services/api'
 import { getToken, type User } from '@/services/auth'
-import { colors, styles } from '@/styles/profile'
+import colors from '@/theme/colors'
+import { cardShadow } from '@/theme/shadows'
 import {
 	Calendar03Icon,
 	Call02Icon,
@@ -22,6 +23,7 @@ import {
 	ActivityIndicator,
 	Alert,
 	Animated,
+	Dimensions,
 	Image,
 	ImageBackground,
 	KeyboardAvoidingView,
@@ -31,6 +33,8 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 type FormErrors = {
 	name?: string
@@ -163,35 +167,36 @@ function ProfileField({
 	autoCorrect = true,
 }: FieldProps) {
 	const content = (
-		<View style={[styles.fieldContainer, error && styles.fieldContainerError]}>
-			<HugeiconsIcon
-				icon={icon}
-				size={20}
-				strokeWidth={1.8}
-				color={colors.primary}
-			/>
+		<View
+			className={`min-h-14 flex-row items-center rounded-[14px] border border-[#08783F] px-4 ${error ? 'bg-niebla' : 'bg-blanco'}`}
+		>
+			<HugeiconsIcon icon={icon} size={20} strokeWidth={1.8} color='#08783F' />
 
 			<TextInput
 				value={value}
 				onChangeText={onChangeText}
 				placeholder={placeholder}
-				placeholderTextColor={colors.placeholder}
+				placeholderTextColor='#06371c'
 				keyboardType={keyboardType}
 				autoCapitalize={autoCapitalize}
 				autoCorrect={autoCorrect}
 				editable={editable}
-				style={styles.fieldInput}
+				className='flex-1 px-3 py-3.5 text-[16px] text-[#06371c]'
 			/>
 		</View>
 	)
 
 	return (
-		<View style={styles.fieldWrapper}>
-			<Text style={styles.fieldLabel}>{label}</Text>
+		<View className='mt-5'>
+			<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-[#06371c]'>
+				{label}
+			</Text>
 
 			{onPress ? <Pressable onPress={onPress}>{content}</Pressable> : content}
 
-			{error && <Text style={styles.fieldError}>{error}</Text>}
+			{error && (
+				<Text className='mt-1 text-[12px] text-[#08783F]'>{error}</Text>
+			)}
 		</View>
 	)
 }
@@ -520,11 +525,13 @@ export default function ProfileScreen() {
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
 				resizeMode='repeat'
-				imageStyle={styles.loadingPattern}
-				style={styles.loadingContainer}
+				imageClassName='opacity-20'
+				className='flex-1 items-center justify-center bg-blanco'
 			>
-				<ActivityIndicator size='large' color={colors.primary} />
-				<Text style={styles.loadingText}>Cargando perfil...</Text>
+				<ActivityIndicator size='large' color='#08783F' />
+				<Text className='mt-4 text-[14px] font-medium text-[#06371c]'>
+					Cargando perfil...
+				</Text>
 			</ImageBackground>
 		)
 	}
@@ -585,10 +592,10 @@ export default function ProfileScreen() {
 		<ImageBackground
 			source={require('@/assets/images/zoo-pattern.png')}
 			resizeMode='repeat'
-			style={styles.container}
+			className='flex-1 bg-blanco'
 		>
 			<KeyboardAvoidingView
-				style={styles.keyboardContainer}
+				className='flex-1'
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 			>
 				<Toast
@@ -604,7 +611,7 @@ export default function ProfileScreen() {
 				/>
 
 				<Animated.ScrollView
-					style={styles.scrollView}
+					className='flex-1'
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 					scrollEventThrottle={16}
@@ -620,11 +627,11 @@ export default function ProfileScreen() {
 					)}
 				>
 					{/* HEADER */}
-					<View style={styles.header}>
+					<View className='relative'>
 						<Animated.Image
 							source={require('../../assets/images/profile-background.png')}
 							resizeMode='cover'
-							style={[styles.coverImage, { height: coverHeight }]}
+							style={{ width: SCREEN_WIDTH, height: coverHeight }}
 						/>
 
 						<BackButton
@@ -632,11 +639,12 @@ export default function ProfileScreen() {
 							opacity={backButtonOpacity}
 						/>
 
-						<View style={styles.profileHeader}>
+						<View className='absolute left-0 right-0 top-0 items-center pt-20'>
 							<Pressable onPress={handlePickAvatar} disabled={uploadingAvatar}>
 								<Animated.View
+									className='h-28 w-28 items-center justify-center overflow-hidden rounded-[56px] border-[5px] border-blanco bg-niebla'
 									style={[
-										styles.avatar,
+										cardShadow,
 										{
 											transform: [
 												{ scale: avatarScale },
@@ -648,38 +656,47 @@ export default function ProfileScreen() {
 									{avatarUrl ? (
 										<Image
 											source={{ uri: avatarUrl }}
-											style={styles.avatarImage}
+											className='h-full w-full'
 											resizeMode='cover'
 										/>
 									) : (
-										<Text style={styles.avatarInitial}>
+										<Text className='text-[48px] font-bold text-[#08783F]'>
 											{user?.name?.charAt(0).toUpperCase() || '?'}
 										</Text>
 									)}
 
 									{uploadingAvatar && (
-										<View style={styles.avatarLoading}>
-											<ActivityIndicator size='large' color={colors.white} />
+										<View className='absolute inset-0 items-center justify-center bg-[rgba(8,120,63,0.55)]'>
+											<ActivityIndicator size='large' color={colors.blanco} />
 										</View>
 									)}
 								</Animated.View>
 
-								<View style={styles.changeAvatarButton}>
-									<Text style={styles.changeAvatarText}>+</Text>
+								<View
+									className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-[#b8f35d]'
+									style={cardShadow}
+								>
+									<Text className='text-[20px] font-bold text-[#06371c]'>
+										+
+									</Text>
 								</View>
 							</Pressable>
 
 							<Animated.Text
-								style={[
-									styles.profileName,
-									{ transform: [{ translateY: nameTranslateY }] },
-								]}
+								className='mt-5 text-[23px] font-bold text-blanco'
+								style={{
+									textShadowColor: 'rgba(0,0,0,0.2)',
+									textShadowOffset: { width: 0, height: 1 },
+									textShadowRadius: 4,
+									transform: [{ translateY: nameTranslateY }],
+								}}
 							>
 								{user?.name || 'Visitante'}
 							</Animated.Text>
 
 							<Animated.Text
-								style={[styles.profileEmail, { opacity: emailOpacity }]}
+								className='mt-1 px-8 text-center text-[14px] text-[#F7F7EE]'
+								style={{ opacity: emailOpacity }}
 								numberOfLines={1}
 							>
 								{user?.email || ''}
@@ -689,62 +706,84 @@ export default function ProfileScreen() {
 
 					{/* PROGRESO */}
 					<Animated.View
-						style={[styles.progressContainer, { marginTop: progressMarginTop }]}
+						className='relative z-10 overflow-hidden rounded-t-[30px] bg-blanco'
+						style={{ marginTop: progressMarginTop }}
 					>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
 							resizeMode='repeat'
-							imageStyle={styles.progressPattern}
-							style={styles.progressBackground}
+							imageClassName='opacity-[0.12]'
+							className='bg-blanco'
 						>
-							<View style={styles.progressContent}>
-								<Text style={styles.sectionTitle}>Tu progreso</Text>
+							<View className='px-5 pb-7 pt-6'>
+								<Text className='text-[21px] font-bold text-[#06371c]'>
+									Tu progreso
+								</Text>
 
-								<Text style={styles.sectionSubtitle}>
+								<Text className='mt-1 text-[14px] text-[#06371c]'>
 									Sigue acumulando puntos en ZooApp.
 								</Text>
 
-								<View style={styles.statsRow}>
-									<View style={styles.pointsCard}>
-										<Text style={styles.pointsLabel}>Puntos</Text>
-										<Text style={styles.pointsValue}>{points}</Text>
+								<View className='mt-5 flex-row'>
+									<View className='flex-1 rounded-[18px] border border-[#063D22] bg-[#08783F] p-4'>
+										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-[#E1F3E7]'>
+											Puntos
+										</Text>
+										<Text className='mt-1 text-[29px] font-extrabold text-blanco'>
+											{points}
+										</Text>
 									</View>
 
-									<View style={styles.levelCard}>
-										<Text style={styles.levelLabel}>Nivel</Text>
-										<Text style={styles.levelValue} numberOfLines={1}>
+									<View
+										className='ml-3 flex-1 rounded-[18px] border border-[#a6c1b3] bg-niebla p-4'
+										style={cardShadow}
+									>
+										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-[#06371c]'>
+											Nivel
+										</Text>
+										<Text
+											className='mt-1 text-[18px] font-bold text-[#06371c]'
+											numberOfLines={1}
+										>
 											{currentLevel}
 										</Text>
 									</View>
 								</View>
 
 								{user?.gamification?.next_level && (
-									<View style={styles.nextLevelCard}>
-										<View style={styles.nextLevelHeader}>
-											<Text style={styles.nextLevelTitle}>
+									<View
+										className='mt-5 rounded-[18px] border border-[#a6c1b3] bg-niebla p-4'
+										style={cardShadow}
+									>
+										<View className='flex-row items-center justify-between'>
+											<Text className='flex-1 text-[14px] font-semibold text-[#06371c]'>
 												Progreso al siguiente nivel
 											</Text>
 
-											<View style={styles.progressBadge}>
-												<Text style={styles.progressBadgeText}>
+											<View className='self-start rounded-full bg-[#b8f35d] px-2.5 py-1'>
+												<Text className='text-[12px] font-extrabold text-[#06371c]'>
 													{progress}%
 												</Text>
 											</View>
 										</View>
 
-										<View style={styles.progressTrack}>
+										<View className='mt-3 h-2.5 overflow-hidden rounded-full bg-[#a6c1b3]'>
 											<View
-												style={[styles.progressFill, { width: `${progress}%` }]}
+												className='h-full rounded-full bg-[#08783F]'
+												style={{ width: `${progress}%` }}
 											/>
 										</View>
 
-										<Text style={styles.progressDescription}>
+										<Text className='mt-3 text-[14px] leading-5 text-[#06371c]'>
 											Te faltan{' '}
-											<Text style={styles.progressStrongText}>
+											<Text className='font-bold text-[#06371c]'>
 												{pointsToNextLevel}
 											</Text>{' '}
 											puntos para{' '}
-											<Text style={styles.progressLevelText}>{nextLevel}</Text>.
+											<Text className='font-semibold text-[#06371c]'>
+												{nextLevel}
+											</Text>
+											.
 										</Text>
 									</View>
 								)}
@@ -756,14 +795,19 @@ export default function ProfileScreen() {
 					<ImageBackground
 						source={require('@/assets/images/zoo-pattern.png')}
 						resizeMode='repeat'
-						imageStyle={styles.personalPattern}
-						style={styles.personalBackground}
+						imageClassName='opacity-[0.12]'
+						className='bg-blanco'
 					>
-						<View style={styles.personalContent}>
-							<View style={styles.personalCard}>
-								<Text style={styles.sectionTitle}>Datos personales</Text>
+						<View className='px-5 pb-12 pt-1'>
+							<View
+								className='rounded-[22px] border border-[#a6c1b3] bg-niebla px-[18px] pb-6 pt-5'
+								style={cardShadow}
+							>
+								<Text className='text-[21px] font-bold text-[#06371c]'>
+									Datos personales
+								</Text>
 
-								<Text style={styles.sectionSubtitle}>
+								<Text className='mt-1 text-[14px] text-[#06371c]'>
 									Mantén actualizada tu información.
 								</Text>
 
@@ -808,31 +852,23 @@ export default function ProfileScreen() {
 									keyboardType='phone-pad'
 								/>
 
-								<View style={styles.dateFieldWrapper}>
-									<Text style={styles.fieldLabel}>Fecha de nacimiento</Text>
+								<View className='mt-5'>
+									<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-[#06371c]'>
+										Fecha de nacimiento
+									</Text>
 
 									<Pressable
 										onPress={() => setShowDatePicker(true)}
-										style={[
-											styles.fieldContainer,
-											errors.birth_date && styles.fieldContainerError,
-										]}
+										className={`min-h-14 flex-row items-center rounded-[14px] border border-[#08783F] px-4 ${errors.birth_date ? 'bg-niebla' : 'bg-blanco'}`}
 									>
 										<HugeiconsIcon
 											icon={Calendar03Icon}
 											size={20}
 											strokeWidth={1.8}
-											color={colors.primary}
+											color='#08783F'
 										/>
 
-										<Text
-											style={[
-												styles.dateValue,
-												{
-													color: birthDate ? colors.text : colors.placeholder,
-												},
-											]}
-										>
+										<Text className='ml-3 flex-1 text-[16px] text-[#06371c]'>
 											{birthDate || 'Seleccionar fecha'}
 										</Text>
 									</Pressable>
@@ -848,7 +884,9 @@ export default function ProfileScreen() {
 									)}
 
 									{errors.birth_date && (
-										<Text style={styles.fieldError}>{errors.birth_date}</Text>
+										<Text className='mt-1 text-[12px] text-[#08783F]'>
+											{errors.birth_date}
+										</Text>
 									)}
 								</View>
 
