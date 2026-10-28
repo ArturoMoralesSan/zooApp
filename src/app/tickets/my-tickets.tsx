@@ -19,6 +19,7 @@ import {
 	ScrollView,
 	Text,
 	View,
+	type ViewStyle,
 } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -27,77 +28,21 @@ import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	bottomSpaceStyle,
-	closeButtonPressedStyle,
-	closeButtonStyle,
-	closeTextStyle,
-	colors,
-	containerStyle,
-	dividerStyle,
-	emptyCardStyle,
-	emptyIconStyle,
-	emptyTextStyle,
-	emptyTitleStyle,
-	folioStyle,
-	infoBlockRightStyle,
-	infoBlockStyle,
-	infoLabelStyle,
-	infoRowStyle,
-	infoTimeStyle,
-	infoValueStyle,
-	loadingContainerStyle,
-	loadingTextStyle,
-	modalDateStyle,
-	modalHeaderStyle,
-	modalIconStyle,
-	modalOverlayStyle,
-	modalSubtitleStyle,
-	modalTitleContainerStyle,
-	modalTitleInfoStyle,
-	modalTitleStyle,
-	purchaseCardStyle,
-	purchaseHeaderStyle,
-	purchaseIconStyle,
-	purchaseInfoStyle,
-	purchasesListStyle,
-	purchaseTitleStyle,
-	qrErrorStyle,
-	qrErrorTextStyle,
-	qrListStyle,
-	qrModalCardStyle,
-	qrModalPatternStyle,
-	qrTicketCardStyle,
-	qrTicketHeaderStyle,
-	qrTicketNameStyle,
-	qrTicketNumberStyle,
-	qrTicketStatusStyle,
-	qrTicketStatusTextStyle,
-	qrTokenDebugStyle,
-	qrWrapperStyle,
-	scrollContentStyle,
-	statCardStyle,
-	statIconStyle,
-	statLabelStyle,
-	statNumberStyle,
-	statsContainerStyle,
-	statusBadgeStyle,
-	statusTextStyle,
-	tabActiveStyle,
-	tabCountActiveStyle,
-	tabCountStyle,
-	tabCountTextActiveStyle,
-	tabCountTextStyle,
-	tabsContainerStyle,
-	tabStyle,
-	tabTextActiveStyle,
-	tabTextStyle,
-	ticketSummaryStyle,
-	ticketSummaryTextStyle,
-	totalValueStyle,
-} from '@/styles/my-tickets'
+import colors from '@/theme/colors'
+
+const ICON_COLORS = {
+	primary: '#187744',
+	muted: '#718477',
+	coral: '#D95C4F',
+} as const
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#244334',
+	shadowOffset: { width: 0, height: 3 },
+	shadowOpacity: 0.055,
+	shadowRadius: 8,
+	elevation: 2,
+}
 
 type Ticket = {
 	id: number
@@ -319,22 +264,19 @@ export default function MyTicketsScreen() {
 	}
 
 	return (
-		<SafeAreaView
-			style={[containerStyle, { flex: 1 }]}
-			edges={['top', 'left', 'right']}
-		>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={[backgroundStyle, { flex: 1 }]}
+				className='flex-1 bg-blanco'
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
+				imageClassName='opacity-[0.12]'
 			>
 				<ScrollView
-					style={{ flex: 1 }}
+					className='flex-1'
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
+					contentContainerClassName='px-5 pb-10 pt-2.5'
 				>
-					<View style={{ marginBottom: 16 }}>
+					<View className='mb-4'>
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
@@ -344,57 +286,68 @@ export default function MyTicketsScreen() {
 						showRewards={false}
 					/>
 
-					<View style={statsContainerStyle}>
-						<View style={statCardStyle}>
-							<View style={statIconStyle}>
+					<View className='mb-5 flex-row gap-3'>
+						<View
+							className='flex-1 flex-row items-center rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-[13px]'
+							style={cardShadow}
+						>
+							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
-									color={colors.primary}
+									color={ICON_COLORS.primary}
 								/>
 							</View>
 
 							<View>
-								<Text style={statNumberStyle}>{activePurchases.length}</Text>
-								<Text style={statLabelStyle}>Compras activas</Text>
+								<Text className='text-[20px] font-extrabold text-[#244334]'>
+									{activePurchases.length}
+								</Text>
+								<Text className='mt-[3px] text-[11px] font-medium text-[#718477]'>
+									Compras activas
+								</Text>
 							</View>
 						</View>
 
-						<View style={statCardStyle}>
-							<View style={statIconStyle}>
+						<View
+							className='flex-1 flex-row items-center rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-[13px]'
+							style={cardShadow}
+						>
+							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
-									color={colors.muted}
+									color={ICON_COLORS.muted}
 								/>
 							</View>
 
 							<View>
-								<Text style={statNumberStyle}>{historyPurchases.length}</Text>
-								<Text style={statLabelStyle}>Historial</Text>
+								<Text className='text-[20px] font-extrabold text-[#244334]'>
+									{historyPurchases.length}
+								</Text>
+								<Text className='mt-[3px] text-[11px] font-medium text-[#718477]'>
+									Historial
+								</Text>
 							</View>
 						</View>
 					</View>
 
-					<View style={tabsContainerStyle}>
+					<View className='mb-[18px] flex-row rounded-2xl border border-[#DCE7DF] bg-[#F2F7F4] p-1'>
 						<Pressable
 							onPress={() => setTab('active')}
-							style={[tabStyle, tab === 'active' && tabActiveStyle]}
+							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-[#187744]' : ''}`}
 						>
 							<Text
-								style={[tabTextStyle, tab === 'active' && tabTextActiveStyle]}
+								className={`text-[13px] ${tab === 'active' ? 'font-extrabold text-blanco' : 'font-semibold text-[#718477]'}`}
 							>
 								Activas
 							</Text>
 
 							<View
-								style={[tabCountStyle, tab === 'active' && tabCountActiveStyle]}
+								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-[#E4F2E8]'}`}
 							>
 								<Text
-									style={[
-										tabCountTextStyle,
-										tab === 'active' && tabCountTextActiveStyle,
-									]}
+									className={`text-[11px] font-bold ${tab === 'active' ? 'text-[#187744]' : 'text-[#244334]'}`}
 								>
 									{activePurchases.length}
 								</Text>
@@ -403,27 +356,19 @@ export default function MyTicketsScreen() {
 
 						<Pressable
 							onPress={() => setTab('history')}
-							style={[tabStyle, tab === 'history' && tabActiveStyle]}
+							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-[#187744]' : ''}`}
 						>
 							<Text
-								style={[tabTextStyle, tab === 'history' && tabTextActiveStyle]}
+								className={`text-[13px] ${tab === 'history' ? 'font-extrabold text-blanco' : 'font-semibold text-[#718477]'}`}
 							>
 								Historial
 							</Text>
 
 							<View
-								style={[
-									tabCountStyle,
-									tab === 'history' && tabCountActiveStyle,
-								]}
+								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-[#E4F2E8]'}`}
 							>
 								<Text
-									style={[
-										tabCountTextStyle,
-										tab === 'history' && tabCountActiveStyle
-											? tabCountTextActiveStyle
-											: null,
-									]}
+									className={`text-[11px] font-bold ${tab === 'history' ? 'text-[#187744]' : 'text-[#244334]'}`}
 								>
 									{historyPurchases.length}
 								</Text>
@@ -432,34 +377,39 @@ export default function MyTicketsScreen() {
 					</View>
 
 					{loading ? (
-						<View style={loadingContainerStyle}>
-							<ActivityIndicator size='large' color={colors.primary} />
-							<Text style={loadingTextStyle}>Cargando tus entradas...</Text>
+						<View className='items-center justify-center py-[60px]'>
+							<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+							<Text className='mt-3 text-[14px] text-[#718477]'>
+								Cargando tus entradas...
+							</Text>
 						</View>
 					) : visiblePurchases.length === 0 ? (
-						<View style={emptyCardStyle}>
-							<View style={emptyIconStyle}>
+						<View
+							className='items-center rounded-3xl border border-[#DCE7DF] bg-[#F2F7F4] px-6 py-8'
+							style={cardShadow}
+						>
+							<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-[#E4F2E8]'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={32}
-									color={colors.primary}
+									color={ICON_COLORS.primary}
 								/>
 							</View>
 
-							<Text style={emptyTitleStyle}>
+							<Text className='text-center text-[18px] font-extrabold text-[#244334]'>
 								{tab === 'active'
 									? 'No tienes compras activas'
 									: 'No tienes historial'}
 							</Text>
 
-							<Text style={emptyTextStyle}>
+							<Text className='mt-[7px] text-center text-[13px] leading-5 text-[#718477]'>
 								{tab === 'active'
 									? 'Cuando compres una entrada aparecerá aquí.'
 									: 'Tus compras anteriores aparecerán aquí.'}
 							</Text>
 
 							{tab === 'active' && (
-								<View style={{ width: '100%', marginTop: 20 }}>
+								<View className='mt-5 w-full'>
 									<ActionButton
 										title='Comprar boletos'
 										onPress={() => router.push('/tickets')}
@@ -468,27 +418,33 @@ export default function MyTicketsScreen() {
 							)}
 						</View>
 					) : (
-						<View style={purchasesListStyle}>
+						<View className='w-full'>
 							{visiblePurchases.map((purchase) => (
-								<View key={purchase.orderId} style={purchaseCardStyle}>
-									<View style={purchaseHeaderStyle}>
-										<View style={purchaseIconStyle}>
+								<View
+									key={purchase.orderId}
+									className='mb-3.5 w-full rounded-[22px] border border-[#DCE7DF] bg-[#F2F7F4] p-4'
+									style={cardShadow}
+								>
+									<View className='flex-row items-center'>
+										<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[15px] bg-[#E4F2E8]'>
 											<HugeiconsIcon
 												icon={Ticket01Icon}
 												size={25}
-												color={colors.primary}
+												color={ICON_COLORS.primary}
 											/>
 										</View>
 
-										<View style={purchaseInfoStyle}>
-											<Text style={purchaseTitleStyle}>
+										<View className='min-w-0 flex-1'>
+											<Text className='text-[15px] font-extrabold text-[#244334]'>
 												Compra #{purchase.orderId}
 											</Text>
-											<Text style={folioStyle}>{purchase.folio}</Text>
+											<Text className='mt-1 text-[12px] text-[#718477]'>
+												{purchase.folio}
+											</Text>
 										</View>
 
-										<View style={statusBadgeStyle}>
-											<Text style={statusTextStyle}>
+										<View className='ml-2 rounded-[10px] bg-[#E4F2E8] px-[9px] py-[5px]'>
+											<Text className='text-[11px] font-bold text-[#187744]'>
 												{getActiveCount(purchase) > 0
 													? 'Activa'
 													: getTicketStatus(purchase.tickets[0])}
@@ -496,66 +452,54 @@ export default function MyTicketsScreen() {
 										</View>
 									</View>
 
-									<View style={dividerStyle} />
+									<View className='my-[13px] h-px bg-[#DCE7DF]' />
 
-									<View style={infoRowStyle}>
-										<View style={infoBlockStyle}>
-											<Text style={infoLabelStyle}>Fecha de compra</Text>
+									<View className='flex-row justify-between gap-3'>
+										<View className='flex-1'>
+											<Text className='text-[11px] text-[#718477]'>
+												Fecha de compra
+											</Text>
 
-											<View
-												style={{
-													flexDirection: 'row',
-													alignItems: 'center',
-													gap: 5,
-													marginTop: 4,
-												}}
-											>
+											<View className='mt-1 flex-row items-center gap-[5px]'>
 												<HugeiconsIcon
 													icon={Calendar03Icon}
 													size={15}
-													color={colors.muted}
+													color={ICON_COLORS.muted}
 												/>
-												<Text style={infoValueStyle}>
+												<Text className='mt-1 text-[13px] font-bold text-[#244334]'>
 													{formatPurchaseDate(purchase.createdAt)}
 												</Text>
 											</View>
 
 											{formatPurchaseTime(purchase.createdAt) ? (
-												<View
-													style={{
-														flexDirection: 'row',
-														alignItems: 'center',
-														gap: 5,
-														marginTop: 3,
-													}}
-												>
+												<View className='mt-[3px] flex-row items-center gap-[5px]'>
 													<HugeiconsIcon
 														icon={Clock01Icon}
 														size={13}
-														color={colors.muted}
+														color={ICON_COLORS.muted}
 													/>
-													<Text style={infoTimeStyle}>
+													<Text className='mt-[3px] text-[11px] text-[#718477]'>
 														{formatPurchaseTime(purchase.createdAt)}
 													</Text>
 												</View>
 											) : null}
 										</View>
 
-										<View style={infoBlockRightStyle}>
-											<Text style={infoLabelStyle}>Total</Text>
-											<Text style={totalValueStyle}>
+										<View className='items-end'>
+											<Text className='text-[11px] text-[#718477]'>Total</Text>
+											<Text className='mt-1 text-[17px] font-extrabold text-[#187744]'>
 												${purchase.total.toFixed(2)}
 											</Text>
 										</View>
 									</View>
 
-									<View style={ticketSummaryStyle}>
+									<View className='mt-3.5 max-w-full flex-row items-center self-start rounded-xl border border-[#DCE7DF] bg-[#E4F2E8] px-3 py-2'>
 										<HugeiconsIcon
 											icon={Ticket01Icon}
 											size={17}
-											color={colors.primary}
+											color={ICON_COLORS.primary}
 										/>
-										<Text style={ticketSummaryTextStyle}>
+										<Text className='ml-2 shrink text-[12px] font-bold text-[#187744]'>
 											{getTicketSummary(purchase)}
 										</Text>
 									</View>
@@ -569,7 +513,7 @@ export default function MyTicketsScreen() {
 						</View>
 					)}
 
-					<View style={bottomSpaceStyle} />
+					<View className='h-10' />
 				</ScrollView>
 
 				<Modal
@@ -578,26 +522,28 @@ export default function MyTicketsScreen() {
 					animationType='slide'
 					onRequestClose={() => setSelectedPurchase(null)}
 				>
-					<View style={modalOverlayStyle}>
+					<View className='flex-1 justify-end bg-[rgba(24,40,30,0.48)]'>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
-							style={qrModalCardStyle}
-							imageStyle={qrModalPatternStyle}
+							className='max-h-[90%] overflow-hidden rounded-t-[26px] border-t border-[#DCE7DF] bg-blanco px-5 pb-[25px] pt-5'
+							imageClassName='opacity-30'
 							resizeMode='repeat'
 						>
-							<View style={modalHeaderStyle}>
-								<View style={modalTitleContainerStyle}>
-									<View style={modalIconStyle}>
+							<View className='flex-row items-center justify-between'>
+								<View className='flex-1 flex-row items-center'>
+									<View className='mr-[11px] h-11 w-11 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
 										<HugeiconsIcon
 											icon={QrCodeIcon}
 											size={25}
-											color={colors.primary}
+											color={ICON_COLORS.primary}
 										/>
 									</View>
 
-									<View style={modalTitleInfoStyle}>
-										<Text style={modalTitleStyle}>Tus entradas</Text>
-										<Text style={modalSubtitleStyle}>
+									<View className='flex-1'>
+										<Text className='text-[19px] font-extrabold text-[#244334]'>
+											Tus entradas
+										</Text>
+										<Text className='mt-1 text-[11px] text-[#718477]'>
 											{selectedPurchase?.folio}
 										</Text>
 									</View>
@@ -605,17 +551,16 @@ export default function MyTicketsScreen() {
 
 								<Pressable
 									onPress={() => setSelectedPurchase(null)}
-									style={({ pressed }) => [
-										closeButtonStyle,
-										pressed && closeButtonPressedStyle,
-									]}
+									className='ml-2.5 h-[38px] w-[38px] items-center justify-center rounded-[13px] border border-[#DCE7DF] bg-[#F2F7F4] active:bg-[#E4F2E8] active:opacity-[0.65]'
 								>
-									<Text style={closeTextStyle}>×</Text>
+									<Text className='text-[24px] leading-7 text-[#244334]'>
+										×
+									</Text>
 								</Pressable>
 							</View>
 
 							{selectedPurchase && (
-								<Text style={modalDateStyle}>
+								<Text className='mb-2.5 mt-3 text-[12px] text-[#718477]'>
 									Compra realizada el{' '}
 									{formatPurchaseDate(selectedPurchase.createdAt)}
 									{formatPurchaseTime(selectedPurchase.createdAt)
@@ -626,48 +571,55 @@ export default function MyTicketsScreen() {
 
 							<ScrollView
 								showsVerticalScrollIndicator={false}
-								contentContainerStyle={qrListStyle}
+								contentContainerClassName='pb-[5px]'
 							>
 								{selectedPurchase?.tickets.map((ticket, index) => (
-									<View key={ticket.id} style={qrTicketCardStyle}>
-										<View style={qrTicketHeaderStyle}>
+									<View
+										key={ticket.id}
+										className='mb-3 rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-3.5'
+										style={cardShadow}
+									>
+										<View className='flex-row items-center justify-between gap-2.5'>
 											<View>
-												<Text style={qrTicketNameStyle}>
+												<Text className='text-[15px] font-extrabold text-[#244334]'>
 													{ticket.ticket_type?.name ?? 'Entrada'}
 												</Text>
-												<Text style={qrTicketNumberStyle}>
+												<Text className='mt-1 text-[11px] text-[#718477]'>
 													Entrada {index + 1} de{' '}
 													{selectedPurchase.tickets.length}
 												</Text>
 											</View>
 
-											<View style={qrTicketStatusStyle}>
-												<Text style={qrTicketStatusTextStyle}>
+											<View className='rounded-[9px] bg-[#E4F2E8] px-[9px] py-[5px]'>
+												<Text className='text-[10px] font-bold text-[#187744]'>
 													{getTicketStatus(ticket)}
 												</Text>
 											</View>
 										</View>
 
-										<View style={qrWrapperStyle}>
+										<View
+											className='mt-3.5 min-h-[236px] min-w-[236px] items-center justify-center self-center rounded-[18px] border border-[#DCE7DF] bg-blanco p-3'
+											style={cardShadow}
+										>
 											{ticket.qr_token && ticket.qr_token.trim() !== '' ? (
 												<QRCode
 													value={ticket.qr_token}
 													size={210}
-													backgroundColor={colors.white}
+													backgroundColor={colors.blanco}
 													color='#000000'
 													quietZone={4}
 												/>
 											) : (
-												<View style={qrErrorStyle}>
+												<View className='h-[210px] w-[210px] items-center justify-center px-[15px]'>
 													<HugeiconsIcon
 														icon={QrCodeIcon}
 														size={45}
-														color={colors.coral}
+														color={ICON_COLORS.coral}
 													/>
-													<Text style={qrErrorTextStyle}>
+													<Text className='mt-2.5 text-center text-[13px] font-bold text-[#D95C4F]'>
 														Este boleto no tiene QR disponible.
 													</Text>
-													<Text style={qrTokenDebugStyle}>
+													<Text className='mt-2 text-center text-[9px] text-[#718477]'>
 														Token: {String(ticket.qr_token ?? 'NULL')}
 													</Text>
 												</View>
