@@ -22,7 +22,7 @@ import {
 } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
@@ -30,6 +30,7 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken, logout, type User } from '@/services/auth'
 import colors from '@/theme/colors'
+import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
 
 type UserWithProfile = User & {
@@ -61,6 +62,8 @@ function getAvatarUrl(avatar?: string | null): string | null {
 }
 
 export default function Panel() {
+	const insets = useSafeAreaInsets()
+
 	const [loggingOut, setLoggingOut] = useState(false)
 	const [user, setUser] = useState<UserWithProfile | null>(null)
 	const [showQr, setShowQr] = useState(false)
@@ -152,7 +155,10 @@ export default function Panel() {
 			>
 				<ScrollView
 					className='flex-1'
-					contentContainerClassName='px-3 pb-[120px] pt-2'
+					contentContainerClassName='px-3 pt-2'
+					contentContainerStyle={{
+						paddingBottom: 120 + getTabBarExtraSpace(insets.bottom),
+					}}
 					showsVerticalScrollIndicator={false}
 				>
 					{/* ENCABEZADO */}

@@ -10,6 +10,7 @@ import { Tabs } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
 import colors from '@/theme/colors'
+import { getTabBarBottomPadding } from '@/theme/layout'
 
 const INACTIVE_COLOR = colors.apagado
 
@@ -19,8 +20,11 @@ export default function TabLayout() {
 			screenOptions={{
 				headerShown: false,
 			}}
-			tabBar={({ state, descriptors, navigation }) => (
-				<View className='absolute bottom-0 left-0 right-0 bg-transparent px-3 pb-[22px]'>
+			tabBar={({ state, descriptors, navigation, insets }) => (
+				<View
+					className='absolute bottom-0 left-0 right-0 bg-transparent px-3'
+					style={{ paddingBottom: getTabBarBottomPadding(insets.bottom) }}
+				>
 					<View className='min-h-[72px] w-full flex-row items-center rounded-[22px] border-[0.8px] border-card-border bg-blanco p-1.5'>
 						{state.routes
 							.filter((route) => route.name !== 'ar')

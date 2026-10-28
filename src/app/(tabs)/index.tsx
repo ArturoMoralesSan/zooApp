@@ -21,7 +21,7 @@ import {
 	Text,
 	View,
 } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
@@ -30,6 +30,7 @@ import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
+import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
 
 const PRIMARY = colors.esmeralda
@@ -105,6 +106,8 @@ function getEventImageUrl(image: string | null): string | null {
 }
 
 export default function Explorar() {
+	const insets = useSafeAreaInsets()
+
 	const { loading: authLoading, refreshUser } = useAuth()
 
 	const [events, setEvents] = useState<ExploreEvent[]>([])
@@ -180,7 +183,10 @@ export default function Explorar() {
 		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
 			<ScrollView
 				className='flex-1'
-				contentContainerClassName='grow px-3 pb-[140px] pt-2'
+				contentContainerClassName='grow px-3 pt-2'
+				contentContainerStyle={{
+					paddingBottom: 140 + getTabBarExtraSpace(insets.bottom),
+				}}
 				showsVerticalScrollIndicator
 				nestedScrollEnabled
 				bounces
