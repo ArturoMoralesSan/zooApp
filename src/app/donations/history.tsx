@@ -13,47 +13,22 @@ import {
 	ScrollView,
 	Text,
 	View,
+	type ViewStyle,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	buyButtonStyle,
-	buyButtonTextStyle,
-	cardShadow,
-	colors,
-	containerStyle,
-	dividerStyle,
-	donationAmountStyle,
-	donationCardStyle,
-	donationDateStyle,
-	donationHeaderStyle,
-	donationIconStyle,
-	donationInfoStyle,
-	donationTimeStyle,
-	donationsListStyle,
-	emptyCardStyle,
-	emptyIconStyle,
-	emptyTextStyle,
-	emptyTitleStyle,
-	infoBlockStyle,
-	infoLabelStyle,
-	infoRowStyle,
-	infoValueStyle,
-	loadingContainerStyle,
-	loadingTextStyle,
-	paymentRowStyle,
-	scrollContentStyle,
-	sectionTitleStyle,
-	statCardStyle,
-	statsContainerStyle,
-	statusBadgeStyle,
-	statusTextStyle,
-} from '@/styles/donation-history'
+const ICON_COLOR = '#06371c'
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#063D22',
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.05,
+	shadowRadius: 5,
+	elevation: 2,
+}
 
 type PaymentMethod = {
 	id?: number
@@ -99,7 +74,7 @@ function getDonationStatus(donation: Donation): string {
 	}
 }
 
-function getDonationStatusColors(donation: Donation) {
+function getDonationStatusClassName(donation: Donation): string {
 	const status = String(donation.status ?? '').toLowerCase()
 
 	if (
@@ -113,26 +88,14 @@ function getDonationStatusColors(donation: Donation) {
 			'fallido',
 		].includes(status)
 	) {
-		return {
-			backgroundColor: colors.coralLight,
-			color: '#06371c',
-			borderColor: colors.border,
-		}
+		return 'bg-[#d5ead9]'
 	}
 
 	if (status === 'pending' || status === 'pendiente') {
-		return {
-			backgroundColor: colors.orangeLight,
-			color: '#06371c',
-			borderColor: colors.border,
-		}
+		return 'bg-niebla'
 	}
 
-	return {
-		backgroundColor: '#b8f45d',
-		color: '#06371c',
-		borderColor: colors.border,
-	}
+	return 'bg-[#b8f45d]'
 }
 
 function formatAmount(amount?: number | string | null): string {
@@ -275,20 +238,20 @@ export default function DonationHistoryScreen() {
 	)
 
 	return (
-		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
+				className='flex-1'
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
+				imageClassName='opacity-[0.15]'
 			>
 				{/* Encabezado */}
-				<View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
-					<View style={{ marginBottom: 12 }}>
+				<View className='px-5 pt-2'>
+					<View className='mb-3'>
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					<View style={{ marginBottom: 20 }}>
+					<View className='mb-5'>
 						<UserHeader
 							title='Mis donaciones'
 							subtitle='Consulta el historial de tus donaciones.'
@@ -299,196 +262,187 @@ export default function DonationHistoryScreen() {
 
 				<ScrollView
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={scrollContentStyle}
+					contentContainerClassName='px-5 pb-10 pt-0'
 				>
 					{/* Estadísticas */}
-					<View style={statsContainerStyle}>
-						<View style={statCardStyle}>
-							<Text style={styles.statNumber}>{donations.length}</Text>
-							<Text style={styles.statLabel}>Donaciones</Text>
+					<View className='mb-[22px] w-full flex-row items-stretch gap-2.5'>
+						<View
+							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							style={cardShadow}
+						>
+							<Text className='text-center text-[21px] font-extrabold text-[#06371c]'>
+								{donations.length}
+							</Text>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+								Donaciones
+							</Text>
 						</View>
 
-						<View style={statCardStyle}>
-							<Text style={styles.statNumber}>{completedDonations}</Text>
-							<Text style={styles.statLabel}>Completadas</Text>
+						<View
+							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							style={cardShadow}
+						>
+							<Text className='text-center text-[21px] font-extrabold text-[#06371c]'>
+								{completedDonations}
+							</Text>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+								Completadas
+							</Text>
 						</View>
 
-						<View style={[statCardStyle, { flex: 1.25 }]}>
+						<View
+							className='min-w-0 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							style={[cardShadow, { flex: 1.25 }]}
+						>
 							<Text
-								style={[styles.statNumber, { fontSize: 16 }]}
+								className='text-center text-[16px] font-extrabold text-[#06371c]'
 								numberOfLines={1}
 								adjustsFontSizeToFit
 								minimumFontScale={0.7}
 							>
 								{formatAmount(totalDonated)}
 							</Text>
-							<Text style={styles.statLabel}>Total donado</Text>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+								Total donado
+							</Text>
 						</View>
 					</View>
 
 					{/* Cargando */}
 					{loading ? (
-						<View style={loadingContainerStyle}>
-							<ActivityIndicator size='large' color={colors.primary} />
-							<Text style={loadingTextStyle}>Cargando tus donaciones...</Text>
+						<View className='items-center justify-center py-[60px]'>
+							<ActivityIndicator size='large' color={ICON_COLOR} />
+							<Text className='mt-3 text-[14px] text-[#06371c]'>
+								Cargando tus donaciones...
+							</Text>
 						</View>
 					) : sortedDonations.length === 0 ? (
 						/* Estado vacío */
-						<View style={emptyCardStyle}>
-							<View style={emptyIconStyle}>
+						<View
+							className='w-full items-center rounded-[22px] border border-[#a6c1b3] bg-niebla px-[25px] py-8'
+							style={cardShadow}
+						>
+							<View className='mb-4 h-[62px] w-[62px] items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-[#d5ead9]'>
 								<HugeiconsIcon
 									icon={HeartAddIcon}
 									size={32}
 									strokeWidth={1.8}
-									color={colors.primary}
+									color={ICON_COLOR}
 								/>
 							</View>
 
-							<Text style={emptyTitleStyle}>No tienes donaciones</Text>
+							<Text className='text-center text-[18px] font-extrabold text-[#06371c]'>
+								No tienes donaciones
+							</Text>
 
-							<Text style={emptyTextStyle}>
+							<Text className='mt-[7px] text-center text-[13px] leading-[19px] text-[#06371c]'>
 								Cuando realices una donación aparecerá aquí.
 							</Text>
 
 							<Pressable
 								onPress={() => router.push('/donations')}
-								style={({ pressed }) => [
-									buyButtonStyle,
-									{
-										marginTop: 18,
-										backgroundColor: pressed
-											? colors.buttonPressed
-											: colors.button,
-									},
-								]}
+								className='mt-[18px] min-h-12 w-full items-center justify-center rounded-[14px] bg-[#08783F] active:bg-[#063D22]'
 							>
-								<Text style={buyButtonTextStyle}>Hacer una donación</Text>
+								<Text className='text-[14px] font-bold text-blanco'>
+									Hacer una donación
+								</Text>
 							</Pressable>
 						</View>
 					) : (
 						/* Historial */
-						<View style={donationsListStyle}>
-							<Text style={sectionTitleStyle}>Historial</Text>
+						<View className='w-full'>
+							<Text className='mb-3 text-[18px] font-extrabold text-[#06371c]'>
+								Historial
+							</Text>
 
-							{sortedDonations.map((donation) => {
-								const statusColors = getDonationStatusColors(donation)
-
-								return (
-									<View
-										key={donation.id}
-										style={[donationCardStyle, cardShadow]}
-									>
-										<View style={donationHeaderStyle}>
-											<View style={donationIconStyle}>
-												<HugeiconsIcon
-													icon={HeartAddIcon}
-													size={25}
-													strokeWidth={1.8}
-													color={colors.primary}
-												/>
-											</View>
-
-											<View style={donationInfoStyle}>
-												<Text style={donationAmountStyle}>
-													{formatAmount(donation.amount)}
-												</Text>
-
-												<Text style={donationDateStyle}>
-													{formatDate(donation.created_at)}
-												</Text>
-
-												{formatTime(donation.created_at) ? (
-													<Text style={donationTimeStyle}>
-														{formatTime(donation.created_at)}
-													</Text>
-												) : null}
-											</View>
-
-											<View
-												style={[
-													statusBadgeStyle,
-													{
-														backgroundColor: statusColors.backgroundColor,
-														borderColor: statusColors.borderColor,
-													},
-												]}
-											>
-												<Text
-													style={[
-														statusTextStyle,
-														{
-															color: statusColors.color,
-														},
-													]}
-												>
-													{getDonationStatus(donation)}
-												</Text>
-											</View>
+							{sortedDonations.map((donation) => (
+								<View
+									key={donation.id}
+									className='mb-[13px] w-full rounded-[20px] border border-[#a6c1b3] bg-niebla p-4'
+									style={cardShadow}
+								>
+									<View className='flex-row items-center'>
+										<View className='mr-[11px] h-[46px] w-[46px] items-center justify-center rounded-[15px] border border-[#a6c1b3] bg-[#d5ead9]'>
+											<HugeiconsIcon
+												icon={HeartAddIcon}
+												size={25}
+												strokeWidth={1.8}
+												color={ICON_COLOR}
+											/>
 										</View>
 
-										<View style={dividerStyle} />
+										<View className='min-w-0 flex-1'>
+											<Text className='text-[19px] font-extrabold text-[#06371c]'>
+												{formatAmount(donation.amount)}
+											</Text>
 
-										{/* Método de pago y referencia */}
-										<View style={infoRowStyle}>
-											<View style={infoBlockStyle}>
-												<Text style={infoLabelStyle}>Método de pago</Text>
+											<Text className='mt-1 text-[12px] text-[#06371c]'>
+												{formatDate(donation.created_at)}
+											</Text>
 
-												<View style={paymentRowStyle}>
-													<HugeiconsIcon
-														icon={CreditCardIcon}
-														size={17}
-														strokeWidth={1.8}
-														color={colors.primary}
-													/>
-
-													<Text style={infoValueStyle} numberOfLines={2}>
-														{donation.payment_method?.name ?? 'No especificado'}
-													</Text>
-												</View>
-											</View>
-
-											<View style={infoBlockStyle}>
-												<Text style={infoLabelStyle}>Referencia</Text>
-
-												<Text
-													style={[
-														infoValueStyle,
-														{
-															marginTop: 6,
-															marginLeft: 0,
-														},
-													]}
-													numberOfLines={2}
-												>
-													{donation.reference || 'No disponible'}
+											{formatTime(donation.created_at) ? (
+												<Text className='mt-0.5 text-[11px] text-[#06371c]'>
+													{formatTime(donation.created_at)}
 												</Text>
-											</View>
+											) : null}
+										</View>
+
+										<View
+											className={`ml-[7px] rounded-[10px] border border-[#a6c1b3] px-2 py-[5px] ${getDonationStatusClassName(donation)}`}
+										>
+											<Text className='text-[10px] font-bold text-[#06371c]'>
+												{getDonationStatus(donation)}
+											</Text>
 										</View>
 									</View>
-								)
-							})}
+
+									<View className='my-3.5 h-px bg-[#a6c1b3]' />
+
+									{/* Método de pago y referencia */}
+									<View className='w-full flex-row items-start gap-4'>
+										<View className='min-w-0 flex-1'>
+											<Text className='text-[11px] font-medium text-[#06371c]'>
+												Método de pago
+											</Text>
+
+											<View className='mt-1.5 flex-row items-center'>
+												<HugeiconsIcon
+													icon={CreditCardIcon}
+													size={17}
+													strokeWidth={1.8}
+													color={ICON_COLOR}
+												/>
+
+												<Text
+													className='ml-1.5 shrink text-[12px] font-semibold leading-[18px] text-[#06371c]'
+													numberOfLines={2}
+												>
+													{donation.payment_method?.name ?? 'No especificado'}
+												</Text>
+											</View>
+										</View>
+
+										<View className='min-w-0 flex-1'>
+											<Text className='text-[11px] font-medium text-[#06371c]'>
+												Referencia
+											</Text>
+
+											<Text
+												className='mt-1.5 shrink text-[12px] font-semibold leading-[18px] text-[#06371c]'
+												numberOfLines={2}
+											>
+												{donation.reference || 'No disponible'}
+											</Text>
+										</View>
+									</View>
+								</View>
+							))}
 						</View>
 					)}
 
-					<View style={{ height: 30 }} />
+					<View className='h-[30px]' />
 				</ScrollView>
 			</ImageBackground>
 		</SafeAreaView>
 	)
-}
-
-const styles = {
-	statNumber: {
-		fontSize: 21,
-		fontWeight: '800' as const,
-		color: colors.primary,
-		textAlign: 'center' as const,
-	},
-	statLabel: {
-		marginTop: 6,
-		fontSize: 11,
-		fontWeight: '500' as const,
-		color: colors.muted,
-		textAlign: 'center' as const,
-	},
 }
