@@ -10,6 +10,7 @@ import {
 	Text,
 	TextInput,
 	View,
+	type ViewStyle,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -18,13 +19,20 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
-import {
-	backgroundImageStyle,
-	backgroundStyle,
-	colors,
-	scrollContentStyle,
-} from '@/styles/panel'
-import styles from '@/styles/species'
+import colors from '@/theme/colors'
+
+const PROP_COLORS = {
+	primary: '#08783F',
+	text: '#06371c',
+} as const
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#08783F',
+	shadowOffset: { width: 0, height: 5 },
+	shadowOpacity: 0.12,
+	shadowRadius: 10,
+	elevation: 4,
+}
 
 type SpeciesCategory = {
 	id: number
@@ -121,22 +129,17 @@ export default function SpeciesScreen() {
 		return (
 			<SafeAreaView
 				edges={['top', 'left', 'right']}
-				style={{ flex: 1, backgroundColor: colors.background }}
+				className='flex-1 bg-blanco'
 			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
 					resizeMode='repeat'
-					imageStyle={backgroundImageStyle}
-					style={[backgroundStyle, { flex: 1 }]}
+					imageClassName='opacity-[0.025]'
+					className='flex-1 bg-blanco'
 				>
-					<View
-						style={[
-							styles.loadingContainer,
-							{ flex: 1, backgroundColor: 'transparent' },
-						]}
-					>
-						<ActivityIndicator size='large' color={colors.primary} />
-						<Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+					<View className='flex-1 items-center justify-center bg-transparent'>
+						<ActivityIndicator size='large' color={PROP_COLORS.primary} />
+						<Text className='mt-3 text-[15px] font-semibold text-[#06371c]'>
 							Cargando especies...
 						</Text>
 					</View>
@@ -146,23 +149,20 @@ export default function SpeciesScreen() {
 	}
 
 	return (
-		<SafeAreaView
-			edges={['top', 'left', 'right']}
-			style={{ flex: 1, backgroundColor: colors.background }}
-		>
+		<SafeAreaView edges={['top', 'left', 'right']} className='flex-1 bg-blanco'>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
-				style={[backgroundStyle, { flex: 1 }]}
+				imageClassName='opacity-[0.025]'
+				className='flex-1 bg-blanco'
 			>
 				<ScrollView
 					className='flex-1'
-					contentContainerStyle={[scrollContentStyle, { flexGrow: 1 }]}
+					contentContainerClassName='grow px-3 pb-[120px] pt-2'
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 				>
-					<View style={{ marginBottom: 16 }}>
+					<View className='mb-4'>
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
@@ -173,27 +173,18 @@ export default function SpeciesScreen() {
 					/>
 
 					{/* Buscador */}
-					<View style={[styles.searchSection, { marginTop: 16 }]}>
-						<Text style={[styles.searchLabel, { color: colors.text }]}>
+					<View className='mb-1 mt-4'>
+						<Text className='mb-2 text-[14px] font-extrabold text-[#06371c]'>
 							Buscar especie
 						</Text>
 
-						<View
-							style={[
-								styles.searchContainer,
-								{
-									backgroundColor: colors.white,
-									borderColor: colors.border,
-									borderWidth: 1,
-								},
-							]}
-						>
-							<View style={styles.searchIcon}>
+						<View className='h-[54px] flex-row items-center rounded-[18px] border border-[#a6c1b3] bg-blanco'>
+							<View className='items-center justify-center pl-4'>
 								<HugeiconsIcon
 									icon={Search01Icon}
 									size={21}
 									strokeWidth={1.8}
-									color={colors.primary}
+									color={PROP_COLORS.primary}
 								/>
 							</View>
 
@@ -201,11 +192,11 @@ export default function SpeciesScreen() {
 								value={search}
 								onChangeText={setSearch}
 								placeholder='Buscar especie...'
-								placeholderTextColor={colors.textSecondary}
+								placeholderTextColor={PROP_COLORS.text}
 								autoCapitalize='none'
 								autoCorrect={false}
-								style={[styles.searchInput, { color: colors.text }]}
-								selectionColor={colors.primary}
+								className='flex-1 px-3 py-0 text-[15px] text-[#06371c]'
+								selectionColor={PROP_COLORS.primary}
 							/>
 						</View>
 					</View>
@@ -214,8 +205,8 @@ export default function SpeciesScreen() {
 					<ScrollView
 						horizontal
 						showsHorizontalScrollIndicator={false}
-						style={styles.filtersScroll}
-						contentContainerStyle={styles.filtersContent}
+						className='-mx-0.5 mt-[15px]'
+						contentContainerClassName='items-center pl-0.5 pr-5'
 					>
 						{FILTERS.map((item) => {
 							const active = filter === item
@@ -223,31 +214,14 @@ export default function SpeciesScreen() {
 							return (
 								<View
 									key={item}
-									style={[
-										styles.filterWrapper,
-										{
-											backgroundColor: active ? colors.primary : colors.white,
-											borderColor: active ? colors.primary : colors.border,
-										},
-										active && styles.filterWrapperActive,
-									]}
+									className={`mr-[9px] overflow-hidden rounded-full border px-4 py-2.5 ${active ? 'border-[#08783F] bg-[#08783F]' : 'border-[#a6c1b3] bg-blanco'}`}
 								>
 									<Pressable
 										onPress={() => setFilter(item)}
-										style={({ pressed }) => [
-											styles.filterButton,
-											active && styles.filterButtonActive,
-											pressed && styles.filterButtonPressed,
-										]}
+										className='items-center justify-center active:opacity-[0.72]'
 									>
 										<Text
-											style={[
-												styles.filterText,
-												{
-													color: active ? colors.white : colors.text,
-												},
-												active && styles.filterTextActive,
-											]}
+											className={`text-[13px] font-extrabold ${active ? 'text-blanco' : 'text-[#06371c]'}`}
 										>
 											{item}
 										</Text>
@@ -258,10 +232,8 @@ export default function SpeciesScreen() {
 					</ScrollView>
 
 					{/* Resultados */}
-					<View style={styles.resultsHeader}>
-						<Text
-							style={[styles.resultsCount, { color: colors.textSecondary }]}
-						>
+					<View className='mb-0.5 mt-[19px] flex-row items-center justify-between'>
+						<Text className='text-[13px] font-extrabold text-[#06371c]'>
 							{filteredSpecies.length}{' '}
 							{filteredSpecies.length === 1 ? 'especie' : 'especies'}
 						</Text>
@@ -269,12 +241,9 @@ export default function SpeciesScreen() {
 						{search.trim() !== '' && (
 							<Pressable
 								onPress={() => setSearch('')}
-								style={({ pressed }) => [
-									styles.clearButton,
-									pressed && styles.clearButtonPressed,
-								]}
+								className='rounded-[14px] px-2.5 py-[7px] active:bg-[#d5ead9]'
 							>
-								<Text style={[styles.clearText, { color: colors.primary }]}>
+								<Text className='text-[13px] font-extrabold text-[#08783F]'>
 									Limpiar
 								</Text>
 							</Pressable>
@@ -283,56 +252,26 @@ export default function SpeciesScreen() {
 
 					{/* Error de carga */}
 					{error ? (
-						<View
-							style={[
-								styles.errorCard,
-								{
-									backgroundColor: colors.errorBackground,
-									borderColor: colors.errorBorder,
-								},
-							]}
-						>
-							<View
-								style={[
-									styles.errorIcon,
-									{
-										borderColor: colors.errorBorder,
-									},
-								]}
-							>
-								<Text
-									style={[styles.errorIconText, { color: colors.errorText }]}
-								>
-									!
-								</Text>
+						<View className='mt-[15px] items-center rounded-[22px] border border-[#a6c1b3] bg-niebla p-[18px]'>
+							<View className='h-11 w-11 items-center justify-center rounded-[15px] border border-[#a6c1b3] bg-blanco'>
+								<Text className='text-[21px] font-black text-[#06371c]'>!</Text>
 							</View>
 
-							<Text style={[styles.errorTitle, { color: colors.errorText }]}>
+							<Text className='mt-3 text-center text-[15px] font-black text-[#06371c]'>
 								No fue posible cargar las especies.
 							</Text>
 
-							<Text style={[styles.errorText, { color: colors.textSecondary }]}>
+							<Text className='mt-1.5 text-center text-[12px] leading-[18px] text-[#06371c]'>
 								{error}
 							</Text>
 
-							<View
-								style={[
-									styles.retryButtonWrapper,
-									{
-										backgroundColor: colors.button,
-										borderColor: colors.button,
-									},
-								]}
-							>
+							<View className='mt-[15px] h-12 w-full overflow-hidden rounded-2xl border border-[#08783F] bg-[#08783F]'>
 								<Pressable
 									onPress={() => void loadSpecies()}
-									style={({ pressed }) => [
-										styles.retryButton,
-										pressed && styles.retryButtonPressed,
-									]}
+									className='h-full w-full items-center justify-center active:bg-[#063D22]'
 								>
-									<View style={styles.retryButtonContent}>
-										<Text style={styles.retryButtonText}>
+									<View className='h-full w-full items-center justify-center'>
+										<Text className='text-center text-[14px] font-black text-blanco'>
 											Intentar nuevamente
 										</Text>
 									</View>
@@ -342,42 +281,29 @@ export default function SpeciesScreen() {
 					) : filteredSpecies.length === 0 ? (
 						/* Sin resultados */
 						<View
-							style={[
-								styles.emptyCard,
-								{
-									backgroundColor: colors.card,
-									borderColor: colors.border,
-								},
-							]}
+							className='mt-[15px] items-center rounded-[25px] border border-[#a6c1b3] bg-niebla px-5 py-[35px]'
+							style={cardShadow}
 						>
-							<View
-								style={[
-									styles.emptyIcon,
-									{
-										backgroundColor: colors.active,
-										borderColor: colors.border,
-									},
-								]}
-							>
+							<View className='h-16 w-16 items-center justify-center rounded-[20px] border border-[#a6c1b3] bg-[#d5ead9]'>
 								<HugeiconsIcon
 									icon={UserGroupIcon}
 									size={30}
 									strokeWidth={1.8}
-									color={colors.primary}
+									color={PROP_COLORS.primary}
 								/>
 							</View>
 
-							<Text style={[styles.emptyTitle, { color: colors.text }]}>
+							<Text className='mt-4 text-center text-[18px] font-black text-[#06371c]'>
 								No encontramos especies
 							</Text>
 
-							<Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-[#06371c]'>
 								Intenta con otro nombre o cambia el filtro.
 							</Text>
 						</View>
 					) : (
 						/* Tarjetas de especies */
-						<View style={styles.speciesList}>
+						<View className='mt-[15px]'>
 							{filteredSpecies.map((item) => (
 								<AppCard
 									key={item.id}
@@ -395,14 +321,14 @@ export default function SpeciesScreen() {
 										.filter(Boolean)
 										.join('\n')}
 									icon={!item.image ? UserGroupIcon : undefined}
-									backgroundColor={colors.card}
-									borderColor={colors.border}
-									iconColor={colors.primary}
-									iconBackgroundColor={colors.active}
-									arrowColor={colors.white}
-									arrowBackgroundColor={colors.primary}
-									textColor={colors.text}
-									descriptionColor={colors.textSecondary}
+									backgroundColor={colors.niebla}
+									borderColor='#a6c1b3'
+									iconColor={PROP_COLORS.primary}
+									iconBackgroundColor='#d5ead9'
+									arrowColor={colors.blanco}
+									arrowBackgroundColor={PROP_COLORS.primary}
+									textColor={PROP_COLORS.text}
+									descriptionColor={PROP_COLORS.text}
 									showArrow
 									style={{ marginBottom: 15 }}
 								/>
@@ -410,7 +336,7 @@ export default function SpeciesScreen() {
 						</View>
 					)}
 
-					<View style={styles.bottomSpace} />
+					<View className='h-10' />
 				</ScrollView>
 			</ImageBackground>
 		</SafeAreaView>
