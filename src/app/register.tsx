@@ -2,6 +2,7 @@ import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
+import colors from '@/theme/colors'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -33,14 +34,8 @@ type FormErrors = {
 }
 
 const palette = {
-	label: '#132519',
-	border: '#3f775e',
 	primary: '#1b7747',
-	register: '#3b543e',
-	title: '#26523f',
 	muted: '#6F8A7D',
-	error: '#C83B3B',
-	white: '#FFFFFF',
 }
 
 export default function Register() {
@@ -196,39 +191,22 @@ export default function Register() {
 					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text
-								className='text-center text-[26.25px] font-bold leading-[31.5px]'
-								style={{ color: palette.title }}
-							>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
 								Crea tu cuenta
 							</Text>
 
-							<Text
-								className='mt-[7px] text-center text-[14px] leading-[21px]'
-								style={{ color: palette.register }}
-							>
+							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
 								Únete a ZooApp y comienza a descubrir el zoológico.
 							</Text>
 						</View>
 
 						{/* NOMBRE */}
-						<Text
-							className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Nombre completo
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.name
-									? palette.error
-									: nameFocused
-										? palette.primary
-										: palette.border,
-								borderWidth: nameFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${nameFocused ? 'border-2' : 'border'} ${errors.name ? 'border-[#C83B3B]' : nameFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -263,23 +241,12 @@ export default function Register() {
 						)}
 
 						{/* CORREO */}
-						<Text
-							className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.email
-									? palette.error
-									: emailFocused
-										? palette.primary
-										: palette.border,
-								borderWidth: emailFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-[#C83B3B]' : emailFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -317,23 +284,12 @@ export default function Register() {
 						)}
 
 						{/* CONTRASEÑA */}
-						<Text
-							className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Contraseña
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.password
-									? palette.error
-									: passwordFocused
-										? palette.primary
-										: palette.border,
-								borderWidth: passwordFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-[#C83B3B]' : passwordFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -389,23 +345,12 @@ export default function Register() {
 						)}
 
 						{/* CONFIRMAR CONTRASEÑA */}
-						<Text
-							className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Confirmar contraseña
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.password_confirmation
-									? palette.error
-									: passwordConfirmationFocused
-										? palette.primary
-										: palette.border,
-								borderWidth: passwordConfirmationFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordConfirmationFocused ? 'border-2' : 'border'} ${errors.password_confirmation ? 'border-[#C83B3B]' : passwordConfirmationFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -482,7 +427,7 @@ export default function Register() {
 						{/* BOTÓN CREAR CUENTA */}
 						{loading ? (
 							<View className='mt-3.5 h-[50px] w-full items-center justify-center rounded-[10.5px] bg-[#8BA997]'>
-								<ActivityIndicator color={palette.white} />
+								<ActivityIndicator color={colors.blanco} />
 							</View>
 						) : (
 							<ActionButton title='Crear cuenta' onPress={handleRegister} />
@@ -490,10 +435,7 @@ export default function Register() {
 
 						{/* INICIAR SESIÓN */}
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text
-								className='text-[14px] leading-[21px]'
-								style={{ color: palette.register }}
-							>
+							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
 								¿Ya tienes una cuenta?{' '}
 							</Text>
 

@@ -1,6 +1,7 @@
 import ActionButton from '@/components/ActionButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
+import colors from '@/theme/colors'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
@@ -29,12 +30,7 @@ type FormErrors = {
 }
 
 const palette = {
-	label: '#132519',
 	border: '#3f775e',
-	forgot: '#1b7747',
-	register: '#3b543e',
-	title: '#26523f',
-	muted: '#6F8A7D',
 	error: '#C83B3B',
 }
 
@@ -151,10 +147,7 @@ export default function Login() {
 
 					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
 						<View className='items-center'>
-							<Text
-								className='text-center text-[26.25px] font-bold leading-[31.5px]'
-								style={{ color: palette.title }}
-							>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
 								¡Bienvenido a ZooApp!
 							</Text>
 
@@ -163,19 +156,12 @@ export default function Login() {
 							</Text>
 						</View>
 
-						<Text
-							className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.email ? palette.error : palette.border,
-								borderWidth: emailFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-[#C83B3B]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -210,19 +196,12 @@ export default function Login() {
 							</Text>
 						)}
 
-						<Text
-							className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Contraseña
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: errors.password ? palette.error : palette.border,
-								borderWidth: passwordFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-[#C83B3B]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -285,10 +264,7 @@ export default function Login() {
 							onPress={() => router.push('/forgot-password')}
 							className='mt-3.5 self-end rounded-[7px] py-[3.5px]'
 						>
-							<Text
-								className='text-[12.25px] font-semibold leading-[17.5px]'
-								style={{ color: palette.forgot }}
-							>
+							<Text className='text-[12.25px] font-semibold leading-[17.5px] text-[#1b7747]'>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
@@ -296,7 +272,7 @@ export default function Login() {
 						<View className='mt-[17.5px]'>
 							{loading ? (
 								<View className='h-[50px] w-full items-center justify-center rounded-[10.5px] bg-[#8BA997]'>
-									<ActivityIndicator color='#FFFFFF' />
+									<ActivityIndicator color={colors.blanco} />
 								</View>
 							) : (
 								<ActionButton title='Iniciar sesión' onPress={handleLogin} />
@@ -304,10 +280,7 @@ export default function Login() {
 						</View>
 
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text
-								className='text-[14px] leading-[21px]'
-								style={{ color: palette.register }}
-							>
+							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
 								¿No tienes una cuenta?{' '}
 							</Text>
 

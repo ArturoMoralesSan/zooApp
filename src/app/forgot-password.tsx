@@ -17,11 +17,7 @@ import {
 } from 'react-native'
 
 const palette = {
-	label: '#132519',
-	border: '#3f775e',
 	primary: '#1b7747',
-	register: '#3b543e',
-	title: '#26523f',
 	muted: '#6F8A7D',
 	error: '#C83B3B',
 }
@@ -91,40 +87,23 @@ export default function ForgotPassword() {
 					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text
-								className='text-center text-[26.25px] font-bold leading-[31.5px]'
-								style={{ color: palette.title }}
-							>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
 								¿Olvidaste tu contraseña?
 							</Text>
 
-							<Text
-								className='mt-[10.5px] text-center text-[14px] leading-[21px]'
-								style={{ color: palette.register }}
-							>
+							<Text className='mt-[10.5px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
 								Ingresa tu correo electrónico y te enviaremos instrucciones para
 								recuperar el acceso a tu cuenta.
 							</Text>
 						</View>
 
 						{/* CORREO */}
-						<Text
-							className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px]'
-							style={{ color: palette.label }}
-						>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-[10.5px] border bg-white'
-							style={{
-								borderColor: error
-									? palette.error
-									: emailFocused
-										? palette.primary
-										: palette.border,
-								borderWidth: emailFocused ? 2 : 1,
-							}}
+							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-[#C83B3B]' : emailFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -179,10 +158,7 @@ export default function ForgotPassword() {
 
 						{/* VOLVER AL LOGIN */}
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text
-								className='text-[14px] leading-[21px]'
-								style={{ color: palette.register }}
-							>
+							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
 								¿Recuerdas tu contraseña?{' '}
 							</Text>
 
