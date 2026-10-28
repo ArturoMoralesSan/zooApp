@@ -224,9 +224,9 @@ export default function Explorar() {
 				<UserHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-6'>
+				<View className='mt-[21px]'>
 					<Text
-						className='mb-3'
+						className='mb-[10.5px]'
 						style={{
 							color: colors.text,
 							fontSize: 21,
@@ -240,20 +240,20 @@ export default function Explorar() {
 					{loading ? (
 						<View style={loadingCardStyle}>
 							<ActivityIndicator size='large' color={colors.primary} />
-							<Text className='mt-3' style={loadingTextStyle}>
+							<Text className='mt-[10.5px]' style={loadingTextStyle}>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
-						<View className='rounded-[22px] p-5' style={errorCardStyle}>
+						<View className='rounded-[22px] p-[17.5px]' style={errorCardStyle}>
 							<Text style={titleTextStyle}>No pudimos cargar los eventos</Text>
 
-							<Text className='mt-2' style={secondaryTextStyle}>
+							<Text className='mt-[7px]' style={secondaryTextStyle}>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-4 self-start rounded-full px-5 py-3'
+								className='mt-3.5 self-start rounded-full px-[17.5px] py-[10.5px]'
 								style={({ pressed }) => retryButtonStyle(pressed)}
 								onPress={() => {
 									setLoading(true)
@@ -272,7 +272,7 @@ export default function Explorar() {
 						</View>
 					) : events.length === 0 ? (
 						<View
-							className='rounded-[22px] p-6'
+							className='rounded-[22px] p-[21px]'
 							style={{
 								backgroundColor: colors.cardLight,
 								borderColor: colors.border,
@@ -283,7 +283,7 @@ export default function Explorar() {
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-2 text-center' style={secondaryTextStyle}>
+							<Text className='mt-[7px] text-center' style={secondaryTextStyle}>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -348,7 +348,7 @@ export default function Explorar() {
 														<View style={eventOverlayStyle} />
 
 														<View
-															className='absolute left-3 top-3 rounded-full'
+															className='absolute left-[10.5px] top-[10.5px] rounded-full'
 															style={eventTypeStyle}
 														>
 															<Text style={eventTypeTextStyle}>
@@ -356,9 +356,9 @@ export default function Explorar() {
 															</Text>
 														</View>
 
-														<View className='absolute bottom-0 left-0 right-0 p-4'>
+														<View className='absolute bottom-0 left-0 right-0 p-3.5'>
 															<View className='flex-row items-end'>
-																<View className='flex-1 pr-2'>
+																<View className='flex-1 pr-[7px]'>
 																	<Text
 																		style={eventTitleStyle}
 																		numberOfLines={1}
@@ -368,7 +368,7 @@ export default function Explorar() {
 
 																	{event.description ? (
 																		<Text
-																			className='mt-1'
+																			className='mt-[3.5px]'
 																			style={eventDescriptionStyle}
 																			numberOfLines={1}
 																		>
@@ -387,7 +387,7 @@ export default function Explorar() {
 																				'Consulta próximamente todos los detalles de este evento.',
 																		)
 																	}
-																	className='h-9 w-9 items-center justify-center rounded-full'
+																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full'
 																	style={{
 																		backgroundColor: colors.primaryLight,
 																	}}
@@ -401,13 +401,13 @@ export default function Explorar() {
 																</Pressable>
 															</View>
 
-															<View className='mt-3 flex-row items-center'>
+															<View className='mt-[10.5px] flex-row items-center'>
 																<Text style={eventMetaStyle} numberOfLines={1}>
 																	{formatEventDate(event.start_at)}
 																</Text>
 
 																<Text
-																	className='mx-2'
+																	className='mx-[7px]'
 																	style={eventSeparatorStyle}
 																>
 																	•
@@ -443,7 +443,7 @@ export default function Explorar() {
 				{/* ACCIONES */}
 				<View style={actionsContainerStyle}>
 					<Text
-						className='mb-3'
+						className='mb-[10.5px]'
 						style={{
 							color: colors.text,
 							fontSize: 21,

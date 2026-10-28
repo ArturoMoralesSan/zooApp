@@ -140,44 +140,44 @@ export default function Login() {
 					keyboardDismissMode='on-drag'
 					showsVerticalScrollIndicator={false}
 				>
-					<View className='mt-24 items-center'>
+					<View className='mt-[84px] items-center'>
 						<Image
 							source={require('../../assets/images/zooapp-logo.png')}
 							resizeMode='contain'
 							accessibilityLabel='Logo de ZooApp'
-							className='h-32 w-36'
+							className='h-28 w-[126px]'
 						/>
 					</View>
 
-					<View className='mt-6 rounded-3xl bg-white p-5'>
+					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
 						<View className='items-center'>
 							<Text
-								className='text-center text-3xl font-bold'
+								className='text-center text-[26.25px] font-bold leading-[31.5px]'
 								style={{ color: palette.title }}
 							>
 								¡Bienvenido a ZooApp!
 							</Text>
 
-							<Text className='mt-2 text-center text-base text-[#3b543e]'>
+							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
 								Inicia sesión para continuar tu aventura.
 							</Text>
 						</View>
 
 						<Text
-							className='mb-2 mt-8 text-sm font-semibold'
+							className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px]'
 							style={{ color: palette.label }}
 						>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-xl border bg-white'
+							className='flex-row items-center rounded-[10.5px] border bg-white'
 							style={{
 								borderColor: errors.email ? palette.error : palette.border,
 								borderWidth: emailFocused ? 2 : 1,
 							}}
 						>
-							<View className='pl-4'>
+							<View className='pl-3.5'>
 								<HugeiconsIcon
 									icon={Mail01Icon}
 									size={20}
@@ -200,29 +200,31 @@ export default function Login() {
 								autoCorrect={false}
 								keyboardType='email-address'
 								textContentType='emailAddress'
-								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
 							/>
 						</View>
 
 						{errors.email && (
-							<Text className='mt-1 text-sm text-red-600'>{errors.email}</Text>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+								{errors.email}
+							</Text>
 						)}
 
 						<Text
-							className='mb-2 mt-5 text-sm font-semibold'
+							className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px]'
 							style={{ color: palette.label }}
 						>
 							Contraseña
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-xl border bg-white'
+							className='flex-row items-center rounded-[10.5px] border bg-white'
 							style={{
 								borderColor: errors.password ? palette.error : palette.border,
 								borderWidth: passwordFocused ? 2 : 1,
 							}}
 						>
-							<View className='pl-4'>
+							<View className='pl-3.5'>
 								<HugeiconsIcon
 									icon={LockPasswordIcon}
 									size={20}
@@ -244,12 +246,12 @@ export default function Login() {
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 								textContentType='password'
-								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
 							/>
 
 							<Pressable
 								onPress={() => setShowPassword((value) => !value)}
-								className='mr-2 items-center justify-center rounded-xl p-2'
+								className='mr-[7px] items-center justify-center rounded-[10.5px] p-[7px]'
 								hitSlop={8}
 								accessibilityRole='button'
 								accessibilityLabel={
@@ -266,32 +268,34 @@ export default function Login() {
 						</View>
 
 						{errors.password && (
-							<Text className='mt-1 text-sm text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
 								{errors.password}
 							</Text>
 						)}
 
 						{error !== '' && (
-							<View className='mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3'>
-								<Text className='text-sm text-red-700'>{error}</Text>
+							<View className='mt-3.5 rounded-[10.5px] border border-red-200 bg-red-50 px-3.5 py-[10.5px]'>
+								<Text className='text-[12.25px] leading-[17.5px] text-red-700'>
+									{error}
+								</Text>
 							</View>
 						)}
 
 						<Pressable
 							onPress={() => router.push('/forgot-password')}
-							className='mt-4 self-end rounded-lg py-1'
+							className='mt-3.5 self-end rounded-[7px] py-[3.5px]'
 						>
 							<Text
-								className='text-sm font-semibold'
+								className='text-[12.25px] font-semibold leading-[17.5px]'
 								style={{ color: palette.forgot }}
 							>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
 
-						<View className='mt-5'>
+						<View className='mt-[17.5px]'>
 							{loading ? (
-								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-[#8BA997]'>
+								<View className='h-[50px] w-full items-center justify-center rounded-[10.5px] bg-[#8BA997]'>
 									<ActivityIndicator color='#FFFFFF' />
 								</View>
 							) : (
@@ -299,16 +303,19 @@ export default function Login() {
 							)}
 						</View>
 
-						<View className='mt-7 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-base' style={{ color: palette.register }}>
+						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
+							<Text
+								className='text-[14px] leading-[21px]'
+								style={{ color: palette.register }}
+							>
 								¿No tienes una cuenta?{' '}
 							</Text>
 
 							<Pressable
 								onPress={() => router.push('/register')}
-								className='rounded-lg py-1'
+								className='rounded-[7px] py-[3.5px]'
 							>
-								<Text className='text-base font-bold text-[#1b7747]'>
+								<Text className='text-[14px] font-bold leading-[21px] text-[#1b7747]'>
 									Regístrate
 								</Text>
 							</Pressable>

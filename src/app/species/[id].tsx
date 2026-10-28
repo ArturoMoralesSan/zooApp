@@ -164,7 +164,10 @@ export default function SpeciesDetailScreen() {
 			>
 				<ActivityIndicator size='large' color={colors.primary} />
 
-				<Text className='mt-4 text-sm font-medium' style={styles.loadingText}>
+				<Text
+					className='mt-3.5 text-[12.25px] font-medium leading-[17.5px]'
+					style={styles.loadingText}
+				>
 					Cargando especie...
 				</Text>
 			</ImageBackground>
@@ -175,7 +178,7 @@ export default function SpeciesDetailScreen() {
 		return (
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 px-5 pt-16'
+				className='flex-1 px-[17.5px] pt-14'
 				resizeMode='repeat'
 				imageStyle={styles.patternImage}
 				style={styles.errorBackground}
@@ -204,7 +207,7 @@ export default function SpeciesDetailScreen() {
 
 					<Pressable
 						onPress={() => void loadSpecies()}
-						className='mt-4 self-start rounded-[20px] px-6 py-3.5'
+						className='mt-3.5 self-start rounded-[20px] px-[21px] py-[12.25px]'
 						style={({ pressed }) => [
 							styles.retryButton,
 							pressed && styles.retryButtonPressed,
@@ -285,15 +288,15 @@ export default function SpeciesDetailScreen() {
 							imageStyle={styles.cardPatternImage}
 							style={styles.cardBackground}
 						>
-							<View className='px-5 pb-8 pt-7'>
+							<View className='px-[17.5px] pb-7 pt-[24.5px]'>
 								{/* CATEGORÍA */}
 								{species.category && (
 									<View
-										className='self-start rounded-full px-3.5 py-1.5'
+										className='self-start rounded-full px-[12.25px] py-[5.25px]'
 										style={styles.categoryBadge}
 									>
 										<Text
-											className='text-xs font-bold uppercase tracking-wide'
+											className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide'
 											style={styles.categoryText}
 										>
 											{species.category.name}
@@ -303,7 +306,7 @@ export default function SpeciesDetailScreen() {
 
 								{/* NOMBRE */}
 								<Text
-									className='mt-4 text-[30px] font-bold leading-9'
+									className='mt-3.5 text-[30px] font-bold leading-[31.5px]'
 									style={styles.speciesName}
 								>
 									{species.common_name}
@@ -311,7 +314,7 @@ export default function SpeciesDetailScreen() {
 
 								{species.scientific_name && (
 									<Text
-										className='mt-1.5 text-base italic'
+										className='mt-[5.25px] text-[14px] italic leading-[21px]'
 										style={styles.scientificName}
 									>
 										{species.scientific_name}
@@ -320,7 +323,7 @@ export default function SpeciesDetailScreen() {
 
 								{/* DESCRIPCIÓN */}
 								{species.description && (
-									<View className='mt-8'>
+									<View className='mt-7'>
 										<Text
 											className='text-[21px] font-bold'
 											style={styles.sectionTitle}
@@ -329,7 +332,7 @@ export default function SpeciesDetailScreen() {
 										</Text>
 
 										<Text
-											className='mt-2 text-[15px] leading-7'
+											className='mt-[7px] text-[15px] leading-[24.5px]'
 											style={styles.description}
 										>
 											{species.description}
@@ -338,7 +341,7 @@ export default function SpeciesDetailScreen() {
 								)}
 
 								{/* DATOS DE LA ESPECIE */}
-								<View className='mt-8'>
+								<View className='mt-7'>
 									<Text
 										className='text-[21px] font-bold'
 										style={styles.sectionTitle}
@@ -347,7 +350,7 @@ export default function SpeciesDetailScreen() {
 									</Text>
 
 									<View
-										className='mt-4'
+										className='mt-3.5'
 										style={{
 											flexDirection: 'row',
 											flexWrap: 'wrap',
@@ -430,7 +433,7 @@ export default function SpeciesDetailScreen() {
 
 								{/* ETIQUETAS */}
 								{species.tags.length > 0 && (
-									<View className='mt-8'>
+									<View className='mt-7'>
 										<Text
 											className='text-[21px] font-bold'
 											style={styles.sectionTitle}
@@ -438,18 +441,18 @@ export default function SpeciesDetailScreen() {
 											Etiquetas
 										</Text>
 
-										<View className='mt-4 flex-row flex-wrap gap-2'>
+										<View className='mt-3.5 flex-row flex-wrap gap-[7px]'>
 											{species.tags.map((tag) => (
 												<View
 													key={tag.id}
-													className='rounded-full border px-4 py-2.5'
+													className='rounded-full border px-3.5 py-[8.75px]'
 													style={{
 														backgroundColor: panelColors.primary,
 														borderColor: panelColors.border,
 													}}
 												>
 													<Text
-														className='text-sm font-semibold'
+														className='text-[12.25px] font-semibold leading-[17.5px]'
 														style={{ color: panelColors.white }}
 													>
 														{tag.name}
@@ -462,7 +465,7 @@ export default function SpeciesDetailScreen() {
 
 								{/* GALERÍA */}
 								{galleryImages.length > 0 && (
-									<View className='mt-8'>
+									<View className='mt-7'>
 										<Text
 											className='text-[21px] font-bold'
 											style={styles.sectionTitle}
@@ -473,13 +476,13 @@ export default function SpeciesDetailScreen() {
 										<ScrollView
 											horizontal
 											showsHorizontalScrollIndicator={false}
-											className='-mx-5 mt-4'
+											className='-mx-[17.5px] mt-3.5'
 											contentContainerStyle={styles.galleryContent}
 										>
 											{galleryImages.map((image) => (
 												<View
 													key={image.id}
-													className='mr-3 overflow-hidden rounded-[22px]'
+													className='mr-[10.5px] overflow-hidden rounded-[22px]'
 													style={[
 														styles.galleryItem,
 														{
@@ -511,7 +514,7 @@ export default function SpeciesDetailScreen() {
 									</View>
 								)}
 
-								<View className='h-2' />
+								<View className='h-[7px]' />
 							</View>
 						</ImageBackground>
 					</Animated.View>
@@ -547,7 +550,7 @@ export default function SpeciesDetailScreen() {
 					<View style={styles.modalCloseWrapper}>
 						<Pressable
 							onPress={() => setSelectedImage(null)}
-							className='rounded-full px-4 py-2.5'
+							className='rounded-full px-3.5 py-[8.75px]'
 							style={({ pressed }) => [
 								styles.modalCloseButton,
 								pressed && styles.modalCloseButtonPressed,

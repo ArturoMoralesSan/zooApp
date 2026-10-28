@@ -183,7 +183,7 @@ export default function Panel() {
 
 					{/* TARJETA DE PERFIL */}
 
-					<View className='mt-6'>
+					<View className='mt-[21px]'>
 						<AppCard
 							avatarUrl={avatarUrl}
 							title={user?.name ?? 'Mi cuenta'}
@@ -195,9 +195,9 @@ export default function Panel() {
 
 					{/* MI CUENTA */}
 
-					<View className='mt-7'>
+					<View className='mt-[24.5px]'>
 						<Text
-							className='mb-4 px-1 text-xl font-bold'
+							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
 							style={{ color: '#06371c' }}
 						>
 							Mi cuenta
@@ -213,9 +213,9 @@ export default function Panel() {
 
 					{/* MI ACTIVIDAD */}
 
-					<View className='mt-5'>
+					<View className='mt-[17.5px]'>
 						<Text
-							className='mb-4 px-1 text-xl font-bold'
+							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
 							style={{ color: '#06371c' }}
 						>
 							Mi actividad
@@ -238,9 +238,9 @@ export default function Panel() {
 
 					{/* AYUDA */}
 
-					<View className='mt-5'>
+					<View className='mt-[17.5px]'>
 						<Text
-							className='mb-4 px-1 text-xl font-bold'
+							className='mb-3.5 px-[3.5px] text-[17.5px] font-bold leading-[24.5px]'
 							style={{ color: '#06371c' }}
 						>
 							Ayuda
@@ -274,20 +274,20 @@ export default function Panel() {
 					{/* CERRAR SESIÓN */}
 
 					<View
-						className='mt-5 overflow-hidden rounded-[18px]'
+						className='mt-[17.5px] overflow-hidden rounded-[18px]'
 						style={logoutContainerStyle}
 					>
 						<Pressable
 							onPress={handleLogout}
 							disabled={loggingOut}
-							className='flex-row items-center px-3.5 py-3'
+							className='flex-row items-center px-[12.25px] py-[10.5px]'
 							style={({ pressed }) => [
 								logoutPressableStyle(pressed),
 								{ minHeight: 80 },
 							]}
 						>
 							<View
-								className='h-12 w-12 items-center justify-center rounded-[16px]'
+								className='h-[42px] w-[42px] items-center justify-center rounded-[16px]'
 								style={logoutIconContainerStyle}
 							>
 								<HugeiconsIcon
@@ -298,13 +298,16 @@ export default function Panel() {
 								/>
 							</View>
 
-							<View className='ml-3 flex-1'>
-								<Text className='text-base font-bold' style={logoutTitleStyle}>
+							<View className='ml-[10.5px] flex-1'>
+								<Text
+									className='text-[14px] font-bold leading-[21px]'
+									style={logoutTitleStyle}
+								>
 									{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 								</Text>
 
 								<Text
-									className='mt-1 text-sm leading-5'
+									className='mt-[3.5px] text-[12.25px] leading-[17.5px]'
 									style={logoutDescriptionStyle}
 								>
 									Salir de tu cuenta
@@ -315,7 +318,7 @@ export default function Panel() {
 								<ActivityIndicator size='small' color='#08783F' />
 							) : (
 								<View
-									className='ml-2 h-8 w-8 items-center justify-center rounded-full'
+									className='ml-[7px] h-7 w-7 items-center justify-center rounded-full'
 									style={{ backgroundColor: '#08783F' }}
 								>
 									<HugeiconsIcon
@@ -331,12 +334,18 @@ export default function Panel() {
 
 					{/* PIE DE PÁGINA */}
 
-					<View className='mt-8 items-center'>
-						<Text className='text-xs' style={footerTitleStyle}>
+					<View className='mt-7 items-center'>
+						<Text
+							className='text-[10.5px] leading-[14px]'
+							style={footerTitleStyle}
+						>
 							ZooApp
 						</Text>
 
-						<Text className='mt-1 text-xs' style={footerSubtitleStyle}>
+						<Text
+							className='mt-[3.5px] text-[10.5px] leading-[14px]'
+							style={footerSubtitleStyle}
+						>
 							Sahuatoba
 						</Text>
 					</View>
@@ -382,7 +391,7 @@ export default function Panel() {
 
 							<View className='items-center'>
 								<View
-									className='h-12 w-12 items-center justify-center rounded-[14px]'
+									className='h-[42px] w-[42px] items-center justify-center rounded-[14px]'
 									style={[qrHeaderIconStyle, { backgroundColor: '#d5ead9' }]}
 								>
 									<HugeiconsIcon
@@ -394,14 +403,14 @@ export default function Panel() {
 								</View>
 
 								<Text
-									className='mt-3 text-center text-[22px]'
+									className='mt-[10.5px] text-center text-[22px]'
 									style={[qrTitleStyle, { color: '#06371c' }]}
 								>
 									Mi código QR
 								</Text>
 
 								<Text
-									className='mt-1 text-center text-[13px] leading-[19px]'
+									className='mt-[3.5px] text-center text-[13px] leading-[19px]'
 									style={[qrDescriptionStyle, { color: '#06371c' }]}
 								>
 									Presenta este código en taquilla para identificar tu cuenta.
@@ -451,7 +460,7 @@ export default function Panel() {
 							{/* INFORMACIÓN */}
 
 							<View
-								className='mt-4 rounded-xl p-3'
+								className='mt-3.5 rounded-[10.5px] p-[10.5px]'
 								style={[
 									qrInfoStyle,
 									{
@@ -462,14 +471,14 @@ export default function Panel() {
 								]}
 							>
 								<Text
-									className='text-sm font-extrabold'
+									className='text-[12.25px] font-extrabold leading-[17.5px]'
 									style={[qrInfoTitleStyle, { color: '#06371c' }]}
 								>
 									Código personal
 								</Text>
 
 								<Text
-									className='mt-1 text-xs leading-[18px]'
+									className='mt-[3.5px] text-[10.5px] leading-[18px]'
 									style={[qrInfoDescriptionStyle, { color: '#06371c' }]}
 								>
 									Este código está asociado a tu cuenta de ZooApp.
@@ -478,7 +487,7 @@ export default function Panel() {
 
 							{/* BOTÓN CERRAR */}
 
-							<View className='mt-4'>
+							<View className='mt-3.5'>
 								<ActionButton title='Cerrar' onPress={() => setShowQr(false)} />
 							</View>
 						</View>

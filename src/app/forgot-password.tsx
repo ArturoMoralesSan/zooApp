@@ -78,28 +78,28 @@ export default function ForgotPassword() {
 					<BackButton onPress={() => router.back()} />
 
 					{/* LOGO */}
-					<View className='mt-24 items-center'>
+					<View className='mt-[84px] items-center'>
 						<Image
 							source={require('../../assets/images/zooapp-logo.png')}
 							resizeMode='contain'
 							accessibilityLabel='Logo de ZooApp'
-							className='h-32 w-36'
+							className='h-28 w-[126px]'
 						/>
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-6 rounded-3xl bg-white p-5'>
+					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
 							<Text
-								className='text-center text-3xl font-bold'
+								className='text-center text-[26.25px] font-bold leading-[31.5px]'
 								style={{ color: palette.title }}
 							>
 								¿Olvidaste tu contraseña?
 							</Text>
 
 							<Text
-								className='mt-3 text-center text-base'
+								className='mt-[10.5px] text-center text-[14px] leading-[21px]'
 								style={{ color: palette.register }}
 							>
 								Ingresa tu correo electrónico y te enviaremos instrucciones para
@@ -109,14 +109,14 @@ export default function ForgotPassword() {
 
 						{/* CORREO */}
 						<Text
-							className='mb-2 mt-8 text-sm font-semibold'
+							className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px]'
 							style={{ color: palette.label }}
 						>
 							Correo electrónico
 						</Text>
 
 						<View
-							className='flex-row items-center rounded-xl border bg-white'
+							className='flex-row items-center rounded-[10.5px] border bg-white'
 							style={{
 								borderColor: error
 									? palette.error
@@ -126,7 +126,7 @@ export default function ForgotPassword() {
 								borderWidth: emailFocused ? 2 : 1,
 							}}
 						>
-							<View className='pl-4'>
+							<View className='pl-3.5'>
 								<HugeiconsIcon
 									icon={Mail01Icon}
 									size={20}
@@ -158,14 +158,16 @@ export default function ForgotPassword() {
 								autoComplete='email'
 								returnKeyType='done'
 								onSubmitEditing={handleRecover}
-								className='min-h-14 flex-1 px-3 py-3 text-base text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
 							/>
 						</View>
 
 						{/* ERROR */}
 						{error !== '' && (
-							<View className='mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3'>
-								<Text className='text-sm text-red-700'>{error}</Text>
+							<View className='mt-[10.5px] rounded-[10.5px] border border-red-200 bg-red-50 px-3.5 py-[10.5px]'>
+								<Text className='text-[12.25px] leading-[17.5px] text-red-700'>
+									{error}
+								</Text>
 							</View>
 						)}
 
@@ -176,17 +178,20 @@ export default function ForgotPassword() {
 						/>
 
 						{/* VOLVER AL LOGIN */}
-						<View className='mt-7 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-base' style={{ color: palette.register }}>
+						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
+							<Text
+								className='text-[14px] leading-[21px]'
+								style={{ color: palette.register }}
+							>
 								¿Recuerdas tu contraseña?{' '}
 							</Text>
 
 							<Pressable
 								onPress={() => router.replace('/login')}
-								className='rounded-lg py-1'
+								className='rounded-[7px] py-[3.5px]'
 								accessibilityRole='button'
 							>
-								<Text className='text-base font-bold text-[#1b7747]'>
+								<Text className='text-[14px] font-bold leading-[21px] text-[#1b7747]'>
 									Iniciar sesión
 								</Text>
 							</Pressable>

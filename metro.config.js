@@ -13,4 +13,8 @@ config.resolver.assetExts.push(
 	'hdr',
 	'arobject',
 )
-module.exports = withNativeWind(config, { input: './src/global.css' })
+// inlineRem 16 keeps the Tailwind scale identical to web (p-4 = 16px).
+module.exports = withNativeWind(config, {
+	input: './src/global.css',
+	inlineRem: 16,
+})

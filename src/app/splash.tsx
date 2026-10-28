@@ -31,15 +31,19 @@ export default function SplashScreen() {
 			{/* Capa blanca con 10 % de opacidad */}
 			<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
 
-			<View className='w-full items-center justify-center px-7'>
+			<View className='w-full items-center justify-center px-[24.5px]'>
 				<Image
 					source={require('../../assets/images/zooapp-logo.png')}
 					resizeMode='contain'
 					accessibilityLabel='Logo de ZooApp'
-					className='mb-3 h-[180px] w-[230px]'
+					className='mb-[10.5px] h-[180px] w-[230px]'
 				/>
 
-				<ActivityIndicator size='large' color='#baf561' className='mt-9' />
+				<ActivityIndicator
+					size='large'
+					color='#baf561'
+					className='mt-[31.5px]'
+				/>
 			</View>
 		</ImageBackground>
 	)
