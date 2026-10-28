@@ -10,6 +10,7 @@ import {
 	ScrollView,
 	Text,
 	View,
+	type ViewStyle,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -19,40 +20,18 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	backButtonContainerStyle,
-	backgroundImageStyle,
-	backgroundStyle,
-	colors,
-	emptyStateDescriptionStyle,
-	emptyStateIconContainerStyle,
-	emptyStateStyle,
-	emptyStateTitleStyle,
-	loadingContentStyle,
-	loadingTextStyle,
-	quantityButtonDisabledStyle,
-	quantityButtonStyle,
-	quantityContainerStyle,
-	quantityPlusButtonStyle,
-	quantityPlusDisabledStyle,
-	quantityPlusTextStyle,
-	quantityStyle,
-	quantityTextStyle,
-	screenHeaderStyle,
-	scrollContentStyle,
-	ticketAmountStyle,
-	ticketBottomStyle,
-	ticketCardStyle,
-	ticketDescriptionStyle,
-	ticketDividerStyle,
-	ticketHeaderStyle,
-	ticketIconStyle,
-	ticketInfoStyle,
-	ticketNameStyle,
-	ticketPriceContainerStyle,
-	ticketPriceLabelStyle,
-	ticketPriceStyle,
-} from '@/styles/tickets'
+const ICON_COLORS = {
+	primary: '#08783F',
+	muted: '#607A6A',
+} as const
+
+const cardShadow: ViewStyle = {
+	shadowColor: '#063D22',
+	shadowOffset: { width: 0, height: 2 },
+	shadowOpacity: 0.04,
+	shadowRadius: 4,
+	elevation: 1,
+}
 
 type TicketType = {
 	id: number
@@ -183,16 +162,21 @@ export default function TicketsScreen() {
 
 	if (loading) {
 		return (
-			<SafeAreaView edges={['top', 'left', 'right']} style={backgroundStyle}>
+			<SafeAreaView
+				edges={['top', 'left', 'right']}
+				className='flex-1 bg-blanco'
+			>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
 					resizeMode='repeat'
-					imageStyle={backgroundImageStyle}
-					style={{ flex: 1 }}
+					imageClassName='opacity-[0.025]'
+					className='flex-1'
 				>
-					<View style={loadingContentStyle}>
-						<ActivityIndicator size='large' color={colors.primary} />
-						<Text style={loadingTextStyle}>Cargando boletos...</Text>
+					<View className='flex-1 items-center justify-center'>
+						<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+						<Text className='mt-3 text-[15px] font-semibold text-[#668475]'>
+							Cargando boletos...
+						</Text>
 					</View>
 				</ImageBackground>
 			</SafeAreaView>
@@ -200,31 +184,24 @@ export default function TicketsScreen() {
 	}
 
 	return (
-		<SafeAreaView edges={['top', 'left', 'right']} style={backgroundStyle}>
+		<SafeAreaView edges={['top', 'left', 'right']} className='flex-1 bg-blanco'>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
 				resizeMode='repeat'
-				imageStyle={backgroundImageStyle}
-				style={{ flex: 1 }}
+				imageClassName='opacity-[0.025]'
+				className='flex-1'
 			>
 				<ScrollView
-					style={{ flex: 1, minHeight: 0 }}
-					contentContainerStyle={[
-						scrollContentStyle,
-						{
-							paddingHorizontal: 20,
-							paddingTop: 12,
-							paddingBottom: 180,
-						},
-					]}
+					className='min-h-0 flex-1'
+					contentContainerClassName='grow px-5 pb-[180px] pt-3'
 					showsVerticalScrollIndicator={false}
 					bounces
 					nestedScrollEnabled
 					keyboardShouldPersistTaps='handled'
 				>
 					{/* ENCABEZADO */}
-					<View style={screenHeaderStyle}>
-						<View style={backButtonContainerStyle}>
+					<View className='pb-3'>
+						<View className='mb-3'>
 							<BackButton onPress={() => router.back()} position='relative' />
 						</View>
 
@@ -237,20 +214,23 @@ export default function TicketsScreen() {
 
 					{/* ESTADO VACÍO */}
 					{ticketTypes.length === 0 ? (
-						<View style={emptyStateStyle}>
-							<View style={emptyStateIconContainerStyle}>
+						<View
+							className='items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-6 py-8'
+							style={cardShadow}
+						>
+							<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-[#a6c1b3] bg-[#d5ead9]'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={30}
-									color={colors.primary}
+									color={ICON_COLORS.primary}
 								/>
 							</View>
 
-							<Text style={emptyStateTitleStyle}>
+							<Text className='text-center text-[17px] font-extrabold text-[#0a2014]'>
 								No hay boletos disponibles
 							</Text>
 
-							<Text style={emptyStateDescriptionStyle}>
+							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-[#668475]'>
 								Por el momento no hay tipos de boleto para mostrar.
 							</Text>
 						</View>
@@ -264,71 +244,82 @@ export default function TicketsScreen() {
 							const canIncrease = quantity < MAX_QUANTITY
 
 							return (
-								<View key={ticket.id} style={ticketCardStyle}>
+								<View
+									key={ticket.id}
+									className='mb-[13px] w-full rounded-[18px] border border-[#a6c1b3] bg-niebla p-[15px]'
+									style={cardShadow}
+								>
 									{/* INFORMACIÓN DEL BOLETO */}
-									<View style={ticketHeaderStyle}>
-										<View style={ticketIconStyle}>
+									<View className='w-full flex-row items-start'>
+										<View className='mr-3 h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-[#a6c1b3] bg-[#d5ead9]'>
 											<HugeiconsIcon
 												icon={Ticket01Icon}
 												size={25}
 												strokeWidth={1.8}
-												color={colors.primary}
+												color={ICON_COLORS.primary}
 											/>
 										</View>
 
-										<View style={ticketInfoStyle}>
-											<Text style={ticketNameStyle}>{ticket.name}</Text>
+										<View className='min-w-0 flex-1 justify-center'>
+											<Text className='text-[15px] font-extrabold leading-5 text-[#0a2014]'>
+												{ticket.name}
+											</Text>
 
 											{!!ticket.description && (
-												<Text style={ticketDescriptionStyle}>
+												<Text className='mt-[3px] text-[12px] leading-4 text-[#668475]'>
 													{ticket.description}
 												</Text>
 											)}
 										</View>
 									</View>
 
-									<View style={ticketDividerStyle} />
+									<View className='mb-[13px] mt-[15px] h-px bg-[#a6c1b3]' />
 
 									{/* PRECIO Y CANTIDAD */}
-									<View style={ticketBottomStyle}>
-										<View style={ticketPriceContainerStyle}>
-											<Text style={ticketPriceLabelStyle}>
+									<View className='w-full flex-row items-center justify-between'>
+										<View className='min-w-0 flex-1 justify-center pr-2'>
+											<Text className='text-[11px] font-semibold text-[#668475]'>
 												Precio por boleto
 											</Text>
 
-											<Text style={ticketPriceStyle}>
+											<Text className='mt-0.5 text-[20px] font-black text-[#12482e]'>
 												{formatCurrency(price)}
 											</Text>
 
-											<Text style={ticketAmountStyle}>
+											<Text className='mt-[3px] text-[12px] font-semibold text-[#668475]'>
 												Monto: {formatCurrency(amount)}
 											</Text>
 										</View>
 
-										<View style={quantityContainerStyle}>
+										<View className='ml-1 shrink-0 flex-row items-center justify-end gap-2'>
 											{/* RESTAR */}
 											<Pressable
 												accessibilityRole='button'
 												accessibilityLabel={`Restar boleto de ${ticket.name}`}
 												onPress={() => changeQuantity(ticket.id, quantity - 1)}
 												disabled={!canDecrease}
-												style={({ pressed }) => [
-													quantityButtonStyle,
-													!canDecrease && quantityButtonDisabledStyle,
-													pressed && canDecrease && { opacity: 0.7 },
-												]}
+												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 items-center justify-center rounded-xl border border-[#a6c1b3] p-0 ${canDecrease ? 'bg-blanco active:opacity-70' : 'bg-niebla opacity-70'}`}
 											>
 												<HugeiconsIcon
 													icon={MinusSignIcon}
 													size={18}
 													strokeWidth={2}
-													color={canDecrease ? colors.primary : colors.muted}
+													color={
+														canDecrease
+															? ICON_COLORS.primary
+															: ICON_COLORS.muted
+													}
 												/>
 											</Pressable>
 
 											{/* CANTIDAD */}
-											<View style={quantityStyle}>
-												<Text style={quantityTextStyle}>{quantity}</Text>
+											<View className='h-10 w-[34px] min-w-[34px] shrink-0 items-center justify-center'>
+												<Text
+													className='text-center text-[15px] font-extrabold text-[#0a2014]'
+													style={{ includeFontPadding: false }}
+												>
+													{quantity}
+												</Text>
 											</View>
 
 											{/* SUMAR */}
@@ -337,12 +328,14 @@ export default function TicketsScreen() {
 												accessibilityLabel={`Agregar boleto de ${ticket.name}`}
 												onPress={() => changeQuantity(ticket.id, quantity + 1)}
 												disabled={!canIncrease}
-												style={[
-													quantityPlusButtonStyle,
-													!canIncrease && quantityPlusDisabledStyle,
-												]}
+												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-[#08783F]' : 'bg-[#a6c1b3]'}`}
 											>
-												<Text style={quantityPlusTextStyle}>+</Text>
+												<Text
+													className='text-center text-[28px] font-semibold leading-8 text-blanco'
+													style={{ includeFontPadding: false }}
+												>
+													+
+												</Text>
 											</Pressable>
 										</View>
 									</View>
