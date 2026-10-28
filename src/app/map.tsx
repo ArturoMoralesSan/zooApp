@@ -31,6 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
 
 const mapShadow: ViewStyle = {
+	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
 	shadowColor: '#000000',
 	shadowOffset: { width: 0, height: 5 },
 	shadowOpacity: 0.18,
@@ -2021,8 +2022,10 @@ export default function MapScreen() {
 
 				{userLocation && (
 					<Marker lngLat={userLocation}>
+						{/* eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention */}
 						<View className='h-[46px] w-[46px] items-center justify-center rounded-[23px] border border-[rgba(8,121,141,0.4)] bg-[rgba(8,118,161,0.2)]'>
 							<View
+								// eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention
 								className='h-[17px] w-[17px] rounded-[9px] border-[3px] border-blanco bg-[#0977B8]'
 								style={mapShadow}
 							/>
@@ -2107,6 +2110,7 @@ export default function MapScreen() {
 					className='absolute right-3.5 top-[150px] flex-row items-center rounded-2xl bg-niebla px-[11px] py-2'
 					style={mapShadow}
 				>
+					{/* eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention */}
 					<View className='mr-[7px] h-[9px] w-[9px] rounded-[5px] bg-[#0977B8]' />
 
 					<View>

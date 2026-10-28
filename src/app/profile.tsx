@@ -688,6 +688,7 @@ export default function ProfileScreen() {
 							<Animated.Text
 								className='mt-5 text-[23px] font-bold text-blanco'
 								style={{
+									// eslint-disable-next-line no-restricted-syntax -- neutral text shadow over the cover photo
 									textShadowColor: 'rgba(0,0,0,0.2)',
 									textShadowOffset: { width: 0, height: 1 },
 									textShadowRadius: 4,

@@ -604,6 +604,7 @@ export default function MyTicketsScreen() {
 													value={ticket.qr_token}
 													size={210}
 													backgroundColor={colors.blanco}
+													// eslint-disable-next-line no-restricted-syntax -- black QR modules for reliable scanning
 													color='#000000'
 													quietZone={4}
 												/>
