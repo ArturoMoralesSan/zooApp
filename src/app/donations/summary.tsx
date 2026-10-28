@@ -17,35 +17,11 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	amountIconStyle,
-	backgroundImageStyle,
-	backgroundStyle,
-	bottomSpaceStyle,
-	containerStyle,
-	detailCardStyle,
-	detailTitleStyle,
-	detailValueStyle,
-	errorCardStyle,
-	errorTextStyle,
-	paymentSelectedStyle,
-	scrollContentStyle,
-	sectionTitleStyle,
-	securityCardStyle,
-	securityContentStyle,
-	securityIconStyle,
-	securityTextStyle,
-	securityTitleStyle,
-	separatorStyle,
-	thanksCardStyle,
-	thanksTextStyle,
-	thanksTitleStyle,
-} from '@/styles/donation-summary'
+import colors from '@/theme/colors'
+import { cardShadow } from '@/theme/shadows'
 
 const COLORS = {
 	primary: '#08783F',
-	dark: '#102E20',
-	muted: '#315744',
 } as const
 
 type Donation = {
@@ -158,23 +134,23 @@ export default function DonationsSummaryScreen() {
 	}
 
 	return (
-		<SafeAreaView style={containerStyle} edges={['top', 'left', 'right']}>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
 			<ImageBackground
 				source={require('@/assets/images/zoo-pattern.png')}
-				style={backgroundStyle}
-				imageStyle={backgroundImageStyle}
+				className='flex-1 bg-blanco'
+				imageClassName='opacity-[0.025]'
 				resizeMode='repeat'
 			>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
-					contentContainerStyle={[scrollContentStyle, { paddingBottom: 190 }]}
+					contentContainerClassName='px-5 pb-[190px] pt-2'
 					keyboardShouldPersistTaps='handled'
 				>
 					{/* BOTÓN REGRESAR */}
 					<BackButton position='relative' onPress={() => router.back()} />
 
 					{/* ENCABEZADO */}
-					<View style={{ marginTop: 1 }}>
+					<View className='mt-px'>
 						<UserHeader
 							title='Resumen de donación'
 							subtitle='Revisa los datos antes de continuar con tu aportación.'
@@ -183,16 +159,12 @@ export default function DonationsSummaryScreen() {
 					</View>
 
 					{/* DONACIÓN Y DETALLE DEL PAGO */}
-					<View style={detailCardStyle}>
-						<View
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								gap: 14,
-								paddingBottom: 18,
-							}}
-						>
-							<View style={amountIconStyle}>
+					<View
+						className='mb-[17px] w-full rounded-[18px] border border-[#B8D5C2] bg-[#EEF5F0] p-[17px]'
+						style={cardShadow}
+					>
+						<View className='flex-row items-center gap-3.5 pb-[18px]'>
+							<View className='h-[54px] w-[54px] shrink-0 items-center justify-center rounded-[17px] border border-[#B8D5C2] bg-[#D6EBDD]'>
 								<HugeiconsIcon
 									icon={HeartAddIcon}
 									size={28}
@@ -201,60 +173,30 @@ export default function DonationsSummaryScreen() {
 								/>
 							</View>
 
-							<View style={{ flex: 1, minWidth: 0 }}>
-								<Text
-									style={{
-										fontSize: 17,
-										fontWeight: '900',
-										color: COLORS.dark,
-									}}
-								>
+							<View className='min-w-0 flex-1'>
+								<Text className='text-[17px] font-black text-[#102E20]'>
 									Donación
 								</Text>
 
-								<Text
-									style={{
-										marginTop: 4,
-										fontSize: 12,
-										lineHeight: 17,
-										color: COLORS.muted,
-									}}
-								>
+								<Text className='mt-1 text-[12px] leading-[17px] text-[#315744]'>
 									Aportación para el Zoológico Sahuatoba
 								</Text>
 							</View>
 						</View>
 
-						<View style={separatorStyle} />
+						<View className='my-[7px] h-px bg-[#B8D5C2]' />
 
-						<Text
-							style={[
-								sectionTitleStyle,
-								{
-									marginTop: 14,
-									textTransform: 'uppercase',
-									letterSpacing: 0.7,
-								},
-							]}
-						>
+						<Text className='mb-3 mt-3.5 text-[14px] font-black uppercase tracking-[0.7px] text-[#063D22]'>
 							DETALLE DEL PAGO
 						</Text>
 
-						<View
-							style={{
-								minHeight: 44,
-								flexDirection: 'row',
-								alignItems: 'center',
-								justifyContent: 'space-between',
-								gap: 12,
-							}}
-						>
-							<Text style={[detailTitleStyle, { flex: 1 }]}>
+						<View className='min-h-11 flex-row items-center justify-between gap-3'>
+							<Text className='flex-1 text-[14px] font-extrabold text-[#102E20]'>
 								Aportación voluntaria
 							</Text>
 
 							<Text
-								style={detailValueStyle}
+								className='text-[15px] font-black text-[#08783F]'
 								numberOfLines={1}
 								adjustsFontSizeToFit
 							>
@@ -262,40 +204,39 @@ export default function DonationsSummaryScreen() {
 							</Text>
 						</View>
 
-						<View style={separatorStyle} />
+						<View className='my-[7px] h-px bg-[#B8D5C2]' />
 
-						<View
-							style={{
-								minHeight: 44,
-								flexDirection: 'row',
-								alignItems: 'center',
-								justifyContent: 'space-between',
-								gap: 12,
-							}}
-						>
-							<Text style={[detailTitleStyle, { flex: 1 }]}>
+						<View className='min-h-11 flex-row items-center justify-between gap-3'>
+							<Text className='flex-1 text-[14px] font-extrabold text-[#102E20]'>
 								Método de pago
 							</Text>
 
-							<Text style={paymentSelectedStyle}>Tarjeta</Text>
+							<Text className='text-[13px] font-black text-[#08783F]'>
+								Tarjeta
+							</Text>
 						</View>
 					</View>
 
 					{/* PAGO SEGURO */}
-					<View style={securityCardStyle}>
-						<View style={securityIconStyle}>
+					<View
+						className='mb-[17px] w-full flex-row items-center rounded-[18px] border border-[#B8D5C2] bg-[#EEF5F0] p-[17px]'
+						style={cardShadow}
+					>
+						<View className='mr-[13px] h-12 w-12 items-center justify-center rounded-[15px] border border-[#042C17] bg-[#042C17]'>
 							<HugeiconsIcon
 								icon={ShieldCheckIcon}
 								size={25}
-								color='#FFFFFF'
+								color={colors.blanco}
 								strokeWidth={2}
 							/>
 						</View>
 
-						<View style={securityContentStyle}>
-							<Text style={securityTitleStyle}>Pago seguro</Text>
+						<View className='min-w-0 flex-1'>
+							<Text className='text-[15px] font-black text-[#063D22]'>
+								Pago seguro
+							</Text>
 
-							<Text style={securityTextStyle}>
+							<Text className='mt-[3px] text-[12px] leading-[17px] text-[#315744]'>
 								Tu información de pago será procesada de forma segura mediante
 								nuestro proveedor de pagos.
 							</Text>
@@ -303,12 +244,15 @@ export default function DonationsSummaryScreen() {
 					</View>
 
 					{/* AGRADECIMIENTO */}
-					<View style={thanksCardStyle}>
-						<Text style={thanksTitleStyle}>
+					<View
+						className='w-full rounded-[18px] border border-[#B8D5C2] bg-[#D6EBDD] p-[17px]'
+						style={cardShadow}
+					>
+						<Text className='text-[15px] font-black text-[#063D22]'>
 							Gracias por apoyar al zoológico
 						</Text>
 
-						<Text style={thanksTextStyle}>
+						<Text className='mt-[5px] text-[12px] leading-[18px] text-[#315744]'>
 							Tu aportación ayuda al cuidado de los animales, mantenimiento de
 							sus espacios y conservación de nuestra fauna.
 						</Text>
@@ -316,43 +260,24 @@ export default function DonationsSummaryScreen() {
 
 					{/* MENSAJE DE ERROR */}
 					{error && (
-						<View style={errorCardStyle}>
-							<Text style={errorTextStyle}>{error}</Text>
+						<View className='mt-[15px] w-full rounded-[18px] border border-[#F3D5D0] bg-[#FFF3F1] p-3.5'>
+							<Text className='text-[13px] font-bold leading-[18px] text-[#8C4037]'>
+								{error}
+							</Text>
 						</View>
 					)}
 
-					<View style={bottomSpaceStyle} />
+					<View className='h-10' />
 				</ScrollView>
 
 				{/* FOOTER FIJO */}
 				{loading ? (
 					<View
-						style={{
-							position: 'absolute',
-							bottom: 0,
-							left: 0,
-							right: 0,
-							backgroundColor: '#FFFFFF',
-							borderTopWidth: 1,
-							borderTopColor: '#BDCCC3',
-							paddingHorizontal: 20,
-							paddingTop: 20,
-							paddingBottom: 28,
-							alignItems: 'center',
-							justifyContent: 'center',
-							flexDirection: 'row',
-							gap: 10,
-							elevation: 15,
-							zIndex: 999,
-						}}
+						className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t border-t-[#BDCCC3] bg-blanco px-5 pb-7 pt-5'
+						style={{ elevation: 15 }}
 					>
 						<ActivityIndicator size='small' color={COLORS.primary} />
-						<Text
-							style={{
-								color: COLORS.primary,
-								fontWeight: '800',
-							}}
-						>
+						<Text className='font-extrabold text-[#08783F]'>
 							Registrando donación...
 						</Text>
 					</View>
