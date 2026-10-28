@@ -29,37 +29,17 @@ import { useAuth } from '@/contexts/AuthContext'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
-import {
-	actionsContainerStyle,
-	colors,
-	dotStyle,
-	dotsContainerStyle,
-	errorCardStyle,
-	eventCardContainerStyle,
-	eventCardStyle,
-	eventCardWidth,
-	eventDescriptionStyle,
-	eventFallbackStyle,
-	eventMetaStyle,
-	eventOverlayStyle,
-	eventPressableStyle,
-	eventSeparatorStyle,
-	eventTitleStyle,
-	eventTypeStyle,
-	eventTypeTextStyle,
-	loadingCardStyle,
-	loadingTextStyle,
-	retryButtonStyle,
-	screenStyle,
-	scrollContentStyle,
-	secondaryTextStyle,
-	titleTextStyle,
-} from '@/styles/explore'
+import colors from '@/theme/colors'
+import { cardShadow } from '@/theme/shadows'
+
+const PRIMARY = '#08783F'
+const EVENT_CARD_WIDTH = 292
+const CAROUSEL_GAP = 10
 
 // Cambia este valor para personalizar el fondo de la tarjeta de donación.
 // Si no se define un color diferente, utiliza el verde predeterminado.
-const donationCardBackground = colors.primaryDark
-const donationAccentBackground = colors.primaryLight
+const donationCardBackground = '#063D22'
+const donationAccentBackground = '#b8f35d'
 
 type ExploreZone = {
 	id: number
@@ -189,7 +169,7 @@ export default function Explorar() {
 		event: NativeSyntheticEvent<NativeScrollEvent>,
 	) => {
 		const offsetX = event.nativeEvent.contentOffset.x
-		const index = Math.round(offsetX / (eventCardWidth + 10))
+		const index = Math.round(offsetX / (EVENT_CARD_WIDTH + CAROUSEL_GAP))
 
 		if (index >= 0 && index < events.length) {
 			setActiveEventIndex(index)
@@ -197,17 +177,10 @@ export default function Explorar() {
 	}
 
 	return (
-		<SafeAreaView className='flex-1' edges={['top']} style={screenStyle}>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
 			<ScrollView
 				className='flex-1'
-				style={{ flex: 1 }}
-				contentContainerStyle={[
-					scrollContentStyle,
-					{
-						flexGrow: 1,
-						paddingBottom: 140,
-					},
-				]}
+				contentContainerClassName='grow px-3 pb-[140px] pt-2'
 				showsVerticalScrollIndicator
 				nestedScrollEnabled
 				bounces
@@ -215,8 +188,8 @@ export default function Explorar() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={handleRefresh}
-						tintColor={colors.primary}
-						colors={[colors.primary]}
+						tintColor={PRIMARY}
+						colors={[PRIMARY]}
 					/>
 				}
 			>
@@ -225,65 +198,47 @@ export default function Explorar() {
 
 				{/* EVENTOS DESTACADOS */}
 				<View className='mt-[21px]'>
-					<Text
-						className='mb-[10.5px]'
-						style={{
-							color: colors.text,
-							fontSize: 21,
-							fontWeight: '800',
-							lineHeight: 27,
-						}}
-					>
+					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-[#0a2014]'>
 						Eventos destacados
 					</Text>
 
 					{loading ? (
-						<View style={loadingCardStyle}>
-							<ActivityIndicator size='large' color={colors.primary} />
-							<Text className='mt-[10.5px]' style={loadingTextStyle}>
+						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-[#a6c1b3] bg-niebla'>
+							<ActivityIndicator size='large' color={PRIMARY} />
+							<Text className='mt-[10.5px] text-[13px] text-[#668475]'>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
-						<View className='rounded-[22px] p-[17.5px]' style={errorCardStyle}>
-							<Text style={titleTextStyle}>No pudimos cargar los eventos</Text>
+						<View
+							className='rounded-[22px] border border-[#a6c1b3] bg-niebla p-[17.5px]'
+							style={cardShadow}
+						>
+							<Text className='text-[16px] font-extrabold leading-[21px] text-[#0a2014]'>
+								No pudimos cargar los eventos
+							</Text>
 
-							<Text className='mt-[7px]' style={secondaryTextStyle}>
+							<Text className='mt-[7px] text-[13px] leading-[18px] text-[#668475]'>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-3.5 self-start rounded-full px-[17.5px] py-[10.5px]'
-								style={({ pressed }) => retryButtonStyle(pressed)}
+								className='mt-3.5 self-start rounded-2xl bg-[#08783F] px-[17.5px] py-[10.5px] active:opacity-80'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
 								}}
 							>
-								<Text
-									style={{
-										color: colors.white,
-										fontWeight: '800',
-									}}
-								>
-									Reintentar
-								</Text>
+								<Text className='font-extrabold text-blanco'>Reintentar</Text>
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						<View
-							className='rounded-[22px] p-[21px]'
-							style={{
-								backgroundColor: colors.cardLight,
-								borderColor: colors.border,
-								borderWidth: 1,
-							}}
-						>
-							<Text className='text-center' style={titleTextStyle}>
+						<View className='rounded-[22px] border border-[#a6c1b3] bg-niebla p-[21px]'>
+							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-[#0a2014]'>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-[7px] text-center' style={secondaryTextStyle}>
+							<Text className='mt-[7px] text-center text-[13px] leading-[18px] text-[#668475]'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -294,11 +249,11 @@ export default function Explorar() {
 								showsHorizontalScrollIndicator={false}
 								nestedScrollEnabled
 								decelerationRate='fast'
-								snapToInterval={eventCardWidth + 10}
+								snapToInterval={EVENT_CARD_WIDTH + CAROUSEL_GAP}
 								snapToAlignment='start'
 								disableIntervalMomentum
 								onMomentumScrollEnd={handleCarouselScroll}
-								contentContainerStyle={{ paddingRight: 8 }}
+								contentContainerClassName='pr-2'
 							>
 								{events.map((event, index) => {
 									const imageUrl = getEventImageUrl(event.image)
@@ -306,11 +261,14 @@ export default function Explorar() {
 									return (
 										<View
 											key={event.id}
-											style={eventCardContainerStyle(index, events.length)}
+											className={`w-[292px] ${index === events.length - 1 ? '' : 'mr-2.5'}`}
 										>
-											<View style={eventCardStyle}>
+											<View
+												className='h-[203px] overflow-hidden rounded-3xl bg-[#063D22]'
+												style={cardShadow}
+											>
 												<Pressable
-													className='flex-1 overflow-hidden rounded-[24px]'
+													className='flex-1 overflow-hidden rounded-[24px] active:opacity-[0.92]'
 													onPress={() =>
 														Alert.alert(
 															event.name,
@@ -318,7 +276,6 @@ export default function Explorar() {
 																'Consulta próximamente todos los detalles de este evento.',
 														)
 													}
-													style={({ pressed }) => eventPressableStyle(pressed)}
 												>
 													<View className='flex-1'>
 														{imageUrl ? (
@@ -328,30 +285,15 @@ export default function Explorar() {
 																resizeMode='cover'
 															/>
 														) : (
-															<View
-																className='absolute inset-0'
-																style={eventFallbackStyle}
-															>
-																<View
-																	style={{
-																		position: 'absolute',
-																		top: 0,
-																		left: 0,
-																		right: 0,
-																		height: '47%',
-																		backgroundColor: '#315744',
-																	}}
-																/>
+															<View className='absolute inset-0 bg-[#315744]'>
+																<View className='absolute left-0 right-0 top-0 h-[47%] bg-[#315744]' />
 															</View>
 														)}
 
-														<View style={eventOverlayStyle} />
+														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-[#063D22] opacity-[0.98]' />
 
-														<View
-															className='absolute left-[10.5px] top-[10.5px] rounded-full'
-															style={eventTypeStyle}
-														>
-															<Text style={eventTypeTextStyle}>
+														<View className='absolute left-[10.5px] top-[10.5px] rounded-[20px] bg-[#b8f35d] px-3 py-1'>
+															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-[#063D22]'>
 																{(event.type || 'Educativo').toUpperCase()}
 															</Text>
 														</View>
@@ -360,7 +302,7 @@ export default function Explorar() {
 															<View className='flex-row items-end'>
 																<View className='flex-1 pr-[7px]'>
 																	<Text
-																		style={eventTitleStyle}
+																		className='text-[23px] font-extrabold leading-7 text-blanco'
 																		numberOfLines={1}
 																	>
 																		{event.name}
@@ -368,8 +310,7 @@ export default function Explorar() {
 
 																	{event.description ? (
 																		<Text
-																			className='mt-[3.5px]'
-																			style={eventDescriptionStyle}
+																			className='mt-[3.5px] text-[12px] font-semibold leading-[17px] text-blanco'
 																			numberOfLines={1}
 																		>
 																			{event.description}
@@ -387,33 +328,30 @@ export default function Explorar() {
 																				'Consulta próximamente todos los detalles de este evento.',
 																		)
 																	}
-																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full'
-																	style={{
-																		backgroundColor: colors.primaryLight,
-																	}}
+																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full bg-[#b8f35d]'
 																>
 																	<HugeiconsIcon
 																		icon={ArrowRight01Icon}
 																		size={22}
 																		strokeWidth={2}
-																		color={colors.primaryDark}
+																		color='#063D22'
 																	/>
 																</Pressable>
 															</View>
 
 															<View className='mt-[10.5px] flex-row items-center'>
-																<Text style={eventMetaStyle} numberOfLines={1}>
+																<Text
+																	className='text-[12px] font-bold text-blanco'
+																	numberOfLines={1}
+																>
 																	{formatEventDate(event.start_at)}
 																</Text>
 
-																<Text
-																	className='mx-[7px]'
-																	style={eventSeparatorStyle}
-																>
+																<Text className='mx-[7px] font-black text-[#b8f35d]'>
 																	•
 																</Text>
 
-																<Text style={eventMetaStyle}>
+																<Text className='text-[12px] font-bold text-blanco'>
 																	{formatEventTime(event.start_at)}
 																</Text>
 															</View>
@@ -427,11 +365,11 @@ export default function Explorar() {
 							</ScrollView>
 
 							{events.length > 1 && (
-								<View style={dotsContainerStyle}>
+								<View className='mt-3 flex-row items-center justify-center gap-1.5'>
 									{events.map((event, index) => (
 										<View
 											key={event.id}
-											style={dotStyle(index === activeEventIndex)}
+											className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-[#08783F]' : 'w-[7px] bg-[#668475] opacity-80'}`}
 										/>
 									))}
 								</View>
@@ -441,54 +379,39 @@ export default function Explorar() {
 				</View>
 
 				{/* ACCIONES */}
-				<View style={actionsContainerStyle}>
-					<Text
-						className='mb-[10.5px]'
-						style={{
-							color: colors.text,
-							fontSize: 21,
-							fontWeight: '800',
-							lineHeight: 27,
-						}}
-					>
+				<View className='mt-5'>
+					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-[#0a2014]'>
 						¿Qué quieres hacer?
 					</Text>
 
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
-					<View
-						style={{
-							flexDirection: 'row',
-							gap: 12,
-							marginBottom: 12,
-							alignItems: 'stretch',
-						}}
-					>
-						<View style={{ flex: 1, minWidth: 0 }}>
+					<View className='mb-3 flex-row items-stretch gap-3'>
+						<View className='min-w-0 flex-1'>
 							<AppCard
 								icon={Ticket01Icon}
 								title='Comprar boletos'
 								iconPosition='top'
 								description='Planea tu visita al zoológico.'
 								onPress={() => router.push('/tickets')}
-								backgroundColor={colors.cardLight}
-								borderColor={colors.border}
+								backgroundColor={colors.niebla}
+								borderColor='#a6c1b3'
 								minHeight={130}
-								iconColor={colors.primary}
+								iconColor={PRIMARY}
 								showArrow={false}
 							/>
 						</View>
 
-						<View style={{ flex: 1, minWidth: 0 }}>
+						<View className='min-w-0 flex-1'>
 							<AppCard
 								icon={UserGroupIcon}
 								iconPosition='top'
 								title='Conoce las especies'
 								description='Descubre nuestros animales.'
 								onPress={() => router.push('/species')}
-								backgroundColor={colors.cardLight}
-								borderColor={colors.border}
+								backgroundColor={colors.niebla}
+								borderColor='#a6c1b3'
 								minHeight={130}
-								iconColor={colors.primary}
+								iconColor={PRIMARY}
 								showArrow={false}
 							/>
 						</View>
@@ -500,9 +423,9 @@ export default function Explorar() {
 						title='Mapa del zoológico'
 						description='Explora caminos, especies y puntos de interés.'
 						onPress={() => router.push('/map')}
-						backgroundColor={colors.cardLight}
-						borderColor={colors.border}
-						iconColor={colors.primary}
+						backgroundColor={colors.niebla}
+						borderColor='#a6c1b3'
+						iconColor={PRIMARY}
 						showArrow={true}
 					/>
 
@@ -512,13 +435,13 @@ export default function Explorar() {
 						description='Tu donación ayuda a cuidar y proteger a nuestros animales.'
 						icon={HeartIcon}
 						onPress={() => router.push('/donations')}
-						backgroundColor={donationCardBackground ?? colors.card}
-						borderColor={colors.border}
-						iconColor={colors.primaryDark}
+						backgroundColor={donationCardBackground}
+						borderColor='#a6c1b3'
+						iconColor='#063D22'
 						iconBackgroundColor={donationAccentBackground}
 						arrowBackgroundColor={donationAccentBackground}
-						arrowColor={colors.primaryDark}
-						textColor='#FFFFFF'
+						arrowColor='#063D22'
+						textColor={colors.blanco}
 						descriptionColor='#D4E8D9'
 						showArrow
 					/>
