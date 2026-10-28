@@ -30,8 +30,8 @@ type FormErrors = {
 }
 
 const palette = {
-	border: '#3f775e',
-	error: '#C83B3B',
+	border: colors.inputBorder,
+	error: colors.error,
 }
 
 export default function Login() {
@@ -122,7 +122,7 @@ export default function Login() {
 				resizeMode='cover'
 				className='flex-1'
 			>
-				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
+				<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
 				<ScrollView
 					className='flex-1'
@@ -145,23 +145,23 @@ export default function Login() {
 						/>
 					</View>
 
-					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
+					<View className='mt-[21px] rounded-[21px] bg-blanco p-[17.5px]'>
 						<View className='items-center'>
-							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-bosque'>
 								¡Bienvenido a ZooApp!
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-tinta-2'>
 								Inicia sesión para continuar tu aventura.
 							</Text>
 						</View>
 
-						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-[#C83B3B]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -181,27 +181,27 @@ export default function Login() {
 								onFocus={() => setEmailFocused(true)}
 								onBlur={() => setEmailFocused(false)}
 								placeholder='correo@ejemplo.com'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								autoCapitalize='none'
 								autoCorrect={false}
 								keyboardType='email-address'
 								textContentType='emailAddress'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 						</View>
 
 						{errors.email && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.email}
 							</Text>
 						)}
 
-						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Contraseña
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-[#C83B3B]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -221,11 +221,11 @@ export default function Login() {
 								onFocus={() => setPasswordFocused(true)}
 								onBlur={() => setPasswordFocused(false)}
 								placeholder='Tu contraseña'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 								textContentType='password'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 
 							<Pressable
@@ -247,14 +247,14 @@ export default function Login() {
 						</View>
 
 						{errors.password && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.password}
 							</Text>
 						)}
 
 						{error !== '' && (
-							<View className='mt-3.5 rounded-[10.5px] border border-red-200 bg-red-50 px-3.5 py-[10.5px]'>
-								<Text className='text-[12.25px] leading-[17.5px] text-red-700'>
+							<View className='mt-3.5 rounded-[10.5px] border border-error-border bg-error-bg px-3.5 py-[10.5px]'>
+								<Text className='text-[12.25px] leading-[17.5px] text-error'>
 									{error}
 								</Text>
 							</View>
@@ -264,14 +264,14 @@ export default function Login() {
 							onPress={() => router.push('/forgot-password')}
 							className='mt-3.5 self-end rounded-[7px] py-[3.5px]'
 						>
-							<Text className='text-[12.25px] font-semibold leading-[17.5px] text-[#1b7747]'>
+							<Text className='text-[12.25px] font-semibold leading-[17.5px] text-esmeralda'>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
 
 						<View className='mt-[17.5px]'>
 							{loading ? (
-								<View className='h-[50px] w-full items-center justify-center rounded-[10.5px] bg-[#8BA997]'>
+								<View className='h-[50px] w-full items-center justify-center rounded-[10.5px] bg-apagado'>
 									<ActivityIndicator color={colors.blanco} />
 								</View>
 							) : (
@@ -280,7 +280,7 @@ export default function Login() {
 						</View>
 
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='text-[14px] leading-[21px] text-tinta-2'>
 								¿No tienes una cuenta?{' '}
 							</Text>
 
@@ -288,7 +288,7 @@ export default function Login() {
 								onPress={() => router.push('/register')}
 								className='rounded-[7px] py-[3.5px]'
 							>
-								<Text className='text-[14px] font-bold leading-[21px] text-[#1b7747]'>
+								<Text className='text-[14px] font-bold leading-[21px] text-esmeralda'>
 									Regístrate
 								</Text>
 							</Pressable>

@@ -15,11 +15,12 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+import colors from '@/theme/colors'
 
 const palette = {
-	primary: '#1b7747',
-	muted: '#6F8A7D',
-	error: '#C83B3B',
+	primary: colors.esmeralda,
+	muted: colors.tinta2,
+	error: colors.error,
 }
 
 export default function ForgotPassword() {
@@ -56,7 +57,7 @@ export default function ForgotPassword() {
 				resizeMode='cover'
 				className='flex-1'
 			>
-				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
+				<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
 				<ScrollView
 					className='flex-1'
@@ -84,26 +85,26 @@ export default function ForgotPassword() {
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
+					<View className='mt-[21px] rounded-[21px] bg-blanco p-[17.5px]'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-bosque'>
 								¿Olvidaste tu contraseña?
 							</Text>
 
-							<Text className='mt-[10.5px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='mt-[10.5px] text-center text-[14px] leading-[21px] text-tinta-2'>
 								Ingresa tu correo electrónico y te enviaremos instrucciones para
 								recuperar el acceso a tu cuenta.
 							</Text>
 						</View>
 
 						{/* CORREO */}
-						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-[#C83B3B]' : emailFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -129,7 +130,7 @@ export default function ForgotPassword() {
 								onFocus={() => setEmailFocused(true)}
 								onBlur={() => setEmailFocused(false)}
 								placeholder='correo@ejemplo.com'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								autoCapitalize='none'
 								autoCorrect={false}
 								keyboardType='email-address'
@@ -137,14 +138,14 @@ export default function ForgotPassword() {
 								autoComplete='email'
 								returnKeyType='done'
 								onSubmitEditing={handleRecover}
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 						</View>
 
 						{/* ERROR */}
 						{error !== '' && (
-							<View className='mt-[10.5px] rounded-[10.5px] border border-red-200 bg-red-50 px-3.5 py-[10.5px]'>
-								<Text className='text-[12.25px] leading-[17.5px] text-red-700'>
+							<View className='mt-[10.5px] rounded-[10.5px] border border-error-border bg-error-bg px-3.5 py-[10.5px]'>
+								<Text className='text-[12.25px] leading-[17.5px] text-error'>
 									{error}
 								</Text>
 							</View>
@@ -158,7 +159,7 @@ export default function ForgotPassword() {
 
 						{/* VOLVER AL LOGIN */}
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='text-[14px] leading-[21px] text-tinta-2'>
 								¿Recuerdas tu contraseña?{' '}
 							</Text>
 
@@ -167,7 +168,7 @@ export default function ForgotPassword() {
 								className='rounded-[7px] py-[3.5px]'
 								accessibilityRole='button'
 							>
-								<Text className='text-[14px] font-bold leading-[21px] text-[#1b7747]'>
+								<Text className='text-[14px] font-bold leading-[21px] text-esmeralda'>
 									Iniciar sesión
 								</Text>
 							</Pressable>

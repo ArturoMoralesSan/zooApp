@@ -17,7 +17,7 @@ export default function BackButton({
 	onPress,
 	opacity = 1,
 	backgroundColor = colors.niebla,
-	iconColor = '#1E4930',
+	iconColor = colors.tinta2,
 	position = 'absolute',
 	top = 56,
 	left = 20,
@@ -36,8 +36,8 @@ export default function BackButton({
 			<Pressable
 				onPress={onPress}
 				hitSlop={8}
-				android_ripple={{ color: '#DCE7DF' }}
-				className='h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-[#DCE7DF]'
+				android_ripple={{ color: colors.cardBorder }}
+				className='h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-card-border'
 				style={{ backgroundColor }}
 			>
 				<HugeiconsIcon

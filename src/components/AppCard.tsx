@@ -82,16 +82,16 @@ export default function AppCard({
 	children,
 
 	backgroundColor = colors.niebla,
-	borderColor = '#a6c1b3',
+	borderColor = colors.cardBorder,
 
-	iconColor = '#08783F',
-	iconBackgroundColor = '#d5ead9',
+	iconColor = colors.esmeralda,
+	iconBackgroundColor = colors.hoja,
 
 	arrowColor = colors.blanco,
-	arrowBackgroundColor = '#08783F',
+	arrowBackgroundColor = colors.esmeralda,
 
-	textColor = '#06371c',
-	descriptionColor = '#06371c',
+	textColor = colors.tinta,
+	descriptionColor = colors.tinta,
 
 	imageHeight = 150,
 	minHeight,

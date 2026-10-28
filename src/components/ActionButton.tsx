@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from 'react-native'
+import colors from '@/theme/colors'
 
 type ActionButtonProps = {
 	title: string
@@ -16,8 +17,8 @@ export default function ActionButton({
 			<Pressable
 				onPress={onPress}
 				disabled={disabled}
-				android_ripple={{ color: '#064720' }}
-				className={`h-[50px] w-full items-center justify-center rounded-[10px] border-b-[3px] border-b-[#064720] ${disabled ? 'bg-[#8BA997]' : 'bg-esmeralda'}`}
+				android_ripple={{ color: colors.bosque }}
+				className={`h-[50px] w-full items-center justify-center rounded-[10px] border-b-[3px] border-b-bosque ${disabled ? 'bg-apagado' : 'bg-esmeralda'}`}
 				style={{ elevation: 2 }}
 			>
 				<Text className='text-[16px] font-extrabold text-blanco'>{title}</Text>

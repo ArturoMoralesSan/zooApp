@@ -11,7 +11,7 @@ import { Pressable, Text, View } from 'react-native'
 
 import colors from '@/theme/colors'
 
-const INACTIVE_COLOR = '#557067'
+const INACTIVE_COLOR = colors.apagado
 
 export default function TabLayout() {
 	return (
@@ -21,7 +21,7 @@ export default function TabLayout() {
 			}}
 			tabBar={({ state, descriptors, navigation }) => (
 				<View className='absolute bottom-0 left-0 right-0 bg-transparent px-3 pb-[22px]'>
-					<View className='min-h-[72px] w-full flex-row items-center rounded-[22px] border-[0.8px] border-[#A7C9B1] bg-blanco p-1.5'>
+					<View className='min-h-[72px] w-full flex-row items-center rounded-[22px] border-[0.8px] border-card-border bg-blanco p-1.5'>
 						{state.routes
 							.filter((route) => route.name !== 'ar')
 							.map((route) => {
@@ -71,7 +71,7 @@ export default function TabLayout() {
 										accessibilityLabel={options.tabBarAccessibilityLabel}
 										onPress={onPress}
 										onLongPress={onLongPress}
-										className={`h-[58px] min-w-0 flex-1 items-center justify-center rounded-2xl ${isFocused ? 'bg-[#075C2B]' : ''}`}
+										className={`h-[58px] min-w-0 flex-1 items-center justify-center rounded-2xl ${isFocused ? 'bg-esmeralda' : ''}`}
 									>
 										<HugeiconsIcon
 											icon={icon}
@@ -80,7 +80,7 @@ export default function TabLayout() {
 										/>
 
 										<Text
-											className={`mt-1 text-[11px] ${isFocused ? 'font-bold text-blanco' : 'font-medium text-[#557067]'}`}
+											className={`mt-1 text-[11px] ${isFocused ? 'font-bold text-blanco' : 'font-medium text-apagado'}`}
 										>
 											{options.title}
 										</Text>

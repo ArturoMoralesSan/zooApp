@@ -31,13 +31,13 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 
 const ICON_COLORS = {
-	primary: '#187744',
-	muted: '#718477',
-	coral: '#D95C4F',
+	primary: colors.esmeralda,
+	muted: colors.tinta2,
+	coral: colors.error,
 } as const
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#244334',
+	shadowColor: colors.tinta,
 	shadowOffset: { width: 0, height: 3 },
 	shadowOpacity: 0.055,
 	shadowRadius: 8,
@@ -288,10 +288,10 @@ export default function MyTicketsScreen() {
 
 					<View className='mb-5 flex-row gap-3'>
 						<View
-							className='flex-1 flex-row items-center rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-[13px]'
+							className='flex-1 flex-row items-center rounded-[20px] border border-card-border bg-niebla p-[13px]'
 							style={cardShadow}
 						>
-							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
+							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
@@ -300,20 +300,20 @@ export default function MyTicketsScreen() {
 							</View>
 
 							<View>
-								<Text className='text-[20px] font-extrabold text-[#244334]'>
+								<Text className='text-[20px] font-extrabold text-tinta'>
 									{activePurchases.length}
 								</Text>
-								<Text className='mt-[3px] text-[11px] font-medium text-[#718477]'>
+								<Text className='mt-[3px] text-[11px] font-medium text-tinta-2'>
 									Compras activas
 								</Text>
 							</View>
 						</View>
 
 						<View
-							className='flex-1 flex-row items-center rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-[13px]'
+							className='flex-1 flex-row items-center rounded-[20px] border border-card-border bg-niebla p-[13px]'
 							style={cardShadow}
 						>
-							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
+							<View className='mr-2.5 h-10 w-10 items-center justify-center rounded-[14px] bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={21}
@@ -322,32 +322,32 @@ export default function MyTicketsScreen() {
 							</View>
 
 							<View>
-								<Text className='text-[20px] font-extrabold text-[#244334]'>
+								<Text className='text-[20px] font-extrabold text-tinta'>
 									{historyPurchases.length}
 								</Text>
-								<Text className='mt-[3px] text-[11px] font-medium text-[#718477]'>
+								<Text className='mt-[3px] text-[11px] font-medium text-tinta-2'>
 									Historial
 								</Text>
 							</View>
 						</View>
 					</View>
 
-					<View className='mb-[18px] flex-row rounded-2xl border border-[#DCE7DF] bg-[#F2F7F4] p-1'>
+					<View className='mb-[18px] flex-row rounded-2xl border border-card-border bg-niebla p-1'>
 						<Pressable
 							onPress={() => setTab('active')}
-							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-[#187744]' : ''}`}
+							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-esmeralda' : ''}`}
 						>
 							<Text
-								className={`text-[13px] ${tab === 'active' ? 'font-extrabold text-blanco' : 'font-semibold text-[#718477]'}`}
+								className={`text-[13px] ${tab === 'active' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
 							>
 								Activas
 							</Text>
 
 							<View
-								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-[#E4F2E8]'}`}
+								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
 							>
 								<Text
-									className={`text-[11px] font-bold ${tab === 'active' ? 'text-[#187744]' : 'text-[#244334]'}`}
+									className={`text-[11px] font-bold ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
 								>
 									{activePurchases.length}
 								</Text>
@@ -356,19 +356,19 @@ export default function MyTicketsScreen() {
 
 						<Pressable
 							onPress={() => setTab('history')}
-							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-[#187744]' : ''}`}
+							className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-esmeralda' : ''}`}
 						>
 							<Text
-								className={`text-[13px] ${tab === 'history' ? 'font-extrabold text-blanco' : 'font-semibold text-[#718477]'}`}
+								className={`text-[13px] ${tab === 'history' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
 							>
 								Historial
 							</Text>
 
 							<View
-								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-[#E4F2E8]'}`}
+								className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
 							>
 								<Text
-									className={`text-[11px] font-bold ${tab === 'history' ? 'text-[#187744]' : 'text-[#244334]'}`}
+									className={`text-[11px] font-bold ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
 								>
 									{historyPurchases.length}
 								</Text>
@@ -379,16 +379,16 @@ export default function MyTicketsScreen() {
 					{loading ? (
 						<View className='items-center justify-center py-[60px]'>
 							<ActivityIndicator size='large' color={ICON_COLORS.primary} />
-							<Text className='mt-3 text-[14px] text-[#718477]'>
+							<Text className='mt-3 text-[14px] text-tinta-2'>
 								Cargando tus entradas...
 							</Text>
 						</View>
 					) : visiblePurchases.length === 0 ? (
 						<View
-							className='items-center rounded-3xl border border-[#DCE7DF] bg-[#F2F7F4] px-6 py-8'
+							className='items-center rounded-3xl border border-card-border bg-niebla px-6 py-8'
 							style={cardShadow}
 						>
-							<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-[#E4F2E8]'>
+							<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={32}
@@ -396,13 +396,13 @@ export default function MyTicketsScreen() {
 								/>
 							</View>
 
-							<Text className='text-center text-[18px] font-extrabold text-[#244334]'>
+							<Text className='text-center text-[18px] font-extrabold text-tinta'>
 								{tab === 'active'
 									? 'No tienes compras activas'
 									: 'No tienes historial'}
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[13px] leading-5 text-[#718477]'>
+							<Text className='mt-[7px] text-center text-[13px] leading-5 text-tinta-2'>
 								{tab === 'active'
 									? 'Cuando compres una entrada aparecerá aquí.'
 									: 'Tus compras anteriores aparecerán aquí.'}
@@ -422,11 +422,11 @@ export default function MyTicketsScreen() {
 							{visiblePurchases.map((purchase) => (
 								<View
 									key={purchase.orderId}
-									className='mb-3.5 w-full rounded-[22px] border border-[#DCE7DF] bg-[#F2F7F4] p-4'
+									className='mb-3.5 w-full rounded-[22px] border border-card-border bg-niebla p-4'
 									style={cardShadow}
 								>
 									<View className='flex-row items-center'>
-										<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[15px] bg-[#E4F2E8]'>
+										<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[15px] bg-hoja'>
 											<HugeiconsIcon
 												icon={Ticket01Icon}
 												size={25}
@@ -435,16 +435,16 @@ export default function MyTicketsScreen() {
 										</View>
 
 										<View className='min-w-0 flex-1'>
-											<Text className='text-[15px] font-extrabold text-[#244334]'>
+											<Text className='text-[15px] font-extrabold text-tinta'>
 												Compra #{purchase.orderId}
 											</Text>
-											<Text className='mt-1 text-[12px] text-[#718477]'>
+											<Text className='mt-1 text-[12px] text-tinta-2'>
 												{purchase.folio}
 											</Text>
 										</View>
 
-										<View className='ml-2 rounded-[10px] bg-[#E4F2E8] px-[9px] py-[5px]'>
-											<Text className='text-[11px] font-bold text-[#187744]'>
+										<View className='ml-2 rounded-[10px] bg-hoja px-[9px] py-[5px]'>
+											<Text className='text-[11px] font-bold text-esmeralda'>
 												{getActiveCount(purchase) > 0
 													? 'Activa'
 													: getTicketStatus(purchase.tickets[0])}
@@ -452,11 +452,11 @@ export default function MyTicketsScreen() {
 										</View>
 									</View>
 
-									<View className='my-[13px] h-px bg-[#DCE7DF]' />
+									<View className='my-[13px] h-px bg-card-border' />
 
 									<View className='flex-row justify-between gap-3'>
 										<View className='flex-1'>
-											<Text className='text-[11px] text-[#718477]'>
+											<Text className='text-[11px] text-tinta-2'>
 												Fecha de compra
 											</Text>
 
@@ -466,7 +466,7 @@ export default function MyTicketsScreen() {
 													size={15}
 													color={ICON_COLORS.muted}
 												/>
-												<Text className='mt-1 text-[13px] font-bold text-[#244334]'>
+												<Text className='mt-1 text-[13px] font-bold text-tinta'>
 													{formatPurchaseDate(purchase.createdAt)}
 												</Text>
 											</View>
@@ -478,7 +478,7 @@ export default function MyTicketsScreen() {
 														size={13}
 														color={ICON_COLORS.muted}
 													/>
-													<Text className='mt-[3px] text-[11px] text-[#718477]'>
+													<Text className='mt-[3px] text-[11px] text-tinta-2'>
 														{formatPurchaseTime(purchase.createdAt)}
 													</Text>
 												</View>
@@ -486,20 +486,20 @@ export default function MyTicketsScreen() {
 										</View>
 
 										<View className='items-end'>
-											<Text className='text-[11px] text-[#718477]'>Total</Text>
-											<Text className='mt-1 text-[17px] font-extrabold text-[#187744]'>
+											<Text className='text-[11px] text-tinta-2'>Total</Text>
+											<Text className='mt-1 text-[17px] font-extrabold text-esmeralda'>
 												${purchase.total.toFixed(2)}
 											</Text>
 										</View>
 									</View>
 
-									<View className='mt-3.5 max-w-full flex-row items-center self-start rounded-xl border border-[#DCE7DF] bg-[#E4F2E8] px-3 py-2'>
+									<View className='mt-3.5 max-w-full flex-row items-center self-start rounded-xl border border-card-border bg-hoja px-3 py-2'>
 										<HugeiconsIcon
 											icon={Ticket01Icon}
 											size={17}
 											color={ICON_COLORS.primary}
 										/>
-										<Text className='ml-2 shrink text-[12px] font-bold text-[#187744]'>
+										<Text className='ml-2 shrink text-[12px] font-bold text-esmeralda'>
 											{getTicketSummary(purchase)}
 										</Text>
 									</View>
@@ -522,16 +522,16 @@ export default function MyTicketsScreen() {
 					animationType='slide'
 					onRequestClose={() => setSelectedPurchase(null)}
 				>
-					<View className='flex-1 justify-end bg-[rgba(24,40,30,0.48)]'>
+					<View className='flex-1 justify-end bg-tinta/[0.48]'>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
-							className='max-h-[90%] overflow-hidden rounded-t-[26px] border-t border-[#DCE7DF] bg-blanco px-5 pb-[25px] pt-5'
+							className='max-h-[90%] overflow-hidden rounded-t-[26px] border-t border-card-border bg-blanco px-5 pb-[25px] pt-5'
 							imageClassName='opacity-30'
 							resizeMode='repeat'
 						>
 							<View className='flex-row items-center justify-between'>
 								<View className='flex-1 flex-row items-center'>
-									<View className='mr-[11px] h-11 w-11 items-center justify-center rounded-[14px] bg-[#E4F2E8]'>
+									<View className='mr-[11px] h-11 w-11 items-center justify-center rounded-[14px] bg-hoja'>
 										<HugeiconsIcon
 											icon={QrCodeIcon}
 											size={25}
@@ -540,10 +540,10 @@ export default function MyTicketsScreen() {
 									</View>
 
 									<View className='flex-1'>
-										<Text className='text-[19px] font-extrabold text-[#244334]'>
+										<Text className='text-[19px] font-extrabold text-tinta'>
 											Tus entradas
 										</Text>
-										<Text className='mt-1 text-[11px] text-[#718477]'>
+										<Text className='mt-1 text-[11px] text-tinta-2'>
 											{selectedPurchase?.folio}
 										</Text>
 									</View>
@@ -551,16 +551,14 @@ export default function MyTicketsScreen() {
 
 								<Pressable
 									onPress={() => setSelectedPurchase(null)}
-									className='ml-2.5 h-[38px] w-[38px] items-center justify-center rounded-[13px] border border-[#DCE7DF] bg-[#F2F7F4] active:bg-[#E4F2E8] active:opacity-[0.65]'
+									className='ml-2.5 h-[38px] w-[38px] items-center justify-center rounded-[13px] border border-card-border bg-niebla active:bg-hoja active:opacity-[0.65]'
 								>
-									<Text className='text-[24px] leading-7 text-[#244334]'>
-										×
-									</Text>
+									<Text className='text-[24px] leading-7 text-tinta'>×</Text>
 								</Pressable>
 							</View>
 
 							{selectedPurchase && (
-								<Text className='mb-2.5 mt-3 text-[12px] text-[#718477]'>
+								<Text className='mb-2.5 mt-3 text-[12px] text-tinta-2'>
 									Compra realizada el{' '}
 									{formatPurchaseDate(selectedPurchase.createdAt)}
 									{formatPurchaseTime(selectedPurchase.createdAt)
@@ -576,29 +574,29 @@ export default function MyTicketsScreen() {
 								{selectedPurchase?.tickets.map((ticket, index) => (
 									<View
 										key={ticket.id}
-										className='mb-3 rounded-[20px] border border-[#DCE7DF] bg-[#F2F7F4] p-3.5'
+										className='mb-3 rounded-[20px] border border-card-border bg-niebla p-3.5'
 										style={cardShadow}
 									>
 										<View className='flex-row items-center justify-between gap-2.5'>
 											<View>
-												<Text className='text-[15px] font-extrabold text-[#244334]'>
+												<Text className='text-[15px] font-extrabold text-tinta'>
 													{ticket.ticket_type?.name ?? 'Entrada'}
 												</Text>
-												<Text className='mt-1 text-[11px] text-[#718477]'>
+												<Text className='mt-1 text-[11px] text-tinta-2'>
 													Entrada {index + 1} de{' '}
 													{selectedPurchase.tickets.length}
 												</Text>
 											</View>
 
-											<View className='rounded-[9px] bg-[#E4F2E8] px-[9px] py-[5px]'>
-												<Text className='text-[10px] font-bold text-[#187744]'>
+											<View className='rounded-[9px] bg-hoja px-[9px] py-[5px]'>
+												<Text className='text-[10px] font-bold text-esmeralda'>
 													{getTicketStatus(ticket)}
 												</Text>
 											</View>
 										</View>
 
 										<View
-											className='mt-3.5 min-h-[236px] min-w-[236px] items-center justify-center self-center rounded-[18px] border border-[#DCE7DF] bg-blanco p-3'
+											className='mt-3.5 min-h-[236px] min-w-[236px] items-center justify-center self-center rounded-[18px] border border-card-border bg-blanco p-3'
 											style={cardShadow}
 										>
 											{ticket.qr_token && ticket.qr_token.trim() !== '' ? (
@@ -616,10 +614,10 @@ export default function MyTicketsScreen() {
 														size={45}
 														color={ICON_COLORS.coral}
 													/>
-													<Text className='mt-2.5 text-center text-[13px] font-bold text-[#D95C4F]'>
+													<Text className='mt-2.5 text-center text-[13px] font-bold text-error'>
 														Este boleto no tiene QR disponible.
 													</Text>
-													<Text className='mt-2 text-center text-[9px] text-[#718477]'>
+													<Text className='mt-2 text-center text-[9px] text-tinta-2'>
 														Token: {String(ticket.qr_token ?? 'NULL')}
 													</Text>
 												</View>

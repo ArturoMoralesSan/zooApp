@@ -127,12 +127,12 @@ export default function DonationSuccessScreen() {
 					</View>
 
 					{/* CONFIRMACIÓN DE DONACIÓN */}
-					<View className='mb-4 items-center justify-center rounded-3xl bg-[#063D1E] px-[22px] py-[30px]'>
-						<View className='mb-[18px] h-[78px] w-[78px] items-center justify-center rounded-[39px] bg-[rgba(184,243,93,0.13)]'>
+					<View className='mb-4 items-center justify-center rounded-3xl bg-bosque px-[22px] py-[30px]'>
+						<View className='mb-[18px] h-[78px] w-[78px] items-center justify-center rounded-[39px] bg-lima/[0.13]'>
 							<HugeiconsIcon
 								icon={CheckmarkCircle02Icon}
 								size={46}
-								color='#B8F35D'
+								color={colors.lima}
 							/>
 						</View>
 
@@ -146,60 +146,60 @@ export default function DonationSuccessScreen() {
 					</View>
 
 					{/* MONTO DONADO Y DETALLE */}
-					<View className='mb-4 rounded-[22px] border border-[#AECCBD] bg-niebla p-5'>
+					<View className='mb-4 rounded-[22px] border border-card-border bg-niebla p-5'>
 						<View className='mb-2'>
-							<Text className='text-[14px] font-semibold text-[#1E4930]'>
+							<Text className='text-[14px] font-semibold text-tinta-2'>
 								Monto donado
 							</Text>
 						</View>
 
-						<Text className='text-[34px] font-extrabold tracking-[-0.7px] text-[#1E4930]'>
+						<Text className='text-[34px] font-extrabold tracking-[-0.7px] text-tinta-2'>
 							{formatCurrency(amount)}
 						</Text>
 
-						<View className='my-2.5 h-px bg-[#D5E5DD]' />
+						<View className='my-2.5 h-px bg-card-border' />
 
 						<View className='mb-3'>
-							<Text className='text-[18px] font-extrabold text-[#1E4930]'>
+							<Text className='text-[18px] font-extrabold text-tinta-2'>
 								Detalle de la donación
 							</Text>
 						</View>
 
 						<View className='flex-row items-center justify-between gap-3 py-2'>
-							<Text className='shrink-0 text-[13px] text-[#1E4930]'>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>
 								Donación
 							</Text>
 
 							<Text
-								className='flex-1 text-right text-[13px] font-bold text-[#1E4930]'
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
 								numberOfLines={1}
 							>
 								Aportación al zoológico
 							</Text>
 						</View>
 
-						<View className='my-2.5 h-px bg-[#D5E5DD]' />
+						<View className='my-2.5 h-px bg-card-border' />
 
 						<View className='flex-row items-center justify-between gap-3 py-2'>
-							<Text className='shrink-0 text-[13px] text-[#1E4930]'>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>
 								Método de pago
 							</Text>
 
 							<Text
-								className='flex-1 text-right text-[13px] font-bold text-[#1E4930]'
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
 								numberOfLines={1}
 							>
 								{paymentMethod}
 							</Text>
 						</View>
 
-						<View className='my-2.5 h-px bg-[#D5E5DD]' />
+						<View className='my-2.5 h-px bg-card-border' />
 
 						<View className='flex-row items-center justify-between gap-3 py-2'>
-							<Text className='shrink-0 text-[13px] text-[#1E4930]'>Folio</Text>
+							<Text className='shrink-0 text-[13px] text-tinta-2'>Folio</Text>
 
 							<Text
-								className='flex-1 text-right text-[13px] font-bold text-[#1E4930]'
+								className='flex-1 text-right text-[13px] font-bold text-tinta-2'
 								numberOfLines={1}
 								selectable
 							>
@@ -210,16 +210,16 @@ export default function DonationSuccessScreen() {
 
 					{/* AGRADECIMIENTO */}
 					<View className='mb-4 flex-row items-start gap-[13px] rounded-[20px] bg-hoja p-[18px]'>
-						<View className='h-[38px] w-[38px] items-center justify-center rounded-xl bg-[#087137]'>
+						<View className='h-[38px] w-[38px] items-center justify-center rounded-xl bg-esmeralda'>
 							<HugeiconsIcon icon={StarIcon} size={24} color={colors.blanco} />
 						</View>
 
 						<View className='flex-1'>
-							<Text className='mb-1.5 text-[15px] font-extrabold text-[#36634C]'>
+							<Text className='mb-1.5 text-[15px] font-extrabold text-tinta-2'>
 								¡Tu apoyo cuenta!
 							</Text>
 
-							<Text className='text-[13px] leading-5 text-[#36634C]'>
+							<Text className='text-[13px] leading-5 text-tinta-2'>
 								Gracias a personas como tú podemos seguir trabajando en el
 								bienestar de los animales y en la conservación de nuestra fauna.
 							</Text>

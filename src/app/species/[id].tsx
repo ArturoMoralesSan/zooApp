@@ -29,7 +29,7 @@ import {
 import colors from '@/theme/colors'
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#08783F',
+	shadowColor: colors.esmeralda,
 	shadowOffset: { width: 0, height: 5 },
 	shadowOpacity: 0.12,
 	shadowRadius: 10,
@@ -37,7 +37,7 @@ const cardShadow: ViewStyle = {
 }
 
 const subtleShadow: ViewStyle = {
-	shadowColor: '#08783F',
+	shadowColor: colors.esmeralda,
 	shadowOffset: { width: 0, height: 3 },
 	shadowOpacity: 0.08,
 	shadowRadius: 7,
@@ -177,9 +177,9 @@ export default function SpeciesDetailScreen() {
 				resizeMode='repeat'
 				imageClassName='opacity-90'
 			>
-				<ActivityIndicator size='large' color='#08783F' />
+				<ActivityIndicator size='large' color={colors.esmeralda} />
 
-				<Text className='mt-3.5 text-[12.25px] font-medium leading-[17.5px] text-[#668475]'>
+				<Text className='mt-3.5 text-[12.25px] font-medium leading-[17.5px] text-tinta-2'>
 					Cargando especie...
 				</Text>
 			</ImageBackground>
@@ -199,29 +199,29 @@ export default function SpeciesDetailScreen() {
 				</View>
 
 				<View
-					className='items-center rounded-[28px] border border-[#a6c1b3] bg-niebla px-6 py-10'
+					className='items-center rounded-[28px] border border-card-border bg-niebla px-6 py-10'
 					style={cardShadow}
 				>
-					<View className='h-16 w-16 items-center justify-center rounded-2xl border border-[#a6c1b3] bg-[#d5ead9]'>
+					<View className='h-16 w-16 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
 						<HugeiconsIcon
 							icon={UserGroupIcon}
 							size={34}
 							strokeWidth={1.8}
-							color='#0a2014'
+							color={colors.tinta}
 						/>
 					</View>
 
-					<Text className='mt-5 text-center text-[18px] font-bold text-[#0a2014]'>
+					<Text className='mt-5 text-center text-[18px] font-bold text-tinta'>
 						No fue posible cargar la especie
 					</Text>
 
-					<Text className='mt-2 text-center text-[14px] leading-5 text-[#668475]'>
+					<Text className='mt-2 text-center text-[14px] leading-5 text-tinta-2'>
 						{error ?? 'La información no está disponible en este momento.'}
 					</Text>
 
 					<Pressable
 						onPress={() => void loadSpecies()}
-						className='mt-3.5 self-start rounded-[20px] bg-[#08783F] px-[21px] py-[12.25px] active:bg-[#063D22]'
+						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-[21px] py-[12.25px] active:bg-bosque'
 					>
 						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
 					</Pressable>
@@ -268,20 +268,20 @@ export default function SpeciesDetailScreen() {
 									icon={UserGroupIcon}
 									size={80}
 									strokeWidth={1.8}
-									color='#08783F'
+									color={colors.esmeralda}
 								/>
 							</View>
 						)}
 
 						<View
-							className='absolute inset-0 bg-[rgba(6,61,34,0.08)]'
+							className='absolute inset-0 bg-bosque/[0.08]'
 							pointerEvents='none'
 						/>
 					</View>
 
 					{/* CONTENIDO */}
 					<Animated.View
-						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border border-[#a6c1b3] bg-niebla'
+						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border border-card-border bg-niebla'
 						style={[cardShadow, { marginTop: cardMarginTop }]}
 					>
 						<ImageBackground
@@ -293,20 +293,20 @@ export default function SpeciesDetailScreen() {
 							<View className='px-[17.5px] pb-7 pt-[24.5px]'>
 								{/* CATEGORÍA */}
 								{species.category && (
-									<View className='self-start rounded-full border border-[#a6c1b3] bg-[#d5ead9] px-[12.25px] py-[5.25px]'>
-										<Text className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide text-[#08783F]'>
+									<View className='self-start rounded-full border border-card-border bg-hoja px-[12.25px] py-[5.25px]'>
+										<Text className='text-[10.5px] font-bold uppercase leading-[14px] tracking-wide text-esmeralda'>
 											{species.category.name}
 										</Text>
 									</View>
 								)}
 
 								{/* NOMBRE */}
-								<Text className='mt-3.5 text-[30px] font-bold leading-[31.5px] text-[#0a2014]'>
+								<Text className='mt-3.5 text-[30px] font-bold leading-[31.5px] text-tinta'>
 									{species.common_name}
 								</Text>
 
 								{species.scientific_name && (
-									<Text className='mt-[5.25px] text-[14px] italic leading-[21px] text-[#668475]'>
+									<Text className='mt-[5.25px] text-[14px] italic leading-[21px] text-tinta-2'>
 										{species.scientific_name}
 									</Text>
 								)}
@@ -314,11 +314,11 @@ export default function SpeciesDetailScreen() {
 								{/* DESCRIPCIÓN */}
 								{species.description && (
 									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-[#0a2014]'>
+										<Text className='text-[21px] font-bold text-tinta'>
 											Conoce a esta especie
 										</Text>
 
-										<Text className='mt-[7px] text-[15px] leading-[24.5px] text-[#668475]'>
+										<Text className='mt-[7px] text-[15px] leading-[24.5px] text-tinta-2'>
 											{species.description}
 										</Text>
 									</View>
@@ -326,7 +326,7 @@ export default function SpeciesDetailScreen() {
 
 								{/* DATOS DE LA ESPECIE */}
 								<View className='mt-7'>
-									<Text className='text-[21px] font-bold text-[#0a2014]'>
+									<Text className='text-[21px] font-bold text-tinta'>
 										Datos de la especie
 									</Text>
 
@@ -339,11 +339,11 @@ export default function SpeciesDetailScreen() {
 													title='Hábitat'
 													description={species.habitat}
 													backgroundColor={colors.niebla}
-													borderColor='#a6c1b3'
-													iconColor='#08783F'
-													iconBackgroundColor='#d5ead9'
-													textColor='#063D22'
-													descriptionColor='#06371c'
+													borderColor={colors.cardBorder}
+													iconColor={colors.esmeralda}
+													iconBackgroundColor={colors.hoja}
+													textColor={colors.bosque}
+													descriptionColor={colors.tinta}
 													showArrow={false}
 												/>
 											</View>
@@ -357,11 +357,11 @@ export default function SpeciesDetailScreen() {
 													title='Origen'
 													description={species.origin}
 													backgroundColor={colors.niebla}
-													borderColor='#a6c1b3'
-													iconColor='#08783F'
-													iconBackgroundColor='#d5ead9'
-													textColor='#063D22'
-													descriptionColor='#06371c'
+													borderColor={colors.cardBorder}
+													iconColor={colors.esmeralda}
+													iconBackgroundColor={colors.hoja}
+													textColor={colors.bosque}
+													descriptionColor={colors.tinta}
 													showArrow={false}
 												/>
 											</View>
@@ -375,11 +375,11 @@ export default function SpeciesDetailScreen() {
 													iconPosition='top'
 													description={species.diet}
 													backgroundColor={colors.niebla}
-													borderColor='#a6c1b3'
-													iconColor='#08783F'
-													iconBackgroundColor='#d5ead9'
-													textColor='#063D22'
-													descriptionColor='#06371c'
+													borderColor={colors.cardBorder}
+													iconColor={colors.esmeralda}
+													iconBackgroundColor={colors.hoja}
+													textColor={colors.bosque}
+													descriptionColor={colors.tinta}
 													showArrow={false}
 												/>
 											</View>
@@ -392,12 +392,12 @@ export default function SpeciesDetailScreen() {
 													iconPosition='top'
 													title='Conservación'
 													description={species.conservation_status}
-													backgroundColor='#d5ead9'
-													borderColor='#a6c1b3'
-													iconColor='#08783F'
+													backgroundColor={colors.hoja}
+													borderColor={colors.cardBorder}
+													iconColor={colors.esmeralda}
 													iconBackgroundColor={colors.niebla}
-													textColor='#063D22'
-													descriptionColor='#06371c'
+													textColor={colors.bosque}
+													descriptionColor={colors.tinta}
 													showArrow={false}
 												/>
 											</View>
@@ -408,7 +408,7 @@ export default function SpeciesDetailScreen() {
 								{/* ETIQUETAS */}
 								{species.tags.length > 0 && (
 									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-[#0a2014]'>
+										<Text className='text-[21px] font-bold text-tinta'>
 											Etiquetas
 										</Text>
 
@@ -416,7 +416,7 @@ export default function SpeciesDetailScreen() {
 											{species.tags.map((tag) => (
 												<View
 													key={tag.id}
-													className='rounded-full border border-[#a6c1b3] bg-[#08783F] px-3.5 py-[8.75px]'
+													className='rounded-full border border-card-border bg-esmeralda px-3.5 py-[8.75px]'
 												>
 													<Text className='text-[12.25px] font-semibold leading-[17.5px] text-blanco'>
 														{tag.name}
@@ -430,7 +430,7 @@ export default function SpeciesDetailScreen() {
 								{/* GALERÍA */}
 								{galleryImages.length > 0 && (
 									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-[#0a2014]'>
+										<Text className='text-[21px] font-bold text-tinta'>
 											Galería
 										</Text>
 
@@ -443,7 +443,7 @@ export default function SpeciesDetailScreen() {
 											{galleryImages.map((image) => (
 												<View
 													key={image.id}
-													className='mr-[10.5px] overflow-hidden rounded-[22px] border border-[#a6c1b3] bg-niebla'
+													className='mr-[10.5px] overflow-hidden rounded-[22px] border border-card-border bg-niebla'
 													style={[
 														subtleShadow,
 														{
@@ -500,11 +500,11 @@ export default function SpeciesDetailScreen() {
 				animationType='fade'
 				onRequestClose={() => setSelectedImage(null)}
 			>
-				<View className='flex-1 items-center justify-center bg-[rgba(6,32,20,0.95)]'>
-					<View className='absolute right-5 top-14 z-10 overflow-hidden rounded-full border border-[rgba(166,193,179,0.35)] bg-[rgba(238,244,240,0.20)]'>
+				<View className='flex-1 items-center justify-center bg-tinta/95'>
+					<View className='absolute right-5 top-14 z-10 overflow-hidden rounded-full border border-card-border/35 bg-niebla/20'>
 						<Pressable
 							onPress={() => setSelectedImage(null)}
-							className='rounded-full bg-[rgba(238,244,240,0.20)] px-3.5 py-[8.75px] active:bg-[rgba(213,234,217,0.30)]'
+							className='rounded-full bg-niebla/20 px-3.5 py-[8.75px] active:bg-hoja/30'
 						>
 							<Text className='text-[14px] font-bold text-blanco'>Cerrar</Text>
 						</Pressable>

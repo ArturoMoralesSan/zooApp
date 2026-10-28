@@ -34,8 +34,8 @@ type FormErrors = {
 }
 
 const palette = {
-	primary: '#1b7747',
-	muted: '#6F8A7D',
+	primary: colors.esmeralda,
+	muted: colors.tinta2,
 }
 
 export default function Register() {
@@ -160,7 +160,7 @@ export default function Register() {
 				resizeMode='cover'
 				className='flex-1'
 			>
-				<View pointerEvents='none' className='absolute inset-0 bg-white/10' />
+				<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
 				<ScrollView
 					className='flex-1'
@@ -188,25 +188,25 @@ export default function Register() {
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-[21px] rounded-[21px] bg-white p-[17.5px]'>
+					<View className='mt-[21px] rounded-[21px] bg-blanco p-[17.5px]'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-[#26523f]'>
+							<Text className='text-center text-[26.25px] font-bold leading-[31.5px] text-bosque'>
 								Crea tu cuenta
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='mt-[7px] text-center text-[14px] leading-[21px] text-tinta-2'>
 								Únete a ZooApp y comienza a descubrir el zoológico.
 							</Text>
 						</View>
 
 						{/* NOMBRE */}
-						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-7 text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Nombre completo
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${nameFocused ? 'border-2' : 'border'} ${errors.name ? 'border-[#C83B3B]' : nameFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${nameFocused ? 'border-2' : 'border'} ${errors.name ? 'border-error' : nameFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -226,27 +226,27 @@ export default function Register() {
 								onFocus={() => setNameFocused(true)}
 								onBlur={() => setNameFocused(false)}
 								placeholder='Tu nombre'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								autoCapitalize='words'
 								autoCorrect={false}
 								returnKeyType='next'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 						</View>
 
 						{errors.name && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.name}
 							</Text>
 						)}
 
 						{/* CORREO */}
-						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Correo electrónico
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-[#C83B3B]' : emailFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -266,30 +266,30 @@ export default function Register() {
 								onFocus={() => setEmailFocused(true)}
 								onBlur={() => setEmailFocused(false)}
 								placeholder='correo@ejemplo.com'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								keyboardType='email-address'
 								autoCapitalize='none'
 								autoCorrect={false}
 								textContentType='emailAddress'
 								autoComplete='email'
 								returnKeyType='next'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 						</View>
 
 						{errors.email && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.email}
 							</Text>
 						)}
 
 						{/* CONTRASEÑA */}
-						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Contraseña
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-[#C83B3B]' : passwordFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : passwordFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -310,14 +310,14 @@ export default function Register() {
 								onFocus={() => setPasswordFocused(true)}
 								onBlur={() => setPasswordFocused(false)}
 								placeholder='Mínimo 8 caracteres'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								secureTextEntry={!showPassword}
 								autoCapitalize='none'
 								autoCorrect={false}
 								textContentType='newPassword'
 								autoComplete='new-password'
 								returnKeyType='next'
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 
 							<Pressable
@@ -339,18 +339,18 @@ export default function Register() {
 						</View>
 
 						{errors.password && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.password}
 							</Text>
 						)}
 
 						{/* CONFIRMAR CONTRASEÑA */}
-						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-[#132519]'>
+						<Text className='mb-[7px] mt-[17.5px] text-[12.25px] font-semibold leading-[17.5px] text-tinta'>
 							Confirmar contraseña
 						</Text>
 
 						<View
-							className={`flex-row items-center rounded-[10.5px] bg-white ${passwordConfirmationFocused ? 'border-2' : 'border'} ${errors.password_confirmation ? 'border-[#C83B3B]' : passwordConfirmationFocused ? 'border-[#1b7747]' : 'border-[#3f775e]'}`}
+							className={`flex-row items-center rounded-[10.5px] bg-blanco ${passwordConfirmationFocused ? 'border-2' : 'border'} ${errors.password_confirmation ? 'border-error' : passwordConfirmationFocused ? 'border-esmeralda' : 'border-input-border'}`}
 						>
 							<View className='pl-3.5'>
 								<HugeiconsIcon
@@ -374,7 +374,7 @@ export default function Register() {
 								onFocus={() => setPasswordConfirmationFocused(true)}
 								onBlur={() => setPasswordConfirmationFocused(false)}
 								placeholder='Repite tu contraseña'
-								placeholderTextColor='#84958A'
+								placeholderTextColor={colors.apagado}
 								secureTextEntry={!showPasswordConfirmation}
 								autoCapitalize='none'
 								autoCorrect={false}
@@ -382,7 +382,7 @@ export default function Register() {
 								autoComplete='new-password'
 								returnKeyType='done'
 								onSubmitEditing={handleRegister}
-								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-[#132519]'
+								className='min-h-[49px] flex-1 px-[10.5px] py-[10.5px] text-[14px] leading-[21px] text-tinta'
 							/>
 
 							<Pressable
@@ -410,15 +410,15 @@ export default function Register() {
 						</View>
 
 						{errors.password_confirmation && (
-							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-red-600'>
+							<Text className='mt-[3.5px] text-[12.25px] leading-[17.5px] text-error'>
 								{errors.password_confirmation}
 							</Text>
 						)}
 
 						{/* ERROR GENERAL */}
 						{error !== '' && (
-							<View className='mt-3.5 rounded-[10.5px] border border-red-200 bg-red-50 px-3.5 py-[10.5px]'>
-								<Text className='text-[12.25px] leading-[17.5px] text-red-700'>
+							<View className='mt-3.5 rounded-[10.5px] border border-error-border bg-error-bg px-3.5 py-[10.5px]'>
+								<Text className='text-[12.25px] leading-[17.5px] text-error'>
 									{error}
 								</Text>
 							</View>
@@ -426,7 +426,7 @@ export default function Register() {
 
 						{/* BOTÓN CREAR CUENTA */}
 						{loading ? (
-							<View className='mt-3.5 h-[50px] w-full items-center justify-center rounded-[10.5px] bg-[#8BA997]'>
+							<View className='mt-3.5 h-[50px] w-full items-center justify-center rounded-[10.5px] bg-apagado'>
 								<ActivityIndicator color={colors.blanco} />
 							</View>
 						) : (
@@ -435,7 +435,7 @@ export default function Register() {
 
 						{/* INICIAR SESIÓN */}
 						<View className='mt-[24.5px] flex-row flex-wrap items-center justify-center'>
-							<Text className='text-[14px] leading-[21px] text-[#3b543e]'>
+							<Text className='text-[14px] leading-[21px] text-tinta-2'>
 								¿Ya tienes una cuenta?{' '}
 							</Text>
 
@@ -444,7 +444,7 @@ export default function Register() {
 								className='rounded-[7px] py-[3.5px]'
 								accessibilityRole='button'
 							>
-								<Text className='text-[14px] font-bold leading-[21px] text-[#1b7747]'>
+								<Text className='text-[14px] font-bold leading-[21px] text-esmeralda'>
 									Inicia sesión
 								</Text>
 							</Pressable>

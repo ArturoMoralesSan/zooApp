@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Text, View } from 'react-native'
+import colors from '@/theme/colors'
 
 type ToastType = 'success' | 'error' | 'warning'
 
@@ -13,21 +14,21 @@ type ToastProps = {
 
 const config = {
 	success: {
-		text: 'text-[#087A5A]',
-		border: 'border-[#B8DCCA]',
-		iconBackground: 'bg-[#DCEFE5]',
+		text: 'text-esmeralda',
+		border: 'border-card-border',
+		iconBackground: 'bg-hoja',
 		icon: '✓',
 	},
 	error: {
-		text: 'text-[#C83B3B]',
-		border: 'border-[#FFE3E1]',
-		iconBackground: 'bg-[#FFF1F0]',
+		text: 'text-error',
+		border: 'border-error-border',
+		iconBackground: 'bg-error-bg',
 		icon: '!',
 	},
 	warning: {
-		text: 'text-[#D97706]',
-		border: 'border-[#FDE7B2]',
-		iconBackground: 'bg-[#FFF7E6]',
+		text: 'text-aviso-text',
+		border: 'border-aviso',
+		iconBackground: 'bg-aviso',
 		icon: '⚠',
 	},
 }
@@ -62,7 +63,7 @@ export default function Toast({
 			className={`absolute left-5 right-5 top-[45px] z-[9999] flex-row items-center rounded-[18px] border bg-blanco px-[14px] py-[13px] ${current.border}`}
 			style={{
 				elevation: 9999,
-				shadowColor: '#123C32',
+				shadowColor: colors.tinta,
 				shadowOffset: {
 					width: 0,
 					height: 4,
@@ -81,7 +82,7 @@ export default function Toast({
 			</View>
 
 			{/* MENSAJE */}
-			<Text className='flex-1 text-[14px] font-semibold leading-5 text-[#123C32]'>
+			<Text className='flex-1 text-[14px] font-semibold leading-5 text-tinta'>
 				{message}
 			</Text>
 		</View>

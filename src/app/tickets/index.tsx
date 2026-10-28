@@ -19,14 +19,15 @@ import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
+import colors from '@/theme/colors'
 
 const ICON_COLORS = {
-	primary: '#08783F',
-	muted: '#607A6A',
+	primary: colors.esmeralda,
+	muted: colors.apagado,
 } as const
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#063D22',
+	shadowColor: colors.bosque,
 	shadowOffset: { width: 0, height: 2 },
 	shadowOpacity: 0.04,
 	shadowRadius: 4,
@@ -174,7 +175,7 @@ export default function TicketsScreen() {
 				>
 					<View className='flex-1 items-center justify-center'>
 						<ActivityIndicator size='large' color={ICON_COLORS.primary} />
-						<Text className='mt-3 text-[15px] font-semibold text-[#668475]'>
+						<Text className='mt-3 text-[15px] font-semibold text-tinta-2'>
 							Cargando boletos...
 						</Text>
 					</View>
@@ -215,10 +216,10 @@ export default function TicketsScreen() {
 					{/* ESTADO VACÍO */}
 					{ticketTypes.length === 0 ? (
 						<View
-							className='items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-6 py-8'
+							className='items-center justify-center rounded-[18px] border border-card-border bg-niebla px-6 py-8'
 							style={cardShadow}
 						>
-							<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-[#a6c1b3] bg-[#d5ead9]'>
+							<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={30}
@@ -226,11 +227,11 @@ export default function TicketsScreen() {
 								/>
 							</View>
 
-							<Text className='text-center text-[17px] font-extrabold text-[#0a2014]'>
+							<Text className='text-center text-[17px] font-extrabold text-tinta'>
 								No hay boletos disponibles
 							</Text>
 
-							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-[#668475]'>
+							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-tinta-2'>
 								Por el momento no hay tipos de boleto para mostrar.
 							</Text>
 						</View>
@@ -246,12 +247,12 @@ export default function TicketsScreen() {
 							return (
 								<View
 									key={ticket.id}
-									className='mb-[13px] w-full rounded-[18px] border border-[#a6c1b3] bg-niebla p-[15px]'
+									className='mb-[13px] w-full rounded-[18px] border border-card-border bg-niebla p-[15px]'
 									style={cardShadow}
 								>
 									{/* INFORMACIÓN DEL BOLETO */}
 									<View className='w-full flex-row items-start'>
-										<View className='mr-3 h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-[#a6c1b3] bg-[#d5ead9]'>
+										<View className='mr-3 h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
 											<HugeiconsIcon
 												icon={Ticket01Icon}
 												size={25}
@@ -261,32 +262,32 @@ export default function TicketsScreen() {
 										</View>
 
 										<View className='min-w-0 flex-1 justify-center'>
-											<Text className='text-[15px] font-extrabold leading-5 text-[#0a2014]'>
+											<Text className='text-[15px] font-extrabold leading-5 text-tinta'>
 												{ticket.name}
 											</Text>
 
 											{!!ticket.description && (
-												<Text className='mt-[3px] text-[12px] leading-4 text-[#668475]'>
+												<Text className='mt-[3px] text-[12px] leading-4 text-tinta-2'>
 													{ticket.description}
 												</Text>
 											)}
 										</View>
 									</View>
 
-									<View className='mb-[13px] mt-[15px] h-px bg-[#a6c1b3]' />
+									<View className='mb-[13px] mt-[15px] h-px bg-card-border' />
 
 									{/* PRECIO Y CANTIDAD */}
 									<View className='w-full flex-row items-center justify-between'>
 										<View className='min-w-0 flex-1 justify-center pr-2'>
-											<Text className='text-[11px] font-semibold text-[#668475]'>
+											<Text className='text-[11px] font-semibold text-tinta-2'>
 												Precio por boleto
 											</Text>
 
-											<Text className='mt-0.5 text-[20px] font-black text-[#12482e]'>
+											<Text className='mt-0.5 text-[20px] font-black text-bosque'>
 												{formatCurrency(price)}
 											</Text>
 
-											<Text className='mt-[3px] text-[12px] font-semibold text-[#668475]'>
+											<Text className='mt-[3px] text-[12px] font-semibold text-tinta-2'>
 												Monto: {formatCurrency(amount)}
 											</Text>
 										</View>
@@ -298,7 +299,7 @@ export default function TicketsScreen() {
 												accessibilityLabel={`Restar boleto de ${ticket.name}`}
 												onPress={() => changeQuantity(ticket.id, quantity - 1)}
 												disabled={!canDecrease}
-												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 items-center justify-center rounded-xl border border-[#a6c1b3] p-0 ${canDecrease ? 'bg-blanco active:opacity-70' : 'bg-niebla opacity-70'}`}
+												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 items-center justify-center rounded-xl border border-card-border p-0 ${canDecrease ? 'bg-blanco active:opacity-70' : 'bg-niebla opacity-70'}`}
 											>
 												<HugeiconsIcon
 													icon={MinusSignIcon}
@@ -315,7 +316,7 @@ export default function TicketsScreen() {
 											{/* CANTIDAD */}
 											<View className='h-10 w-[34px] min-w-[34px] shrink-0 items-center justify-center'>
 												<Text
-													className='text-center text-[15px] font-extrabold text-[#0a2014]'
+													className='text-center text-[15px] font-extrabold text-tinta'
 													style={{ includeFontPadding: false }}
 												>
 													{quantity}
@@ -328,7 +329,7 @@ export default function TicketsScreen() {
 												accessibilityLabel={`Agregar boleto de ${ticket.name}`}
 												onPress={() => changeQuantity(ticket.id, quantity + 1)}
 												disabled={!canIncrease}
-												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-[#08783F]' : 'bg-[#a6c1b3]'}`}
+												className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-esmeralda' : 'bg-card-border'}`}
 											>
 												<Text
 													className='text-center text-[28px] font-semibold leading-8 text-blanco'

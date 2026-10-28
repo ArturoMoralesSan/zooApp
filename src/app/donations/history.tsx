@@ -19,11 +19,12 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
+import colors from '@/theme/colors'
 
-const ICON_COLOR = '#06371c'
+const ICON_COLOR = colors.tinta
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#063D22',
+	shadowColor: colors.bosque,
 	shadowOffset: { width: 0, height: 2 },
 	shadowOpacity: 0.05,
 	shadowRadius: 5,
@@ -88,14 +89,14 @@ function getDonationStatusClassName(donation: Donation): string {
 			'fallido',
 		].includes(status)
 	) {
-		return 'bg-[#d5ead9]'
+		return 'bg-hoja'
 	}
 
 	if (status === 'pending' || status === 'pendiente') {
 		return 'bg-niebla'
 	}
 
-	return 'bg-[#b8f45d]'
+	return 'bg-lima'
 }
 
 function formatAmount(amount?: number | string | null): string {
@@ -267,42 +268,42 @@ export default function DonationHistoryScreen() {
 					{/* Estadísticas */}
 					<View className='mb-[22px] w-full flex-row items-stretch gap-2.5'>
 						<View
-							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
 							style={cardShadow}
 						>
-							<Text className='text-center text-[21px] font-extrabold text-[#06371c]'>
+							<Text className='text-center text-[21px] font-extrabold text-tinta'>
 								{donations.length}
 							</Text>
-							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
 								Donaciones
 							</Text>
 						</View>
 
 						<View
-							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
 							style={cardShadow}
 						>
-							<Text className='text-center text-[21px] font-extrabold text-[#06371c]'>
+							<Text className='text-center text-[21px] font-extrabold text-tinta'>
 								{completedDonations}
 							</Text>
-							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
 								Completadas
 							</Text>
 						</View>
 
 						<View
-							className='min-w-0 items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-niebla px-[7px] py-4'
+							className='min-w-0 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
 							style={[cardShadow, { flex: 1.25 }]}
 						>
 							<Text
-								className='text-center text-[16px] font-extrabold text-[#06371c]'
+								className='text-center text-[16px] font-extrabold text-tinta'
 								numberOfLines={1}
 								adjustsFontSizeToFit
 								minimumFontScale={0.7}
 							>
 								{formatAmount(totalDonated)}
 							</Text>
-							<Text className='mt-1.5 text-center text-[11px] font-medium text-[#06371c]'>
+							<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
 								Total donado
 							</Text>
 						</View>
@@ -312,17 +313,17 @@ export default function DonationHistoryScreen() {
 					{loading ? (
 						<View className='items-center justify-center py-[60px]'>
 							<ActivityIndicator size='large' color={ICON_COLOR} />
-							<Text className='mt-3 text-[14px] text-[#06371c]'>
+							<Text className='mt-3 text-[14px] text-tinta'>
 								Cargando tus donaciones...
 							</Text>
 						</View>
 					) : sortedDonations.length === 0 ? (
 						/* Estado vacío */
 						<View
-							className='w-full items-center rounded-[22px] border border-[#a6c1b3] bg-niebla px-[25px] py-8'
+							className='w-full items-center rounded-[22px] border border-card-border bg-niebla px-[25px] py-8'
 							style={cardShadow}
 						>
-							<View className='mb-4 h-[62px] w-[62px] items-center justify-center rounded-[18px] border border-[#a6c1b3] bg-[#d5ead9]'>
+							<View className='mb-4 h-[62px] w-[62px] items-center justify-center rounded-[18px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={HeartAddIcon}
 									size={32}
@@ -331,17 +332,17 @@ export default function DonationHistoryScreen() {
 								/>
 							</View>
 
-							<Text className='text-center text-[18px] font-extrabold text-[#06371c]'>
+							<Text className='text-center text-[18px] font-extrabold text-tinta'>
 								No tienes donaciones
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[13px] leading-[19px] text-[#06371c]'>
+							<Text className='mt-[7px] text-center text-[13px] leading-[19px] text-tinta'>
 								Cuando realices una donación aparecerá aquí.
 							</Text>
 
 							<Pressable
 								onPress={() => router.push('/donations')}
-								className='mt-[18px] min-h-12 w-full items-center justify-center rounded-[14px] bg-[#08783F] active:bg-[#063D22]'
+								className='mt-[18px] min-h-12 w-full items-center justify-center rounded-[14px] bg-esmeralda active:bg-bosque'
 							>
 								<Text className='text-[14px] font-bold text-blanco'>
 									Hacer una donación
@@ -351,18 +352,18 @@ export default function DonationHistoryScreen() {
 					) : (
 						/* Historial */
 						<View className='w-full'>
-							<Text className='mb-3 text-[18px] font-extrabold text-[#06371c]'>
+							<Text className='mb-3 text-[18px] font-extrabold text-tinta'>
 								Historial
 							</Text>
 
 							{sortedDonations.map((donation) => (
 								<View
 									key={donation.id}
-									className='mb-[13px] w-full rounded-[20px] border border-[#a6c1b3] bg-niebla p-4'
+									className='mb-[13px] w-full rounded-[20px] border border-card-border bg-niebla p-4'
 									style={cardShadow}
 								>
 									<View className='flex-row items-center'>
-										<View className='mr-[11px] h-[46px] w-[46px] items-center justify-center rounded-[15px] border border-[#a6c1b3] bg-[#d5ead9]'>
+										<View className='mr-[11px] h-[46px] w-[46px] items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
 											<HugeiconsIcon
 												icon={HeartAddIcon}
 												size={25}
@@ -372,36 +373,36 @@ export default function DonationHistoryScreen() {
 										</View>
 
 										<View className='min-w-0 flex-1'>
-											<Text className='text-[19px] font-extrabold text-[#06371c]'>
+											<Text className='text-[19px] font-extrabold text-tinta'>
 												{formatAmount(donation.amount)}
 											</Text>
 
-											<Text className='mt-1 text-[12px] text-[#06371c]'>
+											<Text className='mt-1 text-[12px] text-tinta'>
 												{formatDate(donation.created_at)}
 											</Text>
 
 											{formatTime(donation.created_at) ? (
-												<Text className='mt-0.5 text-[11px] text-[#06371c]'>
+												<Text className='mt-0.5 text-[11px] text-tinta'>
 													{formatTime(donation.created_at)}
 												</Text>
 											) : null}
 										</View>
 
 										<View
-											className={`ml-[7px] rounded-[10px] border border-[#a6c1b3] px-2 py-[5px] ${getDonationStatusClassName(donation)}`}
+											className={`ml-[7px] rounded-[10px] border border-card-border px-2 py-[5px] ${getDonationStatusClassName(donation)}`}
 										>
-											<Text className='text-[10px] font-bold text-[#06371c]'>
+											<Text className='text-[10px] font-bold text-tinta'>
 												{getDonationStatus(donation)}
 											</Text>
 										</View>
 									</View>
 
-									<View className='my-3.5 h-px bg-[#a6c1b3]' />
+									<View className='my-3.5 h-px bg-card-border' />
 
 									{/* Método de pago y referencia */}
 									<View className='w-full flex-row items-start gap-4'>
 										<View className='min-w-0 flex-1'>
-											<Text className='text-[11px] font-medium text-[#06371c]'>
+											<Text className='text-[11px] font-medium text-tinta'>
 												Método de pago
 											</Text>
 
@@ -414,7 +415,7 @@ export default function DonationHistoryScreen() {
 												/>
 
 												<Text
-													className='ml-1.5 shrink text-[12px] font-semibold leading-[18px] text-[#06371c]'
+													className='ml-1.5 shrink text-[12px] font-semibold leading-[18px] text-tinta'
 													numberOfLines={2}
 												>
 													{donation.payment_method?.name ?? 'No especificado'}
@@ -423,12 +424,12 @@ export default function DonationHistoryScreen() {
 										</View>
 
 										<View className='min-w-0 flex-1'>
-											<Text className='text-[11px] font-medium text-[#06371c]'>
+											<Text className='text-[11px] font-medium text-tinta'>
 												Referencia
 											</Text>
 
 											<Text
-												className='mt-1.5 shrink text-[12px] font-semibold leading-[18px] text-[#06371c]'
+												className='mt-1.5 shrink text-[12px] font-semibold leading-[18px] text-tinta'
 												numberOfLines={2}
 											>
 												{donation.reference || 'No disponible'}

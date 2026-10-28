@@ -32,14 +32,14 @@ import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 
-const PRIMARY = '#08783F'
+const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
 const CAROUSEL_GAP = 10
 
 // Cambia este valor para personalizar el fondo de la tarjeta de donación.
 // Si no se define un color diferente, utiliza el verde predeterminado.
-const donationCardBackground = '#063D22'
-const donationAccentBackground = '#b8f35d'
+const donationCardBackground = colors.bosque
+const donationAccentBackground = colors.lima
 
 type ExploreZone = {
 	id: number
@@ -198,32 +198,32 @@ export default function Explorar() {
 
 				{/* EVENTOS DESTACADOS */}
 				<View className='mt-[21px]'>
-					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-[#0a2014]'>
+					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-tinta'>
 						Eventos destacados
 					</Text>
 
 					{loading ? (
-						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-[#a6c1b3] bg-niebla'>
+						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
 							<ActivityIndicator size='large' color={PRIMARY} />
-							<Text className='mt-[10.5px] text-[13px] text-[#668475]'>
+							<Text className='mt-[10.5px] text-[13px] text-tinta-2'>
 								Cargando eventos...
 							</Text>
 						</View>
 					) : error ? (
 						<View
-							className='rounded-[22px] border border-[#a6c1b3] bg-niebla p-[17.5px]'
+							className='rounded-[22px] border border-card-border bg-niebla p-[17.5px]'
 							style={cardShadow}
 						>
-							<Text className='text-[16px] font-extrabold leading-[21px] text-[#0a2014]'>
+							<Text className='text-[16px] font-extrabold leading-[21px] text-tinta'>
 								No pudimos cargar los eventos
 							</Text>
 
-							<Text className='mt-[7px] text-[13px] leading-[18px] text-[#668475]'>
+							<Text className='mt-[7px] text-[13px] leading-[18px] text-tinta-2'>
 								{error}
 							</Text>
 
 							<Pressable
-								className='mt-3.5 self-start rounded-2xl bg-[#08783F] px-[17.5px] py-[10.5px] active:opacity-80'
+								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-[17.5px] py-[10.5px] active:opacity-80'
 								onPress={() => {
 									setLoading(true)
 									void loadExplore()
@@ -233,12 +233,12 @@ export default function Explorar() {
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
-						<View className='rounded-[22px] border border-[#a6c1b3] bg-niebla p-[21px]'>
-							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-[#0a2014]'>
+						<View className='rounded-[22px] border border-card-border bg-niebla p-[21px]'>
+							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-tinta'>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-[7px] text-center text-[13px] leading-[18px] text-[#668475]'>
+							<Text className='mt-[7px] text-center text-[13px] leading-[18px] text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -264,7 +264,7 @@ export default function Explorar() {
 											className={`w-[292px] ${index === events.length - 1 ? '' : 'mr-2.5'}`}
 										>
 											<View
-												className='h-[203px] overflow-hidden rounded-3xl bg-[#063D22]'
+												className='h-[203px] overflow-hidden rounded-3xl bg-bosque'
 												style={cardShadow}
 											>
 												<Pressable
@@ -285,15 +285,15 @@ export default function Explorar() {
 																resizeMode='cover'
 															/>
 														) : (
-															<View className='absolute inset-0 bg-[#315744]'>
-																<View className='absolute left-0 right-0 top-0 h-[47%] bg-[#315744]' />
+															<View className='absolute inset-0 bg-tinta-2'>
+																<View className='absolute left-0 right-0 top-0 h-[47%] bg-tinta-2' />
 															</View>
 														)}
 
-														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-[#063D22] opacity-[0.98]' />
+														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
 
-														<View className='absolute left-[10.5px] top-[10.5px] rounded-[20px] bg-[#b8f35d] px-3 py-1'>
-															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-[#063D22]'>
+														<View className='absolute left-[10.5px] top-[10.5px] rounded-[20px] bg-lima px-3 py-1'>
+															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-bosque'>
 																{(event.type || 'Educativo').toUpperCase()}
 															</Text>
 														</View>
@@ -328,13 +328,13 @@ export default function Explorar() {
 																				'Consulta próximamente todos los detalles de este evento.',
 																		)
 																	}
-																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full bg-[#b8f35d]'
+																	className='h-[31.5px] w-[31.5px] items-center justify-center rounded-full bg-lima'
 																>
 																	<HugeiconsIcon
 																		icon={ArrowRight01Icon}
 																		size={22}
 																		strokeWidth={2}
-																		color='#063D22'
+																		color={colors.bosque}
 																	/>
 																</Pressable>
 															</View>
@@ -347,7 +347,7 @@ export default function Explorar() {
 																	{formatEventDate(event.start_at)}
 																</Text>
 
-																<Text className='mx-[7px] font-black text-[#b8f35d]'>
+																<Text className='mx-[7px] font-black text-lima'>
 																	•
 																</Text>
 
@@ -369,7 +369,7 @@ export default function Explorar() {
 									{events.map((event, index) => (
 										<View
 											key={event.id}
-											className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-[#08783F]' : 'w-[7px] bg-[#668475] opacity-80'}`}
+											className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-esmeralda' : 'w-[7px] bg-tinta-2 opacity-80'}`}
 										/>
 									))}
 								</View>
@@ -380,7 +380,7 @@ export default function Explorar() {
 
 				{/* ACCIONES */}
 				<View className='mt-5'>
-					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-[#0a2014]'>
+					<Text className='mb-[10.5px] text-[21px] font-extrabold leading-[27px] text-tinta'>
 						¿Qué quieres hacer?
 					</Text>
 
@@ -394,7 +394,7 @@ export default function Explorar() {
 								description='Planea tu visita al zoológico.'
 								onPress={() => router.push('/tickets')}
 								backgroundColor={colors.niebla}
-								borderColor='#a6c1b3'
+								borderColor={colors.cardBorder}
 								minHeight={130}
 								iconColor={PRIMARY}
 								showArrow={false}
@@ -409,7 +409,7 @@ export default function Explorar() {
 								description='Descubre nuestros animales.'
 								onPress={() => router.push('/species')}
 								backgroundColor={colors.niebla}
-								borderColor='#a6c1b3'
+								borderColor={colors.cardBorder}
 								minHeight={130}
 								iconColor={PRIMARY}
 								showArrow={false}
@@ -424,7 +424,7 @@ export default function Explorar() {
 						description='Explora caminos, especies y puntos de interés.'
 						onPress={() => router.push('/map')}
 						backgroundColor={colors.niebla}
-						borderColor='#a6c1b3'
+						borderColor={colors.cardBorder}
 						iconColor={PRIMARY}
 						showArrow={true}
 					/>
@@ -436,13 +436,13 @@ export default function Explorar() {
 						icon={HeartIcon}
 						onPress={() => router.push('/donations')}
 						backgroundColor={donationCardBackground}
-						borderColor='#a6c1b3'
-						iconColor='#063D22'
+						borderColor={colors.cardBorder}
+						iconColor={colors.bosque}
 						iconBackgroundColor={donationAccentBackground}
 						arrowBackgroundColor={donationAccentBackground}
-						arrowColor='#063D22'
+						arrowColor={colors.bosque}
 						textColor={colors.blanco}
-						descriptionColor='#D4E8D9'
+						descriptionColor={colors.hoja}
 						showArrow
 					/>
 				</View>

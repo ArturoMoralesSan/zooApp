@@ -19,7 +19,7 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#063D22',
+	shadowColor: colors.bosque,
 	shadowOffset: { width: 0, height: 2 },
 	shadowOpacity: 0.04,
 	shadowRadius: 4,
@@ -99,7 +99,7 @@ export default function TicketSuccessScreen() {
 
 					{/* CONFIRMACIÓN DE COMPRA */}
 					<View
-						className='mb-[15px] w-full items-center rounded-[22px] border border-[#08783F] bg-[#08783F] p-[22px]'
+						className='mb-[15px] w-full items-center rounded-[22px] border border-esmeralda bg-esmeralda p-[22px]'
 						style={cardShadow}
 					>
 						<View className='mb-3.5 h-[68px] w-[68px] items-center justify-center rounded-[22px] border-0 bg-transparent'>
@@ -107,7 +107,7 @@ export default function TicketSuccessScreen() {
 								icon={CheckmarkCircle02Icon}
 								size={56}
 								strokeWidth={1.8}
-								color='#B8F35D'
+								color={colors.lima}
 							/>
 						</View>
 
@@ -115,7 +115,7 @@ export default function TicketSuccessScreen() {
 							¡Compra realizada!
 						</Text>
 
-						<Text className='mt-[7px] text-center text-[14px] leading-5 text-[#EAF5EE]'>
+						<Text className='mt-[7px] text-center text-[14px] leading-5 text-hoja'>
 							Tu compra se realizó correctamente. Guarda tus códigos QR para
 							ingresar al zoológico.
 						</Text>
@@ -123,25 +123,25 @@ export default function TicketSuccessScreen() {
 
 					{/* BOLETOS Y CÓDIGOS QR */}
 					<View
-						className='mb-[15px] w-full rounded-[20px] border border-[#a6c1b3] bg-niebla p-4'
+						className='mb-[15px] w-full rounded-[20px] border border-card-border bg-niebla p-4'
 						style={cardShadow}
 					>
 						<View className='mb-[17px] flex-row items-center'>
-							<View className='mr-3 h-12 w-12 items-center justify-center rounded-[15px] border border-[#a6c1b3] bg-[#d5ead9]'>
+							<View className='mr-3 h-12 w-12 items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={Ticket01Icon}
 									size={25}
 									strokeWidth={1.8}
-									color='#08783F'
+									color={colors.esmeralda}
 								/>
 							</View>
 
 							<View className='min-w-0 flex-1'>
-								<Text className='text-[17px] font-black text-[#0a2014]'>
+								<Text className='text-[17px] font-black text-tinta'>
 									Tus boletos
 								</Text>
 
-								<Text className='mt-[3px] text-[12px] leading-[17px] text-[#607A6A]'>
+								<Text className='mt-[3px] text-[12px] leading-[17px] text-tinta-2'>
 									Presenta el código QR en la entrada
 								</Text>
 							</View>
@@ -153,11 +153,11 @@ export default function TicketSuccessScreen() {
 									key={ticket.id ?? index}
 									className='mb-[15px] w-full items-center'
 								>
-									<Text className='mb-[9px] self-start text-[13px] font-extrabold text-[#0a2014]'>
+									<Text className='mb-[9px] self-start text-[13px] font-extrabold text-tinta'>
 										Boleto {index + 1}
 									</Text>
 
-									<View className='items-center justify-center rounded-2xl border border-[#a6c1b3] bg-blanco p-3.5'>
+									<View className='items-center justify-center rounded-2xl border border-card-border bg-blanco p-3.5'>
 										<QRCode
 											value={ticket.qr_token}
 											size={190}
@@ -168,7 +168,7 @@ export default function TicketSuccessScreen() {
 							))
 						) : (
 							<View className='w-full items-center justify-center py-[25px]'>
-								<Text className='text-center text-[14px] text-[#607A6A]'>
+								<Text className='text-center text-[14px] text-tinta-2'>
 									No se encontraron boletos en esta compra.
 								</Text>
 							</View>
@@ -177,42 +177,42 @@ export default function TicketSuccessScreen() {
 
 					{/* TOTAL PAGADO Y FOLIO */}
 					<View
-						className='mb-[15px] mt-0.5 w-full rounded-[18px] border border-[#a6c1b3] bg-niebla p-4'
+						className='mb-[15px] mt-0.5 w-full rounded-[18px] border border-card-border bg-niebla p-4'
 						style={cardShadow}
 					>
 						<View>
-							<Text className='text-[14px] font-bold text-[#607A6A]'>
+							<Text className='text-[14px] font-bold text-tinta-2'>
 								Total pagado
 							</Text>
 
-							<Text className='mt-[3px] text-[25px] font-black text-[#12482e]'>
+							<Text className='mt-[3px] text-[25px] font-black text-bosque'>
 								{formatCurrency(total)}
 							</Text>
 						</View>
 
-						<View className='mt-[13px] border-t border-t-[#a6c1b3] pt-[13px]'>
-							<Text className='text-[11px] font-extrabold uppercase text-[#607A6A]'>
+						<View className='mt-[13px] border-t border-t-card-border pt-[13px]'>
+							<Text className='text-[11px] font-extrabold uppercase text-tinta-2'>
 								Folio
 							</Text>
 
-							<Text className='mt-[3px] text-[14px] font-extrabold text-[#0a2014]'>
+							<Text className='mt-[3px] text-[14px] font-extrabold text-tinta'>
 								#{order?.id ?? '---'}
 							</Text>
 						</View>
 					</View>
 
 					{/* INFORMACIÓN IMPORTANTE */}
-					<View className='w-full flex-row items-center rounded-2xl border border-[#a6c1b3] bg-niebla p-[15px]'>
-						<View className='mr-3 h-[38px] w-[38px] items-center justify-center rounded-xl border border-[#a6c1b3] bg-[#d5ead9]'>
-							<Text className='text-[19px] font-black text-[#08783F]'>✓</Text>
+					<View className='w-full flex-row items-center rounded-2xl border border-card-border bg-niebla p-[15px]'>
+						<View className='mr-3 h-[38px] w-[38px] items-center justify-center rounded-xl border border-card-border bg-hoja'>
+							<Text className='text-[19px] font-black text-esmeralda'>✓</Text>
 						</View>
 
 						<View className='min-w-0 flex-1'>
-							<Text className='text-[14px] font-black text-[#063D22]'>
+							<Text className='text-[14px] font-black text-bosque'>
 								Importante
 							</Text>
 
-							<Text className='mt-1 text-[12px] leading-[18px] text-[#607A6A]'>
+							<Text className='mt-1 text-[12px] leading-[18px] text-tinta-2'>
 								Los códigos QR son tus boletos de entrada. Puedes mostrarlos
 								directamente desde tu celular al llegar al zoológico.
 							</Text>

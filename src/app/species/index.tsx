@@ -22,12 +22,12 @@ import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 
 const PROP_COLORS = {
-	primary: '#08783F',
-	text: '#06371c',
+	primary: colors.esmeralda,
+	text: colors.tinta,
 } as const
 
 const cardShadow: ViewStyle = {
-	shadowColor: '#08783F',
+	shadowColor: colors.esmeralda,
 	shadowOffset: { width: 0, height: 5 },
 	shadowOpacity: 0.12,
 	shadowRadius: 10,
@@ -139,7 +139,7 @@ export default function SpeciesScreen() {
 				>
 					<View className='flex-1 items-center justify-center bg-transparent'>
 						<ActivityIndicator size='large' color={PROP_COLORS.primary} />
-						<Text className='mt-3 text-[15px] font-semibold text-[#06371c]'>
+						<Text className='mt-3 text-[15px] font-semibold text-tinta'>
 							Cargando especies...
 						</Text>
 					</View>
@@ -174,11 +174,11 @@ export default function SpeciesScreen() {
 
 					{/* Buscador */}
 					<View className='mb-1 mt-4'>
-						<Text className='mb-2 text-[14px] font-extrabold text-[#06371c]'>
+						<Text className='mb-2 text-[14px] font-extrabold text-tinta'>
 							Buscar especie
 						</Text>
 
-						<View className='h-[54px] flex-row items-center rounded-[18px] border border-[#a6c1b3] bg-blanco'>
+						<View className='h-[54px] flex-row items-center rounded-[18px] border border-card-border bg-blanco'>
 							<View className='items-center justify-center pl-4'>
 								<HugeiconsIcon
 									icon={Search01Icon}
@@ -195,7 +195,7 @@ export default function SpeciesScreen() {
 								placeholderTextColor={PROP_COLORS.text}
 								autoCapitalize='none'
 								autoCorrect={false}
-								className='flex-1 px-3 py-0 text-[15px] text-[#06371c]'
+								className='flex-1 px-3 py-0 text-[15px] text-tinta'
 								selectionColor={PROP_COLORS.primary}
 							/>
 						</View>
@@ -214,14 +214,14 @@ export default function SpeciesScreen() {
 							return (
 								<View
 									key={item}
-									className={`mr-[9px] overflow-hidden rounded-full border px-4 py-2.5 ${active ? 'border-[#08783F] bg-[#08783F]' : 'border-[#a6c1b3] bg-blanco'}`}
+									className={`mr-[9px] overflow-hidden rounded-full border px-4 py-2.5 ${active ? 'border-esmeralda bg-esmeralda' : 'border-card-border bg-blanco'}`}
 								>
 									<Pressable
 										onPress={() => setFilter(item)}
 										className='items-center justify-center active:opacity-[0.72]'
 									>
 										<Text
-											className={`text-[13px] font-extrabold ${active ? 'text-blanco' : 'text-[#06371c]'}`}
+											className={`text-[13px] font-extrabold ${active ? 'text-blanco' : 'text-tinta'}`}
 										>
 											{item}
 										</Text>
@@ -233,7 +233,7 @@ export default function SpeciesScreen() {
 
 					{/* Resultados */}
 					<View className='mb-0.5 mt-[19px] flex-row items-center justify-between'>
-						<Text className='text-[13px] font-extrabold text-[#06371c]'>
+						<Text className='text-[13px] font-extrabold text-tinta'>
 							{filteredSpecies.length}{' '}
 							{filteredSpecies.length === 1 ? 'especie' : 'especies'}
 						</Text>
@@ -241,9 +241,9 @@ export default function SpeciesScreen() {
 						{search.trim() !== '' && (
 							<Pressable
 								onPress={() => setSearch('')}
-								className='rounded-[14px] px-2.5 py-[7px] active:bg-[#d5ead9]'
+								className='rounded-[14px] px-2.5 py-[7px] active:bg-hoja'
 							>
-								<Text className='text-[13px] font-extrabold text-[#08783F]'>
+								<Text className='text-[13px] font-extrabold text-esmeralda'>
 									Limpiar
 								</Text>
 							</Pressable>
@@ -252,23 +252,23 @@ export default function SpeciesScreen() {
 
 					{/* Error de carga */}
 					{error ? (
-						<View className='mt-[15px] items-center rounded-[22px] border border-[#a6c1b3] bg-niebla p-[18px]'>
-							<View className='h-11 w-11 items-center justify-center rounded-[15px] border border-[#a6c1b3] bg-blanco'>
-								<Text className='text-[21px] font-black text-[#06371c]'>!</Text>
+						<View className='mt-[15px] items-center rounded-[22px] border border-card-border bg-niebla p-[18px]'>
+							<View className='h-11 w-11 items-center justify-center rounded-[15px] border border-card-border bg-blanco'>
+								<Text className='text-[21px] font-black text-tinta'>!</Text>
 							</View>
 
-							<Text className='mt-3 text-center text-[15px] font-black text-[#06371c]'>
+							<Text className='mt-3 text-center text-[15px] font-black text-tinta'>
 								No fue posible cargar las especies.
 							</Text>
 
-							<Text className='mt-1.5 text-center text-[12px] leading-[18px] text-[#06371c]'>
+							<Text className='mt-1.5 text-center text-[12px] leading-[18px] text-tinta'>
 								{error}
 							</Text>
 
-							<View className='mt-[15px] h-12 w-full overflow-hidden rounded-2xl border border-[#08783F] bg-[#08783F]'>
+							<View className='mt-[15px] h-12 w-full overflow-hidden rounded-2xl border border-esmeralda bg-esmeralda'>
 								<Pressable
 									onPress={() => void loadSpecies()}
-									className='h-full w-full items-center justify-center active:bg-[#063D22]'
+									className='h-full w-full items-center justify-center active:bg-bosque'
 								>
 									<View className='h-full w-full items-center justify-center'>
 										<Text className='text-center text-[14px] font-black text-blanco'>
@@ -281,10 +281,10 @@ export default function SpeciesScreen() {
 					) : filteredSpecies.length === 0 ? (
 						/* Sin resultados */
 						<View
-							className='mt-[15px] items-center rounded-[25px] border border-[#a6c1b3] bg-niebla px-5 py-[35px]'
+							className='mt-[15px] items-center rounded-[25px] border border-card-border bg-niebla px-5 py-[35px]'
 							style={cardShadow}
 						>
-							<View className='h-16 w-16 items-center justify-center rounded-[20px] border border-[#a6c1b3] bg-[#d5ead9]'>
+							<View className='h-16 w-16 items-center justify-center rounded-[20px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
 									icon={UserGroupIcon}
 									size={30}
@@ -293,11 +293,11 @@ export default function SpeciesScreen() {
 								/>
 							</View>
 
-							<Text className='mt-4 text-center text-[18px] font-black text-[#06371c]'>
+							<Text className='mt-4 text-center text-[18px] font-black text-tinta'>
 								No encontramos especies
 							</Text>
 
-							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-[#06371c]'>
+							<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-tinta'>
 								Intenta con otro nombre o cambia el filtro.
 							</Text>
 						</View>
@@ -322,9 +322,9 @@ export default function SpeciesScreen() {
 										.join('\n')}
 									icon={!item.image ? UserGroupIcon : undefined}
 									backgroundColor={colors.niebla}
-									borderColor='#a6c1b3'
+									borderColor={colors.cardBorder}
 									iconColor={PROP_COLORS.primary}
-									iconBackgroundColor='#d5ead9'
+									iconBackgroundColor={colors.hoja}
 									arrowColor={colors.blanco}
 									arrowBackgroundColor={PROP_COLORS.primary}
 									textColor={PROP_COLORS.text}

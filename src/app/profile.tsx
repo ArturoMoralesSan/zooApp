@@ -168,34 +168,39 @@ function ProfileField({
 }: FieldProps) {
 	const content = (
 		<View
-			className={`min-h-14 flex-row items-center rounded-[14px] border border-[#08783F] px-4 ${error ? 'bg-niebla' : 'bg-blanco'}`}
+			className={`min-h-14 flex-row items-center rounded-[14px] border border-input-border px-4 ${error ? 'bg-niebla' : 'bg-blanco'}`}
 		>
-			<HugeiconsIcon icon={icon} size={20} strokeWidth={1.8} color='#08783F' />
+			<HugeiconsIcon
+				icon={icon}
+				size={20}
+				strokeWidth={1.8}
+				color={colors.esmeralda}
+			/>
 
 			<TextInput
 				value={value}
 				onChangeText={onChangeText}
 				placeholder={placeholder}
-				placeholderTextColor='#06371c'
+				placeholderTextColor={colors.tinta}
 				keyboardType={keyboardType}
 				autoCapitalize={autoCapitalize}
 				autoCorrect={autoCorrect}
 				editable={editable}
-				className='flex-1 px-3 py-3.5 text-[16px] text-[#06371c]'
+				className='flex-1 px-3 py-3.5 text-[16px] text-tinta'
 			/>
 		</View>
 	)
 
 	return (
 		<View className='mt-5'>
-			<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-[#06371c]'>
+			<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-tinta'>
 				{label}
 			</Text>
 
 			{onPress ? <Pressable onPress={onPress}>{content}</Pressable> : content}
 
 			{error && (
-				<Text className='mt-1 text-[12px] text-[#08783F]'>{error}</Text>
+				<Text className='mt-1 text-[12px] text-esmeralda'>{error}</Text>
 			)}
 		</View>
 	)
@@ -528,8 +533,8 @@ export default function ProfileScreen() {
 				imageClassName='opacity-20'
 				className='flex-1 items-center justify-center bg-blanco'
 			>
-				<ActivityIndicator size='large' color='#08783F' />
-				<Text className='mt-4 text-[14px] font-medium text-[#06371c]'>
+				<ActivityIndicator size='large' color={colors.esmeralda} />
+				<Text className='mt-4 text-[14px] font-medium text-tinta'>
 					Cargando perfil...
 				</Text>
 			</ImageBackground>
@@ -660,25 +665,23 @@ export default function ProfileScreen() {
 											resizeMode='cover'
 										/>
 									) : (
-										<Text className='text-[48px] font-bold text-[#08783F]'>
+										<Text className='text-[48px] font-bold text-esmeralda'>
 											{user?.name?.charAt(0).toUpperCase() || '?'}
 										</Text>
 									)}
 
 									{uploadingAvatar && (
-										<View className='absolute inset-0 items-center justify-center bg-[rgba(8,120,63,0.55)]'>
+										<View className='absolute inset-0 items-center justify-center bg-esmeralda/55'>
 											<ActivityIndicator size='large' color={colors.blanco} />
 										</View>
 									)}
 								</Animated.View>
 
 								<View
-									className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-[#b8f35d]'
+									className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'
 									style={cardShadow}
 								>
-									<Text className='text-[20px] font-bold text-[#06371c]'>
-										+
-									</Text>
+									<Text className='text-[20px] font-bold text-tinta'>+</Text>
 								</View>
 							</Pressable>
 
@@ -695,7 +698,7 @@ export default function ProfileScreen() {
 							</Animated.Text>
 
 							<Animated.Text
-								className='mt-1 px-8 text-center text-[14px] text-[#F7F7EE]'
+								className='mt-1 px-8 text-center text-[14px] text-blanco'
 								style={{ opacity: emailOpacity }}
 								numberOfLines={1}
 							>
@@ -716,17 +719,17 @@ export default function ProfileScreen() {
 							className='bg-blanco'
 						>
 							<View className='px-5 pb-7 pt-6'>
-								<Text className='text-[21px] font-bold text-[#06371c]'>
+								<Text className='text-[21px] font-bold text-tinta'>
 									Tu progreso
 								</Text>
 
-								<Text className='mt-1 text-[14px] text-[#06371c]'>
+								<Text className='mt-1 text-[14px] text-tinta'>
 									Sigue acumulando puntos en ZooApp.
 								</Text>
 
 								<View className='mt-5 flex-row'>
-									<View className='flex-1 rounded-[18px] border border-[#063D22] bg-[#08783F] p-4'>
-										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-[#E1F3E7]'>
+									<View className='flex-1 rounded-[18px] border border-bosque bg-esmeralda p-4'>
+										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-hoja'>
 											Puntos
 										</Text>
 										<Text className='mt-1 text-[29px] font-extrabold text-blanco'>
@@ -735,14 +738,14 @@ export default function ProfileScreen() {
 									</View>
 
 									<View
-										className='ml-3 flex-1 rounded-[18px] border border-[#a6c1b3] bg-niebla p-4'
+										className='ml-3 flex-1 rounded-[18px] border border-card-border bg-niebla p-4'
 										style={cardShadow}
 									>
-										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-[#06371c]'>
+										<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-tinta'>
 											Nivel
 										</Text>
 										<Text
-											className='mt-1 text-[18px] font-bold text-[#06371c]'
+											className='mt-1 text-[18px] font-bold text-tinta'
 											numberOfLines={1}
 										>
 											{currentLevel}
@@ -752,35 +755,35 @@ export default function ProfileScreen() {
 
 								{user?.gamification?.next_level && (
 									<View
-										className='mt-5 rounded-[18px] border border-[#a6c1b3] bg-niebla p-4'
+										className='mt-5 rounded-[18px] border border-card-border bg-niebla p-4'
 										style={cardShadow}
 									>
 										<View className='flex-row items-center justify-between'>
-											<Text className='flex-1 text-[14px] font-semibold text-[#06371c]'>
+											<Text className='flex-1 text-[14px] font-semibold text-tinta'>
 												Progreso al siguiente nivel
 											</Text>
 
-											<View className='self-start rounded-full bg-[#b8f35d] px-2.5 py-1'>
-												<Text className='text-[12px] font-extrabold text-[#06371c]'>
+											<View className='self-start rounded-full bg-lima px-2.5 py-1'>
+												<Text className='text-[12px] font-extrabold text-tinta'>
 													{progress}%
 												</Text>
 											</View>
 										</View>
 
-										<View className='mt-3 h-2.5 overflow-hidden rounded-full bg-[#a6c1b3]'>
+										<View className='mt-3 h-2.5 overflow-hidden rounded-full bg-card-border'>
 											<View
-												className='h-full rounded-full bg-[#08783F]'
+												className='h-full rounded-full bg-esmeralda'
 												style={{ width: `${progress}%` }}
 											/>
 										</View>
 
-										<Text className='mt-3 text-[14px] leading-5 text-[#06371c]'>
+										<Text className='mt-3 text-[14px] leading-5 text-tinta'>
 											Te faltan{' '}
-											<Text className='font-bold text-[#06371c]'>
+											<Text className='font-bold text-tinta'>
 												{pointsToNextLevel}
 											</Text>{' '}
 											puntos para{' '}
-											<Text className='font-semibold text-[#06371c]'>
+											<Text className='font-semibold text-tinta'>
 												{nextLevel}
 											</Text>
 											.
@@ -800,14 +803,14 @@ export default function ProfileScreen() {
 					>
 						<View className='px-5 pb-12 pt-1'>
 							<View
-								className='rounded-[22px] border border-[#a6c1b3] bg-niebla px-[18px] pb-6 pt-5'
+								className='rounded-[22px] border border-card-border bg-niebla px-[18px] pb-6 pt-5'
 								style={cardShadow}
 							>
-								<Text className='text-[21px] font-bold text-[#06371c]'>
+								<Text className='text-[21px] font-bold text-tinta'>
 									Datos personales
 								</Text>
 
-								<Text className='mt-1 text-[14px] text-[#06371c]'>
+								<Text className='mt-1 text-[14px] text-tinta'>
 									Mantén actualizada tu información.
 								</Text>
 
@@ -853,22 +856,22 @@ export default function ProfileScreen() {
 								/>
 
 								<View className='mt-5'>
-									<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-[#06371c]'>
+									<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-tinta'>
 										Fecha de nacimiento
 									</Text>
 
 									<Pressable
 										onPress={() => setShowDatePicker(true)}
-										className={`min-h-14 flex-row items-center rounded-[14px] border border-[#08783F] px-4 ${errors.birth_date ? 'bg-niebla' : 'bg-blanco'}`}
+										className={`min-h-14 flex-row items-center rounded-[14px] border border-input-border px-4 ${errors.birth_date ? 'bg-niebla' : 'bg-blanco'}`}
 									>
 										<HugeiconsIcon
 											icon={Calendar03Icon}
 											size={20}
 											strokeWidth={1.8}
-											color='#08783F'
+											color={colors.esmeralda}
 										/>
 
-										<Text className='ml-3 flex-1 text-[16px] text-[#06371c]'>
+										<Text className='ml-3 flex-1 text-[16px] text-tinta'>
 											{birthDate || 'Seleccionar fecha'}
 										</Text>
 									</Pressable>
@@ -884,7 +887,7 @@ export default function ProfileScreen() {
 									)}
 
 									{errors.birth_date && (
-										<Text className='mt-1 text-[12px] text-[#08783F]'>
+										<Text className='mt-1 text-[12px] text-esmeralda'>
 											{errors.birth_date}
 										</Text>
 									)}

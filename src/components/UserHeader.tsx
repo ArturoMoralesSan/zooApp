@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
 
 import { useAuth } from '@/contexts/AuthContext'
+import colors from '@/theme/colors'
 
 type UserHeaderProps = {
 	title?: string
@@ -25,14 +26,14 @@ export default function UserHeader({
 			<View className='flex-row items-start justify-between'>
 				<View className='mr-2 flex-1'>
 					<Text
-						className='text-[25px] font-black leading-8 tracking-[-0.8px] text-[#063D22]'
+						className='text-[25px] font-black leading-8 tracking-[-0.8px] text-bosque'
 						numberOfLines={1}
 					>
 						{title}
 					</Text>
 
 					{subtitle ? (
-						<Text className='mt-px text-[12px] font-semibold leading-[17px] text-[#668475]'>
+						<Text className='mt-px text-[12px] font-semibold leading-[17px] text-tinta-2'>
 							{subtitle}
 						</Text>
 					) : null}
@@ -41,16 +42,16 @@ export default function UserHeader({
 				{showRewards ? (
 					<View className='flex-row items-center gap-2'>
 						{/* NIVEL */}
-						<View className='flex-row items-center rounded-full border border-[#a6c1b3] bg-niebla px-2.5 py-2'>
+						<View className='flex-row items-center rounded-full border border-card-border bg-niebla px-2.5 py-2'>
 							<HugeiconsIcon
 								icon={Crown02Icon}
 								size={15}
 								strokeWidth={1.8}
-								color='#08783F'
+								color={colors.esmeralda}
 							/>
 
 							<Text
-								className='ml-1 text-[11px] font-extrabold text-[#063D22]'
+								className='ml-1 text-[11px] font-extrabold text-bosque'
 								numberOfLines={1}
 							>
 								{userLevel}
@@ -58,16 +59,16 @@ export default function UserHeader({
 						</View>
 
 						{/* PUNTOS */}
-						<View className='flex-row items-center rounded-full border border-[#a6c1b3] bg-niebla px-2.5 py-2'>
+						<View className='flex-row items-center rounded-full border border-card-border bg-niebla px-2.5 py-2'>
 							<HugeiconsIcon
 								icon={Coins01Icon}
 								size={15}
 								strokeWidth={1.8}
-								color='#08783F'
+								color={colors.esmeralda}
 							/>
 
 							<Text
-								className='ml-1 text-[11px] font-extrabold text-[#063D22]'
+								className='ml-1 text-[11px] font-extrabold text-bosque'
 								numberOfLines={1}
 							>
 								{userPoints.toLocaleString('es-MX')}
