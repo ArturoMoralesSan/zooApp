@@ -1,31 +1,19 @@
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 
-import {
-	Camera,
-	GeoJSONSource,
-	ImageSource,
-	Layer,
-	Map as MapView,
-	Marker,
-	RasterSource,
-} from '@maplibre/maplibre-react-native'
+import { Camera, Map as MapView, Marker } from '@maplibre/maplibre-react-native'
 
 import { Image } from 'expo-image'
 
 import { useEffect, useRef, useState } from 'react'
 
-import {
-	ActivityIndicator,
-	Pressable,
-	Text,
-	View,
-	type ViewStyle,
-} from 'react-native'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
 import type { Coordinate, SelectableItem, Zone } from '@/types/map'
+import { mapShadow } from '@/components/map/mapShadow'
+import { MapLayers } from '@/components/map/MapLayers'
 import { useMapData } from '@/hooks/useMapData'
 import { useMapFeatures } from '@/hooks/useMapFeatures'
 import { useRoute } from '@/hooks/useRoute'
@@ -39,15 +27,6 @@ import {
 	USER_ZOOM,
 	ZOO_CENTER,
 } from '@/utils/map'
-
-const mapShadow: ViewStyle = {
-	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
-	shadowColor: '#000000',
-	shadowOffset: { width: 0, height: 5 },
-	shadowOpacity: 0.18,
-	shadowRadius: 8,
-	elevation: 1,
-}
 
 const NO_ZONES: Zone[] = []
 
@@ -212,144 +191,12 @@ export default function MapScreen() {
 					zoom={userLocation ? USER_ZOOM : DEFAULT_ZOOM}
 				/>
 
-				<RasterSource
-					id='osm-raster'
-					tiles={['https://tile.openstreetmap.org/{z}/{x}/{y}.png']}
-					tileSize={256}
-					minzoom={0}
-					maxzoom={19}
-				>
-					<Layer
-						id='osm-raster-layer'
-						type='raster'
-						paint={{
-							'raster-opacity': 1,
-						}}
-					/>
-				</RasterSource>
-
-				{mapImages.map((image) => (
-					<ImageSource
-						key={`zone-image-source-${image.id}`}
-						id={`zone-image-source-${image.id}`}
-						url={image.url}
-						coordinates={image.coordinates}
-					>
-						<Layer
-							id={`zone-image-layer-${image.id}`}
-							type='raster'
-							paint={{
-								'raster-opacity': 1,
-							}}
-						/>
-					</ImageSource>
-				))}
-
-				<GeoJSONSource id='zoo-zones-source' data={zonesGeoJson as any}>
-					<Layer
-						id='zoo-zones-fill'
-						type='fill'
-						source='zoo-zones-source'
-						paint={{
-							'fill-color': colors.esmeralda,
-							'fill-opacity': 0.12,
-						}}
-					/>
-
-					<Layer
-						id='zoo-zones-outline'
-						type='line'
-						source='zoo-zones-source'
-						paint={{
-							'line-color': colors.esmeralda,
-							'line-width': 2,
-							'line-opacity': 0.7,
-						}}
-					/>
-				</GeoJSONSource>
-
-				<GeoJSONSource id='zoo-paths-source' data={pathsGeoJson as any}>
-					<Layer
-						id='zoo-paths-outline'
-						type='line'
-						source='zoo-paths-source'
-						paint={{
-							'line-color': colors.tinta,
-							'line-width': 9,
-							'line-opacity': 0.5,
-						}}
-						layout={{
-							'line-cap': 'round',
-							'line-join': 'round',
-						}}
-					/>
-
-					<Layer
-						id='zoo-paths-line'
-						type='line'
-						source='zoo-paths-source'
-						paint={{
-							'line-color': colors.blanco,
-							'line-width': 6,
-							'line-opacity': 1,
-						}}
-						layout={{
-							'line-cap': 'round',
-							'line-join': 'round',
-						}}
-					/>
-				</GeoJSONSource>
-
-				<GeoJSONSource id='zoo-route-source' data={routeGeoJson as any}>
-					<Layer
-						id='zoo-route-outline'
-						type='line'
-						source='zoo-route-source'
-						filter={['==', ['get', 'type'], 'real-path']}
-						paint={{
-							'line-color': colors.blanco,
-							'line-width': 12,
-							'line-opacity': 0.95,
-						}}
-						layout={{
-							'line-cap': 'round',
-							'line-join': 'round',
-						}}
-					/>
-
-					<Layer
-						id='zoo-route-line'
-						type='line'
-						source='zoo-route-source'
-						filter={['==', ['get', 'type'], 'real-path']}
-						paint={{
-							'line-color': colors.bosque,
-							'line-width': 7,
-							'line-opacity': 1,
-						}}
-						layout={{
-							'line-cap': 'round',
-							'line-join': 'round',
-						}}
-					/>
-
-					<Layer
-						id='zoo-route-connector'
-						type='line'
-						source='zoo-route-source'
-						filter={['==', ['get', 'type'], 'connector']}
-						paint={{
-							'line-color': colors.bosque,
-							'line-width': 5,
-							'line-opacity': 0.9,
-							'line-dasharray': [1.5, 2.5],
-						}}
-						layout={{
-							'line-cap': 'round',
-							'line-join': 'round',
-						}}
-					/>
-				</GeoJSONSource>
+				<MapLayers
+					mapImages={mapImages}
+					zonesGeoJson={zonesGeoJson}
+					pathsGeoJson={pathsGeoJson}
+					routeGeoJson={routeGeoJson}
+				/>
 
 				{selectableItems
 					.filter((item) => item.type === 'marker')
