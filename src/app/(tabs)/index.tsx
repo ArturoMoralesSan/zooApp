@@ -7,7 +7,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
 	ActivityIndicator,
@@ -26,14 +26,13 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { useAuth } from '@/contexts/AuthContext'
-import { getToken } from '@/services/auth'
+import { useExplore } from '@/hooks/useExplore'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-import type { ExploreEvent } from '@/types/explore'
 import { formatEventDate, formatEventTime } from '@/utils/format'
-import { getExplore } from '@/services/explore'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -59,52 +58,21 @@ function getEventImageUrl(image: string | null): string | null {
 export default function Explorar() {
 	const insets = useSafeAreaInsets()
 
-	const { loading: authLoading, refreshUser } = useAuth()
+	const { refreshUser } = useAuth()
 
-	const [events, setEvents] = useState<ExploreEvent[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data, error, isLoading: loading, refresh } = useExplore()
+	const events = data?.featured_events ?? []
+
 	const [refreshing, setRefreshing] = useState(false)
-	const [error, setError] = useState<string | null>(null)
 	const [activeEventIndex, setActiveEventIndex] = useState(0)
 
-	const loadExplore = useCallback(async () => {
-		try {
-			setError(null)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const { featured_events } = await getExplore()
-
-			setEvents(featured_events)
-			setActiveEventIndex(0)
-		} catch (err) {
-			setError(
-				err instanceof Error
-					? err.message
-					: 'No fue posible cargar los eventos.',
-			)
-		} finally {
-			setLoading(false)
-			setRefreshing(false)
-		}
-	}, [])
-
-	useEffect(() => {
-		if (!authLoading) {
-			void loadExplore()
-		}
-	}, [authLoading, loadExplore])
+	useSessionRedirect()
 
 	const handleRefresh = async () => {
 		setRefreshing(true)
 
 		try {
-			await Promise.all([loadExplore(), refreshUser()])
+			await Promise.all([refresh(), refreshUser()])
 		} finally {
 			setRefreshing(false)
 		}
@@ -167,14 +135,13 @@ export default function Explorar() {
 							</Text>
 
 							<Text className='mt-2 text-[13px] leading-[18px] text-tinta-2'>
-								{error}
+								{error.message || 'No fue posible cargar los eventos.'}
 							</Text>
 
 							<Pressable
 								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
 								onPress={() => {
-									setLoading(true)
-									void loadExplore()
+									void refresh()
 								}}
 							>
 								<Text className='font-extrabold text-blanco'>Reintentar</Text>
