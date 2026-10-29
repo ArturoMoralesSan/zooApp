@@ -5,19 +5,12 @@ import UserHeader from '@/components/UserHeader'
 import { HeartIcon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import {
-	ImageBackground,
-	Pressable,
-	ScrollView,
-	Text,
-	TextInput,
-	View,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
+import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
 const COLUMN_GAP = 10
@@ -128,165 +121,158 @@ export default function DonationsIndexScreen() {
 	)
 
 	return (
-		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				resizeMode='repeat'
-				imageClassName='opacity-[0.025]'
-				className='flex-1 bg-blanco'
+		<ScreenBackground>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps='handled'
+				contentContainerClassName='px-5 pb-[180px] pt-3'
 			>
-				<ScrollView
-					showsVerticalScrollIndicator={false}
-					keyboardShouldPersistTaps='handled'
-					contentContainerClassName='px-5 pb-[180px] pt-3'
-				>
-					{/* ENCABEZADO */}
-					<BackButton position='relative' onPress={() => router.back()} />
+				{/* ENCABEZADO */}
+				<BackButton position='relative' onPress={() => router.back()} />
 
-					<View className='mt-3'>
-						<UserHeader
-							title='Apoya al zoológico'
-							subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
-							showRewards={false}
-						/>
-					</View>
+				<View className='mt-3'>
+					<UserHeader
+						title='Apoya al zoológico'
+						subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+						showRewards={false}
+					/>
+				</View>
 
-					{/* TARJETA INFORMATIVA */}
-					<View className='mt-5'>
-						<AppCard
-							title='Haz la diferencia'
-							description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
-							icon={HeartIcon}
-							backgroundColor={colors.bosque}
-							borderColor={colors.bosque}
-							iconColor={colors.bosque}
-							iconBackgroundColor={colors.lima}
-							arrowBackgroundColor={colors.lima}
-							arrowColor={colors.bosque}
-							textColor={colors.blanco}
-							descriptionColor={colors.hoja}
-							showArrow={false}
-						/>
-					</View>
+				{/* TARJETA INFORMATIVA */}
+				<View className='mt-5'>
+					<AppCard
+						title='Haz la diferencia'
+						description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
+						icon={HeartIcon}
+						backgroundColor={colors.bosque}
+						borderColor={colors.bosque}
+						iconColor={colors.bosque}
+						iconBackgroundColor={colors.lima}
+						arrowBackgroundColor={colors.lima}
+						arrowColor={colors.bosque}
+						textColor={colors.blanco}
+						descriptionColor={colors.hoja}
+						showArrow={false}
+					/>
+				</View>
 
-					{/* SELECCIÓN DE MONTO */}
-					<View className='mt-7'>
-						<Text className='text-[20px] font-extrabold text-bosque'>
-							Selecciona un monto
-						</Text>
+				{/* SELECCIÓN DE MONTO */}
+				<View className='mt-7'>
+					<Text className='text-[20px] font-extrabold text-bosque'>
+						Selecciona un monto
+					</Text>
 
-						<Text className='mb-4 mt-[5px] text-[13px] text-tinta-2'>
-							Elige cuánto deseas aportar al cuidado de nuestros animales.
-						</Text>
+					<Text className='mb-4 mt-[5px] text-[13px] text-tinta-2'>
+						Elige cuánto deseas aportar al cuidado de nuestros animales.
+					</Text>
 
-						<View
-							onLayout={(event) => {
-								const width = event.nativeEvent.layout.width
-								setGridWidth((previous) =>
-									Math.abs(previous - width) > 1 ? width : previous,
-								)
-							}}
-							className='w-full items-center gap-2.5 self-stretch'
-						>
-							<View className='w-full flex-row items-center justify-center gap-2.5'>
-								{DONATION_AMOUNTS.slice(0, 3).map(renderAmountColumn)}
-							</View>
+					<View
+						onLayout={(event) => {
+							const width = event.nativeEvent.layout.width
+							setGridWidth((previous) =>
+								Math.abs(previous - width) > 1 ? width : previous,
+							)
+						}}
+						className='w-full items-center gap-2.5 self-stretch'
+					>
+						<View className='w-full flex-row items-center justify-center gap-2.5'>
+							{DONATION_AMOUNTS.slice(0, 3).map(renderAmountColumn)}
+						</View>
 
-							<View className='w-full flex-row items-center justify-center gap-2.5'>
-								{DONATION_AMOUNTS.slice(3).map(renderAmountColumn)}
+						<View className='w-full flex-row items-center justify-center gap-2.5'>
+							{DONATION_AMOUNTS.slice(3).map(renderAmountColumn)}
 
-								<View className='shrink-0' style={{ width: buttonWidth }}>
-									{renderAmountButton(
-										'Otra cantidad',
-										isCustomSelected,
-										selectCustomAmount,
-										true,
-									)}
-								</View>
+							<View className='shrink-0' style={{ width: buttonWidth }}>
+								{renderAmountButton(
+									'Otra cantidad',
+									isCustomSelected,
+									selectCustomAmount,
+									true,
+								)}
 							</View>
 						</View>
 					</View>
+				</View>
 
-					{/* DONACIÓN PERSONALIZADA */}
-					{isCustomSelected && (
-						<View className='mt-[18px]'>
-							<Text className='mb-2 text-[15px] font-extrabold text-tinta'>
-								Ingresa tu donación
+				{/* DONACIÓN PERSONALIZADA */}
+				{isCustomSelected && (
+					<View className='mt-[18px]'>
+						<Text className='mb-2 text-[15px] font-extrabold text-tinta'>
+							Ingresa tu donación
+						</Text>
+
+						<Text className='mb-3 text-[12px] text-tinta-2'>
+							La aportación mínima es de $10.00 MXN.
+						</Text>
+
+						<View className='h-[52px] flex-row items-center rounded-xl border-1.5 border-input-border bg-blanco px-3.5'>
+							<Text className='mr-2 text-[18px] font-extrabold text-esmeralda'>
+								$
 							</Text>
 
-							<Text className='mb-3 text-[12px] text-tinta-2'>
-								La aportación mínima es de $10.00 MXN.
-							</Text>
-
-							<View className='h-[52px] flex-row items-center rounded-xl border-1.5 border-input-border bg-blanco px-3.5'>
-								<Text className='mr-2 text-[18px] font-extrabold text-esmeralda'>
-									$
-								</Text>
-
-								<TextInput
-									value={customAmount}
-									onChangeText={handleCustomAmount}
-									placeholder='Ej. 150'
-									placeholderTextColor={colors.apagado}
-									keyboardType='decimal-pad'
-									returnKeyType='done'
-									className='h-full flex-1 py-0 text-[16px] font-bold text-tinta'
-								/>
-							</View>
-
-							{customAmount.trim() !== '' && !hasAmount && (
-								<Text className='mt-2 text-[12px] text-error'>
-									Ingresa una cantidad válida de al menos $10.00.
-								</Text>
-							)}
+							<TextInput
+								value={customAmount}
+								onChangeText={handleCustomAmount}
+								placeholder='Ej. 150'
+								placeholderTextColor={colors.apagado}
+								keyboardType='decimal-pad'
+								returnKeyType='done'
+								className='h-full flex-1 py-0 text-[16px] font-bold text-tinta'
+							/>
 						</View>
-					)}
 
-					{/* MÉTODO DE PAGO */}
-					<View className='mb-5 mt-[26px]'>
-						<Text className='mb-3.5 px-1 text-[20px] font-extrabold text-bosque'>
-							Método de pago
-						</Text>
+						{customAmount.trim() !== '' && !hasAmount && (
+							<Text className='mt-2 text-[12px] text-error'>
+								Ingresa una cantidad válida de al menos $10.00.
+							</Text>
+						)}
+					</View>
+				)}
 
-						<View
-							className='overflow-hidden rounded-[18px] border border-card-border bg-niebla'
-							style={cardShadow}
-						>
-							<View className='min-h-[80px] flex-row items-center bg-niebla px-3.5 py-3'>
-								<View className='h-12 w-12 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-									<Text className='text-[23px]'>💳</Text>
-								</View>
+				{/* MÉTODO DE PAGO */}
+				<View className='mb-5 mt-[26px]'>
+					<Text className='mb-3.5 px-1 text-[20px] font-extrabold text-bosque'>
+						Método de pago
+					</Text>
 
-								<View className='ml-3 flex-1'>
-									<Text className='text-[16px] font-extrabold text-tinta'>
-										Tarjeta
-									</Text>
-
-									<Text className='mt-1 text-[12px] leading-4 text-tinta-2'>
-										Pago seguro con tarjeta
-									</Text>
-								</View>
-
-								<View className='h-[22px] w-[22px] rounded-[11px] border-[6px] border-esmeralda bg-blanco' />
+					<View
+						className='overflow-hidden rounded-[18px] border border-card-border bg-niebla'
+						style={cardShadow}
+					>
+						<View className='min-h-[80px] flex-row items-center bg-niebla px-3.5 py-3'>
+							<View className='h-12 w-12 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
+								<Text className='text-[23px]'>💳</Text>
 							</View>
+
+							<View className='ml-3 flex-1'>
+								<Text className='text-[16px] font-extrabold text-tinta'>
+									Tarjeta
+								</Text>
+
+								<Text className='mt-1 text-[12px] leading-4 text-tinta-2'>
+									Pago seguro con tarjeta
+								</Text>
+							</View>
+
+							<View className='h-[22px] w-[22px] rounded-[11px] border-[6px] border-esmeralda bg-blanco' />
 						</View>
 					</View>
-				</ScrollView>
+				</View>
+			</ScrollView>
 
-				{/* FOOTER FIJO */}
-				<FixedFooter
-					label='Donación'
-					description={
-						hasAmount
-							? 'Monto seleccionado'
-							: 'Selecciona un monto para continuar'
-					}
-					amount={formatCurrency(amount)}
-					buttonTitle='Continuar'
-					onButtonPress={continueDonation}
-					disabled={!hasAmount}
-				/>
-			</ImageBackground>
-		</SafeAreaView>
+			{/* FOOTER FIJO */}
+			<FixedFooter
+				label='Donación'
+				description={
+					hasAmount
+						? 'Monto seleccionado'
+						: 'Selecciona un monto para continuar'
+				}
+				amount={formatCurrency(amount)}
+				buttonTitle='Continuar'
+				onButtonPress={continueDonation}
+				disabled={!hasAmount}
+			/>
+		</ScreenBackground>
 	)
 }
