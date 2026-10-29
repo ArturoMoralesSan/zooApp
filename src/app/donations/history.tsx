@@ -1,9 +1,10 @@
-import { getToken } from '@/services/auth'
+import { useDonations } from '@/hooks/useDonations'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import { CreditCardIcon, HeartAddIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -21,7 +22,6 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 import type { Donation } from '@/types/donations'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
-import { getDonations } from '@/services/donations'
 
 const ICON_COLOR = colors.tinta
 
@@ -93,43 +93,27 @@ function isCompleted(donation: Donation): boolean {
 	)
 }
 
+const NO_DONATIONS: Donation[] = []
+
 export default function DonationHistoryScreen() {
 	const router = useRouter()
 
-	const [donations, setDonations] = useState<Donation[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data, error, isLoading: loading } = useDonations()
+	// A failed load shows the empty list, as before.
+	const donations = error ? NO_DONATIONS : (data ?? NO_DONATIONS)
 
-	const loadDonations = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			setDonations(await getDonations())
-		} catch (error) {
-			console.error('Error cargando donaciones:', error)
-
-			Alert.alert(
-				'Mis donaciones',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar tus donaciones.',
-			)
-
-			setDonations([])
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadDonations()
-	}, [loadDonations])
+		if (!error) return
+
+		console.error('Error cargando donaciones:', error)
+
+		Alert.alert(
+			'Mis donaciones',
+			error.message || 'No fue posible cargar tus donaciones.',
+		)
+	}, [error])
 
 	const sortedDonations = useMemo(() => {
 		return [...donations].sort((a, b) => {
