@@ -12,7 +12,6 @@ import {
 } from '@maplibre/maplibre-react-native'
 
 import { Image } from 'expo-image'
-import * as Location from 'expo-location'
 
 import { useEffect, useRef, useState } from 'react'
 
@@ -30,6 +29,7 @@ import type { Coordinate, SelectableItem, Zone } from '@/types/map'
 import { useMapData } from '@/hooks/useMapData'
 import { useMapFeatures } from '@/hooks/useMapFeatures'
 import { useRoute } from '@/hooks/useRoute'
+import { useUserLocation } from '@/hooks/useUserLocation'
 import {
 	DEFAULT_ZOOM,
 	formatDistance,
@@ -55,10 +55,6 @@ export default function MapScreen() {
 	const mapRef = useRef<any>(null)
 	const cameraRef = useRef<any>(null)
 
-	const locationSubscription = useRef<Location.LocationSubscription | null>(
-		null,
-	)
-
 	const { data, error: mapError, isLoading: loading } = useMapData()
 
 	const zones = data ?? NO_ZONES
@@ -70,9 +66,7 @@ export default function MapScreen() {
 			? mapError.message || 'No fue posible cargar el mapa.'
 			: null
 
-	const [userLocation, setUserLocation] = useState<Coordinate | null>(null)
-
-	const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null)
+	const { userLocation, locationAccuracy } = useUserLocation()
 
 	const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null)
 
@@ -81,75 +75,6 @@ export default function MapScreen() {
 	const [mapReady, setMapReady] = useState(false)
 
 	const [routeCardCollapsed, setRouteCardCollapsed] = useState(false)
-
-	useEffect(() => {
-		let mounted = true
-
-		const startLocationTracking = async () => {
-			try {
-				const permission = await Location.requestForegroundPermissionsAsync()
-
-				if (permission.status !== Location.PermissionStatus.GRANTED) {
-					return
-				}
-
-				const current = await Location.getCurrentPositionAsync({
-					accuracy: Location.Accuracy.High,
-				})
-
-				if (!mounted) {
-					return
-				}
-
-				const longitude = current.coords.longitude
-
-				const latitude = current.coords.latitude
-
-				if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
-					return
-				}
-
-				setUserLocation([longitude, latitude])
-
-				setLocationAccuracy(current.coords.accuracy ?? null)
-
-				locationSubscription.current = await Location.watchPositionAsync(
-					{
-						accuracy: Location.Accuracy.High,
-						timeInterval: 3000,
-						distanceInterval: 3,
-					},
-					(location) => {
-						if (!mounted) {
-							return
-						}
-
-						const longitude = location.coords.longitude
-
-						const latitude = location.coords.latitude
-
-						if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
-							return
-						}
-
-						setUserLocation([longitude, latitude])
-
-						setLocationAccuracy(location.coords.accuracy ?? null)
-					},
-				)
-			} catch {
-				return
-			}
-		}
-
-		startLocationTracking()
-
-		return () => {
-			mounted = false
-			locationSubscription.current?.remove()
-			locationSubscription.current = null
-		}
-	}, [])
 
 	const { zonesGeoJson, mapImages, pathsGeoJson, selectableItems } =
 		useMapFeatures(zones)
