@@ -2271,7 +2271,7 @@ export default function MapScreen() {
 
 					{!route && userLocation && isUserInsideZoo && (
 						<Text className='mt-2.5 text-[11px] leading-[17px] text-tinta-2'>
-							Presiona "Cómo llegar" para calcular la ruta por los caminos del
+							Presiona “Cómo llegar” para calcular la ruta por los caminos del
 							zoológico.
 						</Text>
 					)}
