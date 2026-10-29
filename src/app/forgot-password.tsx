@@ -1,7 +1,6 @@
 import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -12,20 +11,17 @@ import {
 	Pressable,
 	ScrollView,
 	Text,
-	TextInput,
 	View,
 } from 'react-native'
 import colors from '@/theme/colors'
+import { TextField } from '@/components/ui/TextField'
 
 const palette = {
-	primary: colors.esmeralda,
-	muted: colors.tinta2,
 	error: colors.error,
 }
 
 export default function ForgotPassword() {
 	const [email, setEmail] = useState('')
-	const [emailFocused, setEmailFocused] = useState(false)
 	const [error, setError] = useState('')
 
 	const handleRecover = () => {
@@ -99,48 +95,26 @@ export default function ForgotPassword() {
 						</View>
 
 						{/* CORREO */}
-						<Text className='mb-2 mt-7 text-xs font-semibold text-tinta'>
-							Correo electrónico
-						</Text>
-
-						<View
-							className={`flex-row items-center rounded-xl bg-blanco ${emailFocused ? 'border-2' : 'border'} ${error ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
-						>
-							<View className='pl-3.5'>
-								<HugeiconsIcon
-									icon={Mail01Icon}
-									size={20}
-									strokeWidth={1.8}
-									color={
-										error
-											? palette.error
-											: emailFocused
-												? palette.primary
-												: palette.muted
-									}
-								/>
-							</View>
-
-							<TextInput
-								value={email}
-								onChangeText={(value) => {
-									setEmail(value)
-									setError('')
-								}}
-								onFocus={() => setEmailFocused(true)}
-								onBlur={() => setEmailFocused(false)}
-								placeholder='correo@ejemplo.com'
-								placeholderTextColor={colors.apagado}
-								autoCapitalize='none'
-								autoCorrect={false}
-								keyboardType='email-address'
-								textContentType='emailAddress'
-								autoComplete='email'
-								returnKeyType='done'
-								onSubmitEditing={handleRecover}
-								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
-							/>
-						</View>
+						<TextField
+							label='Correo electrónico'
+							icon={Mail01Icon}
+							labelClassName='mb-2 mt-7 text-xs font-semibold text-tinta'
+							invalid={Boolean(error)}
+							iconErrorColor={palette.error}
+							value={email}
+							onChangeText={(value) => {
+								setEmail(value)
+								setError('')
+							}}
+							placeholder='correo@ejemplo.com'
+							autoCapitalize='none'
+							autoCorrect={false}
+							keyboardType='email-address'
+							textContentType='emailAddress'
+							autoComplete='email'
+							returnKeyType='done'
+							onSubmitEditing={handleRecover}
+						/>
 
 						{/* ERROR */}
 						{error !== '' && (
