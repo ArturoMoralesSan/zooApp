@@ -18,7 +18,7 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -229,7 +229,7 @@ export default function ProfileScreen() {
 		type: 'success',
 	})
 
-	const scrollY = useRef(new Animated.Value(0)).current
+	const [scrollY] = useState(() => new Animated.Value(0))
 
 	const showToast = useCallback(
 		(message: string, type: ToastState['type'] = 'success') => {
