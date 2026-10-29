@@ -39,4 +39,31 @@ module.exports = defineConfig([
 			],
 		},
 	},
+	{
+		// Data fetching goes through the domain hooks, so SWR can be swapped by
+		// touching only src/hooks and the provider.
+		files: ['src/**/*.{ts,tsx}'],
+		ignores: ['src/hooks/**', 'src/services/swr-config.tsx'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: 'swr',
+							message:
+								'Use the domain hooks in src/hooks (useSpecies, useMyTickets, ...) instead of importing swr.',
+						},
+					],
+					patterns: [
+						{
+							group: ['swr/*'],
+							message:
+								'Use the domain hooks in src/hooks (useSpecies, useMyTickets, ...) instead of importing swr.',
+						},
+					],
+				},
+			],
+		},
+	},
 ])
