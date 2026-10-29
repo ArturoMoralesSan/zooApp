@@ -1,5 +1,7 @@
 import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
+import { RegisterHeader } from '@/components/auth/RegisterHeader'
+import { RegisterLoginLink } from '@/components/auth/RegisterLoginLink'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
 import colors from '@/theme/colors'
@@ -20,7 +22,6 @@ import {
 	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
@@ -153,15 +154,7 @@ export default function Register() {
 					{/* TARJETA */}
 					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						{/* ENCABEZADO */}
-						<View className='items-center'>
-							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
-								Crea tu cuenta
-							</Text>
-
-							<Text className='mt-2 text-center text-sm text-tinta-2'>
-								Únete a ZooApp y comienza a descubrir el zoológico.
-							</Text>
-						</View>
+						<RegisterHeader />
 
 						{/* NOMBRE */}
 						<TextField
@@ -256,21 +249,7 @@ export default function Register() {
 						)}
 
 						{/* INICIAR SESIÓN */}
-						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-sm text-tinta-2'>
-								¿Ya tienes una cuenta?{' '}
-							</Text>
-
-							<Pressable
-								onPress={() => router.replace('/login')}
-								className='rounded-lg py-1'
-								accessibilityRole='button'
-							>
-								<Text className='text-sm font-bold text-esmeralda'>
-									Inicia sesión
-								</Text>
-							</Pressable>
-						</View>
+						<RegisterLoginLink onLogin={() => router.replace('/login')} />
 					</View>
 				</ScrollView>
 			</ImageBackground>
