@@ -20,6 +20,7 @@ import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 import type { CreateDonationResponse } from '@/types/donations'
+import { formatCurrency } from '@/utils/format'
 
 const COLORS = {
 	primary: colors.esmeralda,
@@ -44,13 +45,6 @@ export default function DonationsSummaryScreen() {
 
 		return value
 	}, [params.amount])
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	const confirmDonation = async () => {
 		if (loading) return

@@ -18,6 +18,7 @@ import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
 import type { Order } from '@/types/tickets'
+import { formatCurrency } from '@/utils/format'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.bosque,
@@ -44,13 +45,6 @@ export default function TicketSuccessScreen() {
 
 	const tickets = order?.tickets ?? []
 	const total = Number(order?.total ?? 0)
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	return (
 		<SafeAreaView className='flex-1 bg-blanco' edges={['top', 'left', 'right']}>

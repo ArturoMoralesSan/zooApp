@@ -21,6 +21,7 @@ import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import type { TicketType } from '@/types/tickets'
+import { formatCurrency } from '@/utils/format'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -130,13 +131,6 @@ export default function TicketsScreen() {
 
 		return sum + price * quantity
 	}, 0)
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	const continuePurchase = () => {
 		if (selectedTickets.length === 0) {

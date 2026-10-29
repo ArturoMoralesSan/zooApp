@@ -30,6 +30,7 @@ import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
 import type { MyTicketsResponse, Purchase, Ticket } from '@/types/tickets'
+import { formatDate, formatTime } from '@/utils/format'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -174,41 +175,6 @@ export default function MyTicketsScreen() {
 	}, [purchases])
 
 	const visiblePurchases = tab === 'active' ? activePurchases : historyPurchases
-
-	const formatPurchaseDate = (date?: string | null) => {
-		if (!date) {
-			return 'Fecha no disponible'
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return 'Fecha no disponible'
-		}
-
-		return parsedDate.toLocaleDateString('es-MX', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric',
-		})
-	}
-
-	const formatPurchaseTime = (date?: string | null) => {
-		if (!date) {
-			return ''
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return ''
-		}
-
-		return parsedDate.toLocaleTimeString('es-MX', {
-			hour: '2-digit',
-			minute: '2-digit',
-		})
-	}
 
 	const getTicketSummary = (purchase: Purchase) => {
 		const quantities = new Map<string, number>()
@@ -436,11 +402,11 @@ export default function MyTicketsScreen() {
 													color={ICON_COLORS.muted}
 												/>
 												<Text className='mt-1 text-[13px] font-bold text-tinta'>
-													{formatPurchaseDate(purchase.createdAt)}
+													{formatDate(purchase.createdAt)}
 												</Text>
 											</View>
 
-											{formatPurchaseTime(purchase.createdAt) ? (
+											{formatTime(purchase.createdAt) ? (
 												<View className='mt-[3px] flex-row items-center gap-[5px]'>
 													<HugeiconsIcon
 														icon={Clock01Icon}
@@ -448,7 +414,7 @@ export default function MyTicketsScreen() {
 														color={ICON_COLORS.muted}
 													/>
 													<Text className='mt-[3px] text-[11px] text-tinta-2'>
-														{formatPurchaseTime(purchase.createdAt)}
+														{formatTime(purchase.createdAt)}
 													</Text>
 												</View>
 											) : null}
@@ -528,10 +494,9 @@ export default function MyTicketsScreen() {
 
 							{selectedPurchase && (
 								<Text className='mb-2.5 mt-3 text-[12px] text-tinta-2'>
-									Compra realizada el{' '}
-									{formatPurchaseDate(selectedPurchase.createdAt)}
-									{formatPurchaseTime(selectedPurchase.createdAt)
-										? ` · ${formatPurchaseTime(selectedPurchase.createdAt)}`
+									Compra realizada el {formatDate(selectedPurchase.createdAt)}
+									{formatTime(selectedPurchase.createdAt)
+										? ` · ${formatTime(selectedPurchase.createdAt)}`
 										: ''}
 								</Text>
 							)}

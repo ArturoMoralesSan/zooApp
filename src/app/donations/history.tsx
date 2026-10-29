@@ -21,6 +21,7 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 import type { Donation, DonationsResponse } from '@/types/donations'
+import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 
 const ICON_COLOR = colors.tinta
 
@@ -84,54 +85,6 @@ function getDonationStatusClassName(donation: Donation): string {
 	}
 
 	return 'bg-lima'
-}
-
-function formatAmount(amount?: number | string | null): string {
-	const value = Number(amount ?? 0)
-
-	if (!Number.isFinite(value)) {
-		return '$0.00'
-	}
-
-	return value.toLocaleString('es-MX', {
-		style: 'currency',
-		currency: 'MXN',
-	})
-}
-
-function formatDate(date?: string | null): string {
-	if (!date) {
-		return 'Fecha no disponible'
-	}
-
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return 'Fecha no disponible'
-	}
-
-	return parsedDate.toLocaleDateString('es-MX', {
-		day: '2-digit',
-		month: 'long',
-		year: 'numeric',
-	})
-}
-
-function formatTime(date?: string | null): string {
-	if (!date) {
-		return ''
-	}
-
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleTimeString('es-MX', {
-		hour: '2-digit',
-		minute: '2-digit',
-	})
 }
 
 function isCompleted(donation: Donation): boolean {
@@ -290,7 +243,7 @@ export default function DonationHistoryScreen() {
 								adjustsFontSizeToFit
 								minimumFontScale={0.7}
 							>
-								{formatAmount(totalDonated)}
+								{formatCurrency(totalDonated)}
 							</Text>
 							<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
 								Total donado
@@ -363,7 +316,7 @@ export default function DonationHistoryScreen() {
 
 										<View className='min-w-0 flex-1'>
 											<Text className='text-[19px] font-extrabold text-tinta'>
-												{formatAmount(donation.amount)}
+												{formatCurrency(donation.amount)}
 											</Text>
 
 											<Text className='mt-1 text-[12px] text-tinta'>

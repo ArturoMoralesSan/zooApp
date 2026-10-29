@@ -9,6 +9,7 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
+import { formatCurrency } from '@/utils/format'
 
 type PaymentMethodData = {
 	id?: number | string
@@ -26,16 +27,6 @@ type DonationData = {
 	createdAt?: string | null
 	reference?: string | null
 	folio?: string | null
-}
-
-function formatCurrency(value: number | string | null | undefined) {
-	const amount = Number(value ?? 0)
-
-	return new Intl.NumberFormat('es-MX', {
-		style: 'currency',
-		currency: 'MXN',
-		minimumFractionDigits: 2,
-	}).format(Number.isFinite(amount) ? amount : 0)
 }
 
 function getPaymentMethod(

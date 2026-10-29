@@ -25,6 +25,7 @@ import type {
 	TicketType,
 	TicketTypesResponse,
 } from '@/types/tickets'
+import { formatCurrency } from '@/utils/format'
 
 const ICON_COLOR = colors.esmeralda
 
@@ -134,13 +135,6 @@ export default function TicketSummaryScreen() {
 	const total = summary.reduce((sum, item) => sum + item.subtotal, 0)
 
 	const totalTickets = summary.reduce((sum, item) => sum + item.quantity, 0)
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	const confirmPurchase = async () => {
 		if (purchasing) return

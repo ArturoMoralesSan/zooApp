@@ -33,6 +33,7 @@ import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
 import type { ExploreEvent, ExploreResponse } from '@/types/explore'
+import { formatEventDate, formatEventTime } from '@/utils/format'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -42,32 +43,6 @@ const CAROUSEL_GAP = 10
 // Si no se define un color diferente, utiliza el verde predeterminado.
 const donationCardBackground = colors.bosque
 const donationAccentBackground = colors.lima
-
-function formatEventDate(date: string): string {
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleDateString('es-MX', {
-		day: 'numeric',
-		month: 'long',
-	})
-}
-
-function formatEventTime(date: string): string {
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleTimeString('es-MX', {
-		hour: 'numeric',
-		minute: '2-digit',
-	})
-}
 
 function getEventImageUrl(image: string | null): string | null {
 	if (!image) {
