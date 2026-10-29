@@ -2,6 +2,7 @@ import BackButton from '@/components/BackButton'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
 import { SpeciesTags } from '@/components/species/SpeciesTags'
+import { SpeciesGallery } from '@/components/species/SpeciesGallery'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
@@ -11,12 +12,10 @@ import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
-	Dimensions,
 	Image,
 	ImageBackground,
 	Modal,
 	Pressable,
-	ScrollView,
 	Text,
 	View,
 	type ViewStyle,
@@ -32,16 +31,6 @@ const cardShadow: ViewStyle = {
 	shadowRadius: 10,
 	elevation: 4,
 }
-
-const subtleShadow: ViewStyle = {
-	shadowColor: colors.esmeralda,
-	shadowOffset: { width: 0, height: 3 },
-	shadowOpacity: 0.08,
-	shadowRadius: 7,
-	elevation: 2,
-}
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
@@ -233,46 +222,11 @@ export default function SpeciesDetailScreen() {
 
 								{/* GALERÍA */}
 								{galleryImages.length > 0 && (
-									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-tinta'>
-											Galería
-										</Text>
-
-										<ScrollView
-											horizontal
-											showsHorizontalScrollIndicator={false}
-											className='-mx-4 mt-3.5'
-											contentContainerClassName='px-5'
-										>
-											{galleryImages.map((image) => (
-												<View
-													key={image.id}
-													className='mr-2.5 overflow-hidden rounded-[22px] border border-card-border bg-niebla'
-													style={[
-														subtleShadow,
-														{
-															width: SCREEN_WIDTH * 0.68,
-															height: SCREEN_WIDTH * 0.48,
-														},
-													]}
-												>
-													<Pressable
-														onPress={() => setSelectedImage(image)}
-														className='h-full w-full active:opacity-[0.88]'
-													>
-														<Image
-															source={{ uri: image.url }}
-															className='h-full w-full'
-															resizeMode='cover'
-															accessibilityLabel={
-																image.alt_text || species.common_name
-															}
-														/>
-													</Pressable>
-												</View>
-											))}
-										</ScrollView>
-									</View>
+									<SpeciesGallery
+										galleryImages={galleryImages}
+										species={species}
+										onOpenImage={setSelectedImage}
+									/>
 								)}
 
 								<View className='h-2' />
