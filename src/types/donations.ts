@@ -9,6 +9,7 @@ export type Donation = {
 	amount?: number | string | null
 	status?: string | null
 	reference?: string | null
+	folio?: string | null
 	created_at?: string | null
 	payment_method?: PaymentMethod | null
 }

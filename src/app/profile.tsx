@@ -4,8 +4,11 @@ import Toast from '@/components/toast'
 import { API_URL, ApiValidationError } from '@/services/api'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useProfile } from '@/hooks/useProfile'
-import { useSessionRedirect } from '@/hooks/useSessionRedirect'
-import { getToken, type User } from '@/services/auth'
+import {
+	redirectIfSignedOut,
+	useSessionRedirect,
+} from '@/hooks/useSessionRedirect'
+import { type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 import {
@@ -284,12 +287,7 @@ function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			setSaving(true)
 			setErrors({})
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
+			if (await redirectIfSignedOut()) return
 
 			const response = await updateProfile({
 				name: name.trim(),
@@ -353,12 +351,7 @@ function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 		try {
 			setUploadingAvatar(true)
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
+			if (await redirectIfSignedOut()) return
 
 			const file = new FileSystem.File(asset.uri)
 
