@@ -20,6 +20,7 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
+import type { Species, SpeciesListResponse } from '@/types/species'
 
 const PROP_COLORS = {
 	primary: colors.esmeralda,
@@ -32,28 +33,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.12,
 	shadowRadius: 10,
 	elevation: 4,
-}
-
-type SpeciesCategory = {
-	id: number
-	name: string
-}
-
-type Species = {
-	id: number
-	common_name: string
-	scientific_name: string
-	slug: string
-	description: string | null
-	category: SpeciesCategory | null
-	image: string | null
-}
-
-type SpeciesResponse = {
-	success: boolean
-	data: {
-		species: Species[]
-	}
 }
 
 const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
@@ -79,7 +58,7 @@ export default function SpeciesScreen() {
 				return
 			}
 
-			const response = await api<SpeciesResponse>('/species', {
+			const response = await api<SpeciesListResponse>('/species', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -111,7 +90,7 @@ export default function SpeciesScreen() {
 			const matchesSearch =
 				!normalizedSearch ||
 				item.common_name.toLowerCase().includes(normalizedSearch) ||
-				item.scientific_name.toLowerCase().includes(normalizedSearch)
+				(item.scientific_name ?? '').toLowerCase().includes(normalizedSearch)
 
 			const matchesFilter =
 				filter === 'Todas' ||

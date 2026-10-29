@@ -20,6 +20,11 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
+import type {
+	CreateOrderResponse,
+	TicketType,
+	TicketTypesResponse,
+} from '@/types/tickets'
 
 const ICON_COLOR = colors.esmeralda
 
@@ -29,13 +34,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.05,
 	shadowRadius: 8,
 	elevation: 2,
-}
-
-type TicketType = {
-	id: number
-	name: string
-	price: number | string
-	description?: string | null
 }
 
 type SelectedTicket = {
@@ -81,7 +79,7 @@ export default function TicketSummaryScreen() {
 				return
 			}
 
-			const response = await api<any>('/tickets/types', {
+			const response = await api<TicketTypesResponse>('/tickets/types', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -165,7 +163,7 @@ export default function TicketSummaryScreen() {
 				return
 			}
 
-			const response = await api<any>('/tickets/orders', {
+			const response = await api<CreateOrderResponse>('/tickets/orders', {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${token}`,

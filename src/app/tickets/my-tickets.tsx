@@ -29,6 +29,7 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
+import type { MyTicketsResponse, Purchase, Ticket } from '@/types/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -42,38 +43,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.055,
 	shadowRadius: 8,
 	elevation: 2,
-}
-
-type Ticket = {
-	id: number
-	qr_token?: string | null
-	status?: string | null
-	used_at?: string | null
-	ticket_type?: {
-		id: number
-		name: string
-		price?: number | string
-	}
-	order?: {
-		id?: number
-		user_id?: number
-		folio?: string | null
-		status?: string | null
-		subtotal?: number | string | null
-		discount?: number | string | null
-		total?: number | string | null
-		paid_at?: string | null
-		created_at?: string | null
-	}
-}
-
-type Purchase = {
-	orderId: number
-	folio: string
-	status: string
-	total: number
-	createdAt: string | null
-	tickets: Ticket[]
 }
 
 const getTicketStatus = (ticket?: Ticket) => {
@@ -123,14 +92,14 @@ export default function MyTicketsScreen() {
 				return
 			}
 
-			const response = await api<any>('/tickets', {
+			const response = await api<MyTicketsResponse>('/tickets', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
 
-			const data = response.data ?? response
+			const data = Array.isArray(response) ? response : response.data
 
 			if (!Array.isArray(data)) {
 				setTickets([])

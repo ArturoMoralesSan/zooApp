@@ -33,6 +33,11 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
+import type {
+	AvatarResponse,
+	ProfileResponse,
+	UpdateProfileResponse,
+} from '@/types/user'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -43,24 +48,6 @@ type FormErrors = {
 	birth_date?: string
 	city?: string
 	country?: string
-}
-
-type ProfileResponse = {
-	success: boolean
-	user: User
-}
-
-type UpdateProfileResponse = {
-	success: boolean
-	message: string
-	user: User
-}
-
-type AvatarResponse = {
-	success: boolean
-	message: string
-	avatar: string
-	user: User
 }
 
 type ToastState = {

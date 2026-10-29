@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
+import type { Donation, DonationsResponse } from '@/types/donations'
 
 const ICON_COLOR = colors.tinta
 
@@ -29,20 +30,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.05,
 	shadowRadius: 5,
 	elevation: 2,
-}
-
-type PaymentMethod = {
-	id?: number
-	name?: string | null
-}
-
-type Donation = {
-	id: number
-	amount?: number | string | null
-	status?: string | null
-	reference?: string | null
-	created_at?: string | null
-	payment_method?: PaymentMethod | null
 }
 
 function getDonationStatus(donation: Donation): string {
@@ -170,14 +157,16 @@ export default function DonationHistoryScreen() {
 				return
 			}
 
-			const response = await api<any>('/donations', {
+			const response = await api<DonationsResponse>('/donations', {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
 
-			let result: unknown = response?.data ?? response
+			let result: unknown = Array.isArray(response)
+				? response
+				: (response?.data ?? response)
 
 			if (result && typeof result === 'object' && !Array.isArray(result)) {
 				const payload = result as {

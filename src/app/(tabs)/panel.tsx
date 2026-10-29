@@ -32,11 +32,7 @@ import { getToken, logout, type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-
-type ProfileResponse = {
-	success: boolean
-	user: User
-}
+import type { ProfileResponse } from '@/types/user'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null

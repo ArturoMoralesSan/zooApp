@@ -32,6 +32,7 @@ import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
+import type { ExploreEvent, ExploreResponse } from '@/types/explore'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -41,31 +42,6 @@ const CAROUSEL_GAP = 10
 // Si no se define un color diferente, utiliza el verde predeterminado.
 const donationCardBackground = colors.bosque
 const donationAccentBackground = colors.lima
-
-type ExploreZone = {
-	id: number
-	name: string
-}
-
-type ExploreEvent = {
-	id: number
-	name: string
-	slug: string
-	description: string | null
-	type: string | null
-	start_at: string
-	end_at: string | null
-	image: string | null
-	capacity: number | null
-	zone: ExploreZone | null
-}
-
-type ExploreResponse = {
-	success: boolean
-	data: {
-		featured_events: ExploreEvent[]
-	}
-}
 
 function formatEventDate(date: string): string {
 	const parsedDate = new Date(date)

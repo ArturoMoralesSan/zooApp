@@ -19,32 +19,11 @@ import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
+import type { CreateDonationResponse } from '@/types/donations'
 
 const COLORS = {
 	primary: colors.esmeralda,
 } as const
-
-type Donation = {
-	id?: number | string
-	amount?: number | string
-	reference?: string | null
-	status?: string
-	created_at?: string
-	payment_method?: {
-		id?: number
-		name?: string
-		code?: string
-	} | null
-}
-
-type DonationResponse = {
-	success?: boolean
-	message?: string
-	data?: {
-		donation?: Donation
-	}
-	donation?: Donation
-}
 
 export default function DonationsSummaryScreen() {
 	const router = useRouter()
@@ -92,7 +71,7 @@ export default function DonationsSummaryScreen() {
 				return
 			}
 
-			const response = await api<DonationResponse>('/donations', {
+			const response = await api<CreateDonationResponse>('/donations', {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${token}`,

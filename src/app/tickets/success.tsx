@@ -17,6 +17,7 @@ import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
+import type { Order } from '@/types/tickets'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.bosque,
@@ -24,21 +25,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.04,
 	shadowRadius: 4,
 	elevation: 1,
-}
-
-type Ticket = {
-	id: number
-	ticket_type_id: number
-	qr_token: string
-	status: string
-}
-
-type Order = {
-	id: number
-	total: number | string
-	subtotal?: number | string
-	discount?: number | string
-	tickets?: Ticket[]
 }
 
 export default function TicketSuccessScreen() {
@@ -159,7 +145,7 @@ export default function TicketSuccessScreen() {
 
 									<View className='items-center justify-center rounded-2xl border border-card-border bg-blanco p-3.5'>
 										<QRCode
-											value={ticket.qr_token}
+											value={ticket.qr_token ?? ''}
 											size={190}
 											backgroundColor={colors.blanco}
 										/>

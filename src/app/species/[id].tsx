@@ -27,6 +27,11 @@ import {
 } from 'react-native'
 
 import colors from '@/theme/colors'
+import type {
+	SpeciesDetail,
+	SpeciesDetailResponse,
+	SpeciesImage,
+} from '@/types/species'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.esmeralda,
@@ -46,54 +51,13 @@ const subtleShadow: ViewStyle = {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
-type SpeciesImage = {
-	id: number
-	type: 'main' | 'thumbnail' | 'gallery' | string
-	url: string
-	alt_text: string | null
-	sort_order: number
-}
-
-type SpeciesCategory = {
-	id: number
-	name: string
-}
-
-type SpeciesTag = {
-	id: number
-	name: string
-	slug: string
-}
-
-type Species = {
-	id: number
-	common_name: string
-	scientific_name: string | null
-	slug: string
-	description: string | null
-	habitat: string | null
-	origin: string | null
-	diet: string | null
-	conservation_status: string | null
-	category: SpeciesCategory | null
-	tags: SpeciesTag[]
-	images: SpeciesImage[]
-}
-
-type SpeciesResponse = {
-	success: boolean
-	data: {
-		species: Species
-	}
-}
-
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
 	const params = useLocalSearchParams<{ id: string }>()
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
-	const [species, setSpecies] = useState<Species | null>(null)
+	const [species, setSpecies] = useState<SpeciesDetail | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
@@ -110,12 +74,15 @@ export default function SpeciesDetailScreen() {
 				return
 			}
 
-			const response = await api<SpeciesResponse>(`/species/${params.id}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
+			const response = await api<SpeciesDetailResponse>(
+				`/species/${params.id}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
 				},
-			})
+			)
 
 			if (!response.success || !response.data?.species) {
 				throw new Error('No fue posible obtener la información de la especie.')

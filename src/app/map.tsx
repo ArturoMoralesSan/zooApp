@@ -29,6 +29,16 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
+import type {
+	Coordinate,
+	GeoJSONGeometry,
+	MapResponse,
+	MapSpecies,
+	PathCoordinates,
+	PathEdge,
+	PathNode,
+	Zone,
+} from '@/types/map'
 
 const mapShadow: ViewStyle = {
 	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
@@ -37,125 +47,6 @@ const mapShadow: ViewStyle = {
 	shadowOpacity: 0.18,
 	shadowRadius: 8,
 	elevation: 1,
-}
-
-type Coordinate = [number, number]
-
-type MapMarker = {
-	id: number
-	zone_id: number
-	name: string
-	description?: string | null
-	type?: string | null
-	latitude: number
-	longitude: number
-	icon?: string | null
-	color?: string | null
-}
-
-type SpeciesImage = {
-	id: number
-	species_id: number
-	type: string
-	path: string
-	alt_text?: string | null
-	sort_order?: number | null
-}
-
-type Species = {
-	id: number
-	common_name: string
-	scientific_name?: string | null
-	description?: string | null
-	images?: SpeciesImage[]
-}
-
-type SpeciesLocation = {
-	id: number
-	species_id: number
-	zone_id: number
-	name?: string | null
-	latitude: number
-	longitude: number
-	description?: string | null
-	is_active?: boolean
-	species?: Species | null
-}
-
-type PathNode = {
-	id?: string | number
-	lat?: string | number
-	lng?: string | number
-	latitude?: string | number
-	longitude?: string | number
-	coordinates?: Coordinate
-}
-
-type PathEdge = {
-	id?: string | number
-	from?: string | number
-	to?: string | number
-	from_id?: string | number
-	to_id?: string | number
-	source?: string | number
-	target?: string | number
-	start?: string | number
-	end?: string | number
-	distance?: string | number
-	coordinates?: Coordinate[]
-	points?: Coordinate[]
-}
-
-type PathCoordinates =
-	| Coordinate[]
-	| {
-			nodes?: PathNode[]
-			edges?: PathEdge[]
-	  }
-	| null
-	| undefined
-
-type MapPath = {
-	id: number
-	zone_id: number
-	name: string
-	description?: string | null
-	coordinates: PathCoordinates
-	distance?: number | null
-	estimated_time?: number | null
-	is_active?: boolean
-	order?: number
-}
-
-type GeoJSONGeometry =
-	| {
-			type: 'Polygon'
-			coordinates: number[][][]
-	  }
-	| {
-			type: 'MultiPolygon'
-			coordinates: number[][][][]
-	  }
-	| null
-
-type Zone = {
-	id: number
-	name: string
-	description?: string | null
-	type?: string | null
-	geometry?: GeoJSONGeometry | Record<string, any> | string | null
-	map_image?: string | null
-	map_image_bounds?: any
-	markers?: MapMarker[]
-	species_locations?: SpeciesLocation[]
-	paths?: MapPath[]
-}
-
-type MapResponse = {
-	success: boolean
-	data: {
-		zones: Zone[]
-	}
 }
 
 type SelectableItem = {
@@ -168,7 +59,7 @@ type SelectableItem = {
 	icon?: string | null
 	iconImage?: string | null
 	thumbnail?: string | null
-	species?: Species | null
+	species?: MapSpecies | null
 }
 
 type GraphNode = {

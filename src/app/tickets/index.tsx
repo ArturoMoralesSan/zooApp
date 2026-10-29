@@ -20,6 +20,7 @@ import UserHeader from '@/components/UserHeader'
 import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
+import type { TicketType } from '@/types/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -32,13 +33,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.04,
 	shadowRadius: 4,
 	elevation: 1,
-}
-
-type TicketType = {
-	id: number
-	name: string
-	price: number | string
-	description?: string | null
 }
 
 type SelectedTicket = {
