@@ -1,4 +1,4 @@
-import { api, API_URL } from '@/services/api'
+import { API_URL } from '@/services/api'
 
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
@@ -31,13 +31,13 @@ import colors from '@/theme/colors'
 import type {
 	Coordinate,
 	GeoJSONGeometry,
-	MapResponse,
 	MapSpecies,
 	PathCoordinates,
 	PathEdge,
 	PathNode,
 	Zone,
 } from '@/types/map'
+import { getMap } from '@/services/map'
 
 const mapShadow: ViewStyle = {
 	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
@@ -1081,13 +1081,11 @@ export default function MapScreen() {
 				setLoading(true)
 				setError(null)
 
-				const response = await api<MapResponse>('/map')
+				const receivedZones = await getMap()
 
 				if (!mounted) {
 					return
 				}
-
-				const receivedZones = response?.data?.zones ?? []
 
 				setZones(receivedZones)
 			} catch (apiError) {

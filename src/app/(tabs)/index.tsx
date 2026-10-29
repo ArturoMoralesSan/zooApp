@@ -26,14 +26,14 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { useAuth } from '@/contexts/AuthContext'
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-import type { ExploreEvent, ExploreResponse } from '@/types/explore'
+import type { ExploreEvent } from '@/types/explore'
 import { formatEventDate, formatEventTime } from '@/utils/format'
+import { getExplore } from '@/services/explore'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -78,15 +78,9 @@ export default function Explorar() {
 				return
 			}
 
-			const response = await api<ExploreResponse>('/explore', {
-				method: 'GET',
-			})
+			const { featured_events } = await getExplore()
 
-			if (!response.success) {
-				throw new Error('No fue posible cargar la información de Explorar.')
-			}
-
-			setEvents(response.data.featured_events ?? [])
+			setEvents(featured_events)
 			setActiveEventIndex(0)
 		} catch (err) {
 			setError(

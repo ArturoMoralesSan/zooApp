@@ -17,11 +17,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import type { TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
+import { getTicketTypes } from '@/services/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -61,19 +61,7 @@ export default function TicketsScreen() {
 				return
 			}
 
-			const response = await api<unknown>('/tickets/types', {
-				method: 'GET',
-			})
-
-			const data = response as {
-				data?: TicketType[]
-			}
-
-			const types: TicketType[] = Array.isArray(response)
-				? response
-				: Array.isArray(data?.data)
-					? data.data
-					: []
+			const types = await getTicketTypes()
 
 			setTicketTypes(types)
 

@@ -17,15 +17,11 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
-import type {
-	CreateOrderResponse,
-	TicketType,
-	TicketTypesResponse,
-} from '@/types/tickets'
+import type { TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
+import { createOrder, getTicketTypes } from '@/services/tickets'
 
 const ICON_COLOR = colors.esmeralda
 
@@ -80,17 +76,7 @@ export default function TicketSummaryScreen() {
 				return
 			}
 
-			const response = await api<TicketTypesResponse>('/tickets/types', {
-				method: 'GET',
-			})
-
-			const types: TicketType[] = Array.isArray(response)
-				? response
-				: Array.isArray(response?.data)
-					? response.data
-					: []
-
-			setTicketTypes(types)
+			setTicketTypes(await getTicketTypes())
 		} catch (error) {
 			console.error('Error cargando tipos de boleto:', error)
 
@@ -154,17 +140,12 @@ export default function TicketSummaryScreen() {
 				return
 			}
 
-			const response = await api<CreateOrderResponse>('/tickets/orders', {
-				method: 'POST',
-				body: JSON.stringify({
-					items: summary.map((item) => ({
-						ticket_type_id: item.ticket_type_id,
-						quantity: item.quantity,
-					})),
-				}),
+			const order = await createOrder({
+				items: summary.map((item) => ({
+					ticket_type_id: item.ticket_type_id,
+					quantity: item.quantity,
+				})),
 			})
-
-			const order = response?.data ?? response
 
 			router.replace({
 				pathname: '/tickets/success',

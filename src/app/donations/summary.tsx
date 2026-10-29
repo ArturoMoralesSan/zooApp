@@ -14,13 +14,12 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
-import type { CreateDonationResponse } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
+import { createDonation } from '@/services/donations'
 
 const COLORS = {
 	primary: colors.esmeralda,
@@ -65,24 +64,9 @@ export default function DonationsSummaryScreen() {
 				return
 			}
 
-			const response = await api<CreateDonationResponse>('/donations', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-				body: JSON.stringify({
-					amount: Number(amount.toFixed(2)),
-				}),
+			const donation = await createDonation({
+				amount: Number(amount.toFixed(2)),
 			})
-
-			const donation = response?.data?.donation ?? response?.donation
-
-			if (!donation) {
-				throw new Error(
-					response?.message ?? 'No fue posible registrar la donación.',
-				)
-			}
 
 			router.replace({
 				pathname: '/donations/success',

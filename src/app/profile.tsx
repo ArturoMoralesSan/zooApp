@@ -1,7 +1,7 @@
 import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
-import { API_URL, ApiValidationError, api } from '@/services/api'
+import { API_URL, ApiValidationError } from '@/services/api'
 import { getToken, type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
@@ -33,11 +33,7 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
-import type {
-	AvatarResponse,
-	ProfileResponse,
-	UpdateProfileResponse,
-} from '@/types/user'
+import { getProfile, updateAvatar, updateProfile } from '@/services/profile'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -240,11 +236,7 @@ export default function ProfileScreen() {
 				return
 			}
 
-			const response = await api<ProfileResponse>('/profile', {
-				method: 'GET',
-			})
-
-			const currentUser = response.user
+			const currentUser = await getProfile()
 
 			setUser(currentUser)
 			setName(currentUser.name || '')
@@ -313,16 +305,13 @@ export default function ProfileScreen() {
 				return
 			}
 
-			const response = await api<UpdateProfileResponse>('/profile', {
-				method: 'PUT',
-				body: JSON.stringify({
-					name: name.trim(),
-					email: email.trim(),
-					phone: phone.trim() || null,
-					birth_date: formatDateForApi(birthDate),
-					city: city.trim() || null,
-					country: country.trim() || null,
-				}),
+			const response = await updateProfile({
+				name: name.trim(),
+				email: email.trim(),
+				phone: phone.trim() || null,
+				birth_date: formatDateForApi(birthDate),
+				city: city.trim() || null,
+				country: country.trim() || null,
 			})
 
 			setUser(response.user)
@@ -389,59 +378,7 @@ export default function ProfileScreen() {
 				throw new Error('No fue posible acceder a la imagen seleccionada.')
 			}
 
-			const formData = new FormData()
-			formData.append('avatar', file as unknown as Blob)
-
-			const response = await fetch(`${API_URL}/profile/avatar`, {
-				method: 'POST',
-				headers: {
-					Accept: 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-				body: formData,
-			})
-
-			const responseText = await response.text()
-
-			let data:
-				| AvatarResponse
-				| {
-						message?: string
-						errors?: Record<string, string[]>
-				  }
-
-			try {
-				data = JSON.parse(responseText)
-			} catch {
-				throw new Error(
-					`Respuesta inválida del servidor. Código HTTP: ${response.status}`,
-				)
-			}
-
-			if (!response.ok) {
-				const errorData = data as {
-					message?: string
-					errors?: Record<string, string[]>
-				}
-
-				if (response.status === 401) {
-					throw new Error(
-						'La sesión ya no es válida. Inicia sesión nuevamente.',
-					)
-				}
-
-				if (errorData.errors) {
-					const firstError = Object.values(errorData.errors)[0]?.[0]
-					if (firstError) throw new Error(firstError)
-				}
-
-				throw new Error(
-					errorData.message ||
-						`No fue posible actualizar la foto. Código HTTP: ${response.status}`,
-				)
-			}
-
-			const avatarResponse = data as AvatarResponse
+			const avatarResponse = await updateAvatar(file as unknown as Blob)
 			setUser(avatarResponse.user)
 
 			showToast(

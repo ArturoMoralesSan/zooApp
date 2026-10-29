@@ -7,6 +7,10 @@ export { getToken }
 
 export type { Level, User } from '@/types/user'
 
+export const userKeys = {
+	current: '/user',
+}
+
 type AuthResponse = {
 	success: boolean
 	message: string
@@ -60,7 +64,7 @@ export async function getCurrentUser(): Promise<User> {
 		throw new Error('No hay una sesión activa.')
 	}
 
-	const response = await api<UserResponse>('/user')
+	const response = await api<UserResponse>(userKeys.current)
 
 	return response.user
 }

@@ -27,12 +27,11 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
 import { getToken, logout, type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-import type { ProfileResponse } from '@/types/user'
+import { getProfile } from '@/services/profile'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -70,12 +69,10 @@ export default function Panel() {
 					return
 				}
 
-				const response = await api<ProfileResponse>('/profile', {
-					method: 'GET',
-				})
+				const profile = await getProfile()
 
 				if (mounted) {
-					setUser(response.user)
+					setUser(profile)
 				}
 			} catch (error) {
 				console.error('LOAD PANEL PROFILE ERROR:', error)

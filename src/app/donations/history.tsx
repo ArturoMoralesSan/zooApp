@@ -1,4 +1,3 @@
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import { CreditCardIcon, HeartAddIcon } from '@hugeicons/core-free-icons'
@@ -20,8 +19,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
-import type { Donation, DonationsResponse } from '@/types/donations'
+import type { Donation } from '@/types/donations'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
+import { getDonations } from '@/services/donations'
 
 const ICON_COLOR = colors.tinta
 
@@ -110,28 +110,7 @@ export default function DonationHistoryScreen() {
 				return
 			}
 
-			const response = await api<DonationsResponse>('/donations', {
-				method: 'GET',
-			})
-
-			let result: unknown = Array.isArray(response)
-				? response
-				: (response?.data ?? response)
-
-			if (result && typeof result === 'object' && !Array.isArray(result)) {
-				const payload = result as {
-					data?: unknown
-					donations?: unknown
-				}
-
-				if (Array.isArray(payload.data)) {
-					result = payload.data
-				} else if (Array.isArray(payload.donations)) {
-					result = payload.donations
-				}
-			}
-
-			setDonations(Array.isArray(result) ? (result as Donation[]) : [])
+			setDonations(await getDonations())
 		} catch (error) {
 			console.error('Error cargando donaciones:', error)
 

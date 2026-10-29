@@ -1,4 +1,3 @@
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 
 import {
@@ -29,8 +28,9 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
-import type { MyTicketsResponse, Purchase, Ticket } from '@/types/tickets'
+import type { Purchase, Ticket } from '@/types/tickets'
 import { formatDate, formatTime } from '@/utils/format'
+import { getMyTickets } from '@/services/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -93,18 +93,7 @@ export default function MyTicketsScreen() {
 				return
 			}
 
-			const response = await api<MyTicketsResponse>('/tickets', {
-				method: 'GET',
-			})
-
-			const data = Array.isArray(response) ? response : response.data
-
-			if (!Array.isArray(data)) {
-				setTickets([])
-				return
-			}
-
-			setTickets(data)
+			setTickets(await getMyTickets())
 		} catch (error) {
 			console.error('Error cargando entradas:', error)
 

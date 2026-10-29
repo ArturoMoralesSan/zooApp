@@ -1,6 +1,5 @@
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import {
 	Leaf01Icon,
@@ -27,11 +26,8 @@ import {
 } from 'react-native'
 
 import colors from '@/theme/colors'
-import type {
-	SpeciesDetail,
-	SpeciesDetailResponse,
-	SpeciesImage,
-} from '@/types/species'
+import type { SpeciesDetail, SpeciesImage } from '@/types/species'
+import { getSpeciesById } from '@/services/species'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.esmeralda,
@@ -74,18 +70,7 @@ export default function SpeciesDetailScreen() {
 				return
 			}
 
-			const response = await api<SpeciesDetailResponse>(
-				`/species/${params.id}`,
-				{
-					method: 'GET',
-				},
-			)
-
-			if (!response.success || !response.data?.species) {
-				throw new Error('No fue posible obtener la información de la especie.')
-			}
-
-			setSpecies(response.data.species)
+			setSpecies(await getSpeciesById(params.id))
 		} catch (err) {
 			console.error(err)
 			setError(

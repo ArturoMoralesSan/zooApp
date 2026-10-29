@@ -17,10 +17,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
-import type { Species, SpeciesListResponse } from '@/types/species'
+import type { Species } from '@/types/species'
+import { getSpecies } from '@/services/species'
 
 const PROP_COLORS = {
 	primary: colors.esmeralda,
@@ -58,11 +58,7 @@ export default function SpeciesScreen() {
 				return
 			}
 
-			const response = await api<SpeciesListResponse>('/species', {
-				method: 'GET',
-			})
-
-			setSpecies(response.data.species || [])
+			setSpecies(await getSpecies())
 		} catch (error) {
 			console.error('LOAD SPECIES ERROR:', error)
 
