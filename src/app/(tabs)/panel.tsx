@@ -13,7 +13,6 @@ import { useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
-	ImageBackground,
 	Modal,
 	Pressable,
 	ScrollView,
@@ -22,7 +21,7 @@ import {
 } from 'react-native'
 
 import QRCode from 'react-native-qrcode-svg'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
@@ -33,6 +32,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
+import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -105,244 +105,237 @@ export default function Panel() {
 	const avatarUrl = getAvatarUrl(user?.profile?.avatar)
 
 	return (
-		<SafeAreaView className='flex-1' edges={['top', 'left', 'right']}>
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 bg-blanco'
-				resizeMode='repeat'
-				imageClassName='opacity-[0.025]'
+		<ScreenBackground withSafeAreaBackground={false}>
+			<ScrollView
+				className='flex-1'
+				contentContainerClassName='px-3 pt-2'
+				contentContainerStyle={{
+					paddingBottom: 120 + getTabBarExtraSpace(insets.bottom),
+				}}
+				showsVerticalScrollIndicator={false}
 			>
-				<ScrollView
-					className='flex-1'
-					contentContainerClassName='px-3 pt-2'
-					contentContainerStyle={{
-						paddingBottom: 120 + getTabBarExtraSpace(insets.bottom),
-					}}
-					showsVerticalScrollIndicator={false}
+				{/* ENCABEZADO */}
+
+				<UserHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
+
+				{/* TARJETA DE PERFIL */}
+
+				<View className='mt-5'>
+					<AppCard
+						avatarUrl={avatarUrl}
+						title={user?.name ?? 'Mi cuenta'}
+						description={user?.email ?? 'Consulta tus datos personales'}
+						onPress={() => router.push('/profile')}
+						showArrow
+					/>
+				</View>
+
+				{/* MI CUENTA */}
+
+				<View className='mt-6'>
+					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
+						Mi cuenta
+					</Text>
+
+					<AppCard
+						icon={QrCodeIcon}
+						title='Mi código QR'
+						description='Consulta tu código personal'
+						onPress={handleShowQr}
+					/>
+				</View>
+
+				{/* MI ACTIVIDAD */}
+
+				<View className='mt-4'>
+					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
+						Mi actividad
+					</Text>
+
+					<AppCard
+						icon={Ticket01Icon}
+						title='Mis entradas'
+						description='Consulta tus entradas al zoológico'
+						onPress={() => router.push('/tickets/my-tickets')}
+					/>
+
+					<AppCard
+						icon={Ticket01Icon}
+						title='Mis donaciones'
+						description='Consulta tus donaciones'
+						onPress={() => router.push('/donations/history')}
+					/>
+				</View>
+
+				{/* AYUDA */}
+
+				<View className='mt-4'>
+					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
+						Ayuda
+					</Text>
+
+					<AppCard
+						icon={Settings01Icon}
+						title='Configuración'
+						description='Preferencias de la aplicación'
+						onPress={() =>
+							Alert.alert(
+								'Configuración',
+								'Esta sección estará disponible próximamente.',
+							)
+						}
+					/>
+
+					<AppCard
+						icon={HelpCircleIcon}
+						title='Ayuda'
+						description='Preguntas frecuentes y soporte'
+						onPress={() =>
+							Alert.alert(
+								'Ayuda',
+								'Esta sección estará disponible próximamente.',
+							)
+						}
+					/>
+				</View>
+
+				{/* CERRAR SESIÓN */}
+
+				<View
+					className='mt-4 overflow-hidden rounded-[18px] border border-card-border bg-niebla'
+					style={cardShadow}
 				>
-					{/* ENCABEZADO */}
+					<Pressable
+						onPress={handleLogout}
+						disabled={loggingOut}
+						className='min-h-20 flex-row items-center px-3 py-2.5 active:opacity-[0.84]'
+					>
+						<View className='h-11 w-11 items-center justify-center rounded-[16px] border border-card-border bg-hoja'>
+							<HugeiconsIcon
+								icon={Logout01Icon}
+								size={23}
+								strokeWidth={1.8}
+								color={colors.esmeralda}
+							/>
+						</View>
 
-					<UserHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
+						<View className='ml-2.5 flex-1'>
+							<Text className='text-sm font-extrabold text-tinta'>
+								{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
+							</Text>
 
-					{/* TARJETA DE PERFIL */}
+							<Text className='mt-1 text-xs text-tinta'>
+								Salir de tu cuenta
+							</Text>
+						</View>
 
-					<View className='mt-5'>
-						<AppCard
-							avatarUrl={avatarUrl}
-							title={user?.name ?? 'Mi cuenta'}
-							description={user?.email ?? 'Consulta tus datos personales'}
-							onPress={() => router.push('/profile')}
-							showArrow
-						/>
-					</View>
+						{loggingOut ? (
+							<ActivityIndicator size='small' color={colors.esmeralda} />
+						) : (
+							<View className='ml-2 h-7 w-7 items-center justify-center rounded-full bg-esmeralda'>
+								<HugeiconsIcon
+									icon={ArrowRight01Icon}
+									size={20}
+									strokeWidth={2}
+									color={colors.blanco}
+								/>
+							</View>
+						)}
+					</Pressable>
+				</View>
 
-					{/* MI CUENTA */}
+				{/* PIE DE PÁGINA */}
 
-					<View className='mt-6'>
-						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-							Mi cuenta
-						</Text>
+				<View className='mt-7 items-center'>
+					<Text className='text-[11px] font-extrabold leading-4 text-tinta'>
+						ZooApp
+					</Text>
 
-						<AppCard
-							icon={QrCodeIcon}
-							title='Mi código QR'
-							description='Consulta tu código personal'
-							onPress={handleShowQr}
-						/>
-					</View>
+					<Text className='mt-1 text-[11px] leading-4 text-tinta'>
+						Sahuatoba
+					</Text>
+				</View>
+			</ScrollView>
 
-					{/* MI ACTIVIDAD */}
+			{/* MODAL DEL CÓDIGO QR */}
 
-					<View className='mt-4'>
-						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-							Mi actividad
-						</Text>
+			<Modal
+				visible={showQr}
+				transparent
+				animationType='fade'
+				statusBarTranslucent
+				onRequestClose={() => setShowQr(false)}
+			>
+				{/* Overlay */}
 
-						<AppCard
-							icon={Ticket01Icon}
-							title='Mis entradas'
-							description='Consulta tus entradas al zoológico'
-							onPress={() => router.push('/tickets/my-tickets')}
-						/>
-
-						<AppCard
-							icon={Ticket01Icon}
-							title='Mis donaciones'
-							description='Consulta tus donaciones'
-							onPress={() => router.push('/donations/history')}
-						/>
-					</View>
-
-					{/* AYUDA */}
-
-					<View className='mt-4'>
-						<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-							Ayuda
-						</Text>
-
-						<AppCard
-							icon={Settings01Icon}
-							title='Configuración'
-							description='Preferencias de la aplicación'
-							onPress={() =>
-								Alert.alert(
-									'Configuración',
-									'Esta sección estará disponible próximamente.',
-								)
-							}
-						/>
-
-						<AppCard
-							icon={HelpCircleIcon}
-							title='Ayuda'
-							description='Preguntas frecuentes y soporte'
-							onPress={() =>
-								Alert.alert(
-									'Ayuda',
-									'Esta sección estará disponible próximamente.',
-								)
-							}
-						/>
-					</View>
-
-					{/* CERRAR SESIÓN */}
+				<View className='flex-1 items-center justify-center bg-bosque/55 px-6 py-5'>
+					{/* Modal */}
 
 					<View
-						className='mt-4 overflow-hidden rounded-[18px] border border-card-border bg-niebla'
+						className='w-full max-w-[380px] rounded-3xl border border-card-border bg-blanco p-5'
 						style={cardShadow}
 					>
-						<Pressable
-							onPress={handleLogout}
-							disabled={loggingOut}
-							className='min-h-20 flex-row items-center px-3 py-2.5 active:opacity-[0.84]'
-						>
-							<View className='h-11 w-11 items-center justify-center rounded-[16px] border border-card-border bg-hoja'>
+						{/* ENCABEZADO */}
+
+						<View className='items-center'>
+							<View className='h-11 w-11 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
 								<HugeiconsIcon
-									icon={Logout01Icon}
-									size={23}
+									icon={QrCodeIcon}
+									size={26}
 									strokeWidth={1.8}
 									color={colors.esmeralda}
 								/>
 							</View>
 
-							<View className='ml-2.5 flex-1'>
-								<Text className='text-sm font-extrabold text-tinta'>
-									{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
-								</Text>
+							<Text className='mt-2.5 text-center text-[22px] font-extrabold text-tinta'>
+								Mi código QR
+							</Text>
 
-								<Text className='mt-1 text-xs text-tinta'>
-									Salir de tu cuenta
-								</Text>
-							</View>
+							<Text className='mt-1 text-center text-[13px] leading-[19px] text-tinta'>
+								Presenta este código en taquilla para identificar tu cuenta.
+							</Text>
+						</View>
 
-							{loggingOut ? (
-								<ActivityIndicator size='small' color={colors.esmeralda} />
-							) : (
-								<View className='ml-2 h-7 w-7 items-center justify-center rounded-full bg-esmeralda'>
-									<HugeiconsIcon
-										icon={ArrowRight01Icon}
-										size={20}
-										strokeWidth={2}
-										color={colors.blanco}
-									/>
-								</View>
-							)}
-						</Pressable>
-					</View>
-
-					{/* PIE DE PÁGINA */}
-
-					<View className='mt-7 items-center'>
-						<Text className='text-[11px] font-extrabold leading-4 text-tinta'>
-							ZooApp
-						</Text>
-
-						<Text className='mt-1 text-[11px] leading-4 text-tinta'>
-							Sahuatoba
-						</Text>
-					</View>
-				</ScrollView>
-
-				{/* MODAL DEL CÓDIGO QR */}
-
-				<Modal
-					visible={showQr}
-					transparent
-					animationType='fade'
-					statusBarTranslucent
-					onRequestClose={() => setShowQr(false)}
-				>
-					{/* Overlay */}
-
-					<View className='flex-1 items-center justify-center bg-bosque/55 px-6 py-5'>
-						{/* Modal */}
+						{/* CÓDIGO QR */}
 
 						<View
-							className='w-full max-w-[380px] rounded-3xl border border-card-border bg-blanco p-5'
+							className='mt-[18px] self-center rounded-3xl border border-card-border bg-blanco p-3'
 							style={cardShadow}
 						>
-							{/* ENCABEZADO */}
-
-							<View className='items-center'>
-								<View className='h-11 w-11 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-									<HugeiconsIcon
-										icon={QrCodeIcon}
-										size={26}
-										strokeWidth={1.8}
-										color={colors.esmeralda}
-									/>
+							{user?.qr_token ? (
+								<QRCode
+									value={user.qr_token}
+									size={180}
+									backgroundColor={colors.blanco}
+									color={colors.bosque}
+								/>
+							) : (
+								<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
+									<ActivityIndicator size='large' color={colors.esmeralda} />
 								</View>
+							)}
+						</View>
 
-								<Text className='mt-2.5 text-center text-[22px] font-extrabold text-tinta'>
-									Mi código QR
-								</Text>
+						{/* INFORMACIÓN */}
 
-								<Text className='mt-1 text-center text-[13px] leading-[19px] text-tinta'>
-									Presenta este código en taquilla para identificar tu cuenta.
-								</Text>
-							</View>
+						<View className='mt-3.5 rounded-xl border border-card-border bg-niebla p-2.5'>
+							<Text className='text-xs font-extrabold text-tinta'>
+								Código personal
+							</Text>
 
-							{/* CÓDIGO QR */}
+							<Text className='mt-1 text-[11px] leading-[18px] text-tinta'>
+								Este código está asociado a tu cuenta de ZooApp.
+							</Text>
+						</View>
 
-							<View
-								className='mt-[18px] self-center rounded-3xl border border-card-border bg-blanco p-3'
-								style={cardShadow}
-							>
-								{user?.qr_token ? (
-									<QRCode
-										value={user.qr_token}
-										size={180}
-										backgroundColor={colors.blanco}
-										color={colors.bosque}
-									/>
-								) : (
-									<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
-										<ActivityIndicator size='large' color={colors.esmeralda} />
-									</View>
-								)}
-							</View>
+						{/* BOTÓN CERRAR */}
 
-							{/* INFORMACIÓN */}
-
-							<View className='mt-3.5 rounded-xl border border-card-border bg-niebla p-2.5'>
-								<Text className='text-xs font-extrabold text-tinta'>
-									Código personal
-								</Text>
-
-								<Text className='mt-1 text-[11px] leading-[18px] text-tinta'>
-									Este código está asociado a tu cuenta de ZooApp.
-								</Text>
-							</View>
-
-							{/* BOTÓN CERRAR */}
-
-							<View className='mt-3.5'>
-								<ActionButton title='Cerrar' onPress={() => setShowQr(false)} />
-							</View>
+						<View className='mt-3.5'>
+							<ActionButton title='Cerrar' onPress={() => setShowQr(false)} />
 						</View>
 					</View>
-				</Modal>
-			</ImageBackground>
-		</SafeAreaView>
+				</View>
+			</Modal>
+		</ScreenBackground>
 	)
 }
