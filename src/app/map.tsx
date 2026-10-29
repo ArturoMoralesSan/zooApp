@@ -1,7 +1,7 @@
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 
-import { Camera, Map as MapView, Marker } from '@maplibre/maplibre-react-native'
+import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
 
 import { Image } from 'expo-image'
 
@@ -13,7 +13,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
 import type { Coordinate, SelectableItem, Zone } from '@/types/map'
 import { mapShadow } from '@/components/map/mapShadow'
+import { DestinationMarker } from '@/components/map/DestinationMarker'
 import { MapLayers } from '@/components/map/MapLayers'
+import { PoiMarker } from '@/components/map/PoiMarker'
+import { SpeciesMarker } from '@/components/map/SpeciesMarker'
+import { UserLocationMarker } from '@/components/map/UserLocationMarker'
 import { useMapData } from '@/hooks/useMapData'
 import { useMapFeatures } from '@/hooks/useMapFeatures'
 import { useRoute } from '@/hooks/useRoute'
@@ -201,121 +205,26 @@ export default function MapScreen() {
 				{selectableItems
 					.filter((item) => item.type === 'marker')
 					.map((item) => (
-						<Marker
+						<PoiMarker
 							key={item.id}
-							lngLat={item.coordinate}
+							item={item}
 							onPress={() => selectItem(item)}
-						>
-							<View
-								className='h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-[19px] border-[3px] border-blanco'
-								style={[
-									mapShadow,
-									{ backgroundColor: item.color ?? colors.esmeralda },
-								]}
-							>
-								{item.iconImage ? (
-									<Image
-										source={{
-											uri: item.iconImage,
-										}}
-										style={{ width: 30, height: 30, borderRadius: 15 }}
-										contentFit='contain'
-										cachePolicy='memory-disk'
-									/>
-								) : (
-									<Text className='text-[18px]'>{item.icon ?? '📍'}</Text>
-								)}
-							</View>
-						</Marker>
+						/>
 					))}
 
 				{selectableItems
 					.filter((item) => item.type === 'species')
 					.map((item) => (
-						<Marker
+						<SpeciesMarker
 							key={item.id}
-							lngLat={item.coordinate}
+							item={item}
 							onPress={() => selectItem(item)}
-						>
-							<View
-								className='h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-[21px] border-[3px] border-blanco'
-								style={[
-									mapShadow,
-									{ backgroundColor: item.color ?? colors.bosque },
-								]}
-							>
-								{item.thumbnail ? (
-									<Image
-										source={{
-											uri: item.thumbnail,
-										}}
-										style={{ width: 36, height: 36, borderRadius: 18 }}
-										contentFit='cover'
-										cachePolicy='memory-disk'
-									/>
-								) : (
-									<Text className='text-[18px]'>{item.icon ?? '🦁'}</Text>
-								)}
-							</View>
-						</Marker>
+						/>
 					))}
 
-				{userLocation && (
-					<Marker lngLat={userLocation}>
-						{/* eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention */}
-						<View className='h-[46px] w-[46px] items-center justify-center rounded-[23px] border border-[rgba(8,121,141,0.4)] bg-[rgba(8,118,161,0.2)]'>
-							<View
-								// eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention
-								className='h-[17px] w-[17px] rounded-[9px] border-[3px] border-blanco bg-[#0977B8]'
-								style={mapShadow}
-							/>
-						</View>
-					</Marker>
-				)}
+				{userLocation && <UserLocationMarker userLocation={userLocation} />}
 
-				{selectedItem && (
-					<Marker lngLat={selectedItem.coordinate}>
-						<View
-							className={
-								selectedItem.type === 'species'
-									? 'h-12 w-12 items-center justify-center overflow-hidden rounded-3xl border-4 border-blanco bg-esmeralda'
-									: 'h-[46px] w-[46px] items-center justify-center overflow-hidden rounded-[23px] border-4 border-blanco'
-							}
-							style={[
-								mapShadow,
-								selectedItem.type === 'marker' && {
-									backgroundColor: selectedItem.color ?? colors.bosque,
-								},
-							]}
-						>
-							{selectedItem.type === 'species' && selectedItem.thumbnail ? (
-								<Image
-									source={{
-										uri: selectedItem.thumbnail,
-									}}
-									style={{ width: 40, height: 40, borderRadius: 20 }}
-									contentFit='cover'
-									cachePolicy='memory-disk'
-								/>
-							) : selectedItem.type === 'marker' && selectedItem.iconImage ? (
-								<Image
-									source={{
-										uri: selectedItem.iconImage,
-									}}
-									style={{ width: 36, height: 36, borderRadius: 18 }}
-									contentFit='contain'
-									cachePolicy='memory-disk'
-								/>
-							) : (
-								<Text className='text-[20px]'>
-									{selectedItem.type === 'species'
-										? (selectedItem.icon ?? '🦁')
-										: (selectedItem.icon ?? '📍')}
-								</Text>
-							)}
-						</View>
-					</Marker>
-				)}
+				{selectedItem && <DestinationMarker selectedItem={selectedItem} />}
 			</MapView>
 
 			<View
