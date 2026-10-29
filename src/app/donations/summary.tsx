@@ -15,7 +15,7 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
-import { getToken } from '@/services/auth'
+import { redirectIfSignedOut } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
@@ -60,12 +60,7 @@ export default function DonationsSummaryScreen() {
 		setLoading(true)
 
 		try {
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
+			if (await redirectIfSignedOut()) return
 
 			const donation = await createDonation({
 				amount: Number(amount.toFixed(2)),

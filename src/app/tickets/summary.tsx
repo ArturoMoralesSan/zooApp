@@ -18,9 +18,11 @@ import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
 import { useDataRefresh } from '@/hooks/useDataRefresh'
-import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import {
+	redirectIfSignedOut,
+	useSessionRedirect,
+} from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
-import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
 import type { TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
@@ -125,12 +127,7 @@ export default function TicketSummaryScreen() {
 		try {
 			setPurchasing(true)
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
+			if (await redirectIfSignedOut()) return
 
 			const order = await createOrder({
 				items: summary.map((item) => ({
