@@ -1,7 +1,7 @@
 import { MinusSignIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -17,11 +17,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
-import type { TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
-import { getTicketTypes } from '@/services/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -46,49 +45,22 @@ const MAX_QUANTITY = 20
 export default function TicketsScreen() {
 	const router = useRouter()
 
-	const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
+	const { data: ticketTypes = [], error, isLoading: loading } = useTicketTypes()
+	// Unselected types count as 0 (every read uses `?? 0`).
 	const [quantities, setQuantities] = useState<Record<number, number>>({})
-	const [loading, setLoading] = useState(true)
 
-	const loadTicketTypes = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const types = await getTicketTypes()
-
-			setTicketTypes(types)
-
-			const initialQuantities: Record<number, number> = {}
-
-			types.forEach((ticket) => {
-				initialQuantities[ticket.id] = 0
-			})
-
-			setQuantities(initialQuantities)
-		} catch (error) {
-			console.error('Error cargando boletos:', error)
-
-			Alert.alert(
-				'Error',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar los tipos de boleto.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadTicketTypes()
-	}, [loadTicketTypes])
+		if (!error) return
+
+		console.error('Error cargando boletos:', error)
+
+		Alert.alert(
+			'Error',
+			error.message || 'No fue posible cargar los tipos de boleto.',
+		)
+	}, [error])
 
 	const changeQuantity = (id: number, value: number) => {
 		setQuantities((current) => ({
