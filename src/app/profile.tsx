@@ -1,7 +1,7 @@
 import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
-import { API_URL, ApiValidationError } from '@/services/api'
+import { ApiValidationError } from '@/services/api'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useProfile } from '@/hooks/useProfile'
 import {
@@ -40,6 +40,13 @@ import {
 	View,
 } from 'react-native'
 import { updateAvatar, updateProfile } from '@/services/profile'
+import {
+	formatDateForApi,
+	formatDateForApp,
+	formatDateForDisplay,
+	parseApiDate,
+} from '@/utils/date'
+import { getAvatarUrl } from '@/utils/profile'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -56,76 +63,6 @@ type ToastState = {
 	visible: boolean
 	message: string
 	type: 'success' | 'error' | 'warning'
-}
-
-function formatDateForApp(date: string | null | undefined): string {
-	if (!date) return ''
-
-	const parts = date.split('-')
-
-	if (parts.length !== 3) return ''
-
-	const [year, month, day] = parts
-
-	return `${day}-${month}-${year}`
-}
-
-function formatDateForApi(date: string): string | null {
-	if (!date.trim()) return null
-
-	const parts = date.split('-')
-
-	if (parts.length !== 3) return null
-
-	const [day, month, year] = parts
-
-	if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
-		return null
-	}
-
-	return `${year}-${month}-${day}`
-}
-
-function parseApiDate(date: string | null | undefined): Date {
-	if (!date) return new Date(2000, 0, 1)
-
-	const parts = date.split('-')
-
-	if (parts.length !== 3) return new Date(2000, 0, 1)
-
-	const year = Number(parts[0])
-	const month = Number(parts[1])
-	const day = Number(parts[2])
-
-	if (
-		!Number.isInteger(year) ||
-		!Number.isInteger(month) ||
-		!Number.isInteger(day)
-	) {
-		return new Date(2000, 0, 1)
-	}
-
-	return new Date(year, month - 1, day)
-}
-
-function formatDateForDisplay(date: Date): string {
-	const day = String(date.getDate()).padStart(2, '0')
-	const month = String(date.getMonth() + 1).padStart(2, '0')
-	const year = date.getFullYear()
-
-	return `${day}-${month}-${year}`
-}
-
-function getAvatarUrl(avatar: string | null | undefined): string | null {
-	if (!avatar) return null
-
-	if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
-		return avatar
-	}
-
-	const baseUrl = API_URL.replace(/\/api\/?$/, '')
-
-	return `${baseUrl}/storage/${avatar}`
 }
 
 type FieldProps = {
