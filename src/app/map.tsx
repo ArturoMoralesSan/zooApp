@@ -1674,8 +1674,8 @@ export default function MapScreen() {
 					id='osm-raster'
 					tiles={['https://tile.openstreetmap.org/{z}/{x}/{y}.png']}
 					tileSize={256}
-					minZoomLevel={0}
-					maxZoomLevel={19}
+					minzoom={0}
+					maxzoom={19}
 				>
 					<Layer
 						id='osm-raster-layer'
