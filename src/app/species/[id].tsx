@@ -3,6 +3,7 @@ import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
 import { SpeciesTags } from '@/components/species/SpeciesTags'
 import { SpeciesGallery } from '@/components/species/SpeciesGallery'
+import { SpeciesImageViewer } from '@/components/species/SpeciesImageViewer'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
@@ -12,9 +13,7 @@ import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
-	Image,
 	ImageBackground,
-	Modal,
 	Pressable,
 	Text,
 	View,
@@ -252,32 +251,11 @@ export default function SpeciesDetailScreen() {
 			</Animated.View>
 
 			{/* VISOR DE IMÁGENES */}
-			<Modal
-				visible={selectedImage !== null}
-				transparent
-				animationType='fade'
-				onRequestClose={() => setSelectedImage(null)}
-			>
-				<View className='flex-1 items-center justify-center bg-tinta/95'>
-					<View className='absolute right-5 top-14 z-10 overflow-hidden rounded-full border border-card-border/35 bg-niebla/20'>
-						<Pressable
-							onPress={() => setSelectedImage(null)}
-							className='rounded-full bg-niebla/20 px-3.5 py-2 active:bg-hoja/30'
-						>
-							<Text className='text-[14px] font-bold text-blanco'>Cerrar</Text>
-						</Pressable>
-					</View>
-
-					{selectedImage && (
-						<Image
-							source={{ uri: selectedImage.url }}
-							className='h-[75%] w-full'
-							resizeMode='contain'
-							accessibilityLabel={selectedImage.alt_text || species.common_name}
-						/>
-					)}
-				</View>
-			</Modal>
+			<SpeciesImageViewer
+				selectedImage={selectedImage}
+				species={species}
+				onClose={() => setSelectedImage(null)}
+			/>
 		</View>
 	)
 }
