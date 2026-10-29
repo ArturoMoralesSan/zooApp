@@ -37,7 +37,7 @@ import type {
 	PathNode,
 	Zone,
 } from '@/types/map'
-import { getMap } from '@/services/map'
+import { useMapData } from '@/hooks/useMapData'
 
 const mapShadow: ViewStyle = {
 	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
@@ -976,6 +976,8 @@ function formatMinutes(minutes: number | null | undefined): string {
 	return `${hours} h ${rest} min`
 }
 
+const NO_ZONES: Zone[] = []
+
 export default function MapScreen() {
 	const mapRef = useRef<any>(null)
 	const cameraRef = useRef<any>(null)
@@ -984,11 +986,16 @@ export default function MapScreen() {
 		null,
 	)
 
-	const [loading, setLoading] = useState(true)
+	const { data, error: mapError, isLoading: loading } = useMapData()
 
-	const [error, setError] = useState<string | null>(null)
+	const zones = data ?? NO_ZONES
 
-	const [zones, setZones] = useState<Zone[]>([])
+	// Before SWR the map loaded once, so an error could only replace an empty
+	// map. Keep it that way: a failed background refetch keeps the cached map.
+	const error =
+		mapError && !data
+			? mapError.message || 'No fue posible cargar el mapa.'
+			: null
 
 	const [userLocation, setUserLocation] = useState<Coordinate | null>(null)
 
@@ -997,8 +1004,6 @@ export default function MapScreen() {
 	const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null)
 
 	const [route, setRoute] = useState<RouteResult | null>(null)
-
-	const [isUserInsideZoo, setIsUserInsideZoo] = useState(false)
 
 	const [mapReady, setMapReady] = useState(false)
 
@@ -1070,43 +1075,6 @@ export default function MapScreen() {
 			mounted = false
 			locationSubscription.current?.remove()
 			locationSubscription.current = null
-		}
-	}, [])
-
-	useEffect(() => {
-		let mounted = true
-
-		const loadMap = async () => {
-			try {
-				setLoading(true)
-				setError(null)
-
-				const receivedZones = await getMap()
-
-				if (!mounted) {
-					return
-				}
-
-				setZones(receivedZones)
-			} catch (apiError) {
-				if (mounted) {
-					setError(
-						apiError instanceof Error
-							? apiError.message
-							: 'No fue posible cargar el mapa.',
-					)
-				}
-			} finally {
-				if (mounted) {
-					setLoading(false)
-				}
-			}
-		}
-
-		loadMap()
-
-		return () => {
-			mounted = false
 		}
 	}, [])
 
@@ -1363,20 +1331,13 @@ export default function MapScreen() {
 		return items
 	}, [zones])
 
-	useEffect(() => {
-		if (!userLocation) {
-			setIsUserInsideZoo(false)
-			return
-		}
-
-		const inside = zones.some((zone) => {
+	const isUserInsideZoo =
+		userLocation !== null &&
+		zones.some((zone) => {
 			const geometry = normalizeZoneGeometry(zone.geometry)
 
 			return pointInGeometry(userLocation, geometry)
 		})
-
-		setIsUserInsideZoo(inside)
-	}, [zones, userLocation])
 
 	useEffect(() => {
 		if (!userLocation || !mapReady) {
