@@ -31,6 +31,7 @@ import colors from '@/theme/colors'
 import type {
 	Coordinate,
 	GeoJSONGeometry,
+	ImageCorners,
 	MapSpecies,
 	PathCoordinates,
 	PathEdge,
@@ -384,7 +385,7 @@ function isImageIcon(value: unknown): boolean {
 function normalizeImageBounds(
 	bounds: unknown,
 	geometry: GeoJSONGeometry | null,
-): Coordinate[] | null {
+): ImageCorners | null {
 	const parsed = parseJsonValue(bounds)
 
 	if (parsed && typeof parsed === 'object') {
@@ -436,7 +437,7 @@ function normalizeImageBounds(
 				.filter((item: Coordinate | null): item is Coordinate => item !== null)
 
 			if (coordinates.length >= 4) {
-				return coordinates.slice(0, 4)
+				return [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]
 			}
 		}
 	}
@@ -478,7 +479,7 @@ function normalizeImageBounds(
 			.filter((item): item is Coordinate => item !== null)
 
 		if (coordinates.length >= 4) {
-			return coordinates.slice(0, 4)
+			return [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]
 		}
 	}
 
@@ -1135,7 +1136,7 @@ export default function MapScreen() {
 					id: number
 					name: string
 					url: string
-					coordinates: Coordinate[]
+					coordinates: ImageCorners
 				} => item !== null,
 			)
 	}, [zones])
@@ -1735,6 +1736,8 @@ export default function MapScreen() {
 							'line-color': colors.tinta,
 							'line-width': 9,
 							'line-opacity': 0.5,
+						}}
+						layout={{
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1748,6 +1751,8 @@ export default function MapScreen() {
 							'line-color': colors.blanco,
 							'line-width': 6,
 							'line-opacity': 1,
+						}}
+						layout={{
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1764,6 +1769,8 @@ export default function MapScreen() {
 							'line-color': colors.blanco,
 							'line-width': 12,
 							'line-opacity': 0.95,
+						}}
+						layout={{
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1778,6 +1785,8 @@ export default function MapScreen() {
 							'line-color': colors.bosque,
 							'line-width': 7,
 							'line-opacity': 1,
+						}}
+						layout={{
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}
@@ -1793,6 +1802,8 @@ export default function MapScreen() {
 							'line-width': 5,
 							'line-opacity': 0.9,
 							'line-dasharray': [1.5, 2.5],
+						}}
+						layout={{
 							'line-cap': 'round',
 							'line-join': 'round',
 						}}

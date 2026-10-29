@@ -1,5 +1,12 @@
 export type Coordinate = [number, number]
 
+export type ImageCorners = [
+	topLeft: Coordinate,
+	topRight: Coordinate,
+	bottomRight: Coordinate,
+	bottomLeft: Coordinate,
+]
+
 export type MapMarker = {
 	id: number
 	zone_id: number
