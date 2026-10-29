@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
+import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
@@ -45,6 +46,8 @@ export default function DonationsSummaryScreen() {
 		return value
 	}, [params.amount])
 
+	const { refreshDonations } = useDataRefresh()
+
 	const confirmDonation = async () => {
 		if (loading) return
 
@@ -67,6 +70,8 @@ export default function DonationsSummaryScreen() {
 			const donation = await createDonation({
 				amount: Number(amount.toFixed(2)),
 			})
+
+			void refreshDonations()
 
 			router.replace({
 				pathname: '/donations/success',
