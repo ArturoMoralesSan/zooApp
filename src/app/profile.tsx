@@ -2,6 +2,9 @@ import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
 import { API_URL, ApiValidationError } from '@/services/api'
+import { useDataRefresh } from '@/hooks/useDataRefresh'
+import { useProfile } from '@/hooks/useProfile'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { getToken, type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
@@ -18,7 +21,7 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -33,7 +36,7 @@ import {
 	TextInput,
 	View,
 } from 'react-native'
-import { getProfile, updateAvatar, updateProfile } from '@/services/profile'
+import { updateAvatar, updateProfile } from '@/services/profile'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -189,28 +192,47 @@ function ProfileField({
 	)
 }
 
-export default function ProfileScreen() {
-	const [loading, setLoading] = useState(true)
+type ProfileFormProps = {
+	initialUser: User | null
+	loadError: Error | undefined
+}
+
+// Keyed by user id in ProfileScreen, so the form state starts from the
+// loaded profile without copying it in an effect.
+function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
+	const { refreshProfile } = useDataRefresh()
+
 	const [saving, setSaving] = useState(false)
 	const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
-	const [user, setUser] = useState<User | null>(null)
+	const [user, setUser] = useState<User | null>(initialUser)
 
-	const [name, setName] = useState('')
-	const [email, setEmail] = useState('')
-	const [phone, setPhone] = useState('')
-	const [birthDate, setBirthDate] = useState('')
-	const [city, setCity] = useState('')
-	const [country, setCountry] = useState('')
+	const [name, setName] = useState(initialUser?.name || '')
+	const [email, setEmail] = useState(initialUser?.email || '')
+	const [phone, setPhone] = useState(initialUser?.profile?.phone || '')
+	const [birthDate, setBirthDate] = useState(
+		formatDateForApp(initialUser?.profile?.birth_date),
+	)
+	const [city, setCity] = useState(initialUser?.profile?.city || '')
+	const [country, setCountry] = useState(initialUser?.profile?.country || '')
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const [errors, setErrors] = useState<FormErrors>({})
 
-	const [toast, setToast] = useState<ToastState>({
-		visible: false,
-		message: '',
-		type: 'success',
-	})
+	// A failed load still opens the form, with the error in the toast.
+	const [toast, setToast] = useState<ToastState>(() =>
+		loadError
+			? {
+					visible: true,
+					message: loadError.message || 'No fue posible cargar el perfil.',
+					type: 'error',
+				}
+			: {
+					visible: false,
+					message: '',
+					type: 'success',
+				},
+	)
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
@@ -224,42 +246,6 @@ export default function ProfileScreen() {
 		},
 		[],
 	)
-
-	const loadProfile = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const currentUser = await getProfile()
-
-			setUser(currentUser)
-			setName(currentUser.name || '')
-			setEmail(currentUser.email || '')
-			setPhone(currentUser.profile?.phone || '')
-			setBirthDate(formatDateForApp(currentUser.profile?.birth_date))
-			setCity(currentUser.profile?.city || '')
-			setCountry(currentUser.profile?.country || '')
-		} catch (error) {
-			showToast(
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar el perfil.',
-				'error',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [showToast])
-
-	useEffect(() => {
-		void loadProfile()
-	}, [loadProfile])
 
 	const clearFieldError = (field: keyof FormErrors) => {
 		setErrors((current) => ({
@@ -322,6 +308,8 @@ export default function ProfileScreen() {
 			setCity(response.user.profile?.city || '')
 			setCountry(response.user.profile?.country || '')
 
+			void refreshProfile(response.user)
+
 			showToast(
 				response.message || 'Perfil actualizado correctamente.',
 				'success',
@@ -380,6 +368,7 @@ export default function ProfileScreen() {
 
 			const avatarResponse = await updateAvatar(file as unknown as Blob)
 			setUser(avatarResponse.user)
+			void refreshProfile(avatarResponse.user)
 
 			showToast(
 				avatarResponse.message || 'Foto de perfil actualizada correctamente.',
@@ -441,22 +430,6 @@ export default function ProfileScreen() {
 				'error',
 			)
 		}
-	}
-
-	if (loading) {
-		return (
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				resizeMode='repeat'
-				imageClassName='opacity-20'
-				className='flex-1 items-center justify-center bg-blanco'
-			>
-				<ActivityIndicator size='large' color={colors.esmeralda} />
-				<Text className='mt-4 text-[14px] font-medium text-tinta'>
-					Cargando perfil...
-				</Text>
-			</ImageBackground>
-		)
 	}
 
 	const avatarUrl = getAvatarUrl(user?.profile?.avatar)
@@ -847,5 +820,35 @@ export default function ProfileScreen() {
 				</Animated.ScrollView>
 			</KeyboardAvoidingView>
 		</ImageBackground>
+	)
+}
+
+export default function ProfileScreen() {
+	const { data: user, error, isLoading } = useProfile()
+
+	useSessionRedirect()
+
+	if (isLoading) {
+		return (
+			<ImageBackground
+				source={require('@/assets/images/zoo-pattern.png')}
+				resizeMode='repeat'
+				imageClassName='opacity-20'
+				className='flex-1 items-center justify-center bg-blanco'
+			>
+				<ActivityIndicator size='large' color={colors.esmeralda} />
+				<Text className='mt-4 text-[14px] font-medium text-tinta'>
+					Cargando perfil...
+				</Text>
+			</ImageBackground>
+		)
+	}
+
+	return (
+		<ProfileForm
+			key={user?.id ?? 'empty'}
+			initialUser={user ?? null}
+			loadError={error}
+		/>
 	)
 }
