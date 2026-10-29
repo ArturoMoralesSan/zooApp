@@ -63,9 +63,6 @@ export default function TicketsScreen() {
 
 			const response = await api<unknown>('/tickets/types', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			const data = response as {

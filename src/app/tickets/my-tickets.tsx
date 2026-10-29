@@ -95,9 +95,6 @@ export default function MyTicketsScreen() {
 
 			const response = await api<MyTicketsResponse>('/tickets', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			const data = Array.isArray(response) ? response : response.data

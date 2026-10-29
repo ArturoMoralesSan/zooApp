@@ -72,9 +72,6 @@ export default function Panel() {
 
 				const response = await api<ProfileResponse>('/profile', {
 					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
 				})
 
 				if (mounted) {

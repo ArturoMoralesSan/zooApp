@@ -1,5 +1,4 @@
 import { api, API_URL } from '@/services/api'
-import { getToken } from '@/services/auth'
 
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
@@ -1082,15 +1081,7 @@ export default function MapScreen() {
 				setLoading(true)
 				setError(null)
 
-				const token = await getToken()
-
-				const response = await api<MapResponse>('/map', {
-					headers: token
-						? {
-								Authorization: `Bearer ${token}`,
-							}
-						: undefined,
-				})
+				const response = await api<MapResponse>('/map')
 
 				if (!mounted) {
 					return

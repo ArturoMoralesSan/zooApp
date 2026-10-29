@@ -78,9 +78,6 @@ export default function SpeciesDetailScreen() {
 				`/species/${params.id}`,
 				{
 					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
 				},
 			)
 

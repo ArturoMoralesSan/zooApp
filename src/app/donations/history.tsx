@@ -112,9 +112,6 @@ export default function DonationHistoryScreen() {
 
 			const response = await api<DonationsResponse>('/donations', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			let result: unknown = Array.isArray(response)

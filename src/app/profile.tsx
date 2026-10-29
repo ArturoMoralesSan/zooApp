@@ -242,9 +242,6 @@ export default function ProfileScreen() {
 
 			const response = await api<ProfileResponse>('/profile', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			const currentUser = response.user
@@ -318,9 +315,6 @@ export default function ProfileScreen() {
 
 			const response = await api<UpdateProfileResponse>('/profile', {
 				method: 'PUT',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 				body: JSON.stringify({
 					name: name.trim(),
 					email: email.trim(),

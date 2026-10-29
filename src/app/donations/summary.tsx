@@ -68,7 +68,6 @@ export default function DonationsSummaryScreen() {
 			const response = await api<CreateDonationResponse>('/donations', {
 				method: 'POST',
 				headers: {
-					Authorization: `Bearer ${token}`,
 					'Content-Type': 'application/json',
 					Accept: 'application/json',
 				},

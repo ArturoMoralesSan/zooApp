@@ -60,9 +60,6 @@ export default function SpeciesScreen() {
 
 			const response = await api<SpeciesListResponse>('/species', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			setSpecies(response.data.species || [])

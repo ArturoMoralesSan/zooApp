@@ -80,9 +80,6 @@ export default function Explorar() {
 
 			const response = await api<ExploreResponse>('/explore', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			if (!response.success) {

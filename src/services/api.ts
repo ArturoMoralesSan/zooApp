@@ -1,3 +1,5 @@
+import { getToken } from './token'
+
 const ENV_URL: string | undefined = process.env.EXPO_PUBLIC_API_URL
 
 if (!ENV_URL) throw new Error('EXPO_PUBLIC_API_URL no está definida')
@@ -22,13 +24,25 @@ export async function api<T>(
 	endpoint: string,
 	options: RequestInit = {},
 ): Promise<T> {
+	const headers = new Headers({
+		Accept: 'application/json',
+		'Content-Type': 'application/json',
+	})
+
+	new Headers(options.headers).forEach((value, key) => headers.set(key, value))
+
+	// Callers that pass their own Authorization keep it.
+	if (!headers.has('Authorization')) {
+		const token = await getToken()
+
+		if (token) {
+			headers.set('Authorization', `Bearer ${token}`)
+		}
+	}
+
 	const response = await fetch(`${API_URL}${endpoint}`, {
 		...options,
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			...(options.headers || {}),
-		},
+		headers,
 	})
 
 	let data: T

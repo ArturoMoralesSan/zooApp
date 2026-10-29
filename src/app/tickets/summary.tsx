@@ -82,9 +82,6 @@ export default function TicketSummaryScreen() {
 
 			const response = await api<TicketTypesResponse>('/tickets/types', {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			})
 
 			const types: TicketType[] = Array.isArray(response)
@@ -159,9 +156,6 @@ export default function TicketSummaryScreen() {
 
 			const response = await api<CreateOrderResponse>('/tickets/orders', {
 				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 				body: JSON.stringify({
 					items: summary.map((item) => ({
 						ticket_type_id: item.ticket_type_id,

@@ -1,10 +1,9 @@
-import * as SecureStore from 'expo-secure-store'
-
 import type { User } from '@/types/user'
 
 import { api } from './api'
+import { getToken, removeToken, setToken } from './token'
 
-const TOKEN_KEY = 'zooapp_token'
+export { getToken }
 
 export type { Level, User } from '@/types/user'
 
@@ -38,7 +37,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
 		body: JSON.stringify(data),
 	})
 
-	await SecureStore.setItemAsync(TOKEN_KEY, response.token)
+	await setToken(response.token)
 
 	return response
 }
@@ -49,13 +48,9 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
 		body: JSON.stringify(data),
 	})
 
-	await SecureStore.setItemAsync(TOKEN_KEY, response.token)
+	await setToken(response.token)
 
 	return response
-}
-
-export async function getToken(): Promise<string | null> {
-	return SecureStore.getItemAsync(TOKEN_KEY)
 }
 
 export async function getCurrentUser(): Promise<User> {
@@ -65,11 +60,7 @@ export async function getCurrentUser(): Promise<User> {
 		throw new Error('No hay una sesión activa.')
 	}
 
-	const response = await api<UserResponse>('/user', {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
+	const response = await api<UserResponse>('/user')
 
 	return response.user
 }
@@ -79,15 +70,10 @@ export async function logout(): Promise<void> {
 
 	try {
 		if (token) {
-			await api('/logout', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
+			await api('/logout', { method: 'POST' })
 		}
 	} finally {
-		await SecureStore.deleteItemAsync(TOKEN_KEY)
+		await removeToken()
 	}
 }
 
