@@ -125,3 +125,39 @@ export type MapResponse = {
 		zones: Zone[]
 	}
 }
+
+export type SelectableItem = {
+	id: string
+	name: string
+	type: 'marker' | 'species'
+	description?: string | null
+	coordinate: Coordinate
+	color?: string | null
+	icon?: string | null
+	iconImage?: string | null
+	thumbnail?: string | null
+	species?: MapSpecies | null
+}
+
+export type GraphNode = {
+	id: string
+	coordinate: Coordinate
+}
+
+export type GraphEdge = {
+	to: string
+	distance: number
+}
+
+export type NearestPathPoint = {
+	point: Coordinate
+	nodeId: string
+	distance: number
+}
+
+export type RouteResult = {
+	coordinates: Coordinate[]
+	distance: number
+	pathCoordinates: Coordinate[]
+	connectors: Coordinate[][]
+}
