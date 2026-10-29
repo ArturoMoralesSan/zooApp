@@ -1,7 +1,7 @@
 import { Search01Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	ImageBackground,
@@ -17,10 +17,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
-import type { Species } from '@/types/species'
-import { getSpecies } from '@/services/species'
 
 const PROP_COLORS = {
 	primary: colors.esmeralda,
@@ -40,41 +39,20 @@ const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
 type Filter = (typeof FILTERS)[number]
 
 export default function SpeciesScreen() {
-	const [species, setSpecies] = useState<Species[]>([])
+	const {
+		data: species = [],
+		error: loadError,
+		isLoading: loading,
+		refresh,
+	} = useSpecies()
 	const [search, setSearch] = useState('')
 	const [filter, setFilter] = useState<Filter>('Todas')
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState('')
 
-	const loadSpecies = useCallback(async () => {
-		try {
-			setLoading(true)
-			setError('')
+	const error = loadError
+		? loadError.message || 'No fue posible cargar las especies.'
+		: ''
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			setSpecies(await getSpecies())
-		} catch (error) {
-			console.error('LOAD SPECIES ERROR:', error)
-
-			setError(
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar las especies.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [])
-
-	useEffect(() => {
-		void loadSpecies()
-	}, [loadSpecies])
+	useSessionRedirect()
 
 	const filteredSpecies = useMemo(() => {
 		const normalizedSearch = search.trim().toLowerCase()
@@ -239,7 +217,7 @@ export default function SpeciesScreen() {
 
 							<View className='mt-[15px] h-12 w-full overflow-hidden rounded-2xl border border-esmeralda bg-esmeralda'>
 								<Pressable
-									onPress={() => void loadSpecies()}
+									onPress={() => void refresh()}
 									className='h-full w-full items-center justify-center active:bg-bosque'
 								>
 									<View className='h-full w-full items-center justify-center'>
