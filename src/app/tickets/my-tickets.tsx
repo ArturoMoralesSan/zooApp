@@ -1,7 +1,7 @@
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useMyTickets } from '@/hooks/useTickets'
 
-import { QrCodeIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
+import { QrCodeIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
@@ -17,7 +17,6 @@ import {
 } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 
-import ActionButton from '@/components/ActionButton'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
@@ -28,6 +27,7 @@ import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { TicketStatsRow } from '@/components/tickets/TicketStatsRow'
 import { TicketTabs } from '@/components/tickets/TicketTabs'
 import { PurchaseCard } from '@/components/tickets/PurchaseCard'
+import { MyTicketsEmptyState } from '@/components/tickets/MyTicketsEmptyState'
 import { cardShadow, ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 import { getTicketStatus } from '@/utils/tickets'
 
@@ -140,39 +140,10 @@ export default function MyTicketsScreen() {
 						</Text>
 					</View>
 				) : visiblePurchases.length === 0 ? (
-					<View
-						className='items-center rounded-3xl border border-card-border bg-niebla px-6 py-8'
-						style={cardShadow}
-					>
-						<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-hoja'>
-							<HugeiconsIcon
-								icon={Ticket01Icon}
-								size={32}
-								color={ICON_COLORS.primary}
-							/>
-						</View>
-
-						<Text className='text-center text-[18px] font-extrabold text-tinta'>
-							{tab === 'active'
-								? 'No tienes compras activas'
-								: 'No tienes historial'}
-						</Text>
-
-						<Text className='mt-[7px] text-center text-[13px] leading-5 text-tinta-2'>
-							{tab === 'active'
-								? 'Cuando compres una entrada aparecerá aquí.'
-								: 'Tus compras anteriores aparecerán aquí.'}
-						</Text>
-
-						{tab === 'active' && (
-							<View className='mt-5 w-full'>
-								<ActionButton
-									title='Comprar boletos'
-									onPress={() => router.push('/tickets')}
-								/>
-							</View>
-						)}
-					</View>
+					<MyTicketsEmptyState
+						tab={tab}
+						onBuyTickets={() => router.push('/tickets')}
+					/>
 				) : (
 					<View className='w-full'>
 						{visiblePurchases.map((purchase) => (
