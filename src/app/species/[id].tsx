@@ -1,6 +1,7 @@
 import BackButton from '@/components/BackButton'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
+import { SpeciesTags } from '@/components/species/SpeciesTags'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
@@ -228,26 +229,7 @@ export default function SpeciesDetailScreen() {
 								<SpeciesDataGrid species={species} />
 
 								{/* ETIQUETAS */}
-								{species.tags.length > 0 && (
-									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-tinta'>
-											Etiquetas
-										</Text>
-
-										<View className='mt-3.5 flex-row flex-wrap gap-2'>
-											{species.tags.map((tag) => (
-												<View
-													key={tag.id}
-													className='rounded-full border border-card-border bg-esmeralda px-3.5 py-2'
-												>
-													<Text className='text-xs font-semibold text-blanco'>
-														{tag.name}
-													</Text>
-												</View>
-											))}
-										</View>
-									</View>
-								)}
+								{species.tags.length > 0 && <SpeciesTags species={species} />}
 
 								{/* GALERÍA */}
 								{galleryImages.length > 0 && (
