@@ -26,6 +26,7 @@ import type { TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 
 const ICON_COLOR = colors.esmeralda
 
@@ -301,15 +302,7 @@ export default function TicketSummaryScreen() {
 
 			{/* FOOTER FIJO */}
 			{purchasing ? (
-				<View
-					className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t border-t-card-border bg-blanco px-5 pb-7 pt-5'
-					style={{ elevation: 15 }}
-				>
-					<ActivityIndicator size='small' color={colors.esmeralda} />
-					<Text className='font-extrabold text-esmeralda'>
-						Procesando compra...
-					</Text>
-				</View>
+				<FooterLoadingBar message='Procesando compra...' />
 			) : (
 				<FixedFooter
 					label='Total a pagar'

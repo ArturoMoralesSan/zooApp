@@ -2,7 +2,7 @@ import { HeartAddIcon, ShieldCheckIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
@@ -15,6 +15,7 @@ import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
 import { createDonation } from '@/services/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 
 const COLORS = {
 	primary: colors.esmeralda,
@@ -216,15 +217,7 @@ export default function DonationsSummaryScreen() {
 
 			{/* FOOTER FIJO */}
 			{loading ? (
-				<View
-					className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t border-t-card-border bg-blanco px-5 pb-7 pt-5'
-					style={{ elevation: 15 }}
-				>
-					<ActivityIndicator size='small' color={COLORS.primary} />
-					<Text className='font-extrabold text-esmeralda'>
-						Registrando donación...
-					</Text>
-				</View>
+				<FooterLoadingBar message='Registrando donación...' />
 			) : (
 				<FixedFooter
 					label='Total a donar'
