@@ -1,10 +1,10 @@
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { useDonations } from '@/hooks/useDonations'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import { CreditCardIcon, HeartAddIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -20,6 +20,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
+import type { Donation } from '@/types/donations'
+import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 
 const ICON_COLOR = colors.tinta
 
@@ -29,20 +31,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.05,
 	shadowRadius: 5,
 	elevation: 2,
-}
-
-type PaymentMethod = {
-	id?: number
-	name?: string | null
-}
-
-type Donation = {
-	id: number
-	amount?: number | string | null
-	status?: string | null
-	reference?: string | null
-	created_at?: string | null
-	payment_method?: PaymentMethod | null
 }
 
 function getDonationStatus(donation: Donation): string {
@@ -99,119 +87,33 @@ function getDonationStatusClassName(donation: Donation): string {
 	return 'bg-lima'
 }
 
-function formatAmount(amount?: number | string | null): string {
-	const value = Number(amount ?? 0)
-
-	if (!Number.isFinite(value)) {
-		return '$0.00'
-	}
-
-	return value.toLocaleString('es-MX', {
-		style: 'currency',
-		currency: 'MXN',
-	})
-}
-
-function formatDate(date?: string | null): string {
-	if (!date) {
-		return 'Fecha no disponible'
-	}
-
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return 'Fecha no disponible'
-	}
-
-	return parsedDate.toLocaleDateString('es-MX', {
-		day: '2-digit',
-		month: 'long',
-		year: 'numeric',
-	})
-}
-
-function formatTime(date?: string | null): string {
-	if (!date) {
-		return ''
-	}
-
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleTimeString('es-MX', {
-		hour: '2-digit',
-		minute: '2-digit',
-	})
-}
-
 function isCompleted(donation: Donation): boolean {
 	return ['completed', 'complete', 'completada', 'completado'].includes(
 		String(donation.status ?? '').toLowerCase(),
 	)
 }
 
+const NO_DONATIONS: Donation[] = []
+
 export default function DonationHistoryScreen() {
 	const router = useRouter()
 
-	const [donations, setDonations] = useState<Donation[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data, error, isLoading: loading } = useDonations()
+	// A failed load shows the empty list, as before.
+	const donations = error ? NO_DONATIONS : (data ?? NO_DONATIONS)
 
-	const loadDonations = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<any>('/donations', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			let result: unknown = response?.data ?? response
-
-			if (result && typeof result === 'object' && !Array.isArray(result)) {
-				const payload = result as {
-					data?: unknown
-					donations?: unknown
-				}
-
-				if (Array.isArray(payload.data)) {
-					result = payload.data
-				} else if (Array.isArray(payload.donations)) {
-					result = payload.donations
-				}
-			}
-
-			setDonations(Array.isArray(result) ? (result as Donation[]) : [])
-		} catch (error) {
-			console.error('Error cargando donaciones:', error)
-
-			Alert.alert(
-				'Mis donaciones',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar tus donaciones.',
-			)
-
-			setDonations([])
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadDonations()
-	}, [loadDonations])
+		if (!error) return
+
+		console.error('Error cargando donaciones:', error)
+
+		Alert.alert(
+			'Mis donaciones',
+			error.message || 'No fue posible cargar tus donaciones.',
+		)
+	}, [error])
 
 	const sortedDonations = useMemo(() => {
 		return [...donations].sort((a, b) => {
@@ -301,7 +203,7 @@ export default function DonationHistoryScreen() {
 								adjustsFontSizeToFit
 								minimumFontScale={0.7}
 							>
-								{formatAmount(totalDonated)}
+								{formatCurrency(totalDonated)}
 							</Text>
 							<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
 								Total donado
@@ -374,7 +276,7 @@ export default function DonationHistoryScreen() {
 
 										<View className='min-w-0 flex-1'>
 											<Text className='text-[19px] font-extrabold text-tinta'>
-												{formatAmount(donation.amount)}
+												{formatCurrency(donation.amount)}
 											</Text>
 
 											<Text className='mt-1 text-[12px] text-tinta'>

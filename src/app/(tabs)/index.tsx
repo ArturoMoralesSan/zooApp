@@ -7,7 +7,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
 	ActivityIndicator,
@@ -26,12 +26,13 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { useAuth } from '@/contexts/AuthContext'
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { useExplore } from '@/hooks/useExplore'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
+import { formatEventDate, formatEventTime } from '@/utils/format'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -41,57 +42,6 @@ const CAROUSEL_GAP = 10
 // Si no se define un color diferente, utiliza el verde predeterminado.
 const donationCardBackground = colors.bosque
 const donationAccentBackground = colors.lima
-
-type ExploreZone = {
-	id: number
-	name: string
-}
-
-type ExploreEvent = {
-	id: number
-	name: string
-	slug: string
-	description: string | null
-	type: string | null
-	start_at: string
-	end_at: string | null
-	image: string | null
-	capacity: number | null
-	zone: ExploreZone | null
-}
-
-type ExploreResponse = {
-	success: boolean
-	data: {
-		featured_events: ExploreEvent[]
-	}
-}
-
-function formatEventDate(date: string): string {
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleDateString('es-MX', {
-		day: 'numeric',
-		month: 'long',
-	})
-}
-
-function formatEventTime(date: string): string {
-	const parsedDate = new Date(date)
-
-	if (Number.isNaN(parsedDate.getTime())) {
-		return ''
-	}
-
-	return parsedDate.toLocaleTimeString('es-MX', {
-		hour: 'numeric',
-		minute: '2-digit',
-	})
-}
 
 function getEventImageUrl(image: string | null): string | null {
 	if (!image) {
@@ -108,61 +58,21 @@ function getEventImageUrl(image: string | null): string | null {
 export default function Explorar() {
 	const insets = useSafeAreaInsets()
 
-	const { loading: authLoading, refreshUser } = useAuth()
+	const { refreshUser } = useAuth()
 
-	const [events, setEvents] = useState<ExploreEvent[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data, error, isLoading: loading, refresh } = useExplore()
+	const events = data?.featured_events ?? []
+
 	const [refreshing, setRefreshing] = useState(false)
-	const [error, setError] = useState<string | null>(null)
 	const [activeEventIndex, setActiveEventIndex] = useState(0)
 
-	const loadExplore = useCallback(async () => {
-		try {
-			setError(null)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<ExploreResponse>('/explore', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			if (!response.success) {
-				throw new Error('No fue posible cargar la información de Explorar.')
-			}
-
-			setEvents(response.data.featured_events ?? [])
-			setActiveEventIndex(0)
-		} catch (err) {
-			setError(
-				err instanceof Error
-					? err.message
-					: 'No fue posible cargar los eventos.',
-			)
-		} finally {
-			setLoading(false)
-			setRefreshing(false)
-		}
-	}, [])
-
-	useEffect(() => {
-		if (!authLoading) {
-			void loadExplore()
-		}
-	}, [authLoading, loadExplore])
+	useSessionRedirect()
 
 	const handleRefresh = async () => {
 		setRefreshing(true)
 
 		try {
-			await Promise.all([loadExplore(), refreshUser()])
+			await Promise.all([refresh(), refreshUser()])
 		} finally {
 			setRefreshing(false)
 		}
@@ -225,14 +135,13 @@ export default function Explorar() {
 							</Text>
 
 							<Text className='mt-2 text-[13px] leading-[18px] text-tinta-2'>
-								{error}
+								{error.message || 'No fue posible cargar los eventos.'}
 							</Text>
 
 							<Pressable
 								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
 								onPress={() => {
-									setLoading(true)
-									void loadExplore()
+									void refresh()
 								}}
 							>
 								<Text className='font-extrabold text-blanco'>Reintentar</Text>

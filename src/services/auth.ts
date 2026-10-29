@@ -1,24 +1,14 @@
-import * as SecureStore from 'expo-secure-store'
+import type { User } from '@/types/user'
 
 import { api } from './api'
+import { getToken, removeToken, setToken } from './token'
 
-const TOKEN_KEY = 'zooapp_token'
+export { getToken }
 
-export type Level = {
-	id: number
-	name: string
-	min_points?: number
-	max_points?: number
-	description?: string | null
-}
+export type { Level, User } from '@/types/user'
 
-export type User = {
-	id: number
-	name: string
-	email: string
-	points: number
-	level_id: number | null
-	level?: Level | null
+export const userKeys = {
+	current: '/user',
 }
 
 type AuthResponse = {
@@ -51,7 +41,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
 		body: JSON.stringify(data),
 	})
 
-	await SecureStore.setItemAsync(TOKEN_KEY, response.token)
+	await setToken(response.token)
 
 	return response
 }
@@ -62,13 +52,9 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
 		body: JSON.stringify(data),
 	})
 
-	await SecureStore.setItemAsync(TOKEN_KEY, response.token)
+	await setToken(response.token)
 
 	return response
-}
-
-export async function getToken(): Promise<string | null> {
-	return SecureStore.getItemAsync(TOKEN_KEY)
 }
 
 export async function getCurrentUser(): Promise<User> {
@@ -78,13 +64,18 @@ export async function getCurrentUser(): Promise<User> {
 		throw new Error('No hay una sesión activa.')
 	}
 
-	const response = await api<UserResponse>('/user', {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
+	const response = await api<UserResponse>(userKeys.current)
 
 	return response.user
+}
+
+// The signed-in user, or null when there is no stored session.
+export async function getSessionUser(): Promise<User | null> {
+	const token = await getToken()
+
+	if (!token) return null
+
+	return getCurrentUser()
 }
 
 export async function logout(): Promise<void> {
@@ -92,15 +83,10 @@ export async function logout(): Promise<void> {
 
 	try {
 		if (token) {
-			await api('/logout', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
+			await api('/logout', { method: 'POST' })
 		}
 	} finally {
-		await SecureStore.deleteItemAsync(TOKEN_KEY)
+		await removeToken()
 	}
 }
 

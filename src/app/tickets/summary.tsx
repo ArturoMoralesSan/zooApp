@@ -1,7 +1,7 @@
 import { CreditCardIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -17,9 +17,14 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
-import { api } from '@/services/api'
+import { useDataRefresh } from '@/hooks/useDataRefresh'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useTicketTypes } from '@/hooks/useTickets'
 import { getToken } from '@/services/auth'
 import colors from '@/theme/colors'
+import type { TicketType } from '@/types/tickets'
+import { formatCurrency } from '@/utils/format'
+import { createOrder } from '@/services/tickets'
 
 const ICON_COLOR = colors.esmeralda
 
@@ -29,13 +34,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.05,
 	shadowRadius: 8,
 	elevation: 2,
-}
-
-type TicketType = {
-	id: number
-	name: string
-	price: number | string
-	description?: string | null
 }
 
 type SelectedTicket = {
@@ -50,6 +48,8 @@ type TicketSummaryItem = {
 	subtotal: number
 }
 
+const NO_TICKET_TYPES: TicketType[] = []
+
 export default function TicketSummaryScreen() {
 	const router = useRouter()
 
@@ -57,9 +57,15 @@ export default function TicketSummaryScreen() {
 		items?: string
 	}>()
 
-	const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
-	const [loading, setLoading] = useState(true)
+	const {
+		data: ticketTypes = NO_TICKET_TYPES,
+		error,
+		isLoading: loading,
+	} = useTicketTypes()
+	const { refreshMyTickets } = useDataRefresh()
 	const [purchasing, setPurchasing] = useState(false)
+
+	useSessionRedirect()
 
 	const selectedTickets = useMemo<SelectedTicket[]>(() => {
 		try {
@@ -70,48 +76,16 @@ export default function TicketSummaryScreen() {
 		}
 	}, [params.items])
 
-	const loadTicketTypes = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<any>('/tickets/types', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			const types: TicketType[] = Array.isArray(response)
-				? response
-				: Array.isArray(response?.data)
-					? response.data
-					: []
-
-			setTicketTypes(types)
-		} catch (error) {
-			console.error('Error cargando tipos de boleto:', error)
-
-			Alert.alert(
-				'Error',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar los tipos de boleto.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
-
 	useEffect(() => {
-		void loadTicketTypes()
-	}, [loadTicketTypes])
+		if (!error) return
+
+		console.error('Error cargando tipos de boleto:', error)
+
+		Alert.alert(
+			'Error',
+			error.message || 'No fue posible cargar los tipos de boleto.',
+		)
+	}, [error])
 
 	const summary = useMemo<TicketSummaryItem[]>(() => {
 		return selectedTickets.flatMap((item) => {
@@ -137,13 +111,6 @@ export default function TicketSummaryScreen() {
 
 	const totalTickets = summary.reduce((sum, item) => sum + item.quantity, 0)
 
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
-
 	const confirmPurchase = async () => {
 		if (purchasing) return
 
@@ -165,20 +132,14 @@ export default function TicketSummaryScreen() {
 				return
 			}
 
-			const response = await api<any>('/tickets/orders', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					items: summary.map((item) => ({
-						ticket_type_id: item.ticket_type_id,
-						quantity: item.quantity,
-					})),
-				}),
+			const order = await createOrder({
+				items: summary.map((item) => ({
+					ticket_type_id: item.ticket_type_id,
+					quantity: item.quantity,
+				})),
 			})
 
-			const order = response?.data ?? response
+			void refreshMyTickets()
 
 			router.replace({
 				pathname: '/tickets/success',

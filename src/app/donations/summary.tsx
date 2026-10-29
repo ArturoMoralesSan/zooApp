@@ -14,37 +14,17 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
+import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { getToken } from '@/services/auth'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
+import { formatCurrency } from '@/utils/format'
+import { createDonation } from '@/services/donations'
 
 const COLORS = {
 	primary: colors.esmeralda,
 } as const
-
-type Donation = {
-	id?: number | string
-	amount?: number | string
-	reference?: string | null
-	status?: string
-	created_at?: string
-	payment_method?: {
-		id?: number
-		name?: string
-		code?: string
-	} | null
-}
-
-type DonationResponse = {
-	success?: boolean
-	message?: string
-	data?: {
-		donation?: Donation
-	}
-	donation?: Donation
-}
 
 export default function DonationsSummaryScreen() {
 	const router = useRouter()
@@ -66,12 +46,7 @@ export default function DonationsSummaryScreen() {
 		return value
 	}, [params.amount])
 
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
+	const { refreshDonations } = useDataRefresh()
 
 	const confirmDonation = async () => {
 		if (loading) return
@@ -92,25 +67,11 @@ export default function DonationsSummaryScreen() {
 				return
 			}
 
-			const response = await api<DonationResponse>('/donations', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-				body: JSON.stringify({
-					amount: Number(amount.toFixed(2)),
-				}),
+			const donation = await createDonation({
+				amount: Number(amount.toFixed(2)),
 			})
 
-			const donation = response?.data?.donation ?? response?.donation
-
-			if (!donation) {
-				throw new Error(
-					response?.message ?? 'No fue posible registrar la donación.',
-				)
-			}
+			void refreshDonations()
 
 			router.replace({
 				pathname: '/donations/success',

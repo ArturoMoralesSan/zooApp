@@ -1,7 +1,7 @@
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useSpeciesDetail } from '@/hooks/useSpecies'
 import {
 	Leaf01Icon,
 	Location01Icon,
@@ -11,7 +11,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
@@ -27,6 +27,7 @@ import {
 } from 'react-native'
 
 import colors from '@/theme/colors'
+import type { SpeciesImage } from '@/types/species'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.esmeralda,
@@ -46,97 +47,25 @@ const subtleShadow: ViewStyle = {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
-type SpeciesImage = {
-	id: number
-	type: 'main' | 'thumbnail' | 'gallery' | string
-	url: string
-	alt_text: string | null
-	sort_order: number
-}
-
-type SpeciesCategory = {
-	id: number
-	name: string
-}
-
-type SpeciesTag = {
-	id: number
-	name: string
-	slug: string
-}
-
-type Species = {
-	id: number
-	common_name: string
-	scientific_name: string | null
-	slug: string
-	description: string | null
-	habitat: string | null
-	origin: string | null
-	diet: string | null
-	conservation_status: string | null
-	category: SpeciesCategory | null
-	tags: SpeciesTag[]
-	images: SpeciesImage[]
-}
-
-type SpeciesResponse = {
-	success: boolean
-	data: {
-		species: Species
-	}
-}
-
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
 	const params = useLocalSearchParams<{ id: string }>()
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
-	const [species, setSpecies] = useState<Species | null>(null)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const {
+		data: species,
+		error: loadError,
+		isLoading: loading,
+		refresh,
+	} = useSpeciesDetail(params.id)
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
 
-	const loadSpecies = useCallback(async () => {
-		try {
-			setLoading(true)
-			setError(null)
+	const error = loadError
+		? loadError.message || 'No fue posible cargar la información de la especie.'
+		: null
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<SpeciesResponse>(`/species/${params.id}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			if (!response.success || !response.data?.species) {
-				throw new Error('No fue posible obtener la información de la especie.')
-			}
-
-			setSpecies(response.data.species)
-		} catch (err) {
-			console.error(err)
-			setError(
-				err instanceof Error
-					? err.message
-					: 'No fue posible cargar la información de la especie.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [params.id, router])
-
-	useEffect(() => {
-		void loadSpecies()
-	}, [loadSpecies])
+	useSessionRedirect()
 
 	const cardMarginTop = scrollY.interpolate({
 		inputRange: [0, 180],
@@ -220,7 +149,7 @@ export default function SpeciesDetailScreen() {
 					</Text>
 
 					<Pressable
-						onPress={() => void loadSpecies()}
+						onPress={() => void refresh()}
 						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
 					>
 						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>

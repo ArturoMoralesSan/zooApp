@@ -1,5 +1,5 @@
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useMyTickets } from '@/hooks/useTickets'
 
 import {
 	Calendar03Icon,
@@ -9,7 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -29,6 +29,8 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
+import type { Purchase, Ticket } from '@/types/tickets'
+import { formatDate, formatTime } from '@/utils/format'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -42,38 +44,6 @@ const cardShadow: ViewStyle = {
 	shadowOpacity: 0.055,
 	shadowRadius: 8,
 	elevation: 2,
-}
-
-type Ticket = {
-	id: number
-	qr_token?: string | null
-	status?: string | null
-	used_at?: string | null
-	ticket_type?: {
-		id: number
-		name: string
-		price?: number | string
-	}
-	order?: {
-		id?: number
-		user_id?: number
-		folio?: string | null
-		status?: string | null
-		subtotal?: number | string | null
-		discount?: number | string | null
-		total?: number | string | null
-		paid_at?: string | null
-		created_at?: string | null
-	}
-}
-
-type Purchase = {
-	orderId: number
-	folio: string
-	status: string
-	total: number
-	createdAt: string | null
-	tickets: Ticket[]
 }
 
 const getTicketStatus = (ticket?: Ticket) => {
@@ -105,56 +75,24 @@ const getTicketStatus = (ticket?: Ticket) => {
 export default function MyTicketsScreen() {
 	const router = useRouter()
 
-	const [tickets, setTickets] = useState<Ticket[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
 	const [tab, setTab] = useState<'active' | 'history'>('active')
 	const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(
 		null,
 	)
 
-	const loadTickets = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<any>('/tickets', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			const data = response.data ?? response
-
-			if (!Array.isArray(data)) {
-				setTickets([])
-				return
-			}
-
-			setTickets(data)
-		} catch (error) {
-			console.error('Error cargando entradas:', error)
-
-			Alert.alert(
-				'Mis entradas',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar tus entradas.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadTickets()
-	}, [loadTickets])
+		if (!error) return
+
+		console.error('Error cargando entradas:', error)
+
+		Alert.alert(
+			'Mis entradas',
+			error.message || 'No fue posible cargar tus entradas.',
+		)
+	}, [error])
 
 	const purchases = useMemo<Purchase[]>(() => {
 		const groups = new Map<number, Purchase>()
@@ -205,41 +143,6 @@ export default function MyTicketsScreen() {
 	}, [purchases])
 
 	const visiblePurchases = tab === 'active' ? activePurchases : historyPurchases
-
-	const formatPurchaseDate = (date?: string | null) => {
-		if (!date) {
-			return 'Fecha no disponible'
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return 'Fecha no disponible'
-		}
-
-		return parsedDate.toLocaleDateString('es-MX', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric',
-		})
-	}
-
-	const formatPurchaseTime = (date?: string | null) => {
-		if (!date) {
-			return ''
-		}
-
-		const parsedDate = new Date(date)
-
-		if (Number.isNaN(parsedDate.getTime())) {
-			return ''
-		}
-
-		return parsedDate.toLocaleTimeString('es-MX', {
-			hour: '2-digit',
-			minute: '2-digit',
-		})
-	}
 
 	const getTicketSummary = (purchase: Purchase) => {
 		const quantities = new Map<string, number>()
@@ -467,11 +370,11 @@ export default function MyTicketsScreen() {
 													color={ICON_COLORS.muted}
 												/>
 												<Text className='mt-1 text-[13px] font-bold text-tinta'>
-													{formatPurchaseDate(purchase.createdAt)}
+													{formatDate(purchase.createdAt)}
 												</Text>
 											</View>
 
-											{formatPurchaseTime(purchase.createdAt) ? (
+											{formatTime(purchase.createdAt) ? (
 												<View className='mt-[3px] flex-row items-center gap-[5px]'>
 													<HugeiconsIcon
 														icon={Clock01Icon}
@@ -479,7 +382,7 @@ export default function MyTicketsScreen() {
 														color={ICON_COLORS.muted}
 													/>
 													<Text className='mt-[3px] text-[11px] text-tinta-2'>
-														{formatPurchaseTime(purchase.createdAt)}
+														{formatTime(purchase.createdAt)}
 													</Text>
 												</View>
 											) : null}
@@ -559,10 +462,9 @@ export default function MyTicketsScreen() {
 
 							{selectedPurchase && (
 								<Text className='mb-2.5 mt-3 text-[12px] text-tinta-2'>
-									Compra realizada el{' '}
-									{formatPurchaseDate(selectedPurchase.createdAt)}
-									{formatPurchaseTime(selectedPurchase.createdAt)
-										? ` · ${formatPurchaseTime(selectedPurchase.createdAt)}`
+									Compra realizada el {formatDate(selectedPurchase.createdAt)}
+									{formatTime(selectedPurchase.createdAt)
+										? ` · ${formatTime(selectedPurchase.createdAt)}`
 										: ''}
 								</Text>
 							)}

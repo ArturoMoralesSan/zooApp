@@ -1,19 +1,12 @@
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-	type ReactNode,
-} from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
+
+import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { useDataRefresh } from '@/hooks/useDataRefresh'
 
 import {
 	login as authLogin,
 	logout as authLogout,
 	register as authRegister,
-	getCurrentUser,
-	getToken,
 	type Level,
 	type User,
 } from '@/services/auth'
@@ -48,79 +41,48 @@ type AuthProviderProps = {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const [user, setUser] = useState<User | null>(null)
-	const [loading, setLoading] = useState(true)
+	const { data: currentUser, isLoading: loading, refresh } = useCurrentUser()
+	const { setCurrentUser, clearCache } = useDataRefresh()
 
-	const loadUser = useCallback(async () => {
-		try {
-			const token = await getToken()
+	// A failed first load leaves no data, so the user is null as before; a
+	// failed refresh keeps the last user, as refreshUser did.
+	const user = currentUser ?? null
 
-			if (!token) {
-				setUser(null)
-				return null
-			}
-
-			const currentUser = await getCurrentUser()
-
-			setUser(currentUser)
-
-			return currentUser
-		} catch {
-			setUser(null)
-			return null
-		}
-	}, [])
-
-	useEffect(() => {
-		loadUser().finally(() => {
-			setLoading(false)
-		})
-	}, [loadUser])
-
-	const login = useCallback(async (data: LoginData) => {
+	const login = async (data: LoginData) => {
 		const response = await authLogin(data)
 
-		setUser(response.user)
+		await setCurrentUser(response.user)
 
 		return response.user
-	}, [])
+	}
 
-	const register = useCallback(async (data: RegisterData) => {
+	const register = async (data: RegisterData) => {
 		const response = await authRegister(data)
 
-		setUser(response.user)
+		await setCurrentUser(response.user)
 
 		return response.user
-	}, [])
+	}
 
-	const refreshUser = useCallback(async () => {
-		const currentUser = await getCurrentUser()
+	const refreshUser = async () => (await refresh()) ?? null
 
-		setUser(currentUser)
-
-		return currentUser
-	}, [])
-
-	const logout = useCallback(async () => {
+	const logout = async () => {
 		try {
 			await authLogout()
 		} finally {
-			setUser(null)
+			await clearCache()
 		}
-	}, [])
+	}
 
-	const value = useMemo<AuthContextType>(
-		() => ({
-			user,
-			loading,
-			isAuthenticated: user !== null,
-			login,
-			register,
-			logout,
-			refreshUser,
-		}),
-		[user, loading, login, register, logout, refreshUser],
-	)
+	const value: AuthContextType = {
+		user,
+		loading,
+		isAuthenticated: user !== null,
+		login,
+		register,
+		logout,
+		refreshUser,
+	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

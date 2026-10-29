@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
+import { formatCurrency } from '@/utils/format'
 
 const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
 const COLUMN_GAP = 10
@@ -71,13 +72,6 @@ export default function DonationsIndexScreen() {
 			},
 		})
 	}
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	const renderAmountButton = (
 		label: string,

@@ -1,7 +1,7 @@
 import { MinusSignIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -17,9 +17,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
+import { formatCurrency } from '@/utils/format'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -34,13 +35,6 @@ const cardShadow: ViewStyle = {
 	elevation: 1,
 }
 
-type TicketType = {
-	id: number
-	name: string
-	price: number | string
-	description?: string | null
-}
-
 type SelectedTicket = {
 	ticket_type_id: number
 	quantity: number
@@ -51,64 +45,22 @@ const MAX_QUANTITY = 20
 export default function TicketsScreen() {
 	const router = useRouter()
 
-	const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
+	const { data: ticketTypes = [], error, isLoading: loading } = useTicketTypes()
+	// Unselected types count as 0 (every read uses `?? 0`).
 	const [quantities, setQuantities] = useState<Record<number, number>>({})
-	const [loading, setLoading] = useState(true)
 
-	const loadTicketTypes = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			const response = await api<unknown>('/tickets/types', {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			const data = response as {
-				data?: TicketType[]
-			}
-
-			const types: TicketType[] = Array.isArray(response)
-				? response
-				: Array.isArray(data?.data)
-					? data.data
-					: []
-
-			setTicketTypes(types)
-
-			const initialQuantities: Record<number, number> = {}
-
-			types.forEach((ticket) => {
-				initialQuantities[ticket.id] = 0
-			})
-
-			setQuantities(initialQuantities)
-		} catch (error) {
-			console.error('Error cargando boletos:', error)
-
-			Alert.alert(
-				'Error',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar los tipos de boleto.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadTicketTypes()
-	}, [loadTicketTypes])
+		if (!error) return
+
+		console.error('Error cargando boletos:', error)
+
+		Alert.alert(
+			'Error',
+			error.message || 'No fue posible cargar los tipos de boleto.',
+		)
+	}, [error])
 
 	const changeQuantity = (id: number, value: number) => {
 		setQuantities((current) => ({
@@ -136,13 +88,6 @@ export default function TicketsScreen() {
 
 		return sum + price * quantity
 	}, 0)
-
-	const formatCurrency = (value: number) =>
-		new Intl.NumberFormat('es-MX', {
-			style: 'currency',
-			currency: 'MXN',
-			minimumFractionDigits: 2,
-		}).format(value)
 
 	const continuePurchase = () => {
 		if (selectedTickets.length === 0) {

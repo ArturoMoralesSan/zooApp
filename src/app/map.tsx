@@ -1,5 +1,4 @@
-import { api, API_URL } from '@/services/api'
-import { getToken } from '@/services/auth'
+import { API_URL } from '@/services/api'
 
 import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
@@ -29,6 +28,16 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
+import type {
+	Coordinate,
+	GeoJSONGeometry,
+	MapSpecies,
+	PathCoordinates,
+	PathEdge,
+	PathNode,
+	Zone,
+} from '@/types/map'
+import { useMapData } from '@/hooks/useMapData'
 
 const mapShadow: ViewStyle = {
 	// eslint-disable-next-line no-restricted-syntax -- neutral shadow over the map imagery
@@ -37,125 +46,6 @@ const mapShadow: ViewStyle = {
 	shadowOpacity: 0.18,
 	shadowRadius: 8,
 	elevation: 1,
-}
-
-type Coordinate = [number, number]
-
-type MapMarker = {
-	id: number
-	zone_id: number
-	name: string
-	description?: string | null
-	type?: string | null
-	latitude: number
-	longitude: number
-	icon?: string | null
-	color?: string | null
-}
-
-type SpeciesImage = {
-	id: number
-	species_id: number
-	type: string
-	path: string
-	alt_text?: string | null
-	sort_order?: number | null
-}
-
-type Species = {
-	id: number
-	common_name: string
-	scientific_name?: string | null
-	description?: string | null
-	images?: SpeciesImage[]
-}
-
-type SpeciesLocation = {
-	id: number
-	species_id: number
-	zone_id: number
-	name?: string | null
-	latitude: number
-	longitude: number
-	description?: string | null
-	is_active?: boolean
-	species?: Species | null
-}
-
-type PathNode = {
-	id?: string | number
-	lat?: string | number
-	lng?: string | number
-	latitude?: string | number
-	longitude?: string | number
-	coordinates?: Coordinate
-}
-
-type PathEdge = {
-	id?: string | number
-	from?: string | number
-	to?: string | number
-	from_id?: string | number
-	to_id?: string | number
-	source?: string | number
-	target?: string | number
-	start?: string | number
-	end?: string | number
-	distance?: string | number
-	coordinates?: Coordinate[]
-	points?: Coordinate[]
-}
-
-type PathCoordinates =
-	| Coordinate[]
-	| {
-			nodes?: PathNode[]
-			edges?: PathEdge[]
-	  }
-	| null
-	| undefined
-
-type MapPath = {
-	id: number
-	zone_id: number
-	name: string
-	description?: string | null
-	coordinates: PathCoordinates
-	distance?: number | null
-	estimated_time?: number | null
-	is_active?: boolean
-	order?: number
-}
-
-type GeoJSONGeometry =
-	| {
-			type: 'Polygon'
-			coordinates: number[][][]
-	  }
-	| {
-			type: 'MultiPolygon'
-			coordinates: number[][][][]
-	  }
-	| null
-
-type Zone = {
-	id: number
-	name: string
-	description?: string | null
-	type?: string | null
-	geometry?: GeoJSONGeometry | Record<string, any> | string | null
-	map_image?: string | null
-	map_image_bounds?: any
-	markers?: MapMarker[]
-	species_locations?: SpeciesLocation[]
-	paths?: MapPath[]
-}
-
-type MapResponse = {
-	success: boolean
-	data: {
-		zones: Zone[]
-	}
 }
 
 type SelectableItem = {
@@ -168,7 +58,7 @@ type SelectableItem = {
 	icon?: string | null
 	iconImage?: string | null
 	thumbnail?: string | null
-	species?: Species | null
+	species?: MapSpecies | null
 }
 
 type GraphNode = {
@@ -1086,6 +976,8 @@ function formatMinutes(minutes: number | null | undefined): string {
 	return `${hours} h ${rest} min`
 }
 
+const NO_ZONES: Zone[] = []
+
 export default function MapScreen() {
 	const mapRef = useRef<any>(null)
 	const cameraRef = useRef<any>(null)
@@ -1094,11 +986,16 @@ export default function MapScreen() {
 		null,
 	)
 
-	const [loading, setLoading] = useState(true)
+	const { data, error: mapError, isLoading: loading } = useMapData()
 
-	const [error, setError] = useState<string | null>(null)
+	const zones = data ?? NO_ZONES
 
-	const [zones, setZones] = useState<Zone[]>([])
+	// Before SWR the map loaded once, so an error could only replace an empty
+	// map. Keep it that way: a failed background refetch keeps the cached map.
+	const error =
+		mapError && !data
+			? mapError.message || 'No fue posible cargar el mapa.'
+			: null
 
 	const [userLocation, setUserLocation] = useState<Coordinate | null>(null)
 
@@ -1107,8 +1004,6 @@ export default function MapScreen() {
 	const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null)
 
 	const [route, setRoute] = useState<RouteResult | null>(null)
-
-	const [isUserInsideZoo, setIsUserInsideZoo] = useState(false)
 
 	const [mapReady, setMapReady] = useState(false)
 
@@ -1180,53 +1075,6 @@ export default function MapScreen() {
 			mounted = false
 			locationSubscription.current?.remove()
 			locationSubscription.current = null
-		}
-	}, [])
-
-	useEffect(() => {
-		let mounted = true
-
-		const loadMap = async () => {
-			try {
-				setLoading(true)
-				setError(null)
-
-				const token = await getToken()
-
-				const response = await api<MapResponse>('/map', {
-					headers: token
-						? {
-								Authorization: `Bearer ${token}`,
-							}
-						: undefined,
-				})
-
-				if (!mounted) {
-					return
-				}
-
-				const receivedZones = response?.data?.zones ?? []
-
-				setZones(receivedZones)
-			} catch (apiError) {
-				if (mounted) {
-					setError(
-						apiError instanceof Error
-							? apiError.message
-							: 'No fue posible cargar el mapa.',
-					)
-				}
-			} finally {
-				if (mounted) {
-					setLoading(false)
-				}
-			}
-		}
-
-		loadMap()
-
-		return () => {
-			mounted = false
 		}
 	}, [])
 
@@ -1483,20 +1331,13 @@ export default function MapScreen() {
 		return items
 	}, [zones])
 
-	useEffect(() => {
-		if (!userLocation) {
-			setIsUserInsideZoo(false)
-			return
-		}
-
-		const inside = zones.some((zone) => {
+	const isUserInsideZoo =
+		userLocation !== null &&
+		zones.some((zone) => {
 			const geometry = normalizeZoneGeometry(zone.geometry)
 
 			return pointInGeometry(userLocation, geometry)
 		})
-
-		setIsUserInsideZoo(inside)
-	}, [zones, userLocation])
 
 	useEffect(() => {
 		if (!userLocation || !mapReady) {

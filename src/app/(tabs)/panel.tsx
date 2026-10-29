@@ -8,7 +8,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
 	ActivityIndicator,
@@ -27,22 +27,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
-import { api } from '@/services/api'
-import { getToken, logout, type User } from '@/services/auth'
+import { useProfile } from '@/hooks/useProfile'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useAuth } from '@/contexts/AuthContext'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-
-type UserWithProfile = User & {
-	profile?: {
-		avatar?: string | null
-	}
-}
-
-type ProfileResponse = {
-	success: boolean
-	user: UserWithProfile
-}
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -64,47 +54,16 @@ function getAvatarUrl(avatar?: string | null): string | null {
 export default function Panel() {
 	const insets = useSafeAreaInsets()
 
+	const { logout } = useAuth()
+
 	const [loggingOut, setLoggingOut] = useState(false)
-	const [user, setUser] = useState<UserWithProfile | null>(null)
 	const [showQr, setShowQr] = useState(false)
 
-	useEffect(() => {
-		let mounted = true
+	const { data: profile, error: profileError } = useProfile()
+	// On a failed load the panel falls back to its generic texts, as before.
+	const user = profileError ? null : (profile ?? null)
 
-		const loadProfile = async () => {
-			try {
-				const token = await getToken()
-
-				if (!token) {
-					router.replace('/login')
-					return
-				}
-
-				const response = await api<ProfileResponse>('/profile', {
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				})
-
-				if (mounted) {
-					setUser(response.user)
-				}
-			} catch (error) {
-				console.error('LOAD PANEL PROFILE ERROR:', error)
-
-				if (mounted) {
-					setUser(null)
-				}
-			}
-		}
-
-		void loadProfile()
-
-		return () => {
-			mounted = false
-		}
-	}, [])
+	useSessionRedirect()
 
 	const handleShowQr = () => {
 		if (!user?.qr_token) {
@@ -355,7 +314,6 @@ export default function Panel() {
 										size={180}
 										backgroundColor={colors.blanco}
 										color={colors.bosque}
-										eQuietZone={4}
 									/>
 								) : (
 									<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
