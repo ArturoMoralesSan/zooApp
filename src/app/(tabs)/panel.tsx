@@ -29,7 +29,7 @@ import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
-import { logout } from '@/services/auth'
+import { useAuth } from '@/contexts/AuthContext'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
@@ -53,6 +53,8 @@ function getAvatarUrl(avatar?: string | null): string | null {
 
 export default function Panel() {
 	const insets = useSafeAreaInsets()
+
+	const { logout } = useAuth()
 
 	const [loggingOut, setLoggingOut] = useState(false)
 	const [showQr, setShowQr] = useState(false)

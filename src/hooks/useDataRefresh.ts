@@ -20,5 +20,10 @@ export function useDataRefresh() {
 				user ? mutate(profileKeys.detail, user) : mutate(profileKeys.detail),
 				mutate(userKeys.current),
 			]),
+		// Store the user returned by login/register without refetching it.
+		setCurrentUser: (user: User) =>
+			mutate(userKeys.current, user, { revalidate: false }),
+		// Drop every cached response so nothing leaks into the next account.
+		clearCache: () => mutate(() => true, undefined, { revalidate: false }),
 	}
 }

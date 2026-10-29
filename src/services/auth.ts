@@ -69,6 +69,15 @@ export async function getCurrentUser(): Promise<User> {
 	return response.user
 }
 
+// The signed-in user, or null when there is no stored session.
+export async function getSessionUser(): Promise<User | null> {
+	const token = await getToken()
+
+	if (!token) return null
+
+	return getCurrentUser()
+}
+
 export async function logout(): Promise<void> {
 	const token = await getToken()
 
