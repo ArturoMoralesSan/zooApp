@@ -3,14 +3,13 @@ import BackButton from '@/components/BackButton'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
 import colors from '@/theme/colors'
+import { PasswordField } from '@/components/ui/PasswordField'
+import { TextField } from '@/components/ui/TextField'
 import {
 	LockPasswordIcon,
 	Mail01Icon,
 	UserIcon,
-	ViewIcon,
-	ViewOffSlashIcon,
 } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -22,7 +21,6 @@ import {
 	Pressable,
 	ScrollView,
 	Text,
-	TextInput,
 	View,
 } from 'react-native'
 
@@ -33,11 +31,6 @@ type FormErrors = {
 	password_confirmation?: string
 }
 
-const palette = {
-	primary: colors.esmeralda,
-	muted: colors.tinta2,
-}
-
 export default function Register() {
 	const { register } = useAuth()
 
@@ -46,19 +39,9 @@ export default function Register() {
 	const [password, setPassword] = useState('')
 	const [passwordConfirmation, setPasswordConfirmation] = useState('')
 
-	const [showPassword, setShowPassword] = useState(false)
-	const [showPasswordConfirmation, setShowPasswordConfirmation] =
-		useState(false)
-
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 	const [errors, setErrors] = useState<FormErrors>({})
-
-	const [nameFocused, setNameFocused] = useState(false)
-	const [emailFocused, setEmailFocused] = useState(false)
-	const [passwordFocused, setPasswordFocused] = useState(false)
-	const [passwordConfirmationFocused, setPasswordConfirmationFocused] =
-		useState(false)
 
 	const clearFieldError = (field: keyof FormErrors) => {
 		setErrors((current) => ({
@@ -201,213 +184,80 @@ export default function Register() {
 						</View>
 
 						{/* NOMBRE */}
-						<Text className='mb-2 mt-7 text-xs font-semibold text-tinta'>
-							Nombre completo
-						</Text>
-
-						<View
-							className={`flex-row items-center rounded-xl bg-blanco ${nameFocused ? 'border-2' : 'border'} ${errors.name ? 'border-error' : nameFocused ? 'border-esmeralda' : 'border-input-border'}`}
-						>
-							<View className='pl-3.5'>
-								<HugeiconsIcon
-									icon={UserIcon}
-									size={20}
-									strokeWidth={1.8}
-									color={nameFocused ? palette.primary : palette.muted}
-								/>
-							</View>
-
-							<TextInput
-								value={name}
-								onChangeText={(value) => {
-									setName(value)
-									clearFieldError('name')
-								}}
-								onFocus={() => setNameFocused(true)}
-								onBlur={() => setNameFocused(false)}
-								placeholder='Tu nombre'
-								placeholderTextColor={colors.apagado}
-								autoCapitalize='words'
-								autoCorrect={false}
-								returnKeyType='next'
-								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
-							/>
-						</View>
-
-						{errors.name && (
-							<Text className='mt-1 text-xs text-error'>{errors.name}</Text>
-						)}
+						<TextField
+							label='Nombre completo'
+							icon={UserIcon}
+							labelClassName='mb-2 mt-7 text-xs font-semibold text-tinta'
+							error={errors.name}
+							value={name}
+							onChangeText={(value) => {
+								setName(value)
+								clearFieldError('name')
+							}}
+							placeholder='Tu nombre'
+							autoCapitalize='words'
+							autoCorrect={false}
+							returnKeyType='next'
+						/>
 
 						{/* CORREO */}
-						<Text className='mb-2 mt-4 text-xs font-semibold text-tinta'>
-							Correo electrónico
-						</Text>
-
-						<View
-							className={`flex-row items-center rounded-xl bg-blanco ${emailFocused ? 'border-2' : 'border'} ${errors.email ? 'border-error' : emailFocused ? 'border-esmeralda' : 'border-input-border'}`}
-						>
-							<View className='pl-3.5'>
-								<HugeiconsIcon
-									icon={Mail01Icon}
-									size={20}
-									strokeWidth={1.8}
-									color={emailFocused ? palette.primary : palette.muted}
-								/>
-							</View>
-
-							<TextInput
-								value={email}
-								onChangeText={(value) => {
-									setEmail(value)
-									clearFieldError('email')
-								}}
-								onFocus={() => setEmailFocused(true)}
-								onBlur={() => setEmailFocused(false)}
-								placeholder='correo@ejemplo.com'
-								placeholderTextColor={colors.apagado}
-								keyboardType='email-address'
-								autoCapitalize='none'
-								autoCorrect={false}
-								textContentType='emailAddress'
-								autoComplete='email'
-								returnKeyType='next'
-								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
-							/>
-						</View>
-
-						{errors.email && (
-							<Text className='mt-1 text-xs text-error'>{errors.email}</Text>
-						)}
+						<TextField
+							label='Correo electrónico'
+							icon={Mail01Icon}
+							error={errors.email}
+							value={email}
+							onChangeText={(value) => {
+								setEmail(value)
+								clearFieldError('email')
+							}}
+							placeholder='correo@ejemplo.com'
+							keyboardType='email-address'
+							autoCapitalize='none'
+							autoCorrect={false}
+							textContentType='emailAddress'
+							autoComplete='email'
+							returnKeyType='next'
+						/>
 
 						{/* CONTRASEÑA */}
-						<Text className='mb-2 mt-4 text-xs font-semibold text-tinta'>
-							Contraseña
-						</Text>
-
-						<View
-							className={`flex-row items-center rounded-xl bg-blanco ${passwordFocused ? 'border-2' : 'border'} ${errors.password ? 'border-error' : passwordFocused ? 'border-esmeralda' : 'border-input-border'}`}
-						>
-							<View className='pl-3.5'>
-								<HugeiconsIcon
-									icon={LockPasswordIcon}
-									size={20}
-									strokeWidth={1.8}
-									color={passwordFocused ? palette.primary : palette.muted}
-								/>
-							</View>
-
-							<TextInput
-								value={password}
-								onChangeText={(value) => {
-									setPassword(value)
-									clearFieldError('password')
-									clearFieldError('password_confirmation')
-								}}
-								onFocus={() => setPasswordFocused(true)}
-								onBlur={() => setPasswordFocused(false)}
-								placeholder='Mínimo 8 caracteres'
-								placeholderTextColor={colors.apagado}
-								secureTextEntry={!showPassword}
-								autoCapitalize='none'
-								autoCorrect={false}
-								textContentType='newPassword'
-								autoComplete='new-password'
-								returnKeyType='next'
-								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
-							/>
-
-							<Pressable
-								onPress={() => setShowPassword((value) => !value)}
-								className='mr-2 items-center justify-center rounded-xl p-2'
-								hitSlop={8}
-								accessibilityRole='button'
-								accessibilityLabel={
-									showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-								}
-							>
-								<HugeiconsIcon
-									icon={showPassword ? ViewOffSlashIcon : ViewIcon}
-									size={21}
-									strokeWidth={1.8}
-									color={passwordFocused ? palette.primary : palette.muted}
-								/>
-							</Pressable>
-						</View>
-
-						{errors.password && (
-							<Text className='mt-1 text-xs text-error'>{errors.password}</Text>
-						)}
+						<PasswordField
+							label='Contraseña'
+							icon={LockPasswordIcon}
+							error={errors.password}
+							value={password}
+							onChangeText={(value) => {
+								setPassword(value)
+								clearFieldError('password')
+								clearFieldError('password_confirmation')
+							}}
+							placeholder='Mínimo 8 caracteres'
+							autoCapitalize='none'
+							autoCorrect={false}
+							textContentType='newPassword'
+							autoComplete='new-password'
+							returnKeyType='next'
+						/>
 
 						{/* CONFIRMAR CONTRASEÑA */}
-						<Text className='mb-2 mt-4 text-xs font-semibold text-tinta'>
-							Confirmar contraseña
-						</Text>
-
-						<View
-							className={`flex-row items-center rounded-xl bg-blanco ${passwordConfirmationFocused ? 'border-2' : 'border'} ${errors.password_confirmation ? 'border-error' : passwordConfirmationFocused ? 'border-esmeralda' : 'border-input-border'}`}
-						>
-							<View className='pl-3.5'>
-								<HugeiconsIcon
-									icon={LockPasswordIcon}
-									size={20}
-									strokeWidth={1.8}
-									color={
-										passwordConfirmationFocused
-											? palette.primary
-											: palette.muted
-									}
-								/>
-							</View>
-
-							<TextInput
-								value={passwordConfirmation}
-								onChangeText={(value) => {
-									setPasswordConfirmation(value)
-									clearFieldError('password_confirmation')
-								}}
-								onFocus={() => setPasswordConfirmationFocused(true)}
-								onBlur={() => setPasswordConfirmationFocused(false)}
-								placeholder='Repite tu contraseña'
-								placeholderTextColor={colors.apagado}
-								secureTextEntry={!showPasswordConfirmation}
-								autoCapitalize='none'
-								autoCorrect={false}
-								textContentType='newPassword'
-								autoComplete='new-password'
-								returnKeyType='done'
-								onSubmitEditing={handleRegister}
-								className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
-							/>
-
-							<Pressable
-								onPress={() => setShowPasswordConfirmation((value) => !value)}
-								className='mr-2 items-center justify-center rounded-xl p-2'
-								hitSlop={8}
-								accessibilityRole='button'
-								accessibilityLabel={
-									showPasswordConfirmation
-										? 'Ocultar confirmación de contraseña'
-										: 'Mostrar confirmación de contraseña'
-								}
-							>
-								<HugeiconsIcon
-									icon={showPasswordConfirmation ? ViewOffSlashIcon : ViewIcon}
-									size={21}
-									strokeWidth={1.8}
-									color={
-										passwordConfirmationFocused
-											? palette.primary
-											: palette.muted
-									}
-								/>
-							</Pressable>
-						</View>
-
-						{errors.password_confirmation && (
-							<Text className='mt-1 text-xs text-error'>
-								{errors.password_confirmation}
-							</Text>
-						)}
+						<PasswordField
+							label='Confirmar contraseña'
+							icon={LockPasswordIcon}
+							error={errors.password_confirmation}
+							showLabel='Mostrar confirmación de contraseña'
+							hideLabel='Ocultar confirmación de contraseña'
+							value={passwordConfirmation}
+							onChangeText={(value) => {
+								setPasswordConfirmation(value)
+								clearFieldError('password_confirmation')
+							}}
+							placeholder='Repite tu contraseña'
+							autoCapitalize='none'
+							autoCorrect={false}
+							textContentType='newPassword'
+							autoComplete='new-password'
+							returnKeyType='done'
+							onSubmitEditing={handleRegister}
+						/>
 
 						{/* ERROR GENERAL */}
 						{error !== '' && (
