@@ -1,8 +1,8 @@
-import BackButton from '@/components/BackButton'
 import Toast from '@/components/toast'
 import type { FormErrors } from '@/types/profile'
 import { PersonalDataSection } from '@/components/profile/PersonalDataSection'
 import { ProfileProgress } from '@/components/profile/ProfileProgress'
+import { ProfileHeader } from '@/components/profile/ProfileHeader'
 import { ApiValidationError } from '@/services/api'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useProfile } from '@/hooks/useProfile'
@@ -12,23 +12,17 @@ import {
 } from '@/hooks/useSessionRedirect'
 import { type User } from '@/services/auth'
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
-import { router } from 'expo-router'
 import { useCallback, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
 	Animated,
-	Dimensions,
-	Image,
 	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
-	Pressable,
 	Text,
-	View,
 } from 'react-native'
 import { updateAvatar, updateProfile } from '@/services/profile'
 import {
@@ -37,8 +31,6 @@ import {
 	formatDateForDisplay,
 } from '@/utils/date'
 import { getAvatarUrl } from '@/utils/profile'
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 type ToastState = {
 	visible: boolean
@@ -367,81 +359,18 @@ function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 					)}
 				>
 					{/* HEADER */}
-					<View className='relative'>
-						<Animated.Image
-							source={require('../../assets/images/profile-background.png')}
-							resizeMode='cover'
-							style={{ width: SCREEN_WIDTH, height: coverHeight }}
-						/>
-
-						<BackButton
-							onPress={() => router.back()}
-							opacity={backButtonOpacity}
-						/>
-
-						<View className='absolute left-0 right-0 top-0 items-center pt-20'>
-							<Pressable onPress={handlePickAvatar} disabled={uploadingAvatar}>
-								<Animated.View
-									className='h-28 w-28 items-center justify-center overflow-hidden rounded-[56px] border-[5px] border-blanco bg-niebla'
-									style={[
-										cardShadow,
-										{
-											transform: [
-												{ scale: avatarScale },
-												{ translateY: avatarTranslateY },
-											],
-										},
-									]}
-								>
-									{avatarUrl ? (
-										<Image
-											source={{ uri: avatarUrl }}
-											className='h-full w-full'
-											resizeMode='cover'
-										/>
-									) : (
-										<Text className='text-[48px] font-bold text-esmeralda'>
-											{user?.name?.charAt(0).toUpperCase() || '?'}
-										</Text>
-									)}
-
-									{uploadingAvatar && (
-										<View className='absolute inset-0 items-center justify-center bg-esmeralda/55'>
-											<ActivityIndicator size='large' color={colors.blanco} />
-										</View>
-									)}
-								</Animated.View>
-
-								<View
-									className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'
-									style={cardShadow}
-								>
-									<Text className='text-[20px] font-bold text-tinta'>+</Text>
-								</View>
-							</Pressable>
-
-							<Animated.Text
-								className='mt-5 text-[23px] font-bold text-blanco'
-								style={{
-									// eslint-disable-next-line no-restricted-syntax -- neutral text shadow over the cover photo
-									textShadowColor: 'rgba(0,0,0,0.2)',
-									textShadowOffset: { width: 0, height: 1 },
-									textShadowRadius: 4,
-									transform: [{ translateY: nameTranslateY }],
-								}}
-							>
-								{user?.name || 'Visitante'}
-							</Animated.Text>
-
-							<Animated.Text
-								className='mt-1 px-8 text-center text-[14px] text-blanco'
-								style={{ opacity: emailOpacity }}
-								numberOfLines={1}
-							>
-								{user?.email || ''}
-							</Animated.Text>
-						</View>
-					</View>
+					<ProfileHeader
+						coverHeight={coverHeight}
+						backButtonOpacity={backButtonOpacity}
+						avatarScale={avatarScale}
+						avatarTranslateY={avatarTranslateY}
+						nameTranslateY={nameTranslateY}
+						emailOpacity={emailOpacity}
+						avatarUrl={avatarUrl}
+						user={user}
+						uploadingAvatar={uploadingAvatar}
+						onPickAvatar={handlePickAvatar}
+					/>
 
 					{/* PROGRESO */}
 					<ProfileProgress
