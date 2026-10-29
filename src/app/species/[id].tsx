@@ -1,6 +1,7 @@
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useSpeciesDetail } from '@/hooks/useSpecies'
 import {
 	Leaf01Icon,
 	Location01Icon,
@@ -10,7 +11,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
@@ -26,8 +27,7 @@ import {
 } from 'react-native'
 
 import colors from '@/theme/colors'
-import type { SpeciesDetail, SpeciesImage } from '@/types/species'
-import { getSpeciesById } from '@/services/species'
+import type { SpeciesImage } from '@/types/species'
 
 const cardShadow: ViewStyle = {
 	shadowColor: colors.esmeralda,
@@ -53,39 +53,19 @@ export default function SpeciesDetailScreen() {
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
-	const [species, setSpecies] = useState<SpeciesDetail | null>(null)
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+	const {
+		data: species,
+		error: loadError,
+		isLoading: loading,
+		refresh,
+	} = useSpeciesDetail(params.id)
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
 
-	const loadSpecies = useCallback(async () => {
-		try {
-			setLoading(true)
-			setError(null)
+	const error = loadError
+		? loadError.message || 'No fue posible cargar la información de la especie.'
+		: null
 
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			setSpecies(await getSpeciesById(params.id))
-		} catch (err) {
-			console.error(err)
-			setError(
-				err instanceof Error
-					? err.message
-					: 'No fue posible cargar la información de la especie.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [params.id, router])
-
-	useEffect(() => {
-		void loadSpecies()
-	}, [loadSpecies])
+	useSessionRedirect()
 
 	const cardMarginTop = scrollY.interpolate({
 		inputRange: [0, 180],
@@ -169,7 +149,7 @@ export default function SpeciesDetailScreen() {
 					</Text>
 
 					<Pressable
-						onPress={() => void loadSpecies()}
+						onPress={() => void refresh()}
 						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
 					>
 						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
