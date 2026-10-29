@@ -1,4 +1,5 @@
-import { getToken } from '@/services/auth'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useMyTickets } from '@/hooks/useTickets'
 
 import {
 	Calendar03Icon,
@@ -8,7 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -30,7 +31,6 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 import type { Purchase, Ticket } from '@/types/tickets'
 import { formatDate, formatTime } from '@/utils/format'
-import { getMyTickets } from '@/services/tickets'
 
 const ICON_COLORS = {
 	primary: colors.esmeralda,
@@ -75,42 +75,24 @@ const getTicketStatus = (ticket?: Ticket) => {
 export default function MyTicketsScreen() {
 	const router = useRouter()
 
-	const [tickets, setTickets] = useState<Ticket[]>([])
-	const [loading, setLoading] = useState(true)
+	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
 	const [tab, setTab] = useState<'active' | 'history'>('active')
 	const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(
 		null,
 	)
 
-	const loadTickets = useCallback(async () => {
-		try {
-			setLoading(true)
-
-			const token = await getToken()
-
-			if (!token) {
-				router.replace('/login')
-				return
-			}
-
-			setTickets(await getMyTickets())
-		} catch (error) {
-			console.error('Error cargando entradas:', error)
-
-			Alert.alert(
-				'Mis entradas',
-				error instanceof Error
-					? error.message
-					: 'No fue posible cargar tus entradas.',
-			)
-		} finally {
-			setLoading(false)
-		}
-	}, [router])
+	useSessionRedirect()
 
 	useEffect(() => {
-		void loadTickets()
-	}, [loadTickets])
+		if (!error) return
+
+		console.error('Error cargando entradas:', error)
+
+		Alert.alert(
+			'Mis entradas',
+			error.message || 'No fue posible cargar tus entradas.',
+		)
+	}, [error])
 
 	const purchases = useMemo<Purchase[]>(() => {
 		const groups = new Map<number, Purchase>()
