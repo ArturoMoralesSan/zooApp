@@ -19,7 +19,6 @@ import {
 	ScrollView,
 	Text,
 	View,
-	type ViewStyle,
 } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 
@@ -28,49 +27,15 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
-import type { Purchase, Ticket } from '@/types/tickets'
+import type { Purchase } from '@/types/tickets'
 import { formatDate, formatTime } from '@/utils/format'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
-
-const ICON_COLORS = {
-	primary: colors.esmeralda,
-	muted: colors.tinta2,
-	coral: colors.error,
-} as const
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.tinta,
-	shadowOffset: { width: 0, height: 3 },
-	shadowOpacity: 0.055,
-	shadowRadius: 8,
-	elevation: 2,
-}
-
-const getTicketStatus = (ticket?: Ticket) => {
-	if (!ticket) {
-		return 'Sin estado'
-	}
-
-	const status = String(ticket.status ?? '').toLowerCase()
-
-	switch (status) {
-		case 'active':
-		case 'activo':
-			return 'Activa'
-		case 'used':
-		case 'usado':
-			return 'Usada'
-		case 'expired':
-		case 'expirado':
-			return 'Expirada'
-		case 'cancelled':
-		case 'canceled':
-		case 'cancelado':
-			return 'Cancelada'
-		default:
-			return ticket.status ?? 'Sin estado'
-	}
-}
+import { cardShadow, ICON_COLORS } from '@/components/tickets/myTicketsStyles'
+import {
+	getActiveCount,
+	getTicketStatus,
+	getTicketSummary,
+} from '@/utils/tickets'
 
 export default function MyTicketsScreen() {
 	const router = useRouter()
@@ -143,28 +108,6 @@ export default function MyTicketsScreen() {
 	}, [purchases])
 
 	const visiblePurchases = tab === 'active' ? activePurchases : historyPurchases
-
-	const getTicketSummary = (purchase: Purchase) => {
-		const quantities = new Map<string, number>()
-
-		for (const ticket of purchase.tickets) {
-			const name = ticket.ticket_type?.name ?? 'Entrada'
-
-			quantities.set(name, (quantities.get(name) ?? 0) + 1)
-		}
-
-		return Array.from(quantities.entries())
-			.map(([name, quantity]) => `${quantity} ${name}`)
-			.join(' · ')
-	}
-
-	const getActiveCount = (purchase: Purchase) => {
-		return purchase.tickets.filter((ticket) => {
-			const status = String(ticket.status ?? '').toLowerCase()
-
-			return status === 'active' || status === 'activo'
-		}).length
-	}
 
 	return (
 		<ScreenBackground patternClassName='opacity-[0.12]'>
