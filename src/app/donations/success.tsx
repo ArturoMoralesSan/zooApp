@@ -9,71 +9,36 @@ import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
+import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
 
-type PaymentMethodData = {
-	id?: number | string
-	name?: string | null
-	code?: string | null
-}
-
-type DonationData = {
-	id?: number | string | null
-	amount?: number | string | null
-	payment_method?: string | PaymentMethodData | null
-	paymentMethod?: string | PaymentMethodData | null
-	status?: string | null
-	created_at?: string | null
-	createdAt?: string | null
-	reference?: string | null
-	folio?: string | null
-}
-
-function getPaymentMethod(
-	method: string | PaymentMethodData | null | undefined,
-) {
-	if (!method) return 'Tarjeta'
-
-	if (typeof method === 'string') return method
-
-	return method.name || method.code || 'Tarjeta'
+function getPaymentMethod(method: PaymentMethod | null | undefined) {
+	return method?.name || method?.code || 'Tarjeta'
 }
 
 export default function DonationSuccessScreen() {
+	// donations/summary passes the created donation as JSON, plus the amount
+	// on its own in case the donation can't be read.
 	const params = useLocalSearchParams<{
 		donation?: string
 		amount?: string
-		id?: string
-		folio?: string
-		reference?: string
 	}>()
 
-	const donation = useMemo<DonationData>(() => {
+	const donation = useMemo<Partial<Donation>>(() => {
 		if (params.donation) {
 			try {
 				const parsed = JSON.parse(params.donation)
 
 				if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-					return parsed as DonationData
+					return parsed as Donation
 				}
 			} catch {
-				// Si el parámetro no es JSON válido, usamos los parámetros individuales.
+				// Si el parámetro no es JSON válido, usamos el monto por separado.
 			}
 		}
 
-		return {
-			amount: params.amount,
-			id: params.id,
-			folio: params.folio,
-			reference: params.reference,
-		}
-	}, [
-		params.donation,
-		params.amount,
-		params.id,
-		params.folio,
-		params.reference,
-	])
+		return { amount: params.amount }
+	}, [params.donation, params.amount])
 
 	const amount = donation.amount ?? params.amount ?? 0
 
@@ -81,14 +46,9 @@ export default function DonationSuccessScreen() {
 		donation.folio ||
 		donation.reference ||
 		donation.id ||
-		params.folio ||
-		params.reference ||
-		params.id ||
 		'Registrada correctamente'
 
-	const paymentMethod = getPaymentMethod(
-		donation.payment_method ?? donation.paymentMethod,
-	)
+	const paymentMethod = getPaymentMethod(donation.payment_method)
 
 	const handleGoHome = () => {
 		router.replace('/')
