@@ -12,6 +12,22 @@ export type Level = {
 	description?: string | null
 }
 
+export type UserProfile = {
+	avatar?: string | null
+	phone?: string | null
+	birth_date?: string | null
+	city?: string | null
+	country?: string | null
+}
+
+export type UserGamification = {
+	points?: number
+	current_level?: Level | null
+	next_level?: Level | null
+	progress?: number
+	points_to_next_level?: number
+}
+
 export type User = {
 	id: number
 	name: string
@@ -19,6 +35,9 @@ export type User = {
 	points: number
 	level_id: number | null
 	level?: Level | null
+	qr_token?: string | null
+	profile?: UserProfile | null
+	gamification?: UserGamification | null
 }
 
 type AuthResponse = {

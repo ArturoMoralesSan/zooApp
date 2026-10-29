@@ -33,15 +33,9 @@ import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
 
-type UserWithProfile = User & {
-	profile?: {
-		avatar?: string | null
-	}
-}
-
 type ProfileResponse = {
 	success: boolean
-	user: UserWithProfile
+	user: User
 }
 
 function getAvatarUrl(avatar?: string | null): string | null {
@@ -65,7 +59,7 @@ export default function Panel() {
 	const insets = useSafeAreaInsets()
 
 	const [loggingOut, setLoggingOut] = useState(false)
-	const [user, setUser] = useState<UserWithProfile | null>(null)
+	const [user, setUser] = useState<User | null>(null)
 	const [showQr, setShowQr] = useState(false)
 
 	useEffect(() => {
@@ -355,7 +349,6 @@ export default function Panel() {
 										size={180}
 										backgroundColor={colors.blanco}
 										color={colors.bosque}
-										eQuietZone={4}
 									/>
 								) : (
 									<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
