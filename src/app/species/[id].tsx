@@ -1,4 +1,6 @@
 import BackButton from '@/components/BackButton'
+import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
+import { cardShadow } from '@/components/species/speciesStyles'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
 import { SpeciesTags } from '@/components/species/SpeciesTags'
@@ -6,30 +8,18 @@ import { SpeciesGallery } from '@/components/species/SpeciesGallery'
 import { SpeciesImageViewer } from '@/components/species/SpeciesImageViewer'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
-import { UserGroupIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
 	ImageBackground,
-	Pressable,
 	Text,
 	View,
-	type ViewStyle,
 } from 'react-native'
 
 import colors from '@/theme/colors'
 import type { SpeciesImage } from '@/types/species'
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.esmeralda,
-	shadowOffset: { width: 0, height: 5 },
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
 
 export default function SpeciesDetailScreen() {
 	const router = useRouter()
@@ -101,45 +91,11 @@ export default function SpeciesDetailScreen() {
 
 	if (error || !species) {
 		return (
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 bg-blanco px-4 pt-14'
-				resizeMode='repeat'
-				imageClassName='opacity-90'
-			>
-				<View className='z-[100]' style={{ elevation: 100 }}>
-					<BackButton onPress={() => router.back()} />
-				</View>
-
-				<View
-					className='items-center rounded-[28px] border border-card-border bg-niebla px-6 py-10'
-					style={cardShadow}
-				>
-					<View className='h-16 w-16 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-						<HugeiconsIcon
-							icon={UserGroupIcon}
-							size={34}
-							strokeWidth={1.8}
-							color={colors.tinta}
-						/>
-					</View>
-
-					<Text className='mt-5 text-center text-[18px] font-bold text-tinta'>
-						No fue posible cargar la especie
-					</Text>
-
-					<Text className='mt-2 text-center text-sm leading-5 text-tinta-2'>
-						{error ?? 'La información no está disponible en este momento.'}
-					</Text>
-
-					<Pressable
-						onPress={() => void refresh()}
-						className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
-					>
-						<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
-					</Pressable>
-				</View>
-			</ImageBackground>
+			<SpeciesErrorState
+				error={error}
+				onBack={() => router.back()}
+				onRetry={() => void refresh()}
+			/>
 		)
 	}
 
