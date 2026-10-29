@@ -10,7 +10,7 @@ module.exports = defineConfig([
 	expoConfig,
 	eslintPluginPrettierRecommended,
 	{
-		ignores: ['dist/*'],
+		ignores: ['dist/*', 'expo-env.d.ts'],
 	},
 	{
 		// Keep screens and components on NativeWind classes + the palette.

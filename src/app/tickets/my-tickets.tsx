@@ -9,7 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -112,11 +112,7 @@ export default function MyTicketsScreen() {
 		null,
 	)
 
-	useEffect(() => {
-		void loadTickets()
-	}, [])
-
-	const loadTickets = async () => {
+	const loadTickets = useCallback(async () => {
 		try {
 			setLoading(true)
 
@@ -154,7 +150,11 @@ export default function MyTicketsScreen() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [router])
+
+	useEffect(() => {
+		void loadTickets()
+	}, [loadTickets])
 
 	const purchases = useMemo<Purchase[]>(() => {
 		const groups = new Map<number, Purchase>()

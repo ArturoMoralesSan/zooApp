@@ -11,7 +11,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Animated,
@@ -91,7 +91,7 @@ export default function SpeciesDetailScreen() {
 	const router = useRouter()
 	const params = useLocalSearchParams<{ id: string }>()
 
-	const scrollY = useRef(new Animated.Value(0)).current
+	const [scrollY] = useState(() => new Animated.Value(0))
 
 	const [species, setSpecies] = useState<Species | null>(null)
 	const [loading, setLoading] = useState(true)
