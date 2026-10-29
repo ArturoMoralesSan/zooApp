@@ -8,7 +8,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
 	ActivityIndicator,
@@ -27,11 +27,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
-import { getToken, logout, type User } from '@/services/auth'
+import { useProfile } from '@/hooks/useProfile'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { logout } from '@/services/auth'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-import { getProfile } from '@/services/profile'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -54,41 +55,13 @@ export default function Panel() {
 	const insets = useSafeAreaInsets()
 
 	const [loggingOut, setLoggingOut] = useState(false)
-	const [user, setUser] = useState<User | null>(null)
 	const [showQr, setShowQr] = useState(false)
 
-	useEffect(() => {
-		let mounted = true
+	const { data: profile, error: profileError } = useProfile()
+	// On a failed load the panel falls back to its generic texts, as before.
+	const user = profileError ? null : (profile ?? null)
 
-		const loadProfile = async () => {
-			try {
-				const token = await getToken()
-
-				if (!token) {
-					router.replace('/login')
-					return
-				}
-
-				const profile = await getProfile()
-
-				if (mounted) {
-					setUser(profile)
-				}
-			} catch (error) {
-				console.error('LOAD PANEL PROFILE ERROR:', error)
-
-				if (mounted) {
-					setUser(null)
-				}
-			}
-		}
-
-		void loadProfile()
-
-		return () => {
-			mounted = false
-		}
-	}, [])
+	useSessionRedirect()
 
 	const handleShowQr = () => {
 		if (!user?.qr_token) {
