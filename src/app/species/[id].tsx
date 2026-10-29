@@ -1,5 +1,6 @@
 import AppCard from '@/components/AppCard'
 import BackButton from '@/components/BackButton'
+import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import {
@@ -178,35 +179,11 @@ export default function SpeciesDetailScreen() {
 			>
 				<View className='relative bg-blanco'>
 					{/* IMAGEN PRINCIPAL */}
-					<View className='h-[470px] w-full overflow-hidden bg-niebla'>
-						{heroImage ? (
-							<Pressable
-								onPress={() => setSelectedImage(heroImage)}
-								className='h-full w-full'
-							>
-								<Image
-									source={{ uri: heroImage.url }}
-									className='h-full w-full'
-									resizeMode='cover'
-									accessibilityLabel={heroImage.alt_text || species.common_name}
-								/>
-							</Pressable>
-						) : (
-							<View className='h-full w-full items-center justify-center bg-niebla'>
-								<HugeiconsIcon
-									icon={UserGroupIcon}
-									size={80}
-									strokeWidth={1.8}
-									color={colors.esmeralda}
-								/>
-							</View>
-						)}
-
-						<View
-							className='absolute inset-0 bg-bosque/[0.08]'
-							pointerEvents='none'
-						/>
-					</View>
+					<SpeciesHero
+						heroImage={heroImage}
+						species={species}
+						onOpenImage={setSelectedImage}
+					/>
 
 					{/* CONTENIDO */}
 					<Animated.View
