@@ -2,17 +2,15 @@ import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
 
 import { useEffect, useRef, useState } from 'react'
 
-import { ActivityIndicator, Text, View } from 'react-native'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
-import colors from '@/theme/colors'
 import type { Coordinate, SelectableItem, Zone } from '@/types/map'
-import { mapShadow } from '@/components/map/mapShadow'
 import { CollapsedRouteCard } from '@/components/map/CollapsedRouteCard'
 import { DestinationMarker } from '@/components/map/DestinationMarker'
 import { LocationBadge } from '@/components/map/LocationBadge'
+import { MapErrorState } from '@/components/map/MapErrorState'
 import { MapHeaderCard } from '@/components/map/MapHeaderCard'
 import { MapLayers } from '@/components/map/MapLayers'
+import { MapLoadingState } from '@/components/map/MapLoadingState'
 import { PoiMarker } from '@/components/map/PoiMarker'
 import { RouteCard } from '@/components/map/RouteCard'
 import { SpeciesMarker } from '@/components/map/SpeciesMarker'
@@ -133,43 +131,11 @@ export default function MapScreen() {
 	}
 
 	if (loading) {
-		return (
-			<SafeAreaView className='flex-1 items-center justify-center bg-screen px-6'>
-				<View
-					className='w-full max-w-[320px] items-center justify-center rounded-3xl bg-niebla px-6 py-[30px]'
-					style={mapShadow}
-				>
-					<ActivityIndicator size='large' color={colors.esmeralda} />
-
-					<Text className='mt-3.5 text-[15px] font-semibold text-tinta-2'>
-						Cargando mapa...
-					</Text>
-				</View>
-			</SafeAreaView>
-		)
+		return <MapLoadingState />
 	}
 
 	if (error) {
-		return (
-			<SafeAreaView className='flex-1 items-center justify-center bg-screen px-6'>
-				<View
-					className='w-full max-w-[360px] items-center rounded-3xl border border-error-border bg-error-bg px-6 py-7'
-					style={mapShadow}
-				>
-					<View className='mb-3.5 h-[52px] w-[52px] items-center justify-center rounded-[18px] bg-error-border'>
-						<Text className='text-[28px] font-extrabold text-error'>!</Text>
-					</View>
-
-					<Text className='mb-2 text-center text-[20px] font-extrabold text-tinta'>
-						No fue posible cargar el mapa
-					</Text>
-
-					<Text className='text-center text-[14px] leading-[21px] text-tinta-2'>
-						{error}
-					</Text>
-				</View>
-			</SafeAreaView>
-		)
+		return <MapErrorState error={error} />
 	}
 
 	return (
