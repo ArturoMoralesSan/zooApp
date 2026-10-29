@@ -58,3 +58,5 @@ export type CreateOrderResponse = {
 	message?: string
 	data?: Order
 }
+
+export type MyTicketsTab = 'active' | 'history'

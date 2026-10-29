@@ -27,10 +27,11 @@ import BackButton from '@/components/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import colors from '@/theme/colors'
-import type { Purchase } from '@/types/tickets'
+import type { MyTicketsTab, Purchase } from '@/types/tickets'
 import { formatDate, formatTime } from '@/utils/format'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { TicketStatsRow } from '@/components/tickets/TicketStatsRow'
+import { TicketTabs } from '@/components/tickets/TicketTabs'
 import { cardShadow, ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 import {
 	getActiveCount,
@@ -42,7 +43,7 @@ export default function MyTicketsScreen() {
 	const router = useRouter()
 
 	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
-	const [tab, setTab] = useState<'active' | 'history'>('active')
+	const [tab, setTab] = useState<MyTicketsTab>('active')
 	const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(
 		null,
 	)
@@ -132,49 +133,12 @@ export default function MyTicketsScreen() {
 					historyPurchases={historyPurchases}
 				/>
 
-				<View className='mb-[18px] flex-row rounded-2xl border border-card-border bg-niebla p-1'>
-					<Pressable
-						onPress={() => setTab('active')}
-						className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-esmeralda' : ''}`}
-					>
-						<Text
-							className={`text-[13px] ${tab === 'active' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
-						>
-							Activas
-						</Text>
-
-						<View
-							className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
-						>
-							<Text
-								className={`text-[11px] font-bold ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
-							>
-								{activePurchases.length}
-							</Text>
-						</View>
-					</Pressable>
-
-					<Pressable
-						onPress={() => setTab('history')}
-						className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-esmeralda' : ''}`}
-					>
-						<Text
-							className={`text-[13px] ${tab === 'history' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
-						>
-							Historial
-						</Text>
-
-						<View
-							className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
-						>
-							<Text
-								className={`text-[11px] font-bold ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
-							>
-								{historyPurchases.length}
-							</Text>
-						</View>
-					</Pressable>
-				</View>
+				<TicketTabs
+					tab={tab}
+					activePurchases={activePurchases}
+					historyPurchases={historyPurchases}
+					onChangeTab={setTab}
+				/>
 
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
