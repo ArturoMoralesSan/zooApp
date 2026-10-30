@@ -18,6 +18,9 @@ type QueryViewProps<T> = {
 	empty?: Omit<EmptyStateProps, 'className'>
 	// Spacing around whichever state is shown.
 	className?: string
+	// Frames the loading/error/empty states, for screens where they fill the
+	// screen (background, back button). Children are never wrapped.
+	wrapper?: (state: ReactNode) => ReactNode
 	children: (data: T) => ReactNode
 }
 
@@ -32,6 +35,7 @@ export function QueryView<T>({
 	isEmpty,
 	empty,
 	className,
+	wrapper = (state) => state,
 	children,
 }: QueryViewProps<T>) {
 	const { isOffline } = useNetworkStatus()
@@ -39,17 +43,17 @@ export function QueryView<T>({
 
 	if (data === undefined) {
 		if (isLoading) {
-			return (
+			return wrapper(
 				<LoadingState
 					message={loadingMessage}
 					layout={loadingLayout}
 					className={className}
-				/>
+				/>,
 			)
 		}
 
 		if (error) {
-			return (
+			return wrapper(
 				<ErrorState
 					title={errorTitle}
 					offline={isOffline || isNetworkError(error)}
@@ -57,7 +61,7 @@ export function QueryView<T>({
 						void refresh()
 					}}
 					className={className}
-				/>
+				/>,
 			)
 		}
 
@@ -65,7 +69,7 @@ export function QueryView<T>({
 	}
 
 	if (empty && isEmpty?.(data)) {
-		return <EmptyState {...empty} className={className} />
+		return wrapper(<EmptyState {...empty} className={className} />)
 	}
 
 	return children(data)
