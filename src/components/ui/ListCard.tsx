@@ -1,6 +1,6 @@
 import { Card, type CardTone } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
-import { IconBox } from '@/components/ui/IconBox'
+import { IconBox, type IconBoxTone } from '@/components/ui/IconBox'
 import colors from '@/theme/colors'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import type { IconSvgElement } from '@hugeicons/react-native'
@@ -11,6 +11,8 @@ type ListCardProps = {
 	title: string
 	description?: string
 	icon?: IconSvgElement
+	// Overrides the tone's icon box, e.g. a solid icon on a hoja card.
+	iconTone?: IconBoxTone
 	// Round 40px photo in place of the icon box (user avatar).
 	avatarUrl?: string | null
 	// Shown in an Esmeralda circle when there is no avatar photo.
@@ -57,6 +59,7 @@ export function ListCard({
 	title,
 	description,
 	icon,
+	iconTone,
 	avatarUrl,
 	avatarInitials,
 	image,
@@ -83,7 +86,7 @@ export function ListCard({
 			</Text>
 		</View>
 	) : icon ? (
-		<IconBox icon={icon} tone={style.iconBox} />
+		<IconBox icon={icon} tone={iconTone ?? style.iconBox} />
 	) : null
 
 	return (
