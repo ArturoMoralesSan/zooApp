@@ -11,6 +11,7 @@ import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { Chip } from '@/components/ui/Chip'
 import { IconBox } from '@/components/ui/IconBox'
 import { TextLink } from '@/components/ui/TextLink'
@@ -73,11 +74,9 @@ export default function SpeciesScreen() {
 
 	return (
 		<ScreenBackground>
-			<ScrollView
+			<KeyboardScrollView
 				className='flex-1'
 				contentContainerClassName='grow px-3 pb-[120px] pt-2'
-				keyboardShouldPersistTaps='handled'
-				showsVerticalScrollIndicator={false}
 			>
 				<View className='mb-4'>
 					<BackButton onPress={() => router.back()} position='relative' />
@@ -186,7 +185,7 @@ export default function SpeciesScreen() {
 				)}
 
 				<View className='h-10' />
-			</ScrollView>
+			</KeyboardScrollView>
 		</ScreenBackground>
 	)
 }
