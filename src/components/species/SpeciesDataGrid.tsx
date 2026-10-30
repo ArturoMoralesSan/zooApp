@@ -21,7 +21,7 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 				{species.habitat && (
 					<View className='mb-3 w-[48.5%]'>
 						<ListCard
-							className='flex-1'
+							className='grow'
 							icon={Location01Icon}
 							layout='tile'
 							title='Hábitat'
@@ -34,7 +34,7 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 				{species.origin && (
 					<View className='mb-3 w-[48.5%]'>
 						<ListCard
-							className='flex-1'
+							className='grow'
 							icon={Plant01Icon}
 							layout='tile'
 							title='Origen'
@@ -47,7 +47,7 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 				{species.diet && (
 					<View className='mb-3 w-[48.5%]'>
 						<ListCard
-							className='flex-1'
+							className='grow'
 							icon={Leaf01Icon}
 							title='Alimentación'
 							layout='tile'
@@ -60,7 +60,7 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 				{species.conservation_status && (
 					<View className='mb-3 w-[48.5%]'>
 						<ListCard
-							className='flex-1'
+							className='grow'
 							tone='hoja'
 							icon={Shield01Icon}
 							layout='tile'

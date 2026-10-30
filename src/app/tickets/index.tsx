@@ -1,11 +1,10 @@
-import { MinusSignIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
+import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
@@ -20,6 +19,7 @@ import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
+import { QuantityStepper } from '@/components/ui/QuantityStepper'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const ICON_COLORS = {
@@ -172,8 +172,6 @@ export default function TicketsScreen() {
 						const parsedPrice = Number(ticket.price)
 						const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
 						const amount = price * quantity
-						const canDecrease = quantity > 0
-						const canIncrease = quantity < MAX_QUANTITY
 
 						return (
 							<View
@@ -221,51 +219,12 @@ export default function TicketsScreen() {
 										</Text>
 									</View>
 
-									<View className='ml-1 shrink-0 flex-row items-center justify-end gap-2'>
-										{/* RESTAR */}
-										<Pressable
-											accessibilityRole='button'
-											accessibilityLabel={`Restar boleto de ${ticket.name}`}
-											onPress={() => changeQuantity(ticket.id, quantity - 1)}
-											disabled={!canDecrease}
-											className={`h-10 min-h-10 w-10 min-w-10 shrink-0 items-center justify-center rounded-xl border border-card-border p-0 ${canDecrease ? 'bg-blanco active:opacity-70' : 'bg-niebla opacity-70'}`}
-										>
-											<HugeiconsIcon
-												icon={MinusSignIcon}
-												size={18}
-												strokeWidth={2}
-												color={
-													canDecrease ? ICON_COLORS.primary : ICON_COLORS.muted
-												}
-											/>
-										</Pressable>
-
-										{/* CANTIDAD */}
-										<View className='h-10 w-[34px] min-w-[34px] shrink-0 items-center justify-center'>
-											<Text
-												className='text-center font-display-x text-[15px] text-tinta'
-												style={{ includeFontPadding: false }}
-											>
-												{quantity}
-											</Text>
-										</View>
-
-										{/* SUMAR */}
-										<Pressable
-											accessibilityRole='button'
-											accessibilityLabel={`Agregar boleto de ${ticket.name}`}
-											onPress={() => changeQuantity(ticket.id, quantity + 1)}
-											disabled={!canIncrease}
-											className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-esmeralda' : 'bg-card-border'}`}
-										>
-											<Text
-												className='text-center font-display text-[28px] leading-8 text-blanco'
-												style={{ includeFontPadding: false }}
-											>
-												+
-											</Text>
-										</Pressable>
-									</View>
+									<QuantityStepper
+										value={quantity}
+										onChange={(value) => changeQuantity(ticket.id, value)}
+										max={MAX_QUANTITY}
+										itemLabel={`boleto de ${ticket.name}`}
+									/>
 								</View>
 							</View>
 						)

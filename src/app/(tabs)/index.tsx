@@ -175,7 +175,7 @@ export default function Explorar() {
 					<View className='mb-3 flex-row items-stretch gap-3'>
 						<View className='min-w-0 flex-1'>
 							<ListCard
-								className='flex-1'
+								className='grow'
 								icon={Ticket01Icon}
 								title='Comprar boletos'
 								layout='tile'
@@ -187,7 +187,7 @@ export default function Explorar() {
 
 						<View className='min-w-0 flex-1'>
 							<ListCard
-								className='flex-1'
+								className='grow'
 								icon={UserGroupIcon}
 								layout='tile'
 								title='Conoce las especies'
