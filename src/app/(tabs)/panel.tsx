@@ -4,33 +4,22 @@ import {
 	Settings01Icon,
 	Ticket01Icon,
 } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
 
-import {
-	ActivityIndicator,
-	Alert,
-	Modal,
-	ScrollView,
-	Text,
-	View,
-} from 'react-native'
+import { Alert, ScrollView, Text, View } from 'react-native'
 
-import QRCode from 'react-native-qrcode-svg'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import ActionButton from '@/components/ActionButton'
 import AppCard from '@/components/AppCard'
 import UserHeader from '@/components/UserHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useAuth } from '@/contexts/AuthContext'
-import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
-import { cardShadow } from '@/theme/shadows'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { LogoutCard } from '@/components/panel/LogoutCard'
+import { PanelQrModal } from '@/components/panel/PanelQrModal'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -216,83 +205,11 @@ export default function Panel() {
 
 			{/* MODAL DEL CÓDIGO QR */}
 
-			<Modal
+			<PanelQrModal
 				visible={showQr}
-				transparent
-				animationType='fade'
-				statusBarTranslucent
-				onRequestClose={() => setShowQr(false)}
-			>
-				{/* Overlay */}
-
-				<View className='flex-1 items-center justify-center bg-bosque/55 px-6 py-5'>
-					{/* Modal */}
-
-					<View
-						className='w-full max-w-[380px] rounded-3xl border border-card-border bg-blanco p-5'
-						style={cardShadow}
-					>
-						{/* ENCABEZADO */}
-
-						<View className='items-center'>
-							<View className='h-11 w-11 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-								<HugeiconsIcon
-									icon={QrCodeIcon}
-									size={26}
-									strokeWidth={1.8}
-									color={colors.esmeralda}
-								/>
-							</View>
-
-							<Text className='mt-2.5 text-center text-[22px] font-extrabold text-tinta'>
-								Mi código QR
-							</Text>
-
-							<Text className='mt-1 text-center text-[13px] leading-[19px] text-tinta'>
-								Presenta este código en taquilla para identificar tu cuenta.
-							</Text>
-						</View>
-
-						{/* CÓDIGO QR */}
-
-						<View
-							className='mt-[18px] self-center rounded-3xl border border-card-border bg-blanco p-3'
-							style={cardShadow}
-						>
-							{user?.qr_token ? (
-								<QRCode
-									value={user.qr_token}
-									size={180}
-									backgroundColor={colors.blanco}
-									color={colors.bosque}
-								/>
-							) : (
-								<View className='h-[180px] w-[180px] items-center justify-center bg-blanco'>
-									<ActivityIndicator size='large' color={colors.esmeralda} />
-								</View>
-							)}
-						</View>
-
-						{/* INFORMACIÓN */}
-
-						<View className='mt-3.5 rounded-xl border border-card-border bg-niebla p-2.5'>
-							<Text className='text-xs font-extrabold text-tinta'>
-								Código personal
-							</Text>
-
-							<Text className='mt-1 text-[11px] leading-[18px] text-tinta'>
-								Este código está asociado a tu cuenta de ZooApp.
-							</Text>
-						</View>
-
-						{/* BOTÓN CERRAR */}
-
-						<View className='mt-3.5'>
-							<ActionButton title='Cerrar' onPress={() => setShowQr(false)} />
-						</View>
-					</View>
-				</View>
-			</Modal>
+				user={user}
+				onClose={() => setShowQr(false)}
+			/>
 		</ScreenBackground>
 	)
 }
