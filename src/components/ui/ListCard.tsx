@@ -13,6 +13,8 @@ type ListCardProps = {
 	icon?: IconSvgElement
 	// Round 40px photo in place of the icon box (user avatar).
 	avatarUrl?: string | null
+	// Shown in an Esmeralda circle when there is no avatar photo.
+	avatarInitials?: string
 	// Full-width photo above the text (species).
 	image?: ImageSourcePropType
 	imageHeight?: number
@@ -56,6 +58,7 @@ export function ListCard({
 	description,
 	icon,
 	avatarUrl,
+	avatarInitials,
 	image,
 	imageHeight = 150,
 	layout = 'row',
@@ -73,6 +76,12 @@ export function ListCard({
 			resizeMode='cover'
 			className='h-10 w-10 rounded-full border-1.5 border-card-border bg-hoja'
 		/>
+	) : avatarInitials ? (
+		<View className='h-10 w-10 items-center justify-center rounded-full bg-esmeralda'>
+			<Text className='font-display text-[16px] text-blanco'>
+				{avatarInitials}
+			</Text>
+		</View>
 	) : icon ? (
 		<IconBox icon={icon} tone={style.iconBox} />
 	) : null

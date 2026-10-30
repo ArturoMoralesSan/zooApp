@@ -1,6 +1,7 @@
-import ActionButton from '@/components/ActionButton'
-import { ProfileField } from '@/components/profile/ProfileField'
-import colors from '@/theme/colors'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import { TextField } from '@/components/ui/TextField'
 import type { FormErrors } from '@/types/profile'
 import {
 	Calendar03Icon,
@@ -10,9 +11,8 @@ import {
 	Mail01Icon,
 	UserIcon,
 } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { ImageBackground, Platform, Pressable, Text, View } from 'react-native'
+import { ImageBackground, Platform, View } from 'react-native'
 import { formatDateForApi, parseApiDate } from '@/utils/date'
 
 type PersonalDataSectionProps = {
@@ -64,14 +64,14 @@ export function PersonalDataSection({
 			className='bg-blanco'
 		>
 			<View className='px-5 pb-12 pt-1'>
-				<View className='rounded-[22px] border-1.5 border-card-border bg-niebla px-[18px] pb-6 pt-5'>
-					<Text className='text-h2 text-tinta'>Datos personales</Text>
+				<Card>
+					<SectionTitle
+						title='Datos personales'
+						subtitle='Mantén actualizada tu información.'
+						className=''
+					/>
 
-					<Text className='text-body mt-1 text-tinta'>
-						Mantén actualizada tu información.
-					</Text>
-
-					<ProfileField
+					<TextField
 						label='Nombre'
 						icon={UserIcon}
 						value={name}
@@ -84,7 +84,7 @@ export function PersonalDataSection({
 						autoCapitalize='words'
 					/>
 
-					<ProfileField
+					<TextField
 						label='Correo electrónico'
 						icon={Mail01Icon}
 						value={email}
@@ -99,7 +99,7 @@ export function PersonalDataSection({
 						autoCorrect={false}
 					/>
 
-					<ProfileField
+					<TextField
 						label='Teléfono'
 						icon={Call02Icon}
 						value={phone}
@@ -112,45 +112,26 @@ export function PersonalDataSection({
 						keyboardType='phone-pad'
 					/>
 
-					<View className='mt-5'>
-						<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
-							Fecha de nacimiento
-						</Text>
+					<TextField
+						label='Fecha de nacimiento'
+						icon={Calendar03Icon}
+						value={birthDate}
+						placeholder='Seleccionar fecha'
+						error={errors.birth_date}
+						onPress={() => setShowDatePicker(true)}
+					/>
 
-						<Pressable
-							onPress={() => setShowDatePicker(true)}
-							className={`min-h-14 flex-row items-center rounded-[14px] border border-input-border px-4 ${errors.birth_date ? 'bg-niebla' : 'bg-blanco'}`}
-						>
-							<HugeiconsIcon
-								icon={Calendar03Icon}
-								size={20}
-								strokeWidth={1.8}
-								color={colors.esmeralda}
-							/>
+					{showDatePicker && (
+						<DateTimePicker
+							value={parseApiDate(formatDateForApi(birthDate))}
+							mode='date'
+							display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+							maximumDate={new Date()}
+							onChange={onDateChange}
+						/>
+					)}
 
-							<Text className='text-body ml-3 flex-1 text-tinta'>
-								{birthDate || 'Seleccionar fecha'}
-							</Text>
-						</Pressable>
-
-						{showDatePicker && (
-							<DateTimePicker
-								value={parseApiDate(formatDateForApi(birthDate))}
-								mode='date'
-								display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-								maximumDate={new Date()}
-								onChange={onDateChange}
-							/>
-						)}
-
-						{errors.birth_date && (
-							<Text className='text-meta mt-1 text-esmeralda'>
-								{errors.birth_date}
-							</Text>
-						)}
-					</View>
-
-					<ProfileField
+					<TextField
 						label='Ciudad'
 						icon={Location01Icon}
 						value={city}
@@ -162,7 +143,7 @@ export function PersonalDataSection({
 						}}
 					/>
 
-					<ProfileField
+					<TextField
 						label='País'
 						icon={Globe02Icon}
 						value={country}
@@ -174,12 +155,13 @@ export function PersonalDataSection({
 						}}
 					/>
 
-					<ActionButton
-						title={saving ? 'Guardando...' : 'Guardar cambios'}
+					<Button
+						title='Guardar cambios'
 						onPress={onSave}
-						disabled={saving}
+						loading={saving}
+						className='mt-8'
 					/>
-				</View>
+				</Card>
 			</View>
 		</ImageBackground>
 	)

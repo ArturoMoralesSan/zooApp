@@ -1,5 +1,6 @@
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
+import { Badge } from '@/components/ui/Badge'
+import { Icon } from '@/components/ui/Icon'
 import { Alert, Image, Pressable, Text, View } from 'react-native'
 import colors from '@/theme/colors'
 import type { ExploreEvent } from '@/types/explore'
@@ -16,9 +17,9 @@ export function EventCard({ event, isLast }: EventCardProps) {
 
 	return (
 		<View className={`w-[292px] ${isLast ? '' : 'mr-2.5'}`}>
-			<View className='h-[203px] overflow-hidden rounded-3xl bg-bosque'>
+			<View className='h-[203px] overflow-hidden rounded-2xl bg-bosque'>
 				<Pressable
-					className='flex-1 overflow-hidden rounded-[24px] active:opacity-[0.92]'
+					className='flex-1 active:opacity-[0.92]'
 					onPress={() =>
 						Alert.alert(
 							event.name,
@@ -42,13 +43,13 @@ export function EventCard({ event, isLast }: EventCardProps) {
 
 						<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
 
-						<View className='absolute left-2.5 top-2.5 rounded-[20px] bg-lima px-3 py-1'>
-							<Text className='text-overline text-bosque'>
-								{(event.type || 'Educativo').toUpperCase()}
-							</Text>
-						</View>
+						<Badge
+							label={(event.type || 'Educativo').toUpperCase()}
+							tone='success'
+							className='absolute left-3 top-3'
+						/>
 
-						<View className='absolute bottom-0 left-0 right-0 p-3.5'>
+						<View className='absolute bottom-0 left-0 right-0 p-4'>
 							<View className='flex-row items-end'>
 								<View className='flex-1 pr-2'>
 									<Text
@@ -78,13 +79,14 @@ export function EventCard({ event, isLast }: EventCardProps) {
 												'Consulta próximamente todos los detalles de este evento.',
 										)
 									}
+									hitSlop={4}
 									className='h-8 w-8 items-center justify-center rounded-full bg-lima'
 								>
-									<HugeiconsIcon
+									<Icon
 										icon={ArrowRight01Icon}
-										size={22}
-										strokeWidth={2}
+										size={20}
 										color={colors.bosque}
+										strong
 									/>
 								</Pressable>
 							</View>

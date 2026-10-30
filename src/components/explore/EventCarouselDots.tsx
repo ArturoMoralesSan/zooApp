@@ -15,7 +15,7 @@ export function EventCarouselDots({
 			{events.map((event, index) => (
 				<View
 					key={event.id}
-					className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-esmeralda' : 'w-[7px] bg-tinta-2 opacity-80'}`}
+					className={`h-2 rounded-full ${index === activeEventIndex ? 'w-6 bg-esmeralda' : 'w-2 bg-tinta-2'}`}
 				/>
 			))}
 		</View>

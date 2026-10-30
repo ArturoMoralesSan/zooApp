@@ -1,4 +1,5 @@
 import {
+	HeartIcon,
 	HelpCircleIcon,
 	QrCodeIcon,
 	Settings01Icon,
@@ -12,6 +13,7 @@ import { Alert, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { ListCard } from '@/components/ui/ListCard'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -20,6 +22,7 @@ import { getTabBarExtraSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { LogoutCard } from '@/components/panel/LogoutCard'
 import { PanelQrModal } from '@/components/panel/PanelQrModal'
+import { getInitials } from '@/utils/profile'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -111,6 +114,7 @@ export default function Panel() {
 					<ListCard
 						className='mb-3'
 						avatarUrl={avatarUrl}
+						avatarInitials={getInitials(user?.name)}
 						title={user?.name ?? 'Mi cuenta'}
 						description={user?.email ?? 'Consulta tus datos personales'}
 						onPress={() => router.push('/profile')}
@@ -121,7 +125,7 @@ export default function Panel() {
 				{/* MI CUENTA */}
 
 				<View className='mt-6'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi cuenta</Text>
+					<SectionTitle title='Mi cuenta' />
 
 					<ListCard
 						className='mb-3'
@@ -134,8 +138,8 @@ export default function Panel() {
 
 				{/* MI ACTIVIDAD */}
 
-				<View className='mt-4'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi actividad</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Mi actividad' />
 
 					<ListCard
 						className='mb-3'
@@ -147,7 +151,7 @@ export default function Panel() {
 
 					<ListCard
 						className='mb-3'
-						icon={Ticket01Icon}
+						icon={HeartIcon}
 						title='Mis donaciones'
 						description='Consulta tus donaciones'
 						onPress={() => router.push('/donations/history')}
@@ -156,8 +160,8 @@ export default function Panel() {
 
 				{/* AYUDA */}
 
-				<View className='mt-4'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Ayuda</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Ayuda' />
 
 					<ListCard
 						className='mb-3'

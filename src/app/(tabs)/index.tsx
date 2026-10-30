@@ -11,7 +11,6 @@ import {
 	ActivityIndicator,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
-	Pressable,
 	RefreshControl,
 	ScrollView,
 	Text,
@@ -19,7 +18,10 @@ import {
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { ListCard } from '@/components/ui/ListCard'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import { EventCard } from '@/components/explore/EventCard'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
 import { TabHeader } from '@/components/ui/TabHeader'
@@ -92,18 +94,18 @@ export default function Explorar() {
 				<TabHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-5'>
-					<Text className='text-h2 mb-2.5 text-tinta'>Eventos destacados</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Eventos destacados' />
 
 					{loading ? (
-						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
+						<Card className='min-h-[190px] items-center justify-center'>
 							<ActivityIndicator size='large' color={PRIMARY} />
 							<Text className='text-body mt-2.5 text-tinta-2'>
 								Cargando eventos...
 							</Text>
-						</View>
+						</Card>
 					) : error ? (
-						<View className='rounded-[22px] border-1.5 border-card-border bg-niebla p-4'>
+						<Card>
 							<Text className='text-h3 text-tinta'>
 								No pudimos cargar los eventos
 							</Text>
@@ -112,17 +114,17 @@ export default function Explorar() {
 								{error.message || 'No fue posible cargar los eventos.'}
 							</Text>
 
-							<Pressable
-								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
+							<Button
+								title='Reintentar'
+								variant='secondary'
 								onPress={() => {
 									void refresh()
 								}}
-							>
-								<Text className='text-button text-blanco'>Reintentar</Text>
-							</Pressable>
-						</View>
+								className='mt-4'
+							/>
+						</Card>
 					) : events.length === 0 ? (
-						<View className='rounded-[22px] border border-card-border bg-niebla p-5'>
+						<Card>
 							<Text className='text-h3 text-center text-tinta'>
 								No hay eventos destacados
 							</Text>
@@ -130,7 +132,7 @@ export default function Explorar() {
 							<Text className='text-body mt-2 text-center text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
-						</View>
+						</Card>
 					) : (
 						<>
 							<ScrollView
@@ -164,8 +166,8 @@ export default function Explorar() {
 				</View>
 
 				{/* ACCIONES */}
-				<View className='mt-5'>
-					<Text className='text-h2 mb-2.5 text-tinta'>¿Qué quieres hacer?</Text>
+				<View className='mt-6'>
+					<SectionTitle title='¿Qué quieres hacer?' />
 
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
 					<View className='mb-3 flex-row items-stretch gap-3'>
