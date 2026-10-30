@@ -1,4 +1,4 @@
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import { cardShadow } from '@/components/species/speciesStyles'
 import colors from '@/theme/colors'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'

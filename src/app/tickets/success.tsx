@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { ScrollView, Text, View, type ViewStyle } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 

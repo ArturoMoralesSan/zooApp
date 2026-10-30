@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 
 import AppCard from '@/components/AppCard'
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import UserHeader from '@/components/UserHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'

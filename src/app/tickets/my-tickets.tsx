@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import UserHeader from '@/components/UserHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'

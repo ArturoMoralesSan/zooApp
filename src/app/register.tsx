@@ -1,6 +1,6 @@
 import ActionButton from '@/components/ActionButton'
 import { useScrollBottomSpace } from '@/theme/layout'
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import { RegisterHeader } from '@/components/auth/RegisterHeader'
 import { RegisterLoginLink } from '@/components/auth/RegisterLoginLink'
 import { useAuth } from '@/contexts/AuthContext'

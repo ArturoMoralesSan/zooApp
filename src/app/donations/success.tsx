@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'

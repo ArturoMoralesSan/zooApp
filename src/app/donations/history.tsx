@@ -15,7 +15,7 @@ import {
 	View,
 } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import UserHeader from '@/components/UserHeader'
 import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'

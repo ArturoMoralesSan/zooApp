@@ -12,7 +12,7 @@ import {
 	type ViewStyle,
 } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'

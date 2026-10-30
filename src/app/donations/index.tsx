@@ -1,5 +1,5 @@
 import AppCard from '@/components/AppCard'
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 import { HeartIcon } from '@hugeicons/core-free-icons'

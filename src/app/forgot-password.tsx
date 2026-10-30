@@ -1,6 +1,6 @@
 import ActionButton from '@/components/ActionButton'
 import { useScrollBottomSpace } from '@/theme/layout'
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'

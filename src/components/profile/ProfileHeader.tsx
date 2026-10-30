@@ -1,4 +1,4 @@
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import { type User } from '@/services/auth'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'

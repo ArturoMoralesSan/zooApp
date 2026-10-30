@@ -1,4 +1,4 @@
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
 import { cardShadow } from '@/components/species/speciesStyles'

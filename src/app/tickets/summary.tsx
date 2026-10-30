@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
 
