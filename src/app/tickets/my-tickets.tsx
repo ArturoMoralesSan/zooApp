@@ -3,43 +3,33 @@ import { useScrollBottomSpace } from '@/theme/layout'
 import { useMyTickets } from '@/hooks/useTickets'
 
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
+import { useMemo, useState } from 'react'
+import { ScrollView, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
-import colors from '@/theme/colors'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { TicketStatsRow } from '@/components/tickets/TicketStatsRow'
 import { TicketTabs } from '@/components/tickets/TicketTabs'
 import { PurchaseCard } from '@/components/tickets/PurchaseCard'
-import { MyTicketsEmptyState } from '@/components/tickets/MyTicketsEmptyState'
+import { QueryView } from '@/components/ui/QueryView'
+import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { TicketQrModal } from '@/components/tickets/TicketQrModal'
 
 export default function MyTicketsScreen() {
 	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
-	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
+	const myTickets = useMyTickets()
+	const tickets = useMemo(() => myTickets.data ?? [], [myTickets.data])
 	const [tab, setTab] = useState<MyTicketsTab>('active')
 	const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(
 		null,
 	)
 
 	useSessionRedirect()
-
-	useEffect(() => {
-		if (!error) return
-
-		console.error('Error cargando entradas:', error)
-
-		Alert.alert(
-			'Mis entradas',
-			error.message || 'No fue posible cargar tus entradas.',
-		)
-	}, [error])
 
 	const purchases = useMemo<Purchase[]>(() => {
 		const groups = new Map<number, Purchase>()
@@ -108,41 +98,58 @@ export default function MyTicketsScreen() {
 					subtitle='Consulta tus compras y entradas.'
 				/>
 
-				<TicketStatsRow
-					activePurchases={activePurchases}
-					historyPurchases={historyPurchases}
-				/>
+				{/* Counts and tabs only once there's data, never zeros from a failed load */}
+				{myTickets.data && (
+					<>
+						<TicketStatsRow
+							activePurchases={activePurchases}
+							historyPurchases={historyPurchases}
+						/>
 
-				<TicketTabs
-					tab={tab}
-					activePurchases={activePurchases}
-					historyPurchases={historyPurchases}
-					onChangeTab={setTab}
-				/>
-
-				{loading ? (
-					<View className='items-center justify-center py-[60px]'>
-						<ActivityIndicator size='large' color={colors.esmeralda} />
-						<Text className='text-body mt-3 text-tinta-2'>
-							Cargando tus entradas...
-						</Text>
-					</View>
-				) : visiblePurchases.length === 0 ? (
-					<MyTicketsEmptyState
-						tab={tab}
-						onBuyTickets={() => router.push('/tickets')}
-					/>
-				) : (
-					<View className='w-full'>
-						{visiblePurchases.map((purchase) => (
-							<PurchaseCard
-								key={purchase.orderId}
-								purchase={purchase}
-								onShowQr={() => setSelectedPurchase(purchase)}
-							/>
-						))}
-					</View>
+						<TicketTabs
+							tab={tab}
+							activePurchases={activePurchases}
+							historyPurchases={historyPurchases}
+							onChangeTab={setTab}
+						/>
+					</>
 				)}
+
+				<QueryView
+					query={myTickets}
+					loadingMessage='Cargando tus entradas…'
+					errorTitle='No pudimos cargar tus entradas'
+					isEmpty={() => visiblePurchases.length === 0}
+					empty={
+						tab === 'active'
+							? {
+									icon: Ticket01Icon,
+									title: 'No tienes compras activas',
+									message: 'Cuando compres una entrada aparecerá aquí.',
+									action: {
+										title: 'Comprar boletos',
+										onPress: () => router.push('/tickets'),
+									},
+								}
+							: {
+									icon: Ticket01Icon,
+									title: 'No tienes historial',
+									message: 'Tus compras anteriores aparecerán aquí.',
+								}
+					}
+				>
+					{() => (
+						<View className='w-full'>
+							{visiblePurchases.map((purchase) => (
+								<PurchaseCard
+									key={purchase.orderId}
+									purchase={purchase}
+									onShowQr={() => setSelectedPurchase(purchase)}
+								/>
+							))}
+						</View>
+					)}
+				</QueryView>
 
 				<View className='h-10' />
 			</ScrollView>
