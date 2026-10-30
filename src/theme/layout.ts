@@ -1,13 +1,11 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-// Gap between the floating tab bar and the bottom edge when there is no
-// system navigation bar.
-const TAB_BAR_BOTTOM_GAP = 22
+// The floating tab bar sits 16px from the bottom edge, or 16px above the
+// system navigation bar when there is one (edge-to-edge on Android).
+const TAB_BAR_BOTTOM_GAP = 16
 
-// With edge-to-edge on Android the app draws behind the system navigation
-// bar, so the tab bar sits 8px above it (bottomInset) instead.
 export function getTabBarBottomPadding(bottomInset: number) {
-	return Math.max(TAB_BAR_BOTTOM_GAP, bottomInset + 8)
+	return TAB_BAR_BOTTOM_GAP + bottomInset
 }
 
 // Extra space tab screens need below their content so it can scroll past
