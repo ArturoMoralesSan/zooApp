@@ -1,3 +1,4 @@
+import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { IconBox } from '@/components/ui/IconBox'
 import { ListCard } from '@/components/ui/ListCard'
 import { OptionButton } from '@/components/ui/OptionButton'
@@ -13,7 +14,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
@@ -72,9 +73,7 @@ export default function DonationsIndexScreen() {
 
 	return (
 		<ScreenBackground>
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				keyboardShouldPersistTaps='handled'
+			<KeyboardScrollView
 				contentContainerClassName='px-5 pt-3'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 			>
@@ -175,7 +174,7 @@ export default function DonationsIndexScreen() {
 						</View>
 					</OptionButton>
 				</View>
-			</ScrollView>
+			</KeyboardScrollView>
 
 			{/* FOOTER FIJO */}
 			<FixedFooter
