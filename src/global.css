@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Type roles from the design system (App scale). Weight comes from the font
+ * family (see fontFamily in tailwind.config.js), so don't add font-bold & co.
+ * Sizes are in px because NativeWind's rem is 14px, not 16px.
+ */
+@layer components {
+	.text-h1 {
+		@apply font-display text-[24px] leading-[1.2] text-bosque;
+	}
+	.text-subtitle {
+		@apply font-sans text-[14px] text-tinta-2;
+	}
+	.text-h2 {
+		@apply font-display text-[18px];
+	}
+	.text-h3 {
+		@apply font-sans-bold text-[16px];
+	}
+	.text-body {
+		@apply font-sans text-[14px] leading-[1.5];
+	}
+	.text-meta {
+		@apply font-sans-semibold text-[12px] text-tinta-2;
+	}
+	.text-overline {
+		@apply font-sans-bold text-[12px] uppercase tracking-[0.05em];
+	}
+	.text-button {
+		@apply font-display text-[17px];
+	}
+}
