@@ -102,7 +102,7 @@ export default function DonationHistoryScreen() {
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
 						<ActivityIndicator size='large' color={ICON_COLOR} />
-						<Text className='mt-3 text-[14px] text-tinta'>
+						<Text className='text-body mt-3 text-tinta'>
 							Cargando tus donaciones...
 						</Text>
 					</View>
@@ -121,11 +121,11 @@ export default function DonationHistoryScreen() {
 							/>
 						</View>
 
-						<Text className='text-center text-[18px] font-extrabold text-tinta'>
+						<Text className='text-h3 text-center text-tinta'>
 							No tienes donaciones
 						</Text>
 
-						<Text className='mt-[7px] text-center text-[13px] leading-[19px] text-tinta'>
+						<Text className='text-body mt-[7px] text-center text-tinta'>
 							Cuando realices una donación aparecerá aquí.
 						</Text>
 
@@ -133,7 +133,7 @@ export default function DonationHistoryScreen() {
 							onPress={() => router.push('/donations')}
 							className='mt-[18px] min-h-12 w-full items-center justify-center rounded-[14px] bg-esmeralda active:bg-bosque'
 						>
-							<Text className='text-[14px] font-bold text-blanco'>
+							<Text className='text-button text-blanco'>
 								Hacer una donación
 							</Text>
 						</Pressable>
@@ -141,9 +141,7 @@ export default function DonationHistoryScreen() {
 				) : (
 					/* Historial */
 					<View className='w-full'>
-						<Text className='mb-3 text-[18px] font-extrabold text-tinta'>
-							Historial
-						</Text>
+						<Text className='text-h2 mb-3 text-tinta'>Historial</Text>
 
 						{sortedDonations.map((donation) => (
 							<DonationCard key={donation.id} donation={donation} />

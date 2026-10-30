@@ -30,16 +30,16 @@ export function DonationCard({ donation }: DonationCardProps) {
 				</View>
 
 				<View className='min-w-0 flex-1'>
-					<Text className='text-[19px] font-extrabold text-tinta'>
+					<Text className='font-display-x text-[19px] text-tinta'>
 						{formatCurrency(donation.amount)}
 					</Text>
 
-					<Text className='mt-1 text-[12px] text-tinta'>
+					<Text className='text-meta mt-1 text-tinta'>
 						{formatDate(donation.created_at)}
 					</Text>
 
 					{formatTime(donation.created_at) ? (
-						<Text className='mt-0.5 text-[11px] text-tinta'>
+						<Text className='text-meta mt-0.5 text-tinta'>
 							{formatTime(donation.created_at)}
 						</Text>
 					) : null}
@@ -48,7 +48,7 @@ export function DonationCard({ donation }: DonationCardProps) {
 				<View
 					className={`ml-[7px] rounded-[10px] border border-card-border px-2 py-[5px] ${getDonationStatusClassName(donation)}`}
 				>
-					<Text className='text-[10px] font-bold text-tinta'>
+					<Text className='font-sans-bold text-[12px] text-tinta'>
 						{getDonationStatus(donation)}
 					</Text>
 				</View>
@@ -59,9 +59,7 @@ export function DonationCard({ donation }: DonationCardProps) {
 			{/* Método de pago y referencia */}
 			<View className='w-full flex-row items-start gap-4'>
 				<View className='min-w-0 flex-1'>
-					<Text className='text-[11px] font-medium text-tinta'>
-						Método de pago
-					</Text>
+					<Text className='text-overline text-tinta'>Método de pago</Text>
 
 					<View className='mt-1.5 flex-row items-center'>
 						<HugeiconsIcon
@@ -72,7 +70,7 @@ export function DonationCard({ donation }: DonationCardProps) {
 						/>
 
 						<Text
-							className='ml-1.5 shrink text-[12px] font-semibold leading-[18px] text-tinta'
+							className='ml-1.5 shrink font-sans-bold text-[13px] text-tinta'
 							numberOfLines={2}
 						>
 							{donation.payment_method?.name ?? 'No especificado'}
@@ -81,10 +79,10 @@ export function DonationCard({ donation }: DonationCardProps) {
 				</View>
 
 				<View className='min-w-0 flex-1'>
-					<Text className='text-[11px] font-medium text-tinta'>Referencia</Text>
+					<Text className='text-overline text-tinta'>Referencia</Text>
 
 					<Text
-						className='mt-1.5 shrink text-[12px] font-semibold leading-[18px] text-tinta'
+						className='mt-1.5 shrink font-sans-bold text-[13px] text-tinta'
 						numberOfLines={2}
 					>
 						{donation.reference || 'No disponible'}
