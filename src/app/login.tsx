@@ -139,11 +139,9 @@ export default function Login() {
 
 					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						<View className='items-center'>
-							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
-								¡Bienvenido a ZooApp!
-							</Text>
+							<Text className='text-h1 text-center'>¡Bienvenido a ZooApp!</Text>
 
-							<Text className='mt-2 text-center text-sm text-tinta-2'>
+							<Text className='text-subtitle mt-2 text-center'>
 								Inicia sesión para continuar tu aventura.
 							</Text>
 						</View>
@@ -151,7 +149,7 @@ export default function Login() {
 						<TextField
 							label='Correo electrónico'
 							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-xs font-semibold text-tinta'
+							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
 							error={errors.email}
 							highlightOnFocus={false}
 							iconColor={palette.border}
@@ -187,7 +185,7 @@ export default function Login() {
 
 						{error !== '' && (
 							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-xs text-error'>{error}</Text>
+								<Text className='text-meta text-error'>{error}</Text>
 							</View>
 						)}
 
@@ -195,7 +193,7 @@ export default function Login() {
 							onPress={() => router.push('/forgot-password')}
 							className='mt-3.5 self-end rounded-lg py-1'
 						>
-							<Text className='text-xs font-semibold text-esmeralda'>
+							<Text className='text-meta text-esmeralda'>
 								¿Olvidaste tu contraseña?
 							</Text>
 						</Pressable>
@@ -211,7 +209,7 @@ export default function Login() {
 						</View>
 
 						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-sm text-tinta-2'>
+							<Text className='text-body text-tinta-2'>
 								¿No tienes una cuenta?{' '}
 							</Text>
 
@@ -219,7 +217,7 @@ export default function Login() {
 								onPress={() => router.push('/register')}
 								className='rounded-lg py-1'
 							>
-								<Text className='text-sm font-bold text-esmeralda'>
+								<Text className='font-sans-bold text-[14px] leading-[1.5] text-esmeralda'>
 									Regístrate
 								</Text>
 							</Pressable>

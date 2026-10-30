@@ -1,13 +1,17 @@
 import { Link, Stack } from 'expo-router'
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 
 export default function NotFoundScreen() {
 	return (
 		<>
 			<Stack.Screen options={{ title: 'Página no encontrada.' }} />
 			<View className='flex-1 items-center justify-center'>
-				<View className='text-lg leading-6 underline'>
-					<Link href='/'>Regresar a página de inicio.</Link>
+				<View>
+					<Link href='/' asChild>
+						<Text className='text-button text-esmeralda underline'>
+							Regresar a página de inicio.
+						</Text>
+					</Link>
 				</View>
 			</View>
 		</>
