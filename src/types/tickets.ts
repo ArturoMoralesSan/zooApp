@@ -58,3 +58,12 @@ export type CreateOrderResponse = {
 	message?: string
 	data?: Order
 }
+
+export type MyTicketsTab = 'active' | 'history'
+
+export type TicketSummaryItem = {
+	ticket_type_id: number
+	quantity: number
+	ticket: TicketType
+	subtotal: number
+}
