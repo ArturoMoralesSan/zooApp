@@ -2,18 +2,10 @@ import { useDonations } from '@/hooks/useDonations'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
-import { HeartAddIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
+import { HeartAddIcon, HeartIcon } from '@hugeicons/core-free-icons'
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo } from 'react'
-import {
-	ActivityIndicator,
-	Alert,
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-} from 'react-native'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
@@ -21,7 +13,11 @@ import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { DonationCard } from '@/components/donations/DonationCard'
 import { DonationStatsRow } from '@/components/donations/DonationStatsRow'
-import { ICON_COLOR } from '@/components/donations/historyStyles'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { IconBox } from '@/components/ui/IconBox'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import colors from '@/theme/colors'
 import { isCompleted } from '@/utils/donations'
 
 const NO_DONATIONS: Donation[] = []
@@ -103,44 +99,36 @@ export default function DonationHistoryScreen() {
 				{/* Cargando */}
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
-						<ActivityIndicator size='large' color={ICON_COLOR} />
+						<ActivityIndicator size='large' color={colors.esmeralda} />
 						<Text className='text-body mt-3 text-tinta'>
 							Cargando tus donaciones...
 						</Text>
 					</View>
 				) : sortedDonations.length === 0 ? (
 					/* Estado vacío */
-					<View className='w-full items-center rounded-[22px] border-1.5 border-card-border bg-niebla px-[25px] py-8'>
-						<View className='mb-4 h-[62px] w-[62px] items-center justify-center rounded-[18px] border border-card-border bg-hoja'>
-							<HugeiconsIcon
-								icon={HeartAddIcon}
-								size={32}
-								strokeWidth={1.8}
-								color={ICON_COLOR}
-							/>
-						</View>
+					<Card className='items-center py-8'>
+						<IconBox icon={HeartIcon} size='lg' className='mb-4' />
 
 						<Text className='text-h3 text-center text-tinta'>
 							No tienes donaciones
 						</Text>
 
-						<Text className='text-body mt-[7px] text-center text-tinta'>
+						<Text className='text-body mt-2 text-center text-tinta-2'>
 							Cuando realices una donación aparecerá aquí.
 						</Text>
 
-						<Pressable
+						<Button
+							title='Hacer una donación'
+							icon={HeartAddIcon}
+							iconPosition='leading'
 							onPress={() => router.push('/donations')}
-							className='mt-[18px] min-h-12 w-full items-center justify-center rounded-[14px] bg-esmeralda active:bg-bosque'
-						>
-							<Text className='text-button text-blanco'>
-								Hacer una donación
-							</Text>
-						</Pressable>
-					</View>
+							className='mt-6'
+						/>
+					</Card>
 				) : (
 					/* Historial */
 					<View className='w-full'>
-						<Text className='text-h2 mb-3 text-tinta'>Historial</Text>
+						<SectionTitle title='Historial' />
 
 						{sortedDonations.map((donation) => (
 							<DonationCard key={donation.id} donation={donation} />

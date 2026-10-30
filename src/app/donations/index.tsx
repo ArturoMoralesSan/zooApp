@@ -1,28 +1,31 @@
+import { IconBox } from '@/components/ui/IconBox'
 import { ListCard } from '@/components/ui/ListCard'
+import { OptionButton } from '@/components/ui/OptionButton'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import { TextField } from '@/components/ui/TextField'
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
-import { HeartIcon } from '@hugeicons/core-free-icons'
+import {
+	CreditCardIcon,
+	Dollar01Icon,
+	HeartIcon,
+} from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 
-import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
-const COLUMN_GAP = 10
 
 export default function DonationsIndexScreen() {
 	const footerSpace = useFixedFooterSpace()
 	const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
 	const [customAmount, setCustomAmount] = useState('')
 	const [isCustomSelected, setIsCustomSelected] = useState(false)
-	const [gridWidth, setGridWidth] = useState(0)
-
-	const buttonWidth = gridWidth > 0 ? (gridWidth - COLUMN_GAP * 2) / 3 : 0
 
 	const parsedCustomAmount = Number(customAmount.replace(',', '.'))
 
@@ -67,60 +70,6 @@ export default function DonationsIndexScreen() {
 		})
 	}
 
-	const renderAmountButton = (
-		label: string,
-		selected: boolean,
-		onPress: () => void,
-		dashed = false,
-	) => (
-		<Pressable
-			onPress={onPress}
-			className='h-[100px] w-full rounded-2xl active:opacity-[0.84]'
-		>
-			{dashed ? (
-				<View
-					className={`flex-1 items-center justify-center rounded-2xl border-2 border-dashed px-1.5 py-3 ${selected ? 'border-esmeralda bg-hoja' : 'border-input-border bg-blanco'}`}
-				>
-					<Text
-						numberOfLines={1}
-						adjustsFontSizeToFit
-						className='text-center font-sans-bold text-[14px] text-tinta'
-						style={{ includeFontPadding: false }}
-					>
-						{label}
-					</Text>
-				</View>
-			) : (
-				<View
-					className={`flex-1 rounded-2xl p-0.5 ${selected ? 'bg-esmeralda' : 'bg-input-border'}`}
-				>
-					<View
-						className={`flex-1 items-center justify-center rounded-[14px] px-1.5 py-3 ${selected ? 'bg-hoja' : 'bg-blanco'}`}
-					>
-						<Text
-							numberOfLines={1}
-							adjustsFontSizeToFit
-							className='text-center font-display-x text-[16px] text-tinta'
-							style={{ includeFontPadding: false }}
-						>
-							{label}
-						</Text>
-					</View>
-				</View>
-			)}
-		</Pressable>
-	)
-
-	const renderAmountColumn = (value: number) => (
-		<View key={value} className='shrink-0' style={{ width: buttonWidth }}>
-			{renderAmountButton(
-				formatCurrency(value),
-				selectedAmount === value && !isCustomSelected,
-				() => selectAmount(value),
-			)}
-		</View>
-	)
-
 	return (
 		<ScreenBackground>
 			<ScrollView
@@ -152,97 +101,79 @@ export default function DonationsIndexScreen() {
 				</View>
 
 				{/* SELECCIÓN DE MONTO */}
-				<View className='mt-7'>
-					<Text className='text-h2 text-bosque'>Selecciona un monto</Text>
+				<View className='mt-6'>
+					<SectionTitle
+						title='Selecciona un monto'
+						subtitle='Elige cuánto deseas aportar al cuidado de nuestros animales.'
+					/>
 
-					<Text className='text-body mb-4 mt-[5px] text-tinta-2'>
-						Elige cuánto deseas aportar al cuidado de nuestros animales.
-					</Text>
+					<View className='flex-row flex-wrap gap-2'>
+						{DONATION_AMOUNTS.map((value) => (
+							<OptionButton
+								key={value}
+								label={formatCurrency(value)}
+								selected={selectedAmount === value && !isCustomSelected}
+								onPress={() => selectAmount(value)}
+								className='grow basis-[30%]'
+							/>
+						))}
 
-					<View
-						onLayout={(event) => {
-							const width = event.nativeEvent.layout.width
-							setGridWidth((previous) =>
-								Math.abs(previous - width) > 1 ? width : previous,
-							)
-						}}
-						className='w-full items-center gap-2.5 self-stretch'
-					>
-						<View className='w-full flex-row items-center justify-center gap-2.5'>
-							{DONATION_AMOUNTS.slice(0, 3).map(renderAmountColumn)}
-						</View>
-
-						<View className='w-full flex-row items-center justify-center gap-2.5'>
-							{DONATION_AMOUNTS.slice(3).map(renderAmountColumn)}
-
-							<View className='shrink-0' style={{ width: buttonWidth }}>
-								{renderAmountButton(
-									'Otra cantidad',
-									isCustomSelected,
-									selectCustomAmount,
-									true,
-								)}
-							</View>
-						</View>
+						<OptionButton
+							label='Otra'
+							accessibilityLabel='Otra cantidad'
+							dashed
+							selected={isCustomSelected}
+							onPress={selectCustomAmount}
+							className='grow basis-[30%]'
+						/>
 					</View>
 				</View>
 
 				{/* DONACIÓN PERSONALIZADA */}
 				{isCustomSelected && (
-					<View className='mt-[18px]'>
-						<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
-							Ingresa tu donación
-						</Text>
+					<TextField
+						label='Otra cantidad'
+						icon={Dollar01Icon}
+						value={customAmount}
+						onChangeText={handleCustomAmount}
+						placeholder='Escribe el monto'
+						keyboardType='decimal-pad'
+						returnKeyType='done'
+						error={
+							customAmount.trim() !== '' && !hasAmount
+								? 'Ingresa una cantidad válida de al menos $10.00.'
+								: undefined
+						}
+					/>
+				)}
 
-						<Text className='text-meta mb-3'>
-							La aportación mínima es de $10.00 MXN.
-						</Text>
-
-						<View className='h-[52px] flex-row items-center rounded-xl border-1.5 border-input-border bg-blanco px-3.5'>
-							<Text className='mr-2 font-display-x text-[18px] text-esmeralda'>
-								$
-							</Text>
-
-							<TextInput
-								value={customAmount}
-								onChangeText={handleCustomAmount}
-								placeholder='Ej. 150'
-								placeholderTextColor={colors.apagado}
-								keyboardType='decimal-pad'
-								returnKeyType='done'
-								className='h-full flex-1 py-0 font-sans text-[14px] text-tinta'
-							/>
-						</View>
-
-						{customAmount.trim() !== '' && !hasAmount && (
-							<Text className='text-meta mt-2 text-error'>
-								Ingresa una cantidad válida de al menos $10.00.
-							</Text>
-						)}
-					</View>
+				{isCustomSelected && (customAmount.trim() === '' || hasAmount) && (
+					<Text className='text-meta mt-1.5'>Donación mínima: $10.00 MXN</Text>
 				)}
 
 				{/* MÉTODO DE PAGO */}
-				<View className='mb-5 mt-[26px]'>
-					<Text className='text-h2 mb-3.5 px-1 text-bosque'>
-						Método de pago
-					</Text>
+				<View className='mb-5 mt-6'>
+					<SectionTitle title='Método de pago' />
 
-					<View className='overflow-hidden rounded-[18px] border-1.5 border-card-border bg-niebla'>
-						<View className='min-h-[80px] flex-row items-center bg-niebla px-3.5 py-3'>
-							<View className='h-12 w-12 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-								<Text className='font-sans text-[23px]'>💳</Text>
-							</View>
+					<OptionButton
+						selected
+						onPress={() => {}}
+						accessibilityLabel='Tarjeta'
+					>
+						<View className='flex-row items-center gap-3'>
+							<IconBox icon={CreditCardIcon} />
 
-							<View className='ml-3 flex-1'>
+							<View className='flex-1'>
 								<Text className='text-h3 text-tinta'>Tarjeta</Text>
-
 								<Text className='text-meta mt-1'>Pago seguro con tarjeta</Text>
 							</View>
 
-							<View className='h-[22px] w-[22px] rounded-[11px] border-[6px] border-esmeralda bg-blanco' />
+							{/* Radio: ring plus dot, so the choice doesn't rely on color. */}
+							<View className='h-6 w-6 items-center justify-center rounded-full border-2 border-esmeralda bg-blanco'>
+								<View className='h-3 w-3 rounded-full bg-esmeralda' />
+							</View>
 						</View>
-					</View>
+					</OptionButton>
 				</View>
 			</ScrollView>
 

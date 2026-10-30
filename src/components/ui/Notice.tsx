@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
 import { Alert02Icon, Tick02Icon } from '@hugeicons/core-free-icons'
+import type { IconSvgElement } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
 
 export type NoticeTone = 'success' | 'error' | 'warning'
@@ -9,6 +10,8 @@ type NoticeProps = {
 	tone: NoticeTone
 	title: string
 	message?: string
+	// Replaces the tone's default icon (check or alert).
+	icon?: IconSvgElement
 	className?: string
 }
 
@@ -41,7 +44,13 @@ const tones = {
 
 // Status message with icon, title and text: success on Bosque, error on
 // Fondo error, warning on Aviso. Inline in forms, floating in Toast.
-export function Notice({ tone, title, message, className = '' }: NoticeProps) {
+export function Notice({
+	tone,
+	title,
+	message,
+	icon,
+	className = '',
+}: NoticeProps) {
 	const style = tones[tone]
 
 	return (
@@ -51,7 +60,12 @@ export function Notice({ tone, title, message, className = '' }: NoticeProps) {
 			<View
 				className={`h-8 w-8 items-center justify-center rounded-lg ${style.iconBox}`}
 			>
-				<Icon icon={style.icon} size={20} color={style.iconColor} strong />
+				<Icon
+					icon={icon ?? style.icon}
+					size={20}
+					color={style.iconColor}
+					strong
+				/>
 			</View>
 
 			<View className='min-w-0 flex-1 justify-center'>
