@@ -1,10 +1,18 @@
-import { Image } from 'expo-image'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import colors from '@/theme/colors'
+import { SelectedItemThumb } from '@/components/map/SelectedItemThumb'
+import { Button } from '@/components/ui/Button'
+import { IconButton } from '@/components/ui/IconButton'
+import { Notice } from '@/components/ui/Notice'
+import { StatCard } from '@/components/ui/StatCard'
 import { getFloatingBottom } from '@/theme/layout'
 import type { Coordinate, RouteResult, SelectableItem } from '@/types/map'
 import { formatDistance, formatMinutes } from '@/utils/map'
+import {
+	ArrowDown01Icon,
+	Location01Icon,
+	WalkingIcon,
+} from '@hugeicons/core-free-icons'
 
 type RouteCardProps = {
 	selectedItem: SelectableItem
@@ -16,6 +24,7 @@ type RouteCardProps = {
 	onShowDestination: () => void
 }
 
+// Floating sheet over the map: radius 24, padding 20, above the navigation bar.
 export function RouteCard({
 	selectedItem,
 	route,
@@ -26,66 +35,31 @@ export function RouteCard({
 	onShowDestination,
 }: RouteCardProps) {
 	const insets = useSafeAreaInsets()
+	const canRoute = Boolean(userLocation) && isUserInsideZoo
 
 	return (
 		<View
-			className='absolute left-3 right-3 rounded-[22px] border-1.5 border-card-border bg-niebla p-4'
+			className='absolute left-4 right-4 rounded-3xl border-1.5 border-card-border bg-blanco p-5'
 			style={{ bottom: getFloatingBottom(insets.bottom) }}
 		>
-			<View className='flex-row items-center'>
-				<View
-					className='h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-2xl bg-hoja'
-					style={
-						selectedItem.type === 'marker' && {
-							backgroundColor: selectedItem.color ?? colors.hoja,
-						}
-					}
-				>
-					{selectedItem.type === 'species' && selectedItem.thumbnail ? (
-						<Image
-							source={{
-								uri: selectedItem.thumbnail,
-							}}
-							style={{ width: 42, height: 42, borderRadius: 16 }}
-							contentFit='cover'
-							cachePolicy='memory-disk'
-						/>
-					) : selectedItem.type === 'marker' && selectedItem.iconImage ? (
-						<Image
-							source={{
-								uri: selectedItem.iconImage,
-							}}
-							style={{ width: 34, height: 34, borderRadius: 12 }}
-							contentFit='contain'
-							cachePolicy='memory-disk'
-						/>
-					) : (
-						<Text className='font-sans'>
-							{selectedItem.type === 'species'
-								? (selectedItem.icon ?? '🦁')
-								: (selectedItem.icon ?? '📍')}
-						</Text>
-					)}
-				</View>
+			<View className='flex-row items-center gap-3'>
+				<SelectedItemThumb selectedItem={selectedItem} size={48} />
 
-				<View className='mx-2.5 min-w-0 flex-1'>
-					<Text className='text-h3 text-tinta' numberOfLines={1}>
-						{selectedItem.name}
-					</Text>
-
-					<Text className='text-meta mt-0.5'>
+				<View className='min-w-0 flex-1'>
+					<Text className='text-overline text-esmeralda'>
 						{selectedItem.type === 'species' ? 'Especie' : 'Punto de interés'}
 					</Text>
+
+					<Text className='text-h3 mt-0.5 text-tinta' numberOfLines={1}>
+						{selectedItem.name}
+					</Text>
 				</View>
 
-				<Pressable
+				<IconButton
+					icon={ArrowDown01Icon}
 					onPress={onCollapse}
-					className='h-[34px] w-[34px] items-center justify-center rounded-2xl bg-hoja active:opacity-70'
-				>
-					<Text className='font-sans text-[23px] leading-[25px] text-tinta'>
-						×
-					</Text>
-				</Pressable>
+					accessibilityLabel='Minimizar'
+				/>
 			</View>
 
 			{selectedItem.type === 'species' &&
@@ -101,75 +75,62 @@ export function RouteCard({
 				</Text>
 			)}
 
-			<View className='mt-3.5 w-full'>
-				<View
-					className={`h-14 w-full overflow-hidden rounded-2xl border-1.5 ${!userLocation || !isUserInsideZoo ? 'border-apagado bg-apagado' : 'border-bosque bg-esmeralda'}`}
-				>
-					<Pressable
-						onPress={onHowToGetThere}
-						disabled={!userLocation || !isUserInsideZoo}
-						className='flex-1 items-center justify-center bg-transparent active:opacity-70'
-					>
-						<Text
-							className='text-button m-0 p-0 text-center leading-[56px] text-blanco'
-							style={{
-								includeFontPadding: false,
-								textAlignVertical: 'center',
-							}}
-						>
-							Cómo llegar ➜
-						</Text>
-					</Pressable>
-				</View>
-			</View>
-
-			{!isUserInsideZoo && userLocation && (
-				<Text className='text-meta mt-2.5'>
-					Debes estar dentro del zoológico para calcular una ruta por los
-					caminos internos.
-				</Text>
-			)}
-
-			{route && (
-				<View className='mt-3.5 flex-row items-center justify-between gap-2.5 border-t border-t-card-border pt-[13px]'>
-					<View className='min-w-0 flex-1'>
-						<Text className='text-meta'>Ruta por caminos</Text>
-
-						<Text className='mt-0.5 font-display-x text-[17px] text-bosque'>
-							{formatDistance(route.distance)}
-						</Text>
+			{route ? (
+				<>
+					<View className='mt-4 flex-row gap-3'>
+						<StatCard
+							layout='overline'
+							label='Caminando'
+							value={formatMinutes(route.distance / 80)}
+						/>
+						<StatCard
+							layout='overline'
+							label='Distancia'
+							value={formatDistance(route.distance)}
+						/>
 					</View>
 
-					<View className='min-w-12 items-center'>
-						<Text className='font-display-x text-[13px] text-tinta'>
-							{formatMinutes(route.distance / 80)}
-						</Text>
-
-						<Text className='text-meta'>caminando</Text>
-					</View>
-
-					<Pressable
-						className='rounded-2xl bg-bosque px-[15px] py-2.5 active:opacity-70'
+					<Button
+						title='Ver destino'
+						variant='secondary'
+						icon={Location01Icon}
+						iconPosition='leading'
 						onPress={onShowDestination}
-					>
-						<Text className='font-display text-[13px] text-blanco'>
-							Ver destino
+						className='mt-4'
+					/>
+				</>
+			) : (
+				<>
+					{!userLocation ? (
+						<Notice
+							tone='warning'
+							title='Sin acceso a tu ubicación'
+							message='Activa la ubicación para calcular la ruta.'
+							className='mt-4'
+						/>
+					) : !isUserInsideZoo ? (
+						<Notice
+							tone='warning'
+							title='No podemos calcular la ruta'
+							message='Debes estar dentro del zoológico para calcular una ruta por los caminos internos.'
+							className='mt-4'
+						/>
+					) : (
+						<Text className='text-meta mt-3'>
+							Presiona “Cómo llegar” para calcular la ruta por los caminos del
+							zoológico.
 						</Text>
-					</Pressable>
-				</View>
-			)}
+					)}
 
-			{!route && userLocation && isUserInsideZoo && (
-				<Text className='text-meta mt-2.5'>
-					Presiona “Cómo llegar” para calcular la ruta por los caminos del
-					zoológico.
-				</Text>
-			)}
-
-			{!userLocation && (
-				<Text className='text-meta mt-3'>
-					No tenemos acceso a tu ubicación para calcular la ruta.
-				</Text>
+					<Button
+						title='Cómo llegar'
+						icon={WalkingIcon}
+						iconPosition='leading'
+						onPress={onHowToGetThere}
+						disabled={!canRoute}
+						className='mt-4'
+					/>
+				</>
 			)}
 		</View>
 	)
