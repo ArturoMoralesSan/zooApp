@@ -12,7 +12,7 @@ export function FooterLoadingBar({ message }: FooterLoadingBarProps) {
 			style={{ elevation: 15 }}
 		>
 			<ActivityIndicator size='small' color={colors.esmeralda} />
-			<Text className='font-extrabold text-esmeralda'>{message}</Text>
+			<Text className='font-sans-x text-[14px] text-esmeralda'>{message}</Text>
 		</View>
 	)
 }

@@ -26,14 +26,12 @@ export default function FixedFooter({
 		>
 			<View className='flex-row items-center justify-between gap-3'>
 				<View className='flex-1 justify-center'>
-					<Text className='text-[15px] font-extrabold text-tinta'>{label}</Text>
+					<Text className='text-h3 text-tinta'>{label}</Text>
 
-					<Text className='mt-1 text-[13px] font-medium text-tinta-2'>
-						{description}
-					</Text>
+					<Text className='text-meta mt-1'>{description}</Text>
 				</View>
 
-				<Text className='text-right text-[27px] font-black text-bosque'>
+				<Text className='text-right font-display-x text-[27px] text-bosque'>
 					{amount}
 				</Text>
 			</View>

@@ -25,17 +25,12 @@ export default function UserHeader({
 		<View>
 			<View className='flex-row items-start justify-between'>
 				<View className='mr-2 flex-1'>
-					<Text
-						className='text-[25px] font-black leading-8 tracking-[-0.8px] text-bosque'
-						numberOfLines={1}
-					>
+					<Text className='text-h1' numberOfLines={1}>
 						{title}
 					</Text>
 
 					{subtitle ? (
-						<Text className='mt-px text-[12px] font-semibold leading-[17px] text-tinta-2'>
-							{subtitle}
-						</Text>
+						<Text className='text-subtitle mt-px'>{subtitle}</Text>
 					) : null}
 				</View>
 
@@ -51,7 +46,7 @@ export default function UserHeader({
 							/>
 
 							<Text
-								className='ml-1 text-[11px] font-extrabold text-bosque'
+								className='ml-1 font-sans-bold text-[12px] text-bosque'
 								numberOfLines={1}
 							>
 								{userLevel}
@@ -68,7 +63,7 @@ export default function UserHeader({
 							/>
 
 							<Text
-								className='ml-1 text-[11px] font-extrabold text-bosque'
+								className='ml-1 font-display-x text-[12px] text-bosque'
 								numberOfLines={1}
 							>
 								{userPoints.toLocaleString('es-MX')}
