@@ -10,6 +10,7 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 function getPaymentMethod(method: PaymentMethod | null | undefined) {
@@ -17,6 +18,7 @@ function getPaymentMethod(method: PaymentMethod | null | undefined) {
 }
 
 export default function DonationSuccessScreen() {
+	const footerSpace = useFixedFooterSpace()
 	// donations/summary passes the created donation as JSON, plus the amount
 	// on its own in case the donation can't be read.
 	const params = useLocalSearchParams<{
@@ -58,7 +60,8 @@ export default function DonationSuccessScreen() {
 		<ScreenBackground patternClassName='opacity-[0.13]'>
 			<ScrollView
 				className='flex-1'
-				contentContainerClassName='px-5 pb-6 pt-2.5'
+				contentContainerClassName='px-5 pt-2.5'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 			>
 				<View className='mb-5 gap-3'>

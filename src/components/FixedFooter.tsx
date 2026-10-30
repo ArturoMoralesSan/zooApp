@@ -1,6 +1,8 @@
 import { Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import ActionButton from '@/components/ActionButton'
+import { getFooterBottomPadding } from '@/theme/layout'
 
 type FixedFooterProps = {
 	label: string
@@ -19,10 +21,15 @@ export default function FixedFooter({
 	onButtonPress,
 	disabled = false,
 }: FixedFooterProps) {
+	const insets = useSafeAreaInsets()
+
 	return (
 		<View
-			className='absolute bottom-0 left-0 right-0 z-[999] border-t border-t-card-border bg-blanco px-5 pb-7 pt-4'
-			style={{ elevation: 15 }}
+			className='absolute bottom-0 left-0 right-0 z-[999] border-t border-t-card-border bg-blanco px-5 pt-4'
+			style={{
+				elevation: 15,
+				paddingBottom: getFooterBottomPadding(insets.bottom),
+			}}
 		>
 			<View className='flex-row items-center justify-between gap-3'>
 				<View className='flex-1 justify-center'>

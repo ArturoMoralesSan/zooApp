@@ -1,4 +1,5 @@
 import { useDonations } from '@/hooks/useDonations'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import { HeartAddIcon } from '@hugeicons/core-free-icons'
@@ -26,6 +27,7 @@ import { isCompleted } from '@/utils/donations'
 const NO_DONATIONS: Donation[] = []
 
 export default function DonationHistoryScreen() {
+	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
 	const { data, error, isLoading: loading } = useDonations()
@@ -89,7 +91,8 @@ export default function DonationHistoryScreen() {
 
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerClassName='px-5 pb-10 pt-0'
+				contentContainerStyle={{ paddingBottom: bottomSpace }}
+				contentContainerClassName='px-5 pt-0'
 			>
 				{/* Estadísticas */}
 				<DonationStatsRow

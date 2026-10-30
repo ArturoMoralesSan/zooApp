@@ -2,7 +2,9 @@ import { ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Image } from 'expo-image'
 import { Pressable, Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
+import { getFloatingBottom } from '@/theme/layout'
 import type { RouteResult, SelectableItem } from '@/types/map'
 import { formatDistance, formatMinutes } from '@/utils/map'
 import { mapShadow } from '@/components/map/mapShadow'
@@ -18,10 +20,12 @@ export function CollapsedRouteCard({
 	route,
 	onExpand,
 }: CollapsedRouteCardProps) {
+	const insets = useSafeAreaInsets()
+
 	return (
 		<View
-			className='absolute bottom-[15px] left-3 right-3 h-[72px] rounded-[20px] bg-niebla'
-			style={mapShadow}
+			className='absolute left-3 right-3 h-[72px] rounded-[20px] bg-niebla'
+			style={[mapShadow, { bottom: getFloatingBottom(insets.bottom) }]}
 		>
 			<Pressable
 				onPress={onExpand}

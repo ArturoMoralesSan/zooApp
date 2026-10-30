@@ -15,6 +15,7 @@ import { useTicketTypes } from '@/hooks/useTickets'
 import type { TicketSummaryItem, TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
@@ -30,6 +31,7 @@ type SelectedTicket = {
 const NO_TICKET_TYPES: TicketType[] = []
 
 export default function TicketSummaryScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const params = useLocalSearchParams<{
@@ -152,7 +154,8 @@ export default function TicketSummaryScreen() {
 		<ScreenBackground patternClassName='opacity-[0.12]'>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pb-[180px] pt-3'
+				contentContainerClassName='grow px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled

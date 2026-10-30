@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import colors from '@/theme/colors'
 
 type ToastType = 'success' | 'error' | 'warning'
@@ -40,6 +41,8 @@ export default function Toast({
 	onHide,
 	duration = 3000,
 }: ToastProps) {
+	const insets = useSafeAreaInsets()
+
 	useEffect(() => {
 		if (!visible) {
 			return
@@ -60,8 +63,9 @@ export default function Toast({
 
 	return (
 		<View
-			className={`absolute left-5 right-5 top-[45px] z-[9999] flex-row items-center rounded-[18px] border bg-blanco px-[14px] py-[13px] ${current.border}`}
+			className={`absolute left-5 right-5 z-[9999] flex-row items-center rounded-[18px] border bg-blanco px-[14px] py-[13px] ${current.border}`}
 			style={{
+				top: insets.top + 12,
 				elevation: 9999,
 				shadowColor: colors.tinta,
 				shadowOffset: {

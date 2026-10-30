@@ -10,12 +10,14 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
 const COLUMN_GAP = 10
 
 export default function DonationsIndexScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
 	const [customAmount, setCustomAmount] = useState('')
 	const [isCustomSelected, setIsCustomSelected] = useState(false)
@@ -125,7 +127,8 @@ export default function DonationsIndexScreen() {
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps='handled'
-				contentContainerClassName='px-5 pb-[180px] pt-3'
+				contentContainerClassName='px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 			>
 				{/* ENCABEZADO */}
 				<BackButton position='relative' onPress={() => router.back()} />

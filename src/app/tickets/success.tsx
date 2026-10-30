@@ -12,6 +12,7 @@ import UserHeader from '@/components/UserHeader'
 import colors from '@/theme/colors'
 import type { Order } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const cardShadow: ViewStyle = {
@@ -23,6 +24,7 @@ const cardShadow: ViewStyle = {
 }
 
 export default function TicketSuccessScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const params = useLocalSearchParams<{
@@ -45,7 +47,8 @@ export default function TicketSuccessScreen() {
 			{/* CONTENIDO DESPLAZABLE */}
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='w-full grow items-stretch px-5 pb-[190px] pt-3'
+				contentContainerClassName='w-full grow items-stretch px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled

@@ -14,6 +14,7 @@ import {
 	View,
 } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type TicketQrModalProps = {
 	selectedPurchase: Purchase | null
@@ -24,17 +25,22 @@ export function TicketQrModal({
 	selectedPurchase,
 	onClose,
 }: TicketQrModalProps) {
+	const insets = useSafeAreaInsets()
+
 	return (
 		<Modal
 			visible={selectedPurchase !== null}
 			transparent
 			animationType='slide'
+			statusBarTranslucent
+			navigationBarTranslucent
 			onRequestClose={onClose}
 		>
 			<View className='flex-1 justify-end bg-tinta/[0.48]'>
 				<ImageBackground
 					source={require('@/assets/images/zoo-pattern.png')}
-					className='max-h-[90%] overflow-hidden rounded-t-[26px] border-t border-card-border bg-blanco px-5 pb-[25px] pt-5'
+					className='max-h-[90%] overflow-hidden rounded-t-[26px] border-t border-card-border bg-blanco px-5 pt-5'
+					style={{ paddingBottom: 24 + insets.bottom }}
 					imageClassName='opacity-30'
 					resizeMode='repeat'
 				>

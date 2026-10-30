@@ -20,6 +20,7 @@ export function PanelQrModal({ visible, user, onClose }: PanelQrModalProps) {
 			transparent
 			animationType='fade'
 			statusBarTranslucent
+			navigationBarTranslucent
 			onRequestClose={onClose}
 		>
 			{/* Overlay */}

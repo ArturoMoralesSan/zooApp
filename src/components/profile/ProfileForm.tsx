@@ -24,6 +24,7 @@ import {
 	formatDateForDisplay,
 } from '@/utils/date'
 import { getAvatarUrl } from '@/utils/profile'
+import { useScrollBottomSpace } from '@/theme/layout'
 
 type ToastState = {
 	visible: boolean
@@ -39,6 +40,7 @@ type ProfileFormProps = {
 // Keyed by user id in ProfileScreen, so the form state starts from the
 // loaded profile without copying it in an effect.
 export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
+	const bottomSpace = useScrollBottomSpace(0)
 	const { refreshProfile } = useDataRefresh()
 
 	const [saving, setSaving] = useState(false)
@@ -337,6 +339,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 
 				<Animated.ScrollView
 					className='flex-1'
+					contentContainerStyle={{ paddingBottom: bottomSpace }}
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 					scrollEventThrottle={16}

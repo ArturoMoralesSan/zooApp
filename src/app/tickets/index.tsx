@@ -19,6 +19,7 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const ICON_COLORS = {
@@ -42,6 +43,7 @@ type SelectedTicket = {
 const MAX_QUANTITY = 20
 
 export default function TicketsScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const { data: ticketTypes = [], error, isLoading: loading } = useTicketTypes()
@@ -122,7 +124,8 @@ export default function TicketsScreen() {
 		<ScreenBackground withBackground={false}>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pb-[180px] pt-3'
+				contentContainerClassName='grow px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled

@@ -1,4 +1,5 @@
 import ActionButton from '@/components/ActionButton'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
 import colors from '@/theme/colors'
@@ -30,6 +31,7 @@ const palette = {
 }
 
 export default function Login() {
+	const bottomSpace = useScrollBottomSpace(48)
 	const { login } = useAuth()
 
 	const [email, setEmail] = useState('')
@@ -122,7 +124,7 @@ export default function Login() {
 						flexGrow: 1,
 						paddingHorizontal: 24,
 						paddingTop: 36,
-						paddingBottom: 48,
+						paddingBottom: bottomSpace,
 					}}
 					keyboardShouldPersistTaps='handled'
 					keyboardDismissMode='on-drag'

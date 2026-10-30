@@ -1,4 +1,5 @@
 import ActionButton from '@/components/ActionButton'
+import { useScrollBottomSpace } from '@/theme/layout'
 import BackButton from '@/components/BackButton'
 import { RegisterHeader } from '@/components/auth/RegisterHeader'
 import { RegisterLoginLink } from '@/components/auth/RegisterLoginLink'
@@ -28,6 +29,7 @@ import {
 } from 'react-native'
 
 export default function Register() {
+	const bottomSpace = useScrollBottomSpace(48)
 	const { register } = useAuth()
 
 	const [name, setName] = useState('')
@@ -132,7 +134,7 @@ export default function Register() {
 						flexGrow: 1,
 						paddingHorizontal: 24,
 						paddingTop: 36,
-						paddingBottom: 48,
+						paddingBottom: bottomSpace,
 					}}
 					keyboardShouldPersistTaps='handled'
 					keyboardDismissMode='on-drag'

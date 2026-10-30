@@ -14,6 +14,7 @@ import colors from '@/theme/colors'
 import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
 import { createDonation } from '@/services/donations'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 
@@ -22,6 +23,7 @@ const COLORS = {
 } as const
 
 export default function DonationsSummaryScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const params = useLocalSearchParams<{
@@ -88,7 +90,8 @@ export default function DonationsSummaryScreen() {
 		<ScreenBackground>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerClassName='px-5 pb-[190px] pt-2'
+				contentContainerClassName='px-5 pt-2'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				keyboardShouldPersistTaps='handled'
 			>
 				{/* BOTÓN REGRESAR */}

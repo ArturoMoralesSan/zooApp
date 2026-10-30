@@ -1,4 +1,5 @@
 import ActionButton from '@/components/ActionButton'
+import { useScrollBottomSpace } from '@/theme/layout'
 import BackButton from '@/components/BackButton'
 import { Mail01Icon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
@@ -21,6 +22,7 @@ const palette = {
 }
 
 export default function ForgotPassword() {
+	const bottomSpace = useScrollBottomSpace(48)
 	const [email, setEmail] = useState('')
 	const [error, setError] = useState('')
 
@@ -61,7 +63,7 @@ export default function ForgotPassword() {
 						flexGrow: 1,
 						paddingHorizontal: 24,
 						paddingTop: 36,
-						paddingBottom: 48,
+						paddingBottom: bottomSpace,
 					}}
 					keyboardShouldPersistTaps='handled'
 					keyboardDismissMode='on-drag'

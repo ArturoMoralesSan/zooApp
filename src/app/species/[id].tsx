@@ -1,4 +1,5 @@
 import BackButton from '@/components/BackButton'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
 import { cardShadow } from '@/components/species/speciesStyles'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
@@ -22,6 +23,7 @@ import colors from '@/theme/colors'
 import type { SpeciesImage } from '@/types/species'
 
 export default function SpeciesDetailScreen() {
+	const bottomSpace = useScrollBottomSpace(0)
 	const router = useRouter()
 	const params = useLocalSearchParams<{ id: string }>()
 
@@ -101,6 +103,7 @@ export default function SpeciesDetailScreen() {
 		<View className='relative flex-1'>
 			<Animated.ScrollView
 				className='flex-1 bg-blanco'
+				contentContainerStyle={{ paddingBottom: bottomSpace }}
 				showsVerticalScrollIndicator={false}
 				scrollEventThrottle={16}
 				onScroll={Animated.event(

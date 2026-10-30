@@ -1,4 +1,5 @@
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { useMyTickets } from '@/hooks/useTickets'
 
 import { useRouter } from 'expo-router'
@@ -18,6 +19,7 @@ import { TicketQrModal } from '@/components/tickets/TicketQrModal'
 import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 
 export default function MyTicketsScreen() {
+	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
 	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
@@ -94,7 +96,8 @@ export default function MyTicketsScreen() {
 			<ScrollView
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
-				contentContainerClassName='px-5 pb-10 pt-2.5'
+				contentContainerStyle={{ paddingBottom: bottomSpace }}
+				contentContainerClassName='px-5 pt-2.5'
 			>
 				<View className='mb-4'>
 					<BackButton onPress={() => router.back()} position='relative' />
