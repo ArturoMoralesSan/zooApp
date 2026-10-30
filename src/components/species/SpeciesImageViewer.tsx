@@ -25,7 +25,7 @@ export function SpeciesImageViewer({
 						onPress={onClose}
 						className='rounded-full bg-niebla/20 px-3.5 py-2 active:bg-hoja/30'
 					>
-						<Text className='text-[14px] font-bold text-blanco'>Cerrar</Text>
+						<Text className='text-button text-blanco'>Cerrar</Text>
 					</Pressable>
 				</View>
 

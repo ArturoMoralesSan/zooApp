@@ -40,11 +40,11 @@ export function SpeciesErrorState({
 					/>
 				</View>
 
-				<Text className='mt-5 text-center text-[18px] font-bold text-tinta'>
+				<Text className='text-h2 mt-5 text-center text-tinta'>
 					No fue posible cargar la especie
 				</Text>
 
-				<Text className='mt-2 text-center text-sm leading-5 text-tinta-2'>
+				<Text className='text-body mt-2 text-center text-tinta-2'>
 					{error ?? 'La información no está disponible en este momento.'}
 				</Text>
 
@@ -52,7 +52,7 @@ export function SpeciesErrorState({
 					onPress={onRetry}
 					className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
 				>
-					<Text className='font-bold text-blanco'>Intentar nuevamente</Text>
+					<Text className='text-button text-blanco'>Intentar nuevamente</Text>
 				</Pressable>
 			</View>
 		</ImageBackground>
