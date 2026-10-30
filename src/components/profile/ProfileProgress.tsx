@@ -26,7 +26,7 @@ export function ProfileProgress({
 }: ProfileProgressProps) {
 	return (
 		<Animated.View
-			className='relative z-10 overflow-hidden rounded-t-[30px] bg-blanco'
+			className='relative z-10 overflow-hidden rounded-t-3xl bg-blanco'
 			style={{ marginTop: progressMarginTop }}
 		>
 			<ImageBackground

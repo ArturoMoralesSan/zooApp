@@ -63,7 +63,7 @@ export function ProfileHeader({
 					accessibilityLabel='Cambiar foto de perfil'
 				>
 					<Animated.View
-						className='h-28 w-28 items-center justify-center overflow-hidden rounded-[56px] border-[5px] border-blanco bg-niebla'
+						className='h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[5px] border-blanco bg-niebla'
 						style={[
 							{
 								transform: [

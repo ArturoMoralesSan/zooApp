@@ -32,7 +32,7 @@ export function TicketTabs({
 				</Text>
 
 				<View
-					className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
+					className={`h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
 				>
 					<Text
 						className={`font-display-x text-[12px] ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
@@ -55,7 +55,7 @@ export function TicketTabs({
 				</Text>
 
 				<View
-					className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
+					className={`h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
 				>
 					<Text
 						className={`font-display-x text-[12px] ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
