@@ -1,3 +1,4 @@
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import { ListCard } from '@/components/ui/ListCard'
 import type { SpeciesDetail } from '@/types/species'
 import {
@@ -6,7 +7,7 @@ import {
 	Plant01Icon,
 	Shield01Icon,
 } from '@hugeicons/core-free-icons'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 
 type SpeciesDataGridProps = {
 	species: SpeciesDetail
@@ -14,10 +15,10 @@ type SpeciesDataGridProps = {
 
 export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 	return (
-		<View className='mt-7'>
-			<Text className='text-h2 text-tinta'>Datos de la especie</Text>
+		<View className='mt-6'>
+			<SectionTitle title='Datos de la especie' />
 
-			<View className='mt-3.5 flex-row flex-wrap justify-between'>
+			<View className='flex-row flex-wrap justify-between'>
 				{species.habitat && (
 					<View className='mb-3 w-[48.5%]'>
 						<ListCard

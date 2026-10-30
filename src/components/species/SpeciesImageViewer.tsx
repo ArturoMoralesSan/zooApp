@@ -1,5 +1,7 @@
+import { IconButton } from '@/components/ui/IconButton'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import type { SpeciesDetail, SpeciesImage } from '@/types/species'
-import { Image, Modal, Pressable, Text, View } from 'react-native'
+import { Image, Modal, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type SpeciesImageViewerProps = {
@@ -26,15 +28,15 @@ export function SpeciesImageViewer({
 		>
 			<View className='flex-1 items-center justify-center bg-tinta/95'>
 				<View
-					className='absolute right-5 z-10 overflow-hidden rounded-full border border-card-border/35 bg-niebla/20'
+					className='absolute right-5 z-10'
 					style={{ top: insets.top + 16 }}
 				>
-					<Pressable
+					<IconButton
+						icon={Cancel01Icon}
+						variant='outline'
 						onPress={onClose}
-						className='rounded-full bg-niebla/20 px-3.5 py-2 active:bg-hoja/30'
-					>
-						<Text className='text-button text-blanco'>Cerrar</Text>
-					</Pressable>
+						accessibilityLabel='Cerrar'
+					/>
 				</View>
 
 				{selectedImage && (

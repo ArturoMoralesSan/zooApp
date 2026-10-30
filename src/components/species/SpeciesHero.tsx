@@ -1,7 +1,6 @@
-import colors from '@/theme/colors'
 import type { SpeciesDetail, SpeciesImage } from '@/types/species'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
+import { IconBox } from '@/components/ui/IconBox'
 import { Image, Pressable, View } from 'react-native'
 
 type SpeciesHeroProps = {
@@ -31,12 +30,7 @@ export function SpeciesHero({
 				</Pressable>
 			) : (
 				<View className='h-full w-full items-center justify-center bg-niebla'>
-					<HugeiconsIcon
-						icon={UserGroupIcon}
-						size={80}
-						strokeWidth={1.8}
-						color={colors.esmeralda}
-					/>
+					<IconBox icon={UserGroupIcon} size='lg' />
 				</View>
 			)}
 

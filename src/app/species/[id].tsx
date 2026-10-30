@@ -1,4 +1,5 @@
 import BackButton from '@/components/ui/BackButton'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
@@ -126,7 +127,7 @@ export default function SpeciesDetailScreen() {
 
 					{/* CONTENIDO */}
 					<Animated.View
-						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border-1.5 border-card-border bg-niebla'
+						className='relative z-10 w-full overflow-hidden rounded-t-3xl border-1.5 border-card-border bg-niebla'
 						style={{ marginTop: cardMarginTop }}
 					>
 						<ImageBackground
@@ -138,15 +139,13 @@ export default function SpeciesDetailScreen() {
 							<View className='px-4 pb-7 pt-6'>
 								{/* CATEGORÍA */}
 								{species.category && (
-									<View className='self-start rounded-full border border-card-border bg-hoja px-3 py-1.5'>
-										<Text className='text-overline text-esmeralda'>
-											{species.category.name}
-										</Text>
-									</View>
+									<Text className='text-overline text-esmeralda'>
+										{species.category.name}
+									</Text>
 								)}
 
 								{/* NOMBRE */}
-								<Text className='text-h1 mt-3.5'>{species.common_name}</Text>
+								<Text className='text-h1 mt-1'>{species.common_name}</Text>
 
 								{species.scientific_name && (
 									<Text className='text-body mt-1.5 italic text-tinta-2'>
@@ -156,12 +155,13 @@ export default function SpeciesDetailScreen() {
 
 								{/* DESCRIPCIÓN */}
 								{species.description && (
-									<View className='mt-7'>
-										<Text className='text-h2 text-tinta'>
-											Conoce a esta especie
-										</Text>
+									<View className='mt-6'>
+										<SectionTitle
+											title='Conoce a esta especie'
+											className='mb-2'
+										/>
 
-										<Text className='text-body mt-2 text-tinta-2'>
+										<Text className='text-body text-tinta-2'>
 											{species.description}
 										</Text>
 									</View>
