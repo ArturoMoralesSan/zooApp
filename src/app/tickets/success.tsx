@@ -79,11 +79,11 @@ export default function TicketSuccessScreen() {
 						/>
 					</View>
 
-					<Text className='text-center text-[23px] font-black text-blanco'>
+					<Text className='text-h1 text-center text-blanco'>
 						¡Compra realizada!
 					</Text>
 
-					<Text className='mt-[7px] text-center text-[14px] leading-5 text-hoja'>
+					<Text className='text-subtitle mt-[7px] text-center text-hoja'>
 						Tu compra se realizó correctamente. Guarda tus códigos QR para
 						ingresar al zoológico.
 					</Text>
@@ -105,11 +105,9 @@ export default function TicketSuccessScreen() {
 						</View>
 
 						<View className='min-w-0 flex-1'>
-							<Text className='text-[17px] font-black text-tinta'>
-								Tus boletos
-							</Text>
+							<Text className='text-h3 text-tinta'>Tus boletos</Text>
 
-							<Text className='mt-[3px] text-[12px] leading-[17px] text-tinta-2'>
+							<Text className='text-meta mt-[3px]'>
 								Presenta el código QR en la entrada
 							</Text>
 						</View>
@@ -121,7 +119,7 @@ export default function TicketSuccessScreen() {
 								key={ticket.id ?? index}
 								className='mb-[15px] w-full items-center'
 							>
-								<Text className='mb-[9px] self-start text-[13px] font-extrabold text-tinta'>
+								<Text className='mb-[9px] self-start font-sans-bold text-[13px] text-tinta'>
 									Boleto {index + 1}
 								</Text>
 
@@ -136,7 +134,7 @@ export default function TicketSuccessScreen() {
 						))
 					) : (
 						<View className='w-full items-center justify-center py-[25px]'>
-							<Text className='text-center text-[14px] text-tinta-2'>
+							<Text className='text-body text-center text-tinta-2'>
 								No se encontraron boletos en esta compra.
 							</Text>
 						</View>
@@ -149,21 +147,19 @@ export default function TicketSuccessScreen() {
 					style={cardShadow}
 				>
 					<View>
-						<Text className='text-[14px] font-bold text-tinta-2'>
+						<Text className='font-sans-bold text-[14px] text-tinta-2'>
 							Total pagado
 						</Text>
 
-						<Text className='mt-[3px] text-[25px] font-black text-bosque'>
+						<Text className='mt-[3px] font-display-x text-[25px] text-bosque'>
 							{formatCurrency(total)}
 						</Text>
 					</View>
 
 					<View className='mt-[13px] border-t border-t-card-border pt-[13px]'>
-						<Text className='text-[11px] font-extrabold uppercase text-tinta-2'>
-							Folio
-						</Text>
+						<Text className='text-overline text-tinta-2'>Folio</Text>
 
-						<Text className='mt-[3px] text-[14px] font-extrabold text-tinta'>
+						<Text className='mt-[3px] font-display-x text-[14px] text-tinta'>
 							#{order?.id ?? '---'}
 						</Text>
 					</View>
@@ -172,15 +168,15 @@ export default function TicketSuccessScreen() {
 				{/* INFORMACIÓN IMPORTANTE */}
 				<View className='w-full flex-row items-center rounded-2xl border border-card-border bg-niebla p-[15px]'>
 					<View className='mr-3 h-[38px] w-[38px] items-center justify-center rounded-xl border border-card-border bg-hoja'>
-						<Text className='text-[19px] font-black text-esmeralda'>✓</Text>
+						<Text className='font-sans-x text-[19px] text-esmeralda'>✓</Text>
 					</View>
 
 					<View className='min-w-0 flex-1'>
-						<Text className='text-[14px] font-black text-bosque'>
+						<Text className='font-sans-x text-[14px] text-bosque'>
 							Importante
 						</Text>
 
-						<Text className='mt-1 text-[12px] leading-[18px] text-tinta-2'>
+						<Text className='text-meta mt-1'>
 							Los códigos QR son tus boletos de entrada. Puedes mostrarlos
 							directamente desde tu celular al llegar al zoológico.
 						</Text>

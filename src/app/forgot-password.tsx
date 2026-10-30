@@ -84,11 +84,11 @@ export default function ForgotPassword() {
 					<View className='mt-5 rounded-3xl bg-blanco p-4'>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
-							<Text className='text-center text-[26px] font-bold leading-8 text-bosque'>
+							<Text className='text-h1 text-center'>
 								¿Olvidaste tu contraseña?
 							</Text>
 
-							<Text className='mt-2.5 text-center text-sm text-tinta-2'>
+							<Text className='text-subtitle mt-2.5 text-center'>
 								Ingresa tu correo electrónico y te enviaremos instrucciones para
 								recuperar el acceso a tu cuenta.
 							</Text>
@@ -98,7 +98,7 @@ export default function ForgotPassword() {
 						<TextField
 							label='Correo electrónico'
 							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-xs font-semibold text-tinta'
+							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
 							invalid={Boolean(error)}
 							iconErrorColor={palette.error}
 							value={email}
@@ -119,7 +119,7 @@ export default function ForgotPassword() {
 						{/* ERROR */}
 						{error !== '' && (
 							<View className='mt-2.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-xs text-error'>{error}</Text>
+								<Text className='text-meta text-error'>{error}</Text>
 							</View>
 						)}
 
@@ -131,7 +131,7 @@ export default function ForgotPassword() {
 
 						{/* VOLVER AL LOGIN */}
 						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-sm text-tinta-2'>
+							<Text className='text-body text-tinta-2'>
 								¿Recuerdas tu contraseña?{' '}
 							</Text>
 
@@ -140,7 +140,7 @@ export default function ForgotPassword() {
 								className='rounded-lg py-1'
 								accessibilityRole='button'
 							>
-								<Text className='text-sm font-bold text-esmeralda'>
+								<Text className='font-sans-bold text-[14px] leading-[1.5] text-esmeralda'>
 									Iniciar sesión
 								</Text>
 							</Pressable>

@@ -21,7 +21,7 @@ export default function ActionButton({
 				className={`h-[50px] w-full items-center justify-center rounded-[10px] border-b-[3px] border-b-bosque ${disabled ? 'bg-apagado' : 'bg-esmeralda'}`}
 				style={{ elevation: 2 }}
 			>
-				<Text className='text-[16px] font-extrabold text-blanco'>{title}</Text>
+				<Text className='text-button text-blanco'>{title}</Text>
 			</Pressable>
 		</View>
 	)

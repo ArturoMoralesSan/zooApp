@@ -81,11 +81,11 @@ export default function DonationSuccessScreen() {
 						/>
 					</View>
 
-					<Text className='mb-2.5 text-center text-[25px] font-extrabold text-blanco'>
+					<Text className='text-h1 mb-2.5 text-center text-blanco'>
 						¡Donación realizada!
 					</Text>
 
-					<Text className='text-center text-[14px] leading-[22px] text-blanco opacity-[0.94]'>
+					<Text className='text-body text-center text-blanco opacity-[0.94]'>
 						Gracias por apoyar al Zoológico Sahuatoba.
 					</Text>
 				</View>
@@ -93,28 +93,26 @@ export default function DonationSuccessScreen() {
 				{/* MONTO DONADO Y DETALLE */}
 				<View className='mb-4 rounded-[22px] border border-card-border bg-niebla p-5'>
 					<View className='mb-2'>
-						<Text className='text-[14px] font-semibold text-tinta-2'>
-							Monto donado
-						</Text>
+						<Text className='text-overline text-tinta-2'>Monto donado</Text>
 					</View>
 
-					<Text className='text-[34px] font-extrabold tracking-[-0.7px] text-tinta-2'>
+					<Text className='font-display-x text-[34px] text-tinta-2'>
 						{formatCurrency(amount)}
 					</Text>
 
 					<View className='my-2.5 h-px bg-card-border' />
 
 					<View className='mb-3'>
-						<Text className='text-[18px] font-extrabold text-tinta-2'>
+						<Text className='text-overline text-tinta-2'>
 							Detalle de la donación
 						</Text>
 					</View>
 
 					<View className='flex-row items-center justify-between gap-3 py-2'>
-						<Text className='shrink-0 text-[13px] text-tinta-2'>Donación</Text>
+						<Text className='text-body shrink-0 text-tinta-2'>Donación</Text>
 
 						<Text
-							className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+							className='flex-1 text-right font-sans-bold text-[13px] text-tinta-2'
 							numberOfLines={1}
 						>
 							Aportación al zoológico
@@ -124,12 +122,12 @@ export default function DonationSuccessScreen() {
 					<View className='my-2.5 h-px bg-card-border' />
 
 					<View className='flex-row items-center justify-between gap-3 py-2'>
-						<Text className='shrink-0 text-[13px] text-tinta-2'>
+						<Text className='text-body shrink-0 text-tinta-2'>
 							Método de pago
 						</Text>
 
 						<Text
-							className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+							className='flex-1 text-right font-sans-bold text-[13px] text-tinta-2'
 							numberOfLines={1}
 						>
 							{paymentMethod}
@@ -139,10 +137,10 @@ export default function DonationSuccessScreen() {
 					<View className='my-2.5 h-px bg-card-border' />
 
 					<View className='flex-row items-center justify-between gap-3 py-2'>
-						<Text className='shrink-0 text-[13px] text-tinta-2'>Folio</Text>
+						<Text className='text-body shrink-0 text-tinta-2'>Folio</Text>
 
 						<Text
-							className='flex-1 text-right text-[13px] font-bold text-tinta-2'
+							className='flex-1 text-right font-sans-bold text-[13px] text-tinta-2'
 							numberOfLines={1}
 							selectable
 						>
@@ -158,11 +156,11 @@ export default function DonationSuccessScreen() {
 					</View>
 
 					<View className='flex-1'>
-						<Text className='mb-1.5 text-[15px] font-extrabold text-tinta-2'>
+						<Text className='text-h3 mb-1.5 text-tinta-2'>
 							¡Tu apoyo cuenta!
 						</Text>
 
-						<Text className='text-[13px] leading-5 text-tinta-2'>
+						<Text className='text-body text-tinta-2'>
 							Gracias a personas como tú podemos seguir trabajando en el
 							bienestar de los animales y en la conservación de nuestra fauna.
 						</Text>

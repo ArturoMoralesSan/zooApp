@@ -125,17 +125,14 @@ export default function AppCard({
 		// which collapses this block when iconPosition is 'top' (column layout).
 		<View style={{ flex: 1, minWidth: 0 }}>
 			{title ? (
-				<Text
-					className='shrink text-[16px] font-extrabold'
-					style={{ color: textColor }}
-				>
+				<Text className='text-h3 shrink' style={{ color: textColor }}>
 					{title}
 				</Text>
 			) : null}
 
 			{description ? (
 				<Text
-					className={`shrink text-[12px] leading-[18px] ${title ? 'mt-1' : ''}`}
+					className={`text-meta shrink ${title ? 'mt-1' : ''}`}
 					style={{ color: descriptionColor }}
 				>
 					{description}

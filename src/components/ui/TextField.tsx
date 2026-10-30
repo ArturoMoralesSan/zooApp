@@ -26,7 +26,7 @@ export function TextField({
 	highlightOnFocus = true,
 	iconColor = colors.tinta2,
 	iconErrorColor,
-	labelClassName = 'mb-2 mt-4 text-xs font-semibold text-tinta',
+	labelClassName = 'mb-2 mt-4 text-[14px] font-sans-semibold text-tinta',
 	renderTrailing,
 	...inputProps
 }: TextFieldProps) {
@@ -61,13 +61,13 @@ export function TextField({
 					onFocus={() => setFocused(true)}
 					onBlur={() => setFocused(false)}
 					placeholderTextColor={colors.apagado}
-					className='min-h-12 flex-1 px-2.5 py-2.5 text-sm text-tinta'
+					className='min-h-12 flex-1 px-2.5 py-2.5 font-sans text-[14px] text-tinta'
 				/>
 
 				{renderTrailing?.({ focused })}
 			</View>
 
-			{error && <Text className='mt-1 text-xs text-error'>{error}</Text>}
+			{error && <Text className='text-meta mt-1 text-error'>{error}</Text>}
 		</>
 	)
 }

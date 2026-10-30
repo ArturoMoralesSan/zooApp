@@ -12,9 +12,7 @@ export function MapLoadingState() {
 			>
 				<ActivityIndicator size='large' color={colors.esmeralda} />
 
-				<Text className='mt-3.5 text-[15px] font-semibold text-tinta-2'>
-					Cargando mapa...
-				</Text>
+				<Text className='text-body mt-3.5 text-tinta-2'>Cargando mapa...</Text>
 			</View>
 		</SafeAreaView>
 	)

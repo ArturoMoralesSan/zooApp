@@ -160,7 +160,7 @@ export default function Register() {
 						<TextField
 							label='Nombre completo'
 							icon={UserIcon}
-							labelClassName='mb-2 mt-7 text-xs font-semibold text-tinta'
+							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
 							error={errors.name}
 							value={name}
 							onChangeText={(value) => {
@@ -235,7 +235,7 @@ export default function Register() {
 						{/* ERROR GENERAL */}
 						{error !== '' && (
 							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-xs text-error'>{error}</Text>
+								<Text className='text-meta text-error'>{error}</Text>
 							</View>
 						)}
 

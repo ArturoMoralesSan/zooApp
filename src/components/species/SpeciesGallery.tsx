@@ -33,7 +33,7 @@ export function SpeciesGallery({
 }: SpeciesGalleryProps) {
 	return (
 		<View className='mt-7'>
-			<Text className='text-[21px] font-bold text-tinta'>Galería</Text>
+			<Text className='text-h2 text-tinta'>Galería</Text>
 
 			<ScrollView
 				horizontal

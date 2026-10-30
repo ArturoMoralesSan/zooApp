@@ -76,15 +76,13 @@ export default function Toast({
 			<View
 				className={`mr-3 h-[34px] w-[34px] items-center justify-center rounded-[17px] ${current.iconBackground}`}
 			>
-				<Text className={`text-[16px] font-extrabold ${current.text}`}>
+				<Text className={`font-sans-x text-[16px] ${current.text}`}>
 					{current.icon}
 				</Text>
 			</View>
 
 			{/* MENSAJE */}
-			<Text className='flex-1 text-[14px] font-semibold leading-5 text-tinta'>
-				{message}
-			</Text>
+			<Text className='text-body flex-1 text-tinta'>{message}</Text>
 		</View>
 	)
 }

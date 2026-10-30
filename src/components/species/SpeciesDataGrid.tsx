@@ -16,9 +16,7 @@ type SpeciesDataGridProps = {
 export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 	return (
 		<View className='mt-7'>
-			<Text className='text-[21px] font-bold text-tinta'>
-				Datos de la especie
-			</Text>
+			<Text className='text-h2 text-tinta'>Datos de la especie</Text>
 
 			<View className='mt-3.5 flex-row flex-wrap justify-between'>
 				{species.habitat && (

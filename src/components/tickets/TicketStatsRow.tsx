@@ -28,12 +28,10 @@ export function TicketStatsRow({
 				</View>
 
 				<View>
-					<Text className='text-[20px] font-extrabold text-tinta'>
+					<Text className='font-display-x text-[20px] text-tinta'>
 						{activePurchases.length}
 					</Text>
-					<Text className='mt-[3px] text-[11px] font-medium text-tinta-2'>
-						Compras activas
-					</Text>
+					<Text className='text-meta mt-[3px]'>Compras activas</Text>
 				</View>
 			</View>
 
@@ -50,12 +48,10 @@ export function TicketStatsRow({
 				</View>
 
 				<View>
-					<Text className='text-[20px] font-extrabold text-tinta'>
+					<Text className='font-display-x text-[20px] text-tinta'>
 						{historyPurchases.length}
 					</Text>
-					<Text className='mt-[3px] text-[11px] font-medium text-tinta-2'>
-						Historial
-					</Text>
+					<Text className='text-meta mt-[3px]'>Historial</Text>
 				</View>
 			</View>
 		</View>

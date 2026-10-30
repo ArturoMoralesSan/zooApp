@@ -15,10 +15,12 @@ export function LocationBadge({ locationAccuracy }: LocationBadgeProps) {
 			<View className='mr-[7px] h-[9px] w-[9px] rounded-[5px] bg-[#0977B8]' />
 
 			<View>
-				<Text className='text-[11px] font-bold text-tinta'>Tu ubicación</Text>
+				<Text className='font-sans-bold text-[12px] text-tinta'>
+					Tu ubicación
+				</Text>
 
 				{locationAccuracy !== null && (
-					<Text className='mt-px text-[9px] text-tinta-2'>
+					<Text className='text-meta mt-px'>
 						Precisión ±{Math.round(locationAccuracy)}m
 					</Text>
 				)}

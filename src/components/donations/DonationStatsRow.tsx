@@ -20,10 +20,10 @@ export function DonationStatsRow({
 				className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
 				style={cardShadow}
 			>
-				<Text className='text-center text-[21px] font-extrabold text-tinta'>
+				<Text className='text-center font-display-x text-[21px] text-tinta'>
 					{donations.length}
 				</Text>
-				<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
+				<Text className='text-meta mt-1.5 text-center text-tinta'>
 					Donaciones
 				</Text>
 			</View>
@@ -32,10 +32,10 @@ export function DonationStatsRow({
 				className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
 				style={cardShadow}
 			>
-				<Text className='text-center text-[21px] font-extrabold text-tinta'>
+				<Text className='text-center font-display-x text-[21px] text-tinta'>
 					{completedDonations}
 				</Text>
-				<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
+				<Text className='text-meta mt-1.5 text-center text-tinta'>
 					Completadas
 				</Text>
 			</View>
@@ -45,14 +45,14 @@ export function DonationStatsRow({
 				style={[cardShadow, { flex: 1.25 }]}
 			>
 				<Text
-					className='text-center text-[16px] font-extrabold text-tinta'
+					className='text-center font-display-x text-[16px] text-tinta'
 					numberOfLines={1}
 					adjustsFontSizeToFit
 					minimumFontScale={0.7}
 				>
 					{formatCurrency(totalDonated)}
 				</Text>
-				<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
+				<Text className='text-meta mt-1.5 text-center text-tinta'>
 					Total donado
 				</Text>
 			</View>

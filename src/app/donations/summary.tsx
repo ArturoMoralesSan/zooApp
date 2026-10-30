@@ -119,11 +119,9 @@ export default function DonationsSummaryScreen() {
 						</View>
 
 						<View className='min-w-0 flex-1'>
-							<Text className='text-[17px] font-black text-tinta'>
-								Donación
-							</Text>
+							<Text className='text-h3 text-tinta'>Donación</Text>
 
-							<Text className='mt-1 text-[12px] leading-[17px] text-tinta-2'>
+							<Text className='text-meta mt-1'>
 								Aportación para el Zoológico Sahuatoba
 							</Text>
 						</View>
@@ -131,17 +129,17 @@ export default function DonationsSummaryScreen() {
 
 					<View className='my-[7px] h-px bg-card-border' />
 
-					<Text className='mb-3 mt-3.5 text-[14px] font-black uppercase tracking-[0.7px] text-bosque'>
+					<Text className='text-overline mb-3 mt-3.5 text-bosque'>
 						DETALLE DEL PAGO
 					</Text>
 
 					<View className='min-h-11 flex-row items-center justify-between gap-3'>
-						<Text className='flex-1 text-[14px] font-extrabold text-tinta'>
+						<Text className='text-body flex-1 text-tinta'>
 							Aportación voluntaria
 						</Text>
 
 						<Text
-							className='text-[15px] font-black text-esmeralda'
+							className='font-display-x text-[15px] text-esmeralda'
 							numberOfLines={1}
 							adjustsFontSizeToFit
 						>
@@ -152,11 +150,9 @@ export default function DonationsSummaryScreen() {
 					<View className='my-[7px] h-px bg-card-border' />
 
 					<View className='min-h-11 flex-row items-center justify-between gap-3'>
-						<Text className='flex-1 text-[14px] font-extrabold text-tinta'>
-							Método de pago
-						</Text>
+						<Text className='text-body flex-1 text-tinta'>Método de pago</Text>
 
-						<Text className='text-[13px] font-black text-esmeralda'>
+						<Text className='font-sans-x text-[13px] text-esmeralda'>
 							Tarjeta
 						</Text>
 					</View>
@@ -177,11 +173,9 @@ export default function DonationsSummaryScreen() {
 					</View>
 
 					<View className='min-w-0 flex-1'>
-						<Text className='text-[15px] font-black text-bosque'>
-							Pago seguro
-						</Text>
+						<Text className='text-h3 text-bosque'>Pago seguro</Text>
 
-						<Text className='mt-[3px] text-[12px] leading-[17px] text-tinta-2'>
+						<Text className='text-body mt-[3px] text-tinta-2'>
 							Tu información de pago será procesada de forma segura mediante
 							nuestro proveedor de pagos.
 						</Text>
@@ -193,11 +187,11 @@ export default function DonationsSummaryScreen() {
 					className='w-full rounded-[18px] border border-card-border bg-hoja p-[17px]'
 					style={cardShadow}
 				>
-					<Text className='text-[15px] font-black text-bosque'>
+					<Text className='text-h3 text-bosque'>
 						Gracias por apoyar al zoológico
 					</Text>
 
-					<Text className='mt-[5px] text-[12px] leading-[18px] text-tinta-2'>
+					<Text className='text-body mt-[5px] text-tinta-2'>
 						Tu aportación ayuda al cuidado de los animales, mantenimiento de sus
 						espacios y conservación de nuestra fauna.
 					</Text>
@@ -206,7 +200,7 @@ export default function DonationsSummaryScreen() {
 				{/* MENSAJE DE ERROR */}
 				{error && (
 					<View className='mt-[15px] w-full rounded-[18px] border border-error-border bg-error-bg p-3.5'>
-						<Text className='text-[13px] font-bold leading-[18px] text-error'>
+						<Text className='font-sans-bold text-[13px] text-error'>
 							{error}
 						</Text>
 					</View>

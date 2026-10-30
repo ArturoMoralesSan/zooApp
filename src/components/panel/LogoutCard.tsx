@@ -30,11 +30,11 @@ export function LogoutCard({ loggingOut, onLogout }: LogoutCardProps) {
 				</View>
 
 				<View className='ml-2.5 flex-1'>
-					<Text className='text-sm font-extrabold text-tinta'>
+					<Text className='text-h3 text-tinta'>
 						{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
 					</Text>
 
-					<Text className='mt-1 text-xs text-tinta'>Salir de tu cuenta</Text>
+					<Text className='text-meta mt-1 text-tinta'>Salir de tu cuenta</Text>
 				</View>
 
 				{loggingOut ? (

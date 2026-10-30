@@ -19,12 +19,8 @@ export function PaymentMethodCard() {
 			</View>
 
 			<View className='flex-1'>
-				<Text className='text-[15px] font-extrabold text-tinta'>
-					Método de pago
-				</Text>
-				<Text className='mt-1 text-[13px] leading-[18px] text-tinta-2'>
-					Tarjeta de crédito o débito
-				</Text>
+				<Text className='text-h3 text-tinta'>Método de pago</Text>
+				<Text className='text-meta mt-1'>Tarjeta de crédito o débito</Text>
 			</View>
 		</View>
 	)

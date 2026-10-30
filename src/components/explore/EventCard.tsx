@@ -47,7 +47,7 @@ export function EventCard({ event, isLast }: EventCardProps) {
 						<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
 
 						<View className='absolute left-2.5 top-2.5 rounded-[20px] bg-lima px-3 py-1'>
-							<Text className='text-[10px] font-extrabold tracking-[0.3px] text-bosque'>
+							<Text className='text-overline text-bosque'>
 								{(event.type || 'Educativo').toUpperCase()}
 							</Text>
 						</View>
@@ -56,7 +56,7 @@ export function EventCard({ event, isLast }: EventCardProps) {
 							<View className='flex-row items-end'>
 								<View className='flex-1 pr-2'>
 									<Text
-										className='text-[23px] font-extrabold leading-7 text-blanco'
+										className='font-display text-[23px] leading-7 text-blanco'
 										numberOfLines={1}
 									>
 										{event.name}
@@ -64,7 +64,7 @@ export function EventCard({ event, isLast }: EventCardProps) {
 
 									{event.description ? (
 										<Text
-											className='mt-1 text-[12px] font-semibold leading-[17px] text-blanco'
+											className='text-meta mt-1 text-blanco'
 											numberOfLines={1}
 										>
 											{event.description}
@@ -95,15 +95,15 @@ export function EventCard({ event, isLast }: EventCardProps) {
 
 							<View className='mt-2.5 flex-row items-center'>
 								<Text
-									className='text-[12px] font-bold text-blanco'
+									className='font-sans-bold text-[12px] text-blanco'
 									numberOfLines={1}
 								>
 									{formatEventDate(event.start_at)}
 								</Text>
 
-								<Text className='mx-2 font-black text-lima'>•</Text>
+								<Text className='mx-2 font-sans-x text-lima'>•</Text>
 
-								<Text className='text-[12px] font-bold text-blanco'>
+								<Text className='font-sans-bold text-[12px] text-blanco'>
 									{formatEventTime(event.start_at)}
 								</Text>
 							</View>

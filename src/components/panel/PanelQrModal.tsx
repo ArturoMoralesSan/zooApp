@@ -43,11 +43,11 @@ export function PanelQrModal({ visible, user, onClose }: PanelQrModalProps) {
 							/>
 						</View>
 
-						<Text className='mt-2.5 text-center text-[22px] font-extrabold text-tinta'>
+						<Text className='text-h2 mt-2.5 text-center text-tinta'>
 							Mi código QR
 						</Text>
 
-						<Text className='mt-1 text-center text-[13px] leading-[19px] text-tinta'>
+						<Text className='text-body mt-1 text-center text-tinta'>
 							Presenta este código en taquilla para identificar tu cuenta.
 						</Text>
 					</View>
@@ -75,11 +75,9 @@ export function PanelQrModal({ visible, user, onClose }: PanelQrModalProps) {
 					{/* INFORMACIÓN */}
 
 					<View className='mt-3.5 rounded-xl border border-card-border bg-niebla p-2.5'>
-						<Text className='text-xs font-extrabold text-tinta'>
-							Código personal
-						</Text>
+						<Text className='text-h3 text-tinta'>Código personal</Text>
 
-						<Text className='mt-1 text-[11px] leading-[18px] text-tinta'>
+						<Text className='text-meta mt-1 text-tinta'>
 							Este código está asociado a tu cuenta de ZooApp.
 						</Text>
 					</View>

@@ -49,10 +49,8 @@ export function TicketQrModal({
 							</View>
 
 							<View className='flex-1'>
-								<Text className='text-[19px] font-extrabold text-tinta'>
-									Tus entradas
-								</Text>
-								<Text className='mt-1 text-[11px] text-tinta-2'>
+								<Text className='text-h2 text-tinta'>Tus entradas</Text>
+								<Text className='text-meta mt-1'>
 									{selectedPurchase?.folio}
 								</Text>
 							</View>
@@ -62,12 +60,14 @@ export function TicketQrModal({
 							onPress={onClose}
 							className='ml-2.5 h-[38px] w-[38px] items-center justify-center rounded-[13px] border border-card-border bg-niebla active:bg-hoja active:opacity-[0.65]'
 						>
-							<Text className='text-[24px] leading-7 text-tinta'>×</Text>
+							<Text className='font-sans text-[24px] leading-7 text-tinta'>
+								×
+							</Text>
 						</Pressable>
 					</View>
 
 					{selectedPurchase && (
-						<Text className='mb-2.5 mt-3 text-[12px] text-tinta-2'>
+						<Text className='text-meta mb-2.5 mt-3'>
 							Compra realizada el {formatDate(selectedPurchase.createdAt)}
 							{formatTime(selectedPurchase.createdAt)
 								? ` · ${formatTime(selectedPurchase.createdAt)}`
@@ -87,16 +87,16 @@ export function TicketQrModal({
 							>
 								<View className='flex-row items-center justify-between gap-2.5'>
 									<View>
-										<Text className='text-[15px] font-extrabold text-tinta'>
+										<Text className='text-h3 text-tinta'>
 											{ticket.ticket_type?.name ?? 'Entrada'}
 										</Text>
-										<Text className='mt-1 text-[11px] text-tinta-2'>
+										<Text className='text-meta mt-1'>
 											Entrada {index + 1} de {selectedPurchase.tickets.length}
 										</Text>
 									</View>
 
 									<View className='rounded-[9px] bg-hoja px-[9px] py-[5px]'>
-										<Text className='text-[10px] font-bold text-esmeralda'>
+										<Text className='font-sans-bold text-[12px] text-esmeralda'>
 											{getTicketStatus(ticket)}
 										</Text>
 									</View>
@@ -122,10 +122,10 @@ export function TicketQrModal({
 												size={45}
 												color={ICON_COLORS.coral}
 											/>
-											<Text className='mt-2.5 text-center text-[13px] font-bold text-error'>
+											<Text className='mt-2.5 text-center font-sans-bold text-[13px] text-error'>
 												Este boleto no tiene QR disponible.
 											</Text>
-											<Text className='mt-2 text-center text-[9px] text-tinta-2'>
+											<Text className='text-meta mt-2 text-center'>
 												Token: {String(ticket.qr_token ?? 'NULL')}
 											</Text>
 										</View>

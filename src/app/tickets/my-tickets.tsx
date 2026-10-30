@@ -121,7 +121,7 @@ export default function MyTicketsScreen() {
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
 						<ActivityIndicator size='large' color={ICON_COLORS.primary} />
-						<Text className='mt-3 text-[14px] text-tinta-2'>
+						<Text className='text-body mt-3 text-tinta-2'>
 							Cargando tus entradas...
 						</Text>
 					</View>

@@ -83,7 +83,7 @@ export default function DonationsIndexScreen() {
 					<Text
 						numberOfLines={1}
 						adjustsFontSizeToFit
-						className='text-center text-[16px] font-extrabold text-tinta'
+						className='text-center font-sans-bold text-[14px] text-tinta'
 						style={{ includeFontPadding: false }}
 					>
 						{label}
@@ -99,7 +99,7 @@ export default function DonationsIndexScreen() {
 						<Text
 							numberOfLines={1}
 							adjustsFontSizeToFit
-							className='text-center text-[16px] font-extrabold text-tinta'
+							className='text-center font-display-x text-[16px] text-tinta'
 							style={{ includeFontPadding: false }}
 						>
 							{label}
@@ -158,11 +158,9 @@ export default function DonationsIndexScreen() {
 
 				{/* SELECCIÓN DE MONTO */}
 				<View className='mt-7'>
-					<Text className='text-[20px] font-extrabold text-bosque'>
-						Selecciona un monto
-					</Text>
+					<Text className='text-h2 text-bosque'>Selecciona un monto</Text>
 
-					<Text className='mb-4 mt-[5px] text-[13px] text-tinta-2'>
+					<Text className='text-body mb-4 mt-[5px] text-tinta-2'>
 						Elige cuánto deseas aportar al cuidado de nuestros animales.
 					</Text>
 
@@ -197,16 +195,16 @@ export default function DonationsIndexScreen() {
 				{/* DONACIÓN PERSONALIZADA */}
 				{isCustomSelected && (
 					<View className='mt-[18px]'>
-						<Text className='mb-2 text-[15px] font-extrabold text-tinta'>
+						<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
 							Ingresa tu donación
 						</Text>
 
-						<Text className='mb-3 text-[12px] text-tinta-2'>
+						<Text className='text-meta mb-3'>
 							La aportación mínima es de $10.00 MXN.
 						</Text>
 
 						<View className='h-[52px] flex-row items-center rounded-xl border-1.5 border-input-border bg-blanco px-3.5'>
-							<Text className='mr-2 text-[18px] font-extrabold text-esmeralda'>
+							<Text className='mr-2 font-display-x text-[18px] text-esmeralda'>
 								$
 							</Text>
 
@@ -217,12 +215,12 @@ export default function DonationsIndexScreen() {
 								placeholderTextColor={colors.apagado}
 								keyboardType='decimal-pad'
 								returnKeyType='done'
-								className='h-full flex-1 py-0 text-[16px] font-bold text-tinta'
+								className='h-full flex-1 py-0 font-sans text-[14px] text-tinta'
 							/>
 						</View>
 
 						{customAmount.trim() !== '' && !hasAmount && (
-							<Text className='mt-2 text-[12px] text-error'>
+							<Text className='text-meta mt-2 text-error'>
 								Ingresa una cantidad válida de al menos $10.00.
 							</Text>
 						)}
@@ -231,7 +229,7 @@ export default function DonationsIndexScreen() {
 
 				{/* MÉTODO DE PAGO */}
 				<View className='mb-5 mt-[26px]'>
-					<Text className='mb-3.5 px-1 text-[20px] font-extrabold text-bosque'>
+					<Text className='text-h2 mb-3.5 px-1 text-bosque'>
 						Método de pago
 					</Text>
 
@@ -241,17 +239,13 @@ export default function DonationsIndexScreen() {
 					>
 						<View className='min-h-[80px] flex-row items-center bg-niebla px-3.5 py-3'>
 							<View className='h-12 w-12 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-								<Text className='text-[23px]'>💳</Text>
+								<Text className='font-sans text-[23px]'>💳</Text>
 							</View>
 
 							<View className='ml-3 flex-1'>
-								<Text className='text-[16px] font-extrabold text-tinta'>
-									Tarjeta
-								</Text>
+								<Text className='text-h3 text-tinta'>Tarjeta</Text>
 
-								<Text className='mt-1 text-[12px] leading-4 text-tinta-2'>
-									Pago seguro con tarjeta
-								</Text>
+								<Text className='text-meta mt-1'>Pago seguro con tarjeta</Text>
 							</View>
 
 							<View className='h-[22px] w-[22px] rounded-[11px] border-[6px] border-esmeralda bg-blanco' />

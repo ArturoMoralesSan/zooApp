@@ -79,7 +79,7 @@ export default function SpeciesScreen() {
 			<ScreenBackground>
 				<View className='flex-1 items-center justify-center bg-transparent'>
 					<ActivityIndicator size='large' color={PROP_COLORS.primary} />
-					<Text className='mt-3 text-[15px] font-semibold text-tinta'>
+					<Text className='text-body mt-3 text-tinta'>
 						Cargando especies...
 					</Text>
 				</View>
@@ -107,7 +107,7 @@ export default function SpeciesScreen() {
 
 				{/* Buscador */}
 				<View className='mb-1 mt-4'>
-					<Text className='mb-2 text-[14px] font-extrabold text-tinta'>
+					<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
 						Buscar especie
 					</Text>
 
@@ -128,7 +128,7 @@ export default function SpeciesScreen() {
 							placeholderTextColor={PROP_COLORS.text}
 							autoCapitalize='none'
 							autoCorrect={false}
-							className='flex-1 px-3 py-0 text-[15px] text-tinta'
+							className='flex-1 px-3 py-0 font-sans text-[14px] text-tinta'
 							selectionColor={PROP_COLORS.primary}
 						/>
 					</View>
@@ -154,7 +154,7 @@ export default function SpeciesScreen() {
 									className='items-center justify-center active:opacity-[0.72]'
 								>
 									<Text
-										className={`text-[13px] font-extrabold ${active ? 'text-blanco' : 'text-tinta'}`}
+										className={`font-sans-bold text-[13px] ${active ? 'text-blanco' : 'text-tinta'}`}
 									>
 										{item}
 									</Text>
@@ -166,7 +166,7 @@ export default function SpeciesScreen() {
 
 				{/* Resultados */}
 				<View className='mb-0.5 mt-[19px] flex-row items-center justify-between'>
-					<Text className='text-[13px] font-extrabold text-tinta'>
+					<Text className='text-meta text-tinta'>
 						{filteredSpecies.length}{' '}
 						{filteredSpecies.length === 1 ? 'especie' : 'especies'}
 					</Text>
@@ -176,7 +176,7 @@ export default function SpeciesScreen() {
 							onPress={() => setSearch('')}
 							className='rounded-[14px] px-2.5 py-[7px] active:bg-hoja'
 						>
-							<Text className='text-[13px] font-extrabold text-esmeralda'>
+							<Text className='font-sans-bold text-[13px] text-esmeralda'>
 								Limpiar
 							</Text>
 						</Pressable>
@@ -187,14 +187,14 @@ export default function SpeciesScreen() {
 				{error ? (
 					<View className='mt-[15px] items-center rounded-[22px] border border-card-border bg-niebla p-[18px]'>
 						<View className='h-11 w-11 items-center justify-center rounded-[15px] border border-card-border bg-blanco'>
-							<Text className='text-[21px] font-black text-tinta'>!</Text>
+							<Text className='font-display-x text-[21px] text-tinta'>!</Text>
 						</View>
 
-						<Text className='mt-3 text-center text-[15px] font-black text-tinta'>
+						<Text className='text-h3 mt-3 text-center text-tinta'>
 							No fue posible cargar las especies.
 						</Text>
 
-						<Text className='mt-1.5 text-center text-[12px] leading-[18px] text-tinta'>
+						<Text className='text-meta mt-1.5 text-center text-tinta'>
 							{error}
 						</Text>
 
@@ -204,7 +204,7 @@ export default function SpeciesScreen() {
 								className='h-full w-full items-center justify-center active:bg-bosque'
 							>
 								<View className='h-full w-full items-center justify-center'>
-									<Text className='text-center text-[14px] font-black text-blanco'>
+									<Text className='text-button text-center text-blanco'>
 										Intentar nuevamente
 									</Text>
 								</View>
@@ -226,11 +226,11 @@ export default function SpeciesScreen() {
 							/>
 						</View>
 
-						<Text className='mt-4 text-center text-[18px] font-black text-tinta'>
+						<Text className='text-h2 mt-4 text-center text-tinta'>
 							No encontramos especies
 						</Text>
 
-						<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-tinta'>
+						<Text className='text-body mt-1.5 text-center text-tinta'>
 							Intenta con otro nombre o cambia el filtro.
 						</Text>
 					</View>

@@ -82,9 +82,7 @@ export default function SpeciesDetailScreen() {
 			>
 				<ActivityIndicator size='large' color={colors.esmeralda} />
 
-				<Text className='mt-3.5 text-xs font-medium text-tinta-2'>
-					Cargando especie...
-				</Text>
+				<Text className='text-meta mt-3.5'>Cargando especie...</Text>
 			</ImageBackground>
 		)
 	}
@@ -139,19 +137,17 @@ export default function SpeciesDetailScreen() {
 								{/* CATEGORÍA */}
 								{species.category && (
 									<View className='self-start rounded-full border border-card-border bg-hoja px-3 py-1.5'>
-										<Text className='text-[11px] font-bold uppercase leading-4 tracking-wide text-esmeralda'>
+										<Text className='text-overline text-esmeralda'>
 											{species.category.name}
 										</Text>
 									</View>
 								)}
 
 								{/* NOMBRE */}
-								<Text className='mt-3.5 text-[30px] font-bold leading-8 text-tinta'>
-									{species.common_name}
-								</Text>
+								<Text className='text-h1 mt-3.5'>{species.common_name}</Text>
 
 								{species.scientific_name && (
-									<Text className='mt-1.5 text-sm italic text-tinta-2'>
+									<Text className='text-body mt-1.5 italic text-tinta-2'>
 										{species.scientific_name}
 									</Text>
 								)}
@@ -159,11 +155,11 @@ export default function SpeciesDetailScreen() {
 								{/* DESCRIPCIÓN */}
 								{species.description && (
 									<View className='mt-7'>
-										<Text className='text-[21px] font-bold text-tinta'>
+										<Text className='text-h2 text-tinta'>
 											Conoce a esta especie
 										</Text>
 
-										<Text className='mt-2 text-[15px] leading-6 text-tinta-2'>
+										<Text className='text-body mt-2 text-tinta-2'>
 											{species.description}
 										</Text>
 									</View>

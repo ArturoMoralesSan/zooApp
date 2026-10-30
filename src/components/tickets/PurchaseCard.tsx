@@ -36,16 +36,12 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 				</View>
 
 				<View className='min-w-0 flex-1'>
-					<Text className='text-[15px] font-extrabold text-tinta'>
-						Compra #{purchase.orderId}
-					</Text>
-					<Text className='mt-1 text-[12px] text-tinta-2'>
-						{purchase.folio}
-					</Text>
+					<Text className='text-h3 text-tinta'>Compra #{purchase.orderId}</Text>
+					<Text className='text-meta mt-1'>{purchase.folio}</Text>
 				</View>
 
 				<View className='ml-2 rounded-[10px] bg-hoja px-[9px] py-[5px]'>
-					<Text className='text-[11px] font-bold text-esmeralda'>
+					<Text className='font-sans-bold text-[12px] text-esmeralda'>
 						{getActiveCount(purchase) > 0
 							? 'Activa'
 							: getTicketStatus(purchase.tickets[0])}
@@ -57,7 +53,7 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 
 			<View className='flex-row justify-between gap-3'>
 				<View className='flex-1'>
-					<Text className='text-[11px] text-tinta-2'>Fecha de compra</Text>
+					<Text className='text-overline text-tinta-2'>Fecha de compra</Text>
 
 					<View className='mt-1 flex-row items-center gap-[5px]'>
 						<HugeiconsIcon
@@ -65,7 +61,7 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 							size={15}
 							color={ICON_COLORS.muted}
 						/>
-						<Text className='mt-1 text-[13px] font-bold text-tinta'>
+						<Text className='mt-1 font-sans-bold text-[13px] text-tinta'>
 							{formatDate(purchase.createdAt)}
 						</Text>
 					</View>
@@ -77,7 +73,7 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 								size={13}
 								color={ICON_COLORS.muted}
 							/>
-							<Text className='mt-[3px] text-[11px] text-tinta-2'>
+							<Text className='text-meta mt-[3px]'>
 								{formatTime(purchase.createdAt)}
 							</Text>
 						</View>
@@ -85,8 +81,8 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 				</View>
 
 				<View className='items-end'>
-					<Text className='text-[11px] text-tinta-2'>Total</Text>
-					<Text className='mt-1 text-[17px] font-extrabold text-esmeralda'>
+					<Text className='text-overline text-tinta-2'>Total</Text>
+					<Text className='mt-1 font-display-x text-[17px] text-esmeralda'>
 						${purchase.total.toFixed(2)}
 					</Text>
 				</View>
@@ -98,12 +94,12 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 					size={17}
 					color={ICON_COLORS.primary}
 				/>
-				<Text className='ml-2 shrink text-[12px] font-bold text-esmeralda'>
+				<Text className='ml-2 shrink font-sans-bold text-[12px] text-esmeralda'>
 					{getTicketSummary(purchase)}
 				</Text>
 			</View>
 
-			<ActionButton title='VER CÓDIGOS QR' onPress={onShowQr} />
+			<ActionButton title='Ver códigos QR' onPress={onShowQr} />
 		</View>
 	)
 }
