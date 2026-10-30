@@ -44,7 +44,7 @@ export function DestinationMarker({ selectedItem }: DestinationMarkerProps) {
 						cachePolicy='memory-disk'
 					/>
 				) : (
-					<Text className='text-[20px]'>
+					<Text className='font-sans text-[20px]'>
 						{selectedItem.type === 'species'
 							? (selectedItem.icon ?? '🦁')
 							: (selectedItem.icon ?? '📍')}

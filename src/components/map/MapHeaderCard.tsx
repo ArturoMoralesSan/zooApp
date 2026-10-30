@@ -13,11 +13,9 @@ export function MapHeaderCard({ isUserInsideZoo }: MapHeaderCardProps) {
 		>
 			<View className='flex-row items-center justify-between'>
 				<View className='flex-1 pr-2.5'>
-					<Text className='text-[19px] font-extrabold text-tinta'>
-						Mapa del zoológico
-					</Text>
+					<Text className='text-h2 text-tinta'>Mapa del zoológico</Text>
 
-					<Text className='mt-[3px] text-[12px] text-tinta-2'>
+					<Text className='text-meta mt-[3px]'>
 						Explora zonas, caminos y especies
 					</Text>
 				</View>
@@ -27,7 +25,7 @@ export function MapHeaderCard({ isUserInsideZoo }: MapHeaderCardProps) {
 						className={`mr-[5px] h-2 w-2 rounded ${isUserInsideZoo ? 'bg-esmeralda' : 'bg-apagado'}`}
 					/>
 
-					<Text className='text-[11px] font-bold text-tinta'>
+					<Text className='font-sans-bold text-[12px] text-tinta'>
 						{isUserInsideZoo ? 'Dentro' : 'Fuera'}
 					</Text>
 				</View>

@@ -27,7 +27,7 @@ export function SpeciesMarker({ item, onPress }: SpeciesMarkerProps) {
 						cachePolicy='memory-disk'
 					/>
 				) : (
-					<Text className='text-[18px]'>{item.icon ?? '🦁'}</Text>
+					<Text className='font-sans text-[18px]'>{item.icon ?? '🦁'}</Text>
 				)}
 			</View>
 		</Marker>

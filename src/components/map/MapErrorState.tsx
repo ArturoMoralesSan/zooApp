@@ -14,16 +14,14 @@ export function MapErrorState({ error }: MapErrorStateProps) {
 				style={mapShadow}
 			>
 				<View className='mb-3.5 h-[52px] w-[52px] items-center justify-center rounded-[18px] bg-error-border'>
-					<Text className='text-[28px] font-extrabold text-error'>!</Text>
+					<Text className='font-display-x text-[28px] text-error'>!</Text>
 				</View>
 
-				<Text className='mb-2 text-center text-[20px] font-extrabold text-tinta'>
+				<Text className='text-h2 mb-2 text-center text-tinta'>
 					No fue posible cargar el mapa
 				</Text>
 
-				<Text className='text-center text-[14px] leading-[21px] text-tinta-2'>
-					{error}
-				</Text>
+				<Text className='text-body text-center text-tinta-2'>{error}</Text>
 			</View>
 		</SafeAreaView>
 	)

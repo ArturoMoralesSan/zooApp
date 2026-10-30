@@ -54,7 +54,7 @@ export function CollapsedRouteCard({
 							cachePolicy='memory-disk'
 						/>
 					) : (
-						<Text className='text-[18px]'>
+						<Text className='font-sans text-[18px]'>
 							{selectedItem.type === 'species'
 								? (selectedItem.icon ?? '🦁')
 								: (selectedItem.icon ?? '📍')}
@@ -65,39 +65,33 @@ export function CollapsedRouteCard({
 				<View className='absolute left-[59px] right-[92px] top-3 h-12 justify-center'>
 					<View className='w-full justify-center'>
 						<Text
-							className='text-[14px] font-extrabold leading-[18px] text-tinta'
+							className='font-sans-bold text-[14px] leading-[18px] text-tinta'
 							numberOfLines={1}
 						>
 							{selectedItem.name}
 						</Text>
 
-						<Text className='mt-0.5 text-[9px] leading-3 text-tinta-2'>
-							Ruta por caminos
-						</Text>
+						<Text className='text-meta mt-0.5'>Ruta por caminos</Text>
 					</View>
 
 					{route && (
-						<View className='absolute -right-[30px] top-0 h-12 w-[125px] flex-row items-center justify-end'>
-							<View className='w-[52px] items-center justify-center'>
-								<Text className='text-center text-[14px] font-extrabold leading-[17px] text-bosque'>
+						<View className='absolute -right-[30px] top-0 h-12 w-[150px] flex-row items-center justify-end'>
+							<View className='w-[68px] items-center justify-center'>
+								<Text className='text-center font-display-x text-[14px] leading-[17px] text-bosque'>
 									{formatDistance(route.distance)}
 								</Text>
 
-								<Text className='mt-px text-center text-[7px] leading-[9px] text-tinta-2'>
-									distancia
-								</Text>
+								<Text className='text-meta mt-px text-center'>distancia</Text>
 							</View>
 
 							<View className='mx-[5px] h-6 w-px bg-card-border' />
 
-							<View className='w-[52px] items-center justify-center'>
-								<Text className='text-center text-[13px] font-extrabold leading-4 text-tinta'>
+							<View className='w-[68px] items-center justify-center'>
+								<Text className='text-center font-display-x text-[13px] leading-4 text-tinta'>
 									{formatMinutes(route.distance / 80)}
 								</Text>
 
-								<Text className='mt-px text-center text-[7px] leading-[9px] text-tinta-2'>
-									caminando
-								</Text>
+								<Text className='text-meta mt-px text-center'>caminando</Text>
 							</View>
 						</View>
 					)}
