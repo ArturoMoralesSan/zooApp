@@ -10,13 +10,7 @@ import { type User } from '@/services/auth'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useCallback, useState } from 'react'
-import {
-	Alert,
-	Animated,
-	ImageBackground,
-	KeyboardAvoidingView,
-	Platform,
-} from 'react-native'
+import { Alert, Animated, ImageBackground } from 'react-native'
 import { updateAvatar, updateProfile } from '@/services/profile'
 import {
 	formatDateForApi,
@@ -25,6 +19,7 @@ import {
 } from '@/utils/date'
 import { getAvatarUrl } from '@/utils/profile'
 import { useScrollBottomSpace } from '@/theme/layout'
+import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 
 type ToastState = {
 	visible: boolean
@@ -326,88 +321,80 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			resizeMode='repeat'
 			className='flex-1 bg-blanco'
 		>
-			<KeyboardAvoidingView
+			<Toast
+				visible={toast.visible}
+				title={toast.title}
+				message={toast.message}
+				type={toast.type}
+				onHide={() =>
+					setToast((current) => ({
+						...current,
+						visible: false,
+					}))
+				}
+			/>
+
+			<KeyboardScrollView
 				className='flex-1'
-				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+				contentContainerStyle={{ paddingBottom: bottomSpace }}
+				onScroll={Animated.event(
+					[
+						{
+							nativeEvent: {
+								contentOffset: { y: scrollY },
+							},
+						},
+					],
+					{ useNativeDriver: false },
+				)}
 			>
-				<Toast
-					visible={toast.visible}
-					title={toast.title}
-					message={toast.message}
-					type={toast.type}
-					onHide={() =>
-						setToast((current) => ({
-							...current,
-							visible: false,
-						}))
-					}
+				{/* HEADER */}
+				<ProfileHeader
+					coverHeight={coverHeight}
+					backButtonOpacity={backButtonOpacity}
+					avatarScale={avatarScale}
+					avatarTranslateY={avatarTranslateY}
+					nameTranslateY={nameTranslateY}
+					emailOpacity={emailOpacity}
+					avatarUrl={avatarUrl}
+					user={user}
+					uploadingAvatar={uploadingAvatar}
+					onPickAvatar={handlePickAvatar}
 				/>
 
-				<Animated.ScrollView
-					className='flex-1'
-					contentContainerStyle={{ paddingBottom: bottomSpace }}
-					keyboardShouldPersistTaps='handled'
-					showsVerticalScrollIndicator={false}
-					scrollEventThrottle={16}
-					onScroll={Animated.event(
-						[
-							{
-								nativeEvent: {
-									contentOffset: { y: scrollY },
-								},
-							},
-						],
-						{ useNativeDriver: false },
-					)}
-				>
-					{/* HEADER */}
-					<ProfileHeader
-						coverHeight={coverHeight}
-						backButtonOpacity={backButtonOpacity}
-						avatarScale={avatarScale}
-						avatarTranslateY={avatarTranslateY}
-						nameTranslateY={nameTranslateY}
-						emailOpacity={emailOpacity}
-						avatarUrl={avatarUrl}
-						user={user}
-						uploadingAvatar={uploadingAvatar}
-						onPickAvatar={handlePickAvatar}
-					/>
+				{/* PROGRESO */}
+				<ProfileProgress
+					progressMarginTop={progressMarginTop}
+					user={user}
+					points={points}
+					currentLevel={currentLevel}
+					progress={progress}
+					pointsToNextLevel={pointsToNextLevel}
+					nextLevel={nextLevel}
+				/>
 
-					{/* PROGRESO */}
-					<ProfileProgress
-						progressMarginTop={progressMarginTop}
-						user={user}
-						points={points}
-						currentLevel={currentLevel}
-						progress={progress}
-						pointsToNextLevel={pointsToNextLevel}
-						nextLevel={nextLevel}
-					/>
-
-					{/* DATOS PERSONALES */}
-					<PersonalDataSection
-						name={name}
-						email={email}
-						phone={phone}
-						birthDate={birthDate}
-						city={city}
-						country={country}
-						setName={setName}
-						setEmail={setEmail}
-						setPhone={setPhone}
-						setCity={setCity}
-						setCountry={setCountry}
-						errors={errors}
-						clearFieldError={clearFieldError}
-						showDatePicker={showDatePicker}
-						setShowDatePicker={setShowDatePicker}
-						onDateChange={handleDateChange}
-						saving={saving}
-						onSave={handleSave}
-					/>
-				</Animated.ScrollView>
-			</KeyboardAvoidingView>
+				{/* DATOS PERSONALES */}
+				<PersonalDataSection
+					name={name}
+					email={email}
+					phone={phone}
+					birthDate={birthDate}
+					city={city}
+					country={country}
+					setName={setName}
+					setEmail={setEmail}
+					setPhone={setPhone}
+					setCity={setCity}
+					setCountry={setCountry}
+					errors={errors}
+					clearFieldError={clearFieldError}
+					showDatePicker={showDatePicker}
+					setShowDatePicker={setShowDatePicker}
+					onDateChange={handleDateChange}
+					saving={saving}
+					onSave={handleSave}
+				/>
+			</KeyboardScrollView>
 		</ImageBackground>
 	)
 }
