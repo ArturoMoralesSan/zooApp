@@ -19,6 +19,7 @@ import UserHeader from '@/components/UserHeader'
 import type { Donation } from '@/types/donations'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { DonationStatsRow } from '@/components/donations/DonationStatsRow'
 import { cardShadow, ICON_COLOR } from '@/components/donations/historyStyles'
 import {
 	getDonationStatus,
@@ -95,48 +96,11 @@ export default function DonationHistoryScreen() {
 				contentContainerClassName='px-5 pb-10 pt-0'
 			>
 				{/* Estadísticas */}
-				<View className='mb-[22px] w-full flex-row items-stretch gap-2.5'>
-					<View
-						className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
-						style={cardShadow}
-					>
-						<Text className='text-center text-[21px] font-extrabold text-tinta'>
-							{donations.length}
-						</Text>
-						<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
-							Donaciones
-						</Text>
-					</View>
-
-					<View
-						className='min-w-0 flex-1 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
-						style={cardShadow}
-					>
-						<Text className='text-center text-[21px] font-extrabold text-tinta'>
-							{completedDonations}
-						</Text>
-						<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
-							Completadas
-						</Text>
-					</View>
-
-					<View
-						className='min-w-0 items-center justify-center rounded-[18px] border border-card-border bg-niebla px-[7px] py-4'
-						style={[cardShadow, { flex: 1.25 }]}
-					>
-						<Text
-							className='text-center text-[16px] font-extrabold text-tinta'
-							numberOfLines={1}
-							adjustsFontSizeToFit
-							minimumFontScale={0.7}
-						>
-							{formatCurrency(totalDonated)}
-						</Text>
-						<Text className='mt-1.5 text-center text-[11px] font-medium text-tinta'>
-							Total donado
-						</Text>
-					</View>
-				</View>
+				<DonationStatsRow
+					donations={donations}
+					completedDonations={completedDonations}
+					totalDonated={totalDonated}
+				/>
 
 				{/* Cargando */}
 				{loading ? (
