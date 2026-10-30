@@ -21,6 +21,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import AppCard from '@/components/AppCard'
 import { EventCard } from '@/components/explore/EventCard'
+import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
 import UserHeader from '@/components/UserHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
@@ -164,14 +165,10 @@ export default function Explorar() {
 							</ScrollView>
 
 							{events.length > 1 && (
-								<View className='mt-3 flex-row items-center justify-center gap-1.5'>
-									{events.map((event, index) => (
-										<View
-											key={event.id}
-											className={`h-[7px] rounded-[10px] ${index === activeEventIndex ? 'w-[21px] bg-esmeralda' : 'w-[7px] bg-tinta-2 opacity-80'}`}
-										/>
-									))}
-								</View>
+								<EventCarouselDots
+									events={events}
+									activeEventIndex={activeEventIndex}
+								/>
 							)}
 						</>
 					)}
