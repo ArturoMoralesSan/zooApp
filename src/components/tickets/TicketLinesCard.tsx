@@ -1,8 +1,9 @@
-import { ICON_COLOR } from '@/components/tickets/summaryStyles'
+import { Card } from '@/components/ui/Card'
+import { Divider } from '@/components/ui/Divider'
+import { IconBox } from '@/components/ui/IconBox'
 import type { TicketSummaryItem } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
 
 type TicketLinesCardProps = {
@@ -12,20 +13,13 @@ type TicketLinesCardProps = {
 
 export function TicketLinesCard({ summary, total }: TicketLinesCardProps) {
 	return (
-		<View className='mb-3.5 w-full rounded-[20px] border-1.5 border-card-border bg-niebla p-4'>
-			<View className='mb-4 flex-row items-center'>
-				<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-					<HugeiconsIcon
-						icon={Ticket01Icon}
-						size={25}
-						strokeWidth={1.8}
-						color={ICON_COLOR}
-					/>
-				</View>
+		<Card className='mb-3'>
+			<View className='mb-2 flex-row items-center gap-3'>
+				<IconBox icon={Ticket01Icon} />
 
 				<View className='flex-1'>
 					<Text className='text-h3 text-tinta'>Tus boletos</Text>
-					<Text className='text-meta mt-[3px]'>Detalle de la compra</Text>
+					<Text className='text-meta mt-1'>Detalle de la compra</Text>
 				</View>
 			</View>
 
@@ -35,7 +29,7 @@ export function TicketLinesCard({ summary, total }: TicketLinesCardProps) {
 				summary.map((item) => (
 					<View
 						key={item.ticket_type_id}
-						className='flex-row items-center justify-between border-b border-b-niebla py-3'
+						className='flex-row items-center justify-between py-2'
 					>
 						<View className='flex-1 pr-3'>
 							<Text className='font-sans-bold text-[14px] text-tinta'>
@@ -55,7 +49,7 @@ export function TicketLinesCard({ summary, total }: TicketLinesCardProps) {
 				))
 			)}
 
-			<View className='my-3 h-px bg-card-border' />
+			<Divider />
 
 			<View className='flex-row items-center justify-between pt-1'>
 				<Text className='font-sans-bold text-[14px] text-tinta'>Total</Text>
@@ -63,6 +57,6 @@ export function TicketLinesCard({ summary, total }: TicketLinesCardProps) {
 					{formatCurrency(total)}
 				</Text>
 			</View>
-		</View>
+		</Card>
 	)
 }

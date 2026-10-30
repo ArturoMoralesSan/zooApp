@@ -10,13 +10,13 @@ import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
+import colors from '@/theme/colors'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { TicketStatsRow } from '@/components/tickets/TicketStatsRow'
 import { TicketTabs } from '@/components/tickets/TicketTabs'
 import { PurchaseCard } from '@/components/tickets/PurchaseCard'
 import { MyTicketsEmptyState } from '@/components/tickets/MyTicketsEmptyState'
 import { TicketQrModal } from '@/components/tickets/TicketQrModal'
-import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 
 export default function MyTicketsScreen() {
 	const bottomSpace = useScrollBottomSpace(40)
@@ -122,7 +122,7 @@ export default function MyTicketsScreen() {
 
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
-						<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+						<ActivityIndicator size='large' color={colors.esmeralda} />
 						<Text className='text-body mt-3 text-tinta-2'>
 							Cargando tus entradas...
 						</Text>

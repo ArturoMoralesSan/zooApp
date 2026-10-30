@@ -1,5 +1,4 @@
-import { CheckmarkCircle02Icon, Ticket01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
+import { InformationCircleIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
@@ -7,6 +6,12 @@ import QRCode from 'react-native-qrcode-svg'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
+import { Badge } from '@/components/ui/Badge'
+import { Card } from '@/components/ui/Card'
+import { Divider } from '@/components/ui/Divider'
+import { IconBox } from '@/components/ui/IconBox'
+import { ListCard } from '@/components/ui/ListCard'
+import { SuccessBanner } from '@/components/ui/SuccessBanner'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import colors from '@/theme/colors'
@@ -60,58 +65,40 @@ export default function TicketSuccessScreen() {
 				</View>
 
 				{/* CONFIRMACIÓN DE COMPRA */}
-				<View className='mb-[15px] w-full items-center rounded-[22px] border-1.5 border-esmeralda bg-esmeralda p-[22px]'>
-					<View className='mb-3.5 h-[68px] w-[68px] items-center justify-center rounded-[22px] border-0 bg-transparent'>
-						<HugeiconsIcon
-							icon={CheckmarkCircle02Icon}
-							size={56}
-							strokeWidth={1.8}
-							color={colors.lima}
-						/>
-					</View>
-
-					<Text className='text-h1 text-center text-blanco'>
-						¡Compra realizada!
-					</Text>
-
-					<Text className='text-subtitle mt-[7px] text-center text-hoja'>
-						Tu compra se realizó correctamente. Guarda tus códigos QR para
-						ingresar al zoológico.
-					</Text>
-				</View>
+				<SuccessBanner
+					title='¡Compra realizada!'
+					message='Tu compra se realizó correctamente. Guarda tus códigos QR para ingresar al zoológico.'
+				/>
 
 				{/* BOLETOS Y CÓDIGOS QR */}
-				<View className='mb-[15px] w-full rounded-[20px] border-1.5 border-card-border bg-niebla p-4'>
-					<View className='mb-[17px] flex-row items-center'>
-						<View className='mr-3 h-12 w-12 items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
-							<HugeiconsIcon
-								icon={Ticket01Icon}
-								size={25}
-								strokeWidth={1.8}
-								color={colors.esmeralda}
-							/>
-						</View>
+				<Card className='mb-3'>
+					<View className='flex-row items-center gap-3'>
+						<IconBox icon={Ticket01Icon} />
 
 						<View className='min-w-0 flex-1'>
 							<Text className='text-h3 text-tinta'>Tus boletos</Text>
 
-							<Text className='text-meta mt-[3px]'>
+							<Text className='text-meta mt-1'>
 								Presenta el código QR en la entrada
 							</Text>
 						</View>
 					</View>
 
+					<Divider className='my-4' />
+
 					{tickets.length > 0 ? (
 						tickets.map((ticket, index) => (
 							<View
 								key={ticket.id ?? index}
-								className='mb-[15px] w-full items-center'
+								className='mb-4 w-full items-center'
 							>
-								<Text className='mb-[9px] self-start font-sans-bold text-[13px] text-tinta'>
-									Boleto {index + 1}
-								</Text>
+								<Badge
+									label={`Boleto ${index + 1}`}
+									tone='success'
+									className='mb-3 self-center'
+								/>
 
-								<View className='items-center justify-center rounded-2xl border border-card-border bg-blanco p-3.5'>
+								<View className='items-center justify-center rounded-2xl border-1.5 border-card-border bg-blanco p-3'>
 									<QRCode
 										value={ticket.qr_token ?? ''}
 										size={190}
@@ -121,54 +108,37 @@ export default function TicketSuccessScreen() {
 							</View>
 						))
 					) : (
-						<View className='w-full items-center justify-center py-[25px]'>
+						<View className='w-full items-center justify-center py-6'>
 							<Text className='text-body text-center text-tinta-2'>
 								No se encontraron boletos en esta compra.
 							</Text>
 						</View>
 					)}
-				</View>
+				</Card>
 
 				{/* TOTAL PAGADO Y FOLIO */}
-				<View className='mb-[15px] mt-0.5 w-full rounded-[18px] border-1.5 border-card-border bg-niebla p-4'>
-					<View>
-						<Text className='font-sans-bold text-[14px] text-tinta-2'>
-							Total pagado
-						</Text>
+				<Card className='mb-3'>
+					<Text className='text-overline text-tinta-2'>Total pagado</Text>
 
-						<Text className='mt-[3px] font-display-x text-[25px] text-bosque'>
-							{formatCurrency(total)}
-						</Text>
-					</View>
+					<Text className='mt-1 font-display-x text-[25px] text-bosque'>
+						{formatCurrency(total)}
+					</Text>
 
-					<View className='mt-[13px] border-t border-t-card-border pt-[13px]'>
-						<Text className='text-overline text-tinta-2'>Folio</Text>
+					<Divider />
 
-						<Text className='mt-[3px] font-display-x text-[14px] text-tinta'>
-							#{order?.id ?? '---'}
-						</Text>
-					</View>
-				</View>
+					<Text className='text-overline text-tinta-2'>Folio</Text>
+
+					<Text className='mt-1 font-display-x text-[14px] text-tinta'>
+						#{order?.id ?? '---'}
+					</Text>
+				</Card>
 
 				{/* INFORMACIÓN IMPORTANTE */}
-				<View className='w-full flex-row items-center rounded-2xl border border-card-border bg-niebla p-[15px]'>
-					<View className='mr-3 h-[38px] w-[38px] items-center justify-center rounded-xl border border-card-border bg-hoja'>
-						<Text className='font-sans-x text-[19px] text-esmeralda'>✓</Text>
-					</View>
-
-					<View className='min-w-0 flex-1'>
-						<Text className='font-sans-x text-[14px] text-bosque'>
-							Importante
-						</Text>
-
-						<Text className='text-meta mt-1'>
-							Los códigos QR son tus boletos de entrada. Puedes mostrarlos
-							directamente desde tu celular al llegar al zoológico.
-						</Text>
-					</View>
-				</View>
-
-				<View className='h-0' />
+				<ListCard
+					icon={InformationCircleIcon}
+					title='Importante'
+					description='Los códigos QR son tus boletos de entrada. Puedes mostrarlos directamente desde tu celular al llegar al zoológico.'
+				/>
 			</ScrollView>
 
 			{/* FOOTER FIJO */}

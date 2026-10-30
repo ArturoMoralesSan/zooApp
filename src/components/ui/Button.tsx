@@ -14,8 +14,9 @@ type ButtonProps = {
 	size?: 'md' | 'sm'
 	disabled?: boolean
 	loading?: boolean
-	// Trailing icon, e.g. an arrow on "Cómo llegar".
 	icon?: IconSvgElement
+	// trailing for arrows ("Cómo llegar"), leading for objects ("Ver códigos QR").
+	iconPosition?: 'leading' | 'trailing'
 	fullWidth?: boolean
 	// Spacing around the button (margins), never its look.
 	className?: string
@@ -51,6 +52,7 @@ export function Button({
 	disabled = false,
 	loading = false,
 	icon,
+	iconPosition = 'trailing',
 	fullWidth = true,
 	className = '',
 	accessibilityLabel,
@@ -80,6 +82,15 @@ export function Button({
 					<ActivityIndicator size='small' color={style.icon} />
 				) : (
 					<>
+						{icon && iconPosition === 'leading' && (
+							<Icon
+								icon={icon}
+								size={20}
+								color={disabled ? style.disabledIcon : style.icon}
+								strong
+							/>
+						)}
+
 						<Text
 							className={`${size === 'md' ? 'text-button' : 'font-display text-[15px]'} ${disabled ? style.disabledText : style.text}`}
 							numberOfLines={1}
@@ -87,7 +98,7 @@ export function Button({
 							{title}
 						</Text>
 
-						{icon && (
+						{icon && iconPosition === 'trailing' && (
 							<Icon
 								icon={icon}
 								size={20}

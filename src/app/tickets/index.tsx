@@ -1,5 +1,4 @@
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
@@ -12,13 +11,11 @@ import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
+import { Card } from '@/components/ui/Card'
+import { Divider } from '@/components/ui/Divider'
+import { IconBox } from '@/components/ui/IconBox'
 import { QuantityStepper } from '@/components/ui/QuantityStepper'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
-
-const ICON_COLORS = {
-	primary: colors.esmeralda,
-	muted: colors.apagado,
-} as const
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -96,7 +93,7 @@ export default function TicketsScreen() {
 		return (
 			<ScreenBackground withBackground={false}>
 				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+					<ActivityIndicator size='large' color={colors.esmeralda} />
 					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando boletos...
 					</Text>
@@ -130,14 +127,8 @@ export default function TicketsScreen() {
 
 				{/* ESTADO VACÍO */}
 				{ticketTypes.length === 0 ? (
-					<View className='items-center justify-center rounded-[18px] border-1.5 border-card-border bg-niebla px-6 py-8'>
-						<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-							<HugeiconsIcon
-								icon={Ticket01Icon}
-								size={30}
-								color={ICON_COLORS.primary}
-							/>
-						</View>
+					<Card className='items-center py-8'>
+						<IconBox icon={Ticket01Icon} size='lg' className='mb-3' />
 
 						<Text className='text-h3 text-center text-tinta'>
 							No hay boletos disponibles
@@ -146,7 +137,7 @@ export default function TicketsScreen() {
 						<Text className='text-body mt-1.5 text-center text-tinta-2'>
 							Por el momento no hay tipos de boleto para mostrar.
 						</Text>
-					</View>
+					</Card>
 				) : (
 					ticketTypes.map((ticket) => {
 						const quantity = quantities[ticket.id] ?? 0
@@ -155,20 +146,10 @@ export default function TicketsScreen() {
 						const amount = price * quantity
 
 						return (
-							<View
-								key={ticket.id}
-								className='mb-[13px] w-full rounded-[18px] border-1.5 border-card-border bg-niebla p-[15px]'
-							>
+							<Card key={ticket.id} className='mb-3'>
 								{/* INFORMACIÓN DEL BOLETO */}
-								<View className='w-full flex-row items-start'>
-									<View className='mr-3 h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-										<HugeiconsIcon
-											icon={Ticket01Icon}
-											size={25}
-											strokeWidth={1.8}
-											color={ICON_COLORS.primary}
-										/>
-									</View>
+								<View className='w-full flex-row items-center gap-3'>
+									<IconBox icon={Ticket01Icon} />
 
 									<View className='min-w-0 flex-1 justify-center'>
 										<Text className='text-h3 text-tinta'>{ticket.name}</Text>
@@ -181,7 +162,7 @@ export default function TicketsScreen() {
 									</View>
 								</View>
 
-								<View className='mb-[13px] mt-[15px] h-px bg-card-border' />
+								<Divider />
 
 								{/* PRECIO Y CANTIDAD */}
 								<View className='w-full flex-row items-center justify-between'>
@@ -206,7 +187,7 @@ export default function TicketsScreen() {
 										itemLabel={`boleto de ${ticket.name}`}
 									/>
 								</View>
-							</View>
+							</Card>
 						)
 					})
 				)}

@@ -1,9 +1,9 @@
-import ActionButton from '@/components/ActionButton'
-import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { IconBox } from '@/components/ui/IconBox'
 import type { MyTicketsTab } from '@/types/tickets'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
-import { Text, View } from 'react-native'
+import { Text } from 'react-native'
 
 type MyTicketsEmptyStateProps = {
 	tab: MyTicketsTab
@@ -15,14 +15,8 @@ export function MyTicketsEmptyState({
 	onBuyTickets,
 }: MyTicketsEmptyStateProps) {
 	return (
-		<View className='items-center rounded-3xl border-1.5 border-card-border bg-niebla px-6 py-8'>
-			<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-hoja'>
-				<HugeiconsIcon
-					icon={Ticket01Icon}
-					size={32}
-					color={ICON_COLORS.primary}
-				/>
-			</View>
+		<Card className='items-center py-8'>
+			<IconBox icon={Ticket01Icon} size='lg' className='mb-4' />
 
 			<Text className='text-h2 text-center text-tinta'>
 				{tab === 'active' ? 'No tienes compras activas' : 'No tienes historial'}
@@ -35,10 +29,12 @@ export function MyTicketsEmptyState({
 			</Text>
 
 			{tab === 'active' && (
-				<View className='mt-5 w-full'>
-					<ActionButton title='Comprar boletos' onPress={onBuyTickets} />
-				</View>
+				<Button
+					title='Comprar boletos'
+					onPress={onBuyTickets}
+					className='mt-6'
+				/>
 			)}
-		</View>
+		</Card>
 	)
 }

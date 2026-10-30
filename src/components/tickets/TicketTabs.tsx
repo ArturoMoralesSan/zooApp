@@ -15,9 +15,14 @@ export function TicketTabs({
 	onChangeTab,
 }: TicketTabsProps) {
 	return (
-		<View className='mb-[18px] flex-row rounded-2xl border border-card-border bg-niebla p-1'>
+		<View
+			className='mb-4 flex-row rounded-2xl border-1.5 border-card-border bg-niebla p-1'
+			accessibilityRole='tablist'
+		>
 			<Pressable
 				onPress={() => onChangeTab('active')}
+				accessibilityRole='tab'
+				accessibilityState={{ selected: tab === 'active' }}
 				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-esmeralda' : ''}`}
 			>
 				<Text
@@ -39,6 +44,8 @@ export function TicketTabs({
 
 			<Pressable
 				onPress={() => onChangeTab('history')}
+				accessibilityRole='tab'
+				accessibilityState={{ selected: tab === 'history' }}
 				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-esmeralda' : ''}`}
 			>
 				<Text

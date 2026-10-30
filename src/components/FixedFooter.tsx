@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import ActionButton from '@/components/ActionButton'
+import { Button } from '@/components/ui/Button'
 import { getFooterBottomPadding } from '@/theme/layout'
 
 type FixedFooterProps = {
@@ -42,10 +42,11 @@ export default function FixedFooter({
 				</Text>
 			</View>
 
-			<ActionButton
+			<Button
 				title={buttonTitle}
 				onPress={onButtonPress}
 				disabled={disabled}
+				className='mt-4'
 			/>
 		</View>
 	)

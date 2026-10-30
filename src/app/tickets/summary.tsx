@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import colors from '@/theme/colors'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
@@ -21,7 +22,6 @@ import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
 import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
-import { ICON_COLOR } from '@/components/tickets/summaryStyles'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -141,7 +141,7 @@ export default function TicketSummaryScreen() {
 		return (
 			<ScreenBackground patternClassName='opacity-[0.12]'>
 				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={ICON_COLOR} />
+					<ActivityIndicator size='large' color={colors.esmeralda} />
 					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando resumen...
 					</Text>
