@@ -20,6 +20,20 @@ export class ApiValidationError extends Error {
 	}
 }
 
+// fetch() rejects with a TypeError when the request never reaches the
+// server (no network, DNS, timeout); api() rethrows it as NetworkError.
+export class NetworkError extends Error {
+	constructor() {
+		super('Sin conexión')
+		this.name = 'NetworkError'
+	}
+}
+
+// Tells a failed connection apart from an error the server answered with.
+export function isNetworkError(error: unknown) {
+	return error instanceof NetworkError || error instanceof TypeError
+}
+
 export async function api<T>(
 	endpoint: string,
 	options: RequestInit = {},
@@ -40,10 +54,16 @@ export async function api<T>(
 		}
 	}
 
-	const response = await fetch(`${API_URL}${endpoint}`, {
-		...options,
-		headers,
-	})
+	let response: Response
+
+	try {
+		response = await fetch(`${API_URL}${endpoint}`, {
+			...options,
+			headers,
+		})
+	} catch {
+		throw new NetworkError()
+	}
 
 	let data: T
 

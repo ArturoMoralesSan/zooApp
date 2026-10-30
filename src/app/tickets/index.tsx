@@ -1,20 +1,20 @@
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { useRouter } from 'expo-router'
-import { useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
+import { useState } from 'react'
+import { Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
-import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { Card } from '@/components/ui/Card'
 import { Divider } from '@/components/ui/Divider'
 import { IconBox } from '@/components/ui/IconBox'
 import { QuantityStepper } from '@/components/ui/QuantityStepper'
+import { QueryView } from '@/components/ui/QueryView'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 type SelectedTicket = {
@@ -28,22 +28,12 @@ export default function TicketsScreen() {
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
-	const { data: ticketTypes = [], error, isLoading: loading } = useTicketTypes()
+	const ticketTypesQuery = useTicketTypes()
+	const ticketTypes = ticketTypesQuery.data ?? []
 	// Unselected types count as 0 (every read uses `?? 0`).
 	const [quantities, setQuantities] = useState<Record<number, number>>({})
 
 	useSessionRedirect()
-
-	useEffect(() => {
-		if (!error) return
-
-		console.error('Error cargando boletos:', error)
-
-		Alert.alert(
-			'Error',
-			error.message || 'No fue posible cargar los tipos de boleto.',
-		)
-	}, [error])
 
 	const changeQuantity = (id: number, value: number) => {
 		setQuantities((current) => ({
@@ -89,19 +79,6 @@ export default function TicketsScreen() {
 		})
 	}
 
-	if (loading) {
-		return (
-			<ScreenBackground withBackground={false}>
-				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={colors.esmeralda} />
-					<Text className='text-body mt-3 text-tinta-2'>
-						Cargando boletos...
-					</Text>
-				</View>
-			</ScreenBackground>
-		)
-	}
-
 	return (
 		<ScreenBackground withBackground={false}>
 			<ScrollView
@@ -125,72 +102,71 @@ export default function TicketsScreen() {
 					/>
 				</View>
 
-				{/* ESTADO VACÍO */}
-				{ticketTypes.length === 0 ? (
-					<Card className='items-center py-8'>
-						<IconBox icon={Ticket01Icon} size='lg' className='mb-3' />
+				<QueryView
+					query={ticketTypesQuery}
+					loadingMessage='Cargando boletos…'
+					errorTitle='No pudimos cargar los boletos'
+					isEmpty={(types) => types.length === 0}
+					empty={{
+						icon: Ticket01Icon,
+						title: 'No hay boletos disponibles',
+						message: 'Por el momento no hay tipos de boleto para mostrar.',
+					}}
+				>
+					{(types) =>
+						types.map((ticket) => {
+							const quantity = quantities[ticket.id] ?? 0
+							const parsedPrice = Number(ticket.price)
+							const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
+							const amount = price * quantity
 
-						<Text className='text-h3 text-center text-tinta'>
-							No hay boletos disponibles
-						</Text>
+							return (
+								<Card key={ticket.id} className='mb-3'>
+									{/* INFORMACIÓN DEL BOLETO */}
+									<View className='w-full flex-row items-center gap-3'>
+										<IconBox icon={Ticket01Icon} />
 
-						<Text className='text-body mt-1.5 text-center text-tinta-2'>
-							Por el momento no hay tipos de boleto para mostrar.
-						</Text>
-					</Card>
-				) : (
-					ticketTypes.map((ticket) => {
-						const quantity = quantities[ticket.id] ?? 0
-						const parsedPrice = Number(ticket.price)
-						const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
-						const amount = price * quantity
+										<View className='min-w-0 flex-1 justify-center'>
+											<Text className='text-h3 text-tinta'>{ticket.name}</Text>
 
-						return (
-							<Card key={ticket.id} className='mb-3'>
-								{/* INFORMACIÓN DEL BOLETO */}
-								<View className='w-full flex-row items-center gap-3'>
-									<IconBox icon={Ticket01Icon} />
+											{!!ticket.description && (
+												<Text className='text-meta mt-[3px]'>
+													{ticket.description}
+												</Text>
+											)}
+										</View>
+									</View>
 
-									<View className='min-w-0 flex-1 justify-center'>
-										<Text className='text-h3 text-tinta'>{ticket.name}</Text>
+									<Divider />
 
-										{!!ticket.description && (
-											<Text className='text-meta mt-[3px]'>
-												{ticket.description}
+									{/* PRECIO Y CANTIDAD */}
+									<View className='w-full flex-row items-center justify-between'>
+										<View className='min-w-0 flex-1 justify-center pr-2'>
+											<Text className='text-overline text-tinta-2'>
+												Precio por boleto
 											</Text>
-										)}
+
+											<Text className='mt-0.5 font-display-x text-[20px] text-bosque'>
+												{formatCurrency(price)}
+											</Text>
+
+											<Text className='text-meta mt-[3px]'>
+												Monto: {formatCurrency(amount)}
+											</Text>
+										</View>
+
+										<QuantityStepper
+											value={quantity}
+											onChange={(value) => changeQuantity(ticket.id, value)}
+											max={MAX_QUANTITY}
+											itemLabel={`boleto de ${ticket.name}`}
+										/>
 									</View>
-								</View>
-
-								<Divider />
-
-								{/* PRECIO Y CANTIDAD */}
-								<View className='w-full flex-row items-center justify-between'>
-									<View className='min-w-0 flex-1 justify-center pr-2'>
-										<Text className='text-overline text-tinta-2'>
-											Precio por boleto
-										</Text>
-
-										<Text className='mt-0.5 font-display-x text-[20px] text-bosque'>
-											{formatCurrency(price)}
-										</Text>
-
-										<Text className='text-meta mt-[3px]'>
-											Monto: {formatCurrency(amount)}
-										</Text>
-									</View>
-
-									<QuantityStepper
-										value={quantity}
-										onChange={(value) => changeQuantity(ticket.id, value)}
-										max={MAX_QUANTITY}
-										itemLabel={`boleto de ${ticket.name}`}
-									/>
-								</View>
-							</Card>
-						)
-					})
-				)}
+								</Card>
+							)
+						})
+					}
+				</QueryView>
 			</ScrollView>
 
 			{/* FOOTER FIJO */}

@@ -4,7 +4,7 @@ import {
 	ShieldCheckIcon,
 } from '@hugeicons/core-free-icons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
@@ -17,13 +17,20 @@ import { ListCard } from '@/components/ui/ListCard'
 import { Notice } from '@/components/ui/Notice'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
+import { checkOffline } from '@/hooks/useNetworkStatus'
 import { redirectIfSignedOut } from '@/hooks/useSessionRedirect'
 
 import { formatCurrency } from '@/utils/format'
 import { createDonation } from '@/services/donations'
+import { ApiValidationError, isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
+import Toast from '@/components/ui/Toast'
+
+const OFFLINE_DONATION =
+	'No enviamos tu donación. Conéctate a internet e inténtalo de nuevo.'
 
 export default function DonationsSummaryScreen() {
 	const footerSpace = useFixedFooterSpace()
@@ -34,7 +41,10 @@ export default function DonationsSummaryScreen() {
 	}>()
 
 	const [loading, setLoading] = useState(false)
+	// Inline for the amount check; a failed payment uses the A-43 toast.
 	const [error, setError] = useState<string | null>(null)
+	const [paymentError, setPaymentError] = useState<string | null>(null)
+	const hidePaymentError = useCallback(() => setPaymentError(null), [])
 
 	const amount = useMemo(() => {
 		const value = Number(String(params.amount ?? '0').replace(',', '.'))
@@ -57,6 +67,12 @@ export default function DonationsSummaryScreen() {
 		}
 
 		setError(null)
+
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_DONATION)
+			return
+		}
+
 		setLoading(true)
 
 		try {
@@ -76,14 +92,16 @@ export default function DonationsSummaryScreen() {
 				},
 			})
 		} catch (err: unknown) {
-			console.error('Error al crear donación:', err)
+			if (isNetworkError(err)) {
+				notifyOffline(OFFLINE_DONATION)
+				return
+			}
 
-			const message =
-				err instanceof Error
+			setPaymentError(
+				err instanceof ApiValidationError
 					? err.message
-					: 'No fue posible registrar la donación. Inténtalo nuevamente.'
-
-			setError(message)
+					: 'Verifica los datos de tu tarjeta e intenta de nuevo.',
+			)
 		} finally {
 			setLoading(false)
 		}
@@ -154,11 +172,11 @@ export default function DonationsSummaryScreen() {
 					message='Tu aportación ayuda al cuidado de los animales, mantenimiento de sus espacios y conservación de nuestra fauna.'
 				/>
 
-				{/* MENSAJE DE ERROR */}
+				{/* MONTO INVÁLIDO */}
 				{error && (
 					<Notice
 						tone='error'
-						title='No se pudo registrar la donación'
+						title='Revisa el monto'
 						message={error}
 						className='mt-3'
 					/>
@@ -180,6 +198,15 @@ export default function DonationsSummaryScreen() {
 					disabled={amount < 10}
 				/>
 			)}
+
+			<Toast
+				visible={paymentError !== null}
+				type='error'
+				title='No se pudo completar el pago'
+				message={paymentError ?? ''}
+				onHide={hidePaymentError}
+				duration={5000}
+			/>
 		</ScreenBackground>
 	)
 }

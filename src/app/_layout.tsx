@@ -12,6 +12,7 @@ import { useEffect } from 'react'
 import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
+import { OfflineBanner } from '@/components/ui/OfflineBanner'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { DataProvider } from '@/services/swr-config'
 import '../global.css'
@@ -57,6 +58,8 @@ export default function RootLayout() {
 							<Stack.Screen name='login' />
 							<Stack.Screen name='(tabs)' />
 						</Stack>
+
+						<OfflineBanner />
 					</AuthProvider>
 				</DataProvider>
 			</KeyboardProvider>

@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from 'react'
 
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
+import { isNetworkError } from '@/services/api'
 
 import {
 	login as authLogin,
@@ -41,7 +42,12 @@ type AuthProviderProps = {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { data: currentUser, isLoading: loading, refresh } = useCurrentUser()
+	const {
+		data: currentUser,
+		error,
+		isLoading: loading,
+		refresh,
+	} = useCurrentUser()
 	const { setCurrentUser, clearCache } = useDataRefresh()
 
 	// A failed first load leaves no data, so the user is null as before; a
@@ -77,7 +83,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const value: AuthContextType = {
 		user,
 		loading,
-		isAuthenticated: user !== null,
+		// getSessionUser only hits the network with a stored token, so a
+		// network failure means a session we can't check yet: stay signed in
+		// and let the screens show their offline states.
+		isAuthenticated: user !== null || isNetworkError(error),
 		login,
 		register,
 		logout,

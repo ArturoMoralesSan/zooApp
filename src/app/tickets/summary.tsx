@@ -1,13 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import colors from '@/theme/colors'
-import { useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
+import { useCallback, useMemo, useState } from 'react'
+import { Alert, ScrollView, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import { useDataRefresh } from '@/hooks/useDataRefresh'
+import { checkOffline } from '@/hooks/useNetworkStatus'
 import {
 	redirectIfSignedOut,
 	useSessionRedirect,
@@ -16,9 +16,13 @@ import { useTicketTypes } from '@/hooks/useTickets'
 import type { TicketSummaryItem, TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
+import { ApiValidationError, isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
+import { QueryView } from '@/components/ui/QueryView'
+import Toast from '@/components/ui/Toast'
 import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
 import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
@@ -30,6 +34,9 @@ type SelectedTicket = {
 
 const NO_TICKET_TYPES: TicketType[] = []
 
+const OFFLINE_PURCHASE =
+	'No enviamos tu compra. Conéctate a internet e inténtalo de nuevo.'
+
 export default function TicketSummaryScreen() {
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
@@ -38,13 +45,12 @@ export default function TicketSummaryScreen() {
 		items?: string
 	}>()
 
-	const {
-		data: ticketTypes = NO_TICKET_TYPES,
-		error,
-		isLoading: loading,
-	} = useTicketTypes()
+	const ticketTypesQuery = useTicketTypes()
+	const ticketTypes = ticketTypesQuery.data ?? NO_TICKET_TYPES
 	const { refreshMyTickets } = useDataRefresh()
 	const [purchasing, setPurchasing] = useState(false)
+	const [paymentError, setPaymentError] = useState<string | null>(null)
+	const hidePaymentError = useCallback(() => setPaymentError(null), [])
 
 	useSessionRedirect()
 
@@ -56,17 +62,6 @@ export default function TicketSummaryScreen() {
 			return []
 		}
 	}, [params.items])
-
-	useEffect(() => {
-		if (!error) return
-
-		console.error('Error cargando tipos de boleto:', error)
-
-		Alert.alert(
-			'Error',
-			error.message || 'No fue posible cargar los tipos de boleto.',
-		)
-	}, [error])
 
 	const summary = useMemo<TicketSummaryItem[]>(() => {
 		return selectedTickets.flatMap((item) => {
@@ -103,6 +98,11 @@ export default function TicketSummaryScreen() {
 			return
 		}
 
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_PURCHASE)
+			return
+		}
+
 		try {
 			setPurchasing(true)
 
@@ -124,30 +124,19 @@ export default function TicketSummaryScreen() {
 				},
 			})
 		} catch (error) {
-			console.error('Error realizando compra:', error)
+			if (isNetworkError(error)) {
+				notifyOffline(OFFLINE_PURCHASE)
+				return
+			}
 
-			Alert.alert(
-				'No fue posible realizar la compra',
-				error instanceof Error
+			setPaymentError(
+				error instanceof ApiValidationError
 					? error.message
-					: 'Ocurrió un error al procesar la compra.',
+					: 'Verifica los datos de tu tarjeta e intenta de nuevo.',
 			)
 		} finally {
 			setPurchasing(false)
 		}
-	}
-
-	if (loading) {
-		return (
-			<ScreenBackground patternClassName='opacity-[0.12]'>
-				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={colors.esmeralda} />
-					<Text className='text-body mt-3 text-tinta-2'>
-						Cargando resumen...
-					</Text>
-				</View>
-			</ScreenBackground>
-		)
 	}
 
 	return (
@@ -173,14 +162,24 @@ export default function TicketSummaryScreen() {
 					/>
 				</View>
 
-				{/* DETALLE DE BOLETOS */}
-				<TicketLinesCard summary={summary} total={total} />
+				<QueryView
+					query={ticketTypesQuery}
+					loadingMessage='Cargando resumen…'
+					errorTitle='No pudimos cargar el resumen'
+				>
+					{() => (
+						<>
+							{/* DETALLE DE BOLETOS */}
+							<TicketLinesCard summary={summary} total={total} />
 
-				{/* MÉTODO DE PAGO */}
-				<PaymentMethodCard />
+							{/* MÉTODO DE PAGO */}
+							<PaymentMethodCard />
 
-				{/* AVISO DE COMPRA SEGURA */}
-				<SecurePurchaseNotice />
+							{/* AVISO DE COMPRA SEGURA */}
+							<SecurePurchaseNotice />
+						</>
+					)}
+				</QueryView>
 
 				<View className='h-6' />
 			</ScrollView>
@@ -200,6 +199,15 @@ export default function TicketSummaryScreen() {
 					disabled={summary.length === 0}
 				/>
 			)}
+
+			<Toast
+				visible={paymentError !== null}
+				type='error'
+				title='No se pudo completar el pago'
+				message={paymentError ?? ''}
+				onHide={hidePaymentError}
+				duration={5000}
+			/>
 		</ScreenBackground>
 	)
 }
