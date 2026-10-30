@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type MapHeaderCardProps = {
 	isUserInsideZoo: boolean
@@ -8,9 +9,16 @@ type MapHeaderCardProps = {
 }
 
 // Back button and title card floating over the top of the map.
+// Absolute children ignore the SafeAreaView's padding, so the top inset is
+// added here.
 export function MapHeaderCard({ isUserInsideZoo, onBack }: MapHeaderCardProps) {
+	const insets = useSafeAreaInsets()
+
 	return (
-		<View className='absolute left-4 right-4 top-4 flex-row items-start gap-2'>
+		<View
+			className='absolute left-4 right-4 flex-row items-start gap-2'
+			style={{ top: insets.top + 16 }}
+		>
 			<BackButton variant='outline' position='relative' onPress={onBack} />
 
 			<View className='flex-1 flex-row items-center justify-between rounded-2xl border-1.5 border-card-border bg-blanco p-4'>
