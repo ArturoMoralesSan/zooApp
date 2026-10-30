@@ -1,7 +1,5 @@
 import {
-	ArrowRight01Icon,
 	HelpCircleIcon,
-	Logout01Icon,
 	QrCodeIcon,
 	Settings01Icon,
 	Ticket01Icon,
@@ -14,7 +12,6 @@ import {
 	ActivityIndicator,
 	Alert,
 	Modal,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
@@ -33,6 +30,7 @@ import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { LogoutCard } from '@/components/panel/LogoutCard'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -201,48 +199,7 @@ export default function Panel() {
 
 				{/* CERRAR SESIÓN */}
 
-				<View
-					className='mt-4 overflow-hidden rounded-[18px] border border-card-border bg-niebla'
-					style={cardShadow}
-				>
-					<Pressable
-						onPress={handleLogout}
-						disabled={loggingOut}
-						className='min-h-20 flex-row items-center px-3 py-2.5 active:opacity-[0.84]'
-					>
-						<View className='h-11 w-11 items-center justify-center rounded-[16px] border border-card-border bg-hoja'>
-							<HugeiconsIcon
-								icon={Logout01Icon}
-								size={23}
-								strokeWidth={1.8}
-								color={colors.esmeralda}
-							/>
-						</View>
-
-						<View className='ml-2.5 flex-1'>
-							<Text className='text-sm font-extrabold text-tinta'>
-								{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
-							</Text>
-
-							<Text className='mt-1 text-xs text-tinta'>
-								Salir de tu cuenta
-							</Text>
-						</View>
-
-						{loggingOut ? (
-							<ActivityIndicator size='small' color={colors.esmeralda} />
-						) : (
-							<View className='ml-2 h-7 w-7 items-center justify-center rounded-full bg-esmeralda'>
-								<HugeiconsIcon
-									icon={ArrowRight01Icon}
-									size={20}
-									strokeWidth={2}
-									color={colors.blanco}
-								/>
-							</View>
-						)}
-					</Pressable>
-				</View>
+				<LogoutCard loggingOut={loggingOut} onLogout={handleLogout} />
 
 				{/* PIE DE PÁGINA */}
 
