@@ -17,6 +17,7 @@ import UserHeader from '@/components/UserHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
+import { Chip } from '@/components/ui/Chip'
 import { SearchField } from '@/components/ui/SearchField'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
@@ -118,30 +119,18 @@ export default function SpeciesScreen() {
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					className='-mx-0.5 mt-[15px]'
+					className='-mx-0.5 mt-[15px] grow-0'
 					contentContainerClassName='items-center pl-0.5 pr-5'
 				>
-					{FILTERS.map((item) => {
-						const active = filter === item
-
-						return (
-							<View
-								key={item}
-								className={`mr-[9px] overflow-hidden rounded-full border px-4 py-2.5 ${active ? 'border-esmeralda bg-esmeralda' : 'border-card-border bg-blanco'}`}
-							>
-								<Pressable
-									onPress={() => setFilter(item)}
-									className='items-center justify-center active:opacity-[0.72]'
-								>
-									<Text
-										className={`font-sans-bold text-[13px] ${active ? 'text-blanco' : 'text-tinta'}`}
-									>
-										{item}
-									</Text>
-								</Pressable>
-							</View>
-						)
-					})}
+					{FILTERS.map((item) => (
+						<Chip
+							key={item}
+							label={item}
+							selected={filter === item}
+							onPress={() => setFilter(item)}
+							className='mr-2'
+						/>
+					))}
 				</ScrollView>
 
 				{/* Resultados */}
