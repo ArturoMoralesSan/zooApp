@@ -12,7 +12,6 @@ import { Divider } from '@/components/ui/Divider'
 import { IconBox } from '@/components/ui/IconBox'
 import { ListCard } from '@/components/ui/ListCard'
 import { SuccessBanner } from '@/components/ui/SuccessBanner'
-import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import colors from '@/theme/colors'
 import type { Order } from '@/types/tickets'
@@ -50,18 +49,9 @@ export default function TicketSuccessScreen() {
 				bounces
 				nestedScrollEnabled
 			>
-				{/* BOTÓN REGRESAR Y ENCABEZADO */}
-				<View className='w-full items-stretch self-stretch pb-4'>
-					<View className='mb-3 w-full items-start'>
-						<BackButton onPress={() => router.back()} position='relative' />
-					</View>
-
-					<View className='w-full items-stretch self-stretch'>
-						<ScreenHeader
-							title='¡Compra realizada!'
-							subtitle='Tus boletos están listos para usar.'
-						/>
-					</View>
+				{/* BOTÓN REGRESAR (el título lo da SuccessBanner) */}
+				<View className='mb-4'>
+					<BackButton onPress={() => router.back()} position='relative' />
 				</View>
 
 				{/* CONFIRMACIÓN DE COMPRA */}

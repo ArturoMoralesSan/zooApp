@@ -10,7 +10,6 @@ import { DetailRow } from '@/components/ui/DetailRow'
 import { Divider } from '@/components/ui/Divider'
 import { ListCard } from '@/components/ui/ListCard'
 import { SuccessBanner } from '@/components/ui/SuccessBanner'
-import { ScreenHeader } from '@/components/ui/TabHeader'
 import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
@@ -67,13 +66,9 @@ export default function DonationSuccessScreen() {
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 			>
-				<View className='mb-5 gap-3'>
+				{/* BOTÓN REGRESAR (el título lo da SuccessBanner) */}
+				<View className='mb-4'>
 					<BackButton position='relative' onPress={() => router.back()} />
-
-					<ScreenHeader
-						title='Donación realizada'
-						subtitle='Gracias por apoyar el cuidado de las especies.'
-					/>
 				</View>
 
 				{/* CONFIRMACIÓN DE DONACIÓN */}
