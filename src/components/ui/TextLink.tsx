@@ -8,11 +8,15 @@ type TextLinkProps = {
 }
 
 // Underlined Esmeralda link with a 40px touch target.
-export function TextLink({ label, onPress, className = '' }: TextLinkProps) {
+export function TextLink({
+	label,
+	onPress,
+	className = 'self-start',
+}: TextLinkProps) {
 	const { focused, focusProps } = useFocusRing()
 
 	return (
-		<View className={`self-start ${className}`}>
+		<View className={className}>
 			<Pressable
 				onPress={onPress}
 				accessibilityRole='link'

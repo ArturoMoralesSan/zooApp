@@ -1,30 +1,24 @@
-import ActionButton from '@/components/ActionButton'
+import { AuthCard } from '@/components/auth/AuthCard'
+import { AuthSwitchLink } from '@/components/auth/AuthSwitchLink'
+import { Button } from '@/components/ui/Button'
+import { Notice } from '@/components/ui/Notice'
 import { useScrollBottomSpace } from '@/theme/layout'
 import BackButton from '@/components/ui/BackButton'
 import { RegisterHeader } from '@/components/auth/RegisterHeader'
-import { RegisterLoginLink } from '@/components/auth/RegisterLoginLink'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import colors from '@/theme/colors'
 import { PasswordField } from '@/components/ui/PasswordField'
 import { TextField } from '@/components/ui/TextField'
 import type { RegisterFormErrors as FormErrors } from '@/types/auth'
 import { validateRegisterForm } from '@/utils/auth'
-import {
-	LockPasswordIcon,
-	Mail01Icon,
-	UserIcon,
-} from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
-	ActivityIndicator,
 	Image,
 	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
-	Text,
 	View,
 } from 'react-native'
 
@@ -141,7 +135,7 @@ export default function Register() {
 					showsVerticalScrollIndicator={false}
 				>
 					{/* REGRESAR */}
-					<BackButton onPress={() => router.back()} />
+					<BackButton variant='outline' onPress={() => router.back()} />
 
 					{/* LOGO */}
 					<View className='mt-7 items-center'>
@@ -154,14 +148,13 @@ export default function Register() {
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-5 rounded-3xl bg-blanco p-4'>
+					<AuthCard>
 						{/* ENCABEZADO */}
 						<RegisterHeader />
 
 						{/* NOMBRE */}
 						<TextField
 							label='Nombre completo'
-							icon={UserIcon}
 							className='mt-8'
 							error={errors.name}
 							value={name}
@@ -178,7 +171,6 @@ export default function Register() {
 						{/* CORREO */}
 						<TextField
 							label='Correo electrónico'
-							icon={Mail01Icon}
 							error={errors.email}
 							value={email}
 							onChangeText={(value) => {
@@ -197,7 +189,6 @@ export default function Register() {
 						{/* CONTRASEÑA */}
 						<PasswordField
 							label='Contraseña'
-							icon={LockPasswordIcon}
 							error={errors.password}
 							value={password}
 							onChangeText={(value) => {
@@ -216,7 +207,6 @@ export default function Register() {
 						{/* CONFIRMAR CONTRASEÑA */}
 						<PasswordField
 							label='Confirmar contraseña'
-							icon={LockPasswordIcon}
 							error={errors.password_confirmation}
 							showLabel='Mostrar confirmación de contraseña'
 							hideLabel='Ocultar confirmación de contraseña'
@@ -236,23 +226,29 @@ export default function Register() {
 
 						{/* ERROR GENERAL */}
 						{error !== '' && (
-							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-meta text-error'>{error}</Text>
-							</View>
+							<Notice
+								tone='error'
+								title='No se pudo crear la cuenta'
+								message={error}
+								className='mt-5'
+							/>
 						)}
 
 						{/* BOTÓN CREAR CUENTA */}
-						{loading ? (
-							<View className='mt-3.5 h-[50px] w-full items-center justify-center rounded-xl bg-apagado'>
-								<ActivityIndicator color={colors.blanco} />
-							</View>
-						) : (
-							<ActionButton title='Crear cuenta' onPress={handleRegister} />
-						)}
+						<Button
+							title='Crear cuenta'
+							onPress={handleRegister}
+							loading={loading}
+							className='mt-8'
+						/>
 
 						{/* INICIAR SESIÓN */}
-						<RegisterLoginLink onLogin={() => router.replace('/login')} />
-					</View>
+						<AuthSwitchLink
+							prompt='¿Ya tienes una cuenta?'
+							label='Inicia sesión'
+							onPress={() => router.replace('/login')}
+						/>
+					</AuthCard>
 				</ScrollView>
 			</ImageBackground>
 		</KeyboardAvoidingView>
