@@ -1,4 +1,5 @@
 import { type User } from '@/services/auth'
+import { StatCard } from '@/components/ui/StatCard'
 import { cardShadow } from '@/theme/shadows'
 import { Animated, ImageBackground, Text, View } from 'react-native'
 
@@ -39,26 +40,15 @@ export function ProfileProgress({
 						Sigue acumulando puntos en ZooApp.
 					</Text>
 
-					<View className='mt-5 flex-row'>
-						<View className='flex-1 rounded-[18px] border border-bosque bg-esmeralda p-4'>
-							<Text className='text-overline text-hoja'>Puntos</Text>
-							<Text className='mt-1 font-display-x text-[29px] text-blanco'>
-								{points}
-							</Text>
-						</View>
+					<View className='mt-5 flex-row gap-3'>
+						<StatCard
+							layout='overline'
+							tone='brand'
+							value={points}
+							label='Puntos'
+						/>
 
-						<View
-							className='ml-3 flex-1 rounded-[18px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
-							<Text className='text-overline text-tinta'>Nivel</Text>
-							<Text
-								className='mt-1 font-display-x text-[18px] text-tinta'
-								numberOfLines={1}
-							>
-								{currentLevel}
-							</Text>
-						</View>
+						<StatCard layout='overline' value={currentLevel} label='Nivel' />
 					</View>
 
 					{user?.gamification?.next_level && (
