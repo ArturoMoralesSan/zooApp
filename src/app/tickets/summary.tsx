@@ -2,14 +2,7 @@ import { CreditCardIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
-import {
-	ActivityIndicator,
-	Alert,
-	ScrollView,
-	Text,
-	View,
-	type ViewStyle,
-} from 'react-native'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/BackButton'
 import FixedFooter from '@/components/FixedFooter'
@@ -21,33 +14,16 @@ import {
 	useSessionRedirect,
 } from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
-import colors from '@/theme/colors'
-import type { TicketType } from '@/types/tickets'
+import type { TicketSummaryItem, TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
-
-const ICON_COLOR = colors.esmeralda
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.bosque,
-	shadowOffset: { width: 0, height: 2 },
-	shadowOpacity: 0.05,
-	shadowRadius: 8,
-	elevation: 2,
-}
+import { cardShadow, ICON_COLOR } from '@/components/tickets/summaryStyles'
 
 type SelectedTicket = {
 	ticket_type_id: number
 	quantity: number
-}
-
-type TicketSummaryItem = {
-	ticket_type_id: number
-	quantity: number
-	ticket: TicketType
-	subtotal: number
 }
 
 const NO_TICKET_TYPES: TicketType[] = []
