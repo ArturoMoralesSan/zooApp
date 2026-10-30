@@ -22,7 +22,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ListCard } from '@/components/ui/ListCard'
 import { EventCard } from '@/components/explore/EventCard'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
-import UserHeader from '@/components/UserHeader'
+import { TabHeader } from '@/components/ui/TabHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -90,7 +90,7 @@ export default function Explorar() {
 				}
 			>
 				{/* ENCABEZADO */}
-				<UserHeader title='Explorar' />
+				<TabHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
 				<View className='mt-5'>

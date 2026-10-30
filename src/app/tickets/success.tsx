@@ -7,7 +7,7 @@ import QRCode from 'react-native-qrcode-svg'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import colors from '@/theme/colors'
 import type { Order } from '@/types/tickets'
@@ -60,10 +60,9 @@ export default function TicketSuccessScreen() {
 					</View>
 
 					<View className='w-full items-stretch self-stretch'>
-						<UserHeader
+						<ScreenHeader
 							title='¡Compra realizada!'
 							subtitle='Tus boletos están listos para usar.'
-							showRewards={false}
 						/>
 					</View>
 				</View>

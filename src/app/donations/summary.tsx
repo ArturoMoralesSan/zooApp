@@ -6,7 +6,7 @@ import { ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { redirectIfSignedOut } from '@/hooks/useSessionRedirect'
 
@@ -99,10 +99,9 @@ export default function DonationsSummaryScreen() {
 
 				{/* ENCABEZADO */}
 				<View className='mt-px'>
-					<UserHeader
+					<ScreenHeader
 						title='Resumen de donación'
 						subtitle='Revisa los datos antes de continuar con tu aportación.'
-						showRewards={false}
 					/>
 				</View>
 

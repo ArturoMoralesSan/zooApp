@@ -1,7 +1,7 @@
 import { ListCard } from '@/components/ui/ListCard'
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import { HeartIcon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
@@ -134,10 +134,9 @@ export default function DonationsIndexScreen() {
 				<BackButton position='relative' onPress={() => router.back()} />
 
 				<View className='mt-3'>
-					<UserHeader
+					<ScreenHeader
 						title='Apoya al zoológico'
 						subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
-						showRewards={false}
 					/>
 				</View>
 

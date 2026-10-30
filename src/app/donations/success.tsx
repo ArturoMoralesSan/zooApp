@@ -6,7 +6,7 @@ import { ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import colors from '@/theme/colors'
 import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
@@ -67,10 +67,9 @@ export default function DonationSuccessScreen() {
 				<View className='mb-5 gap-3'>
 					<BackButton position='relative' onPress={() => router.back()} />
 
-					<UserHeader
+					<ScreenHeader
 						title='Donación realizada'
 						subtitle='Gracias por apoyar el cuidado de las especies.'
-						showRewards={false}
 					/>
 				</View>
 

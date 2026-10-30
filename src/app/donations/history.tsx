@@ -16,7 +16,7 @@ import {
 } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { DonationCard } from '@/components/donations/DonationCard'
@@ -81,10 +81,9 @@ export default function DonationHistoryScreen() {
 				</View>
 
 				<View className='mb-5'>
-					<UserHeader
+					<ScreenHeader
 						title='Mis donaciones'
 						subtitle='Consulta el historial de tus donaciones.'
-						showRewards={false}
 					/>
 				</View>
 			</View>

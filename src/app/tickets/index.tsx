@@ -13,7 +13,7 @@ import {
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
@@ -137,10 +137,9 @@ export default function TicketsScreen() {
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					<UserHeader
+					<ScreenHeader
 						title='Comprar boletos'
 						subtitle='Selecciona los boletos que necesitas.'
-						showRewards={false}
 					/>
 				</View>
 

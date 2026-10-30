@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
@@ -103,10 +103,9 @@ export default function MyTicketsScreen() {
 					<BackButton onPress={() => router.back()} position='relative' />
 				</View>
 
-				<UserHeader
+				<ScreenHeader
 					title='Mis entradas'
 					subtitle='Consulta tus compras y entradas.'
-					showRewards={false}
 				/>
 
 				<TicketStatsRow

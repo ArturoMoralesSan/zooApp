@@ -13,7 +13,7 @@ import {
 
 import { ListCard } from '@/components/ui/ListCard'
 import BackButton from '@/components/ui/BackButton'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
@@ -100,10 +100,9 @@ export default function SpeciesScreen() {
 					<BackButton onPress={() => router.back()} position='relative' />
 				</View>
 
-				<UserHeader
+				<ScreenHeader
 					title='Especies'
 					subtitle='Conoce a los habitantes del zoológico.'
-					showRewards={false}
 				/>
 
 				{/* Buscador */}

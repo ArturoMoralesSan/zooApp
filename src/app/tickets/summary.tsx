@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import {
@@ -167,10 +167,9 @@ export default function TicketSummaryScreen() {
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					<UserHeader
+					<ScreenHeader
 						title='Resumen de compra'
 						subtitle='Revisa tus boletos antes de continuar.'
-						showRewards={false}
 					/>
 				</View>
 

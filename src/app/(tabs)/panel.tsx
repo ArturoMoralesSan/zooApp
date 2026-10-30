@@ -12,7 +12,7 @@ import { Alert, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { ListCard } from '@/components/ui/ListCard'
-import UserHeader from '@/components/UserHeader'
+import { TabHeader } from '@/components/ui/TabHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useAuth } from '@/contexts/AuthContext'
@@ -103,7 +103,7 @@ export default function Panel() {
 			>
 				{/* ENCABEZADO */}
 
-				<UserHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
+				<TabHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
 
 				{/* TARJETA DE PERFIL */}
 
