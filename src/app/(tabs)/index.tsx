@@ -1,18 +1,14 @@
 import {
-	ArrowRight01Icon,
 	HeartIcon,
 	Location01Icon,
 	Ticket01Icon,
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useState } from 'react'
 
 import {
 	ActivityIndicator,
-	Alert,
-	Image,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	Pressable,
@@ -24,6 +20,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import AppCard from '@/components/AppCard'
+import { EventCard } from '@/components/explore/EventCard'
 import UserHeader from '@/components/UserHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
@@ -32,7 +29,6 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
 import { cardShadow } from '@/theme/shadows'
-import { formatEventDate, formatEventTime } from '@/utils/format'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -42,18 +38,6 @@ const CAROUSEL_GAP = 10
 // Si no se define un color diferente, utiliza el verde predeterminado.
 const donationCardBackground = colors.bosque
 const donationAccentBackground = colors.lima
-
-function getEventImageUrl(image: string | null): string | null {
-	if (!image) {
-		return null
-	}
-
-	if (image.startsWith('http://') || image.startsWith('https://')) {
-		return image
-	}
-
-	return null
-}
 
 export default function Explorar() {
 	const insets = useSafeAreaInsets()
@@ -170,113 +154,13 @@ export default function Explorar() {
 								onMomentumScrollEnd={handleCarouselScroll}
 								contentContainerClassName='pr-2'
 							>
-								{events.map((event, index) => {
-									const imageUrl = getEventImageUrl(event.image)
-
-									return (
-										<View
-											key={event.id}
-											className={`w-[292px] ${index === events.length - 1 ? '' : 'mr-2.5'}`}
-										>
-											<View
-												className='h-[203px] overflow-hidden rounded-3xl bg-bosque'
-												style={cardShadow}
-											>
-												<Pressable
-													className='flex-1 overflow-hidden rounded-[24px] active:opacity-[0.92]'
-													onPress={() =>
-														Alert.alert(
-															event.name,
-															event.description ||
-																'Consulta próximamente todos los detalles de este evento.',
-														)
-													}
-												>
-													<View className='flex-1'>
-														{imageUrl ? (
-															<Image
-																source={{ uri: imageUrl }}
-																className='absolute inset-0 h-full w-full'
-																resizeMode='cover'
-															/>
-														) : (
-															<View className='absolute inset-0 bg-tinta-2'>
-																<View className='absolute left-0 right-0 top-0 h-[47%] bg-tinta-2' />
-															</View>
-														)}
-
-														<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
-
-														<View className='absolute left-2.5 top-2.5 rounded-[20px] bg-lima px-3 py-1'>
-															<Text className='text-[10px] font-extrabold tracking-[0.3px] text-bosque'>
-																{(event.type || 'Educativo').toUpperCase()}
-															</Text>
-														</View>
-
-														<View className='absolute bottom-0 left-0 right-0 p-3.5'>
-															<View className='flex-row items-end'>
-																<View className='flex-1 pr-2'>
-																	<Text
-																		className='text-[23px] font-extrabold leading-7 text-blanco'
-																		numberOfLines={1}
-																	>
-																		{event.name}
-																	</Text>
-
-																	{event.description ? (
-																		<Text
-																			className='mt-1 text-[12px] font-semibold leading-[17px] text-blanco'
-																			numberOfLines={1}
-																		>
-																			{event.description}
-																		</Text>
-																	) : null}
-																</View>
-
-																<Pressable
-																	accessibilityRole='button'
-																	accessibilityLabel={`Ver evento ${event.name}`}
-																	onPress={() =>
-																		Alert.alert(
-																			event.name,
-																			event.description ||
-																				'Consulta próximamente todos los detalles de este evento.',
-																		)
-																	}
-																	className='h-8 w-8 items-center justify-center rounded-full bg-lima'
-																>
-																	<HugeiconsIcon
-																		icon={ArrowRight01Icon}
-																		size={22}
-																		strokeWidth={2}
-																		color={colors.bosque}
-																	/>
-																</Pressable>
-															</View>
-
-															<View className='mt-2.5 flex-row items-center'>
-																<Text
-																	className='text-[12px] font-bold text-blanco'
-																	numberOfLines={1}
-																>
-																	{formatEventDate(event.start_at)}
-																</Text>
-
-																<Text className='mx-2 font-black text-lima'>
-																	•
-																</Text>
-
-																<Text className='text-[12px] font-bold text-blanco'>
-																	{formatEventTime(event.start_at)}
-																</Text>
-															</View>
-														</View>
-													</View>
-												</Pressable>
-											</View>
-										</View>
-									)
-								})}
+								{events.map((event, index) => (
+									<EventCard
+										key={event.id}
+										event={event}
+										isLast={index === events.length - 1}
+									/>
+								))}
 							</ScrollView>
 
 							{events.length > 1 && (
