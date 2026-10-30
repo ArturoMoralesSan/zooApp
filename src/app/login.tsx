@@ -25,11 +25,6 @@ type FormErrors = {
 	password?: string
 }
 
-const palette = {
-	border: colors.inputBorder,
-	error: colors.error,
-}
-
 export default function Login() {
 	const bottomSpace = useScrollBottomSpace(48)
 	const { login } = useAuth()
@@ -151,11 +146,8 @@ export default function Login() {
 						<TextField
 							label='Correo electrónico'
 							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
+							className='mt-8'
 							error={errors.email}
-							highlightOnFocus={false}
-							iconColor={palette.border}
-							iconErrorColor={palette.error}
 							value={email}
 							onChangeText={(value) => {
 								setEmail(value)
@@ -172,9 +164,6 @@ export default function Login() {
 							label='Contraseña'
 							icon={LockPasswordIcon}
 							error={errors.password}
-							highlightOnFocus={false}
-							iconColor={palette.border}
-							iconErrorColor={palette.error}
 							value={password}
 							onChangeText={(value) => {
 								setPassword(value)

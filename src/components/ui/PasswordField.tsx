@@ -1,19 +1,18 @@
-import colors from '@/theme/colors'
-import { ViewIcon, ViewOffSlashIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useState } from 'react'
-import { Pressable } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 
 import { TextField, type TextFieldProps } from '@/components/ui/TextField'
 
 type PasswordFieldProps = Omit<
 	TextFieldProps,
-	'secureTextEntry' | 'renderTrailing'
+	'secureTextEntry' | 'renderTrailing' | 'onPress'
 > & {
 	showLabel?: string
 	hideLabel?: string
 }
 
+// TextField with a "Ver / Ocultar" text toggle: text, not just an eye icon,
+// so the action never depends on recognising a glyph.
 export function PasswordField({
 	showLabel = 'Mostrar contraseña',
 	hideLabel = 'Ocultar contraseña',
@@ -21,26 +20,22 @@ export function PasswordField({
 }: PasswordFieldProps) {
 	const [showPassword, setShowPassword] = useState(false)
 
-	const { highlightOnFocus = true, iconColor = colors.tinta2 } = fieldProps
-
 	return (
 		<TextField
 			{...fieldProps}
 			secureTextEntry={!showPassword}
-			renderTrailing={({ focused }) => (
+			renderTrailing={() => (
 				<Pressable
 					onPress={() => setShowPassword((value) => !value)}
-					className='mr-2 items-center justify-center rounded-xl p-2'
-					hitSlop={8}
+					className='mr-1.5 h-10 justify-center'
 					accessibilityRole='button'
 					accessibilityLabel={showPassword ? hideLabel : showLabel}
 				>
-					<HugeiconsIcon
-						icon={showPassword ? ViewOffSlashIcon : ViewIcon}
-						size={21}
-						strokeWidth={1.8}
-						color={highlightOnFocus && focused ? colors.esmeralda : iconColor}
-					/>
+					<View className='h-8 justify-center rounded-lg bg-hoja px-3 active:bg-card-border'>
+						<Text className='font-sans-bold text-[14px] text-bosque'>
+							{showPassword ? 'Ocultar' : 'Ver'}
+						</Text>
+					</View>
 				</Pressable>
 			)}
 		/>

@@ -162,7 +162,7 @@ export default function Register() {
 						<TextField
 							label='Nombre completo'
 							icon={UserIcon}
-							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
+							className='mt-8'
 							error={errors.name}
 							value={name}
 							onChangeText={(value) => {

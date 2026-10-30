@@ -14,12 +14,7 @@ import {
 	Text,
 	View,
 } from 'react-native'
-import colors from '@/theme/colors'
 import { TextField } from '@/components/ui/TextField'
-
-const palette = {
-	error: colors.error,
-}
 
 export default function ForgotPassword() {
 	const bottomSpace = useScrollBottomSpace(48)
@@ -100,9 +95,8 @@ export default function ForgotPassword() {
 						<TextField
 							label='Correo electrónico'
 							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
+							className='mt-8'
 							invalid={Boolean(error)}
-							iconErrorColor={palette.error}
 							value={email}
 							onChangeText={(value) => {
 								setEmail(value)
