@@ -51,13 +51,15 @@ function initReconnect(callback: () => void) {
 }
 
 const onErrorRetry: SWRConfiguration['onErrorRetry'] = async (
-	error,
+	_error,
 	_key,
 	config,
 	revalidate,
 	{ retryCount },
 ) => {
-	if (isNetworkError(error) || isOfflineState(await NetInfo.fetch())) {
+	// Still offline: reconnect revalidates. A network error once back online
+	// (a request caught mid-transition) is retried like any other.
+	if (isOfflineState(await NetInfo.fetch())) {
 		return
 	}
 
