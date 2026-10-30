@@ -1,5 +1,6 @@
 import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
 
+import { router } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -190,7 +191,10 @@ export default function MapScreen() {
 				{selectedItem && <DestinationMarker selectedItem={selectedItem} />}
 			</MapView>
 
-			<MapHeaderCard isUserInsideZoo={isUserInsideZoo} />
+			<MapHeaderCard
+				isUserInsideZoo={isUserInsideZoo}
+				onBack={() => router.back()}
+			/>
 
 			{userLocation && <LocationBadge locationAccuracy={locationAccuracy} />}
 
