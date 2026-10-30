@@ -1,4 +1,5 @@
 import {
+	HeartIcon,
 	HelpCircleIcon,
 	QrCodeIcon,
 	Settings01Icon,
@@ -11,8 +12,9 @@ import { Alert, ScrollView, Text, View } from 'react-native'
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import AppCard from '@/components/AppCard'
-import UserHeader from '@/components/UserHeader'
+import { ListCard } from '@/components/ui/ListCard'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import { TabHeader } from '@/components/ui/TabHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useAuth } from '@/contexts/AuthContext'
@@ -20,6 +22,7 @@ import { getTabBarExtraSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { LogoutCard } from '@/components/panel/LogoutCard'
 import { PanelQrModal } from '@/components/panel/PanelQrModal'
+import { getInitials } from '@/utils/profile'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -103,26 +106,29 @@ export default function Panel() {
 			>
 				{/* ENCABEZADO */}
 
-				<UserHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
+				<TabHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
 
 				{/* TARJETA DE PERFIL */}
 
 				<View className='mt-5'>
-					<AppCard
+					<ListCard
+						className='mb-3'
 						avatarUrl={avatarUrl}
+						avatarInitials={getInitials(user?.name)}
 						title={user?.name ?? 'Mi cuenta'}
 						description={user?.email ?? 'Consulta tus datos personales'}
 						onPress={() => router.push('/profile')}
-						showArrow
+						showChevron
 					/>
 				</View>
 
 				{/* MI CUENTA */}
 
 				<View className='mt-6'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi cuenta</Text>
+					<SectionTitle title='Mi cuenta' />
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={QrCodeIcon}
 						title='Mi código QR'
 						description='Consulta tu código personal'
@@ -132,18 +138,20 @@ export default function Panel() {
 
 				{/* MI ACTIVIDAD */}
 
-				<View className='mt-4'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi actividad</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Mi actividad' />
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Ticket01Icon}
 						title='Mis entradas'
 						description='Consulta tus entradas al zoológico'
 						onPress={() => router.push('/tickets/my-tickets')}
 					/>
 
-					<AppCard
-						icon={Ticket01Icon}
+					<ListCard
+						className='mb-3'
+						icon={HeartIcon}
 						title='Mis donaciones'
 						description='Consulta tus donaciones'
 						onPress={() => router.push('/donations/history')}
@@ -152,10 +160,11 @@ export default function Panel() {
 
 				{/* AYUDA */}
 
-				<View className='mt-4'>
-					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Ayuda</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Ayuda' />
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Settings01Icon}
 						title='Configuración'
 						description='Preferencias de la aplicación'
@@ -167,7 +176,8 @@ export default function Panel() {
 						}
 					/>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={HelpCircleIcon}
 						title='Ayuda'
 						description='Preguntas frecuentes y soporte'

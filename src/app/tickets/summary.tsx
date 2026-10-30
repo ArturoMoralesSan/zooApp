@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import colors from '@/theme/colors'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import {
@@ -15,12 +16,12 @@ import { useTicketTypes } from '@/hooks/useTickets'
 import type { TicketSummaryItem, TicketType } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
+import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
 import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
-import { ICON_COLOR } from '@/components/tickets/summaryStyles'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -30,6 +31,7 @@ type SelectedTicket = {
 const NO_TICKET_TYPES: TicketType[] = []
 
 export default function TicketSummaryScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const params = useLocalSearchParams<{
@@ -139,7 +141,7 @@ export default function TicketSummaryScreen() {
 		return (
 			<ScreenBackground patternClassName='opacity-[0.12]'>
 				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={ICON_COLOR} />
+					<ActivityIndicator size='large' color={colors.esmeralda} />
 					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando resumen...
 					</Text>
@@ -152,7 +154,8 @@ export default function TicketSummaryScreen() {
 		<ScreenBackground patternClassName='opacity-[0.12]'>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pb-[180px] pt-3'
+				contentContainerClassName='grow px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
@@ -164,10 +167,9 @@ export default function TicketSummaryScreen() {
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					<UserHeader
+					<ScreenHeader
 						title='Resumen de compra'
 						subtitle='Revisa tus boletos antes de continuar.'
-						showRewards={false}
 					/>
 				</View>
 

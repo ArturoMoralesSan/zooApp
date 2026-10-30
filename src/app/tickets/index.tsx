@@ -1,38 +1,21 @@
-import { MinusSignIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
+import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-	ActivityIndicator,
-	Alert,
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-	type ViewStyle,
-} from 'react-native'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
-import UserHeader from '@/components/UserHeader'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useTicketTypes } from '@/hooks/useTickets'
 import colors from '@/theme/colors'
 import { formatCurrency } from '@/utils/format'
+import { useFixedFooterSpace } from '@/theme/layout'
+import { Card } from '@/components/ui/Card'
+import { Divider } from '@/components/ui/Divider'
+import { IconBox } from '@/components/ui/IconBox'
+import { QuantityStepper } from '@/components/ui/QuantityStepper'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
-
-const ICON_COLORS = {
-	primary: colors.esmeralda,
-	muted: colors.apagado,
-} as const
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.bosque,
-	shadowOffset: { width: 0, height: 2 },
-	shadowOpacity: 0.04,
-	shadowRadius: 4,
-	elevation: 1,
-}
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -42,6 +25,7 @@ type SelectedTicket = {
 const MAX_QUANTITY = 20
 
 export default function TicketsScreen() {
+	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
 	const { data: ticketTypes = [], error, isLoading: loading } = useTicketTypes()
@@ -109,7 +93,7 @@ export default function TicketsScreen() {
 		return (
 			<ScreenBackground withBackground={false}>
 				<View className='flex-1 items-center justify-center'>
-					<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+					<ActivityIndicator size='large' color={colors.esmeralda} />
 					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando boletos...
 					</Text>
@@ -122,7 +106,8 @@ export default function TicketsScreen() {
 		<ScreenBackground withBackground={false}>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pb-[180px] pt-3'
+				contentContainerClassName='grow px-5 pt-3'
+				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
@@ -134,26 +119,16 @@ export default function TicketsScreen() {
 						<BackButton onPress={() => router.back()} position='relative' />
 					</View>
 
-					<UserHeader
+					<ScreenHeader
 						title='Comprar boletos'
 						subtitle='Selecciona los boletos que necesitas.'
-						showRewards={false}
 					/>
 				</View>
 
 				{/* ESTADO VACÍO */}
 				{ticketTypes.length === 0 ? (
-					<View
-						className='items-center justify-center rounded-[18px] border border-card-border bg-niebla px-6 py-8'
-						style={cardShadow}
-					>
-						<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-							<HugeiconsIcon
-								icon={Ticket01Icon}
-								size={30}
-								color={ICON_COLORS.primary}
-							/>
-						</View>
+					<Card className='items-center py-8'>
+						<IconBox icon={Ticket01Icon} size='lg' className='mb-3' />
 
 						<Text className='text-h3 text-center text-tinta'>
 							No hay boletos disponibles
@@ -162,32 +137,19 @@ export default function TicketsScreen() {
 						<Text className='text-body mt-1.5 text-center text-tinta-2'>
 							Por el momento no hay tipos de boleto para mostrar.
 						</Text>
-					</View>
+					</Card>
 				) : (
 					ticketTypes.map((ticket) => {
 						const quantity = quantities[ticket.id] ?? 0
 						const parsedPrice = Number(ticket.price)
 						const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
 						const amount = price * quantity
-						const canDecrease = quantity > 0
-						const canIncrease = quantity < MAX_QUANTITY
 
 						return (
-							<View
-								key={ticket.id}
-								className='mb-[13px] w-full rounded-[18px] border border-card-border bg-niebla p-[15px]'
-								style={cardShadow}
-							>
+							<Card key={ticket.id} className='mb-3'>
 								{/* INFORMACIÓN DEL BOLETO */}
-								<View className='w-full flex-row items-start'>
-									<View className='mr-3 h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-										<HugeiconsIcon
-											icon={Ticket01Icon}
-											size={25}
-											strokeWidth={1.8}
-											color={ICON_COLORS.primary}
-										/>
-									</View>
+								<View className='w-full flex-row items-center gap-3'>
+									<IconBox icon={Ticket01Icon} />
 
 									<View className='min-w-0 flex-1 justify-center'>
 										<Text className='text-h3 text-tinta'>{ticket.name}</Text>
@@ -200,7 +162,7 @@ export default function TicketsScreen() {
 									</View>
 								</View>
 
-								<View className='mb-[13px] mt-[15px] h-px bg-card-border' />
+								<Divider />
 
 								{/* PRECIO Y CANTIDAD */}
 								<View className='w-full flex-row items-center justify-between'>
@@ -218,53 +180,14 @@ export default function TicketsScreen() {
 										</Text>
 									</View>
 
-									<View className='ml-1 shrink-0 flex-row items-center justify-end gap-2'>
-										{/* RESTAR */}
-										<Pressable
-											accessibilityRole='button'
-											accessibilityLabel={`Restar boleto de ${ticket.name}`}
-											onPress={() => changeQuantity(ticket.id, quantity - 1)}
-											disabled={!canDecrease}
-											className={`h-10 min-h-10 w-10 min-w-10 shrink-0 items-center justify-center rounded-xl border border-card-border p-0 ${canDecrease ? 'bg-blanco active:opacity-70' : 'bg-niebla opacity-70'}`}
-										>
-											<HugeiconsIcon
-												icon={MinusSignIcon}
-												size={18}
-												strokeWidth={2}
-												color={
-													canDecrease ? ICON_COLORS.primary : ICON_COLORS.muted
-												}
-											/>
-										</Pressable>
-
-										{/* CANTIDAD */}
-										<View className='h-10 w-[34px] min-w-[34px] shrink-0 items-center justify-center'>
-											<Text
-												className='text-center font-display-x text-[15px] text-tinta'
-												style={{ includeFontPadding: false }}
-											>
-												{quantity}
-											</Text>
-										</View>
-
-										{/* SUMAR */}
-										<Pressable
-											accessibilityRole='button'
-											accessibilityLabel={`Agregar boleto de ${ticket.name}`}
-											onPress={() => changeQuantity(ticket.id, quantity + 1)}
-											disabled={!canIncrease}
-											className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-esmeralda' : 'bg-card-border'}`}
-										>
-											<Text
-												className='text-center font-display text-[28px] leading-8 text-blanco'
-												style={{ includeFontPadding: false }}
-											>
-												+
-											</Text>
-										</Pressable>
-									</View>
+									<QuantityStepper
+										value={quantity}
+										onChange={(value) => changeQuantity(ticket.id, value)}
+										max={MAX_QUANTITY}
+										itemLabel={`boleto de ${ticket.name}`}
+									/>
 								</View>
-							</View>
+							</Card>
 						)
 					})
 				)}

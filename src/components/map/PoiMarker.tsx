@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Text, View } from 'react-native'
 import colors from '@/theme/colors'
 import type { SelectableItem } from '@/types/map'
-import { mapShadow } from '@/components/map/mapShadow'
+import { markerShadow } from '@/components/map/markerShadow'
 
 type PoiMarkerProps = {
 	item: SelectableItem
@@ -15,7 +15,10 @@ export function PoiMarker({ item, onPress }: PoiMarkerProps) {
 		<Marker lngLat={item.coordinate} onPress={onPress}>
 			<View
 				className='h-[38px] w-[38px] items-center justify-center overflow-hidden rounded-[19px] border-[3px] border-blanco'
-				style={[mapShadow, { backgroundColor: item.color ?? colors.esmeralda }]}
+				style={[
+					markerShadow,
+					{ backgroundColor: item.color ?? colors.esmeralda },
+				]}
 			>
 				{item.iconImage ? (
 					<Image

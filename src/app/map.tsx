@@ -139,7 +139,7 @@ export default function MapScreen() {
 	}
 
 	return (
-		<SafeAreaView className='flex-1 bg-screen'>
+		<SafeAreaView className='flex-1 bg-screen' edges={['top', 'left', 'right']}>
 			<MapView
 				ref={mapRef}
 				style={{ flex: 1 }}

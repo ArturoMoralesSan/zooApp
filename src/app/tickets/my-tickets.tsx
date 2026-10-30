@@ -1,23 +1,25 @@
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { useMyTickets } from '@/hooks/useTickets'
 
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/BackButton'
-import UserHeader from '@/components/UserHeader'
+import BackButton from '@/components/ui/BackButton'
+import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
+import colors from '@/theme/colors'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { TicketStatsRow } from '@/components/tickets/TicketStatsRow'
 import { TicketTabs } from '@/components/tickets/TicketTabs'
 import { PurchaseCard } from '@/components/tickets/PurchaseCard'
 import { MyTicketsEmptyState } from '@/components/tickets/MyTicketsEmptyState'
 import { TicketQrModal } from '@/components/tickets/TicketQrModal'
-import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 
 export default function MyTicketsScreen() {
+	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
 	const { data: tickets = [], error, isLoading: loading } = useMyTickets()
@@ -94,16 +96,16 @@ export default function MyTicketsScreen() {
 			<ScrollView
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
-				contentContainerClassName='px-5 pb-10 pt-2.5'
+				contentContainerStyle={{ paddingBottom: bottomSpace }}
+				contentContainerClassName='px-5 pt-2.5'
 			>
 				<View className='mb-4'>
 					<BackButton onPress={() => router.back()} position='relative' />
 				</View>
 
-				<UserHeader
+				<ScreenHeader
 					title='Mis entradas'
 					subtitle='Consulta tus compras y entradas.'
-					showRewards={false}
 				/>
 
 				<TicketStatsRow
@@ -120,7 +122,7 @@ export default function MyTicketsScreen() {
 
 				{loading ? (
 					<View className='items-center justify-center py-[60px]'>
-						<ActivityIndicator size='large' color={ICON_COLORS.primary} />
+						<ActivityIndicator size='large' color={colors.esmeralda} />
 						<Text className='text-body mt-3 text-tinta-2'>
 							Cargando tus entradas...
 						</Text>

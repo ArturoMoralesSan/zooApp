@@ -1,6 +1,8 @@
-import ActionButton from '@/components/ActionButton'
-import BackButton from '@/components/BackButton'
-import { Mail01Icon } from '@hugeicons/core-free-icons'
+import { AuthCard } from '@/components/auth/AuthCard'
+import { AuthSwitchLink } from '@/components/auth/AuthSwitchLink'
+import { Button } from '@/components/ui/Button'
+import { useScrollBottomSpace } from '@/theme/layout'
+import BackButton from '@/components/ui/BackButton'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -8,19 +10,14 @@ import {
 	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
 } from 'react-native'
-import colors from '@/theme/colors'
 import { TextField } from '@/components/ui/TextField'
 
-const palette = {
-	error: colors.error,
-}
-
 export default function ForgotPassword() {
+	const bottomSpace = useScrollBottomSpace(48)
 	const [email, setEmail] = useState('')
 	const [error, setError] = useState('')
 
@@ -61,14 +58,14 @@ export default function ForgotPassword() {
 						flexGrow: 1,
 						paddingHorizontal: 24,
 						paddingTop: 36,
-						paddingBottom: 48,
+						paddingBottom: bottomSpace,
 					}}
 					keyboardShouldPersistTaps='handled'
 					keyboardDismissMode='on-drag'
 					showsVerticalScrollIndicator={false}
 				>
 					{/* REGRESAR */}
-					<BackButton onPress={() => router.back()} />
+					<BackButton variant='outline' onPress={() => router.back()} />
 
 					{/* LOGO */}
 					<View className='mt-20 items-center'>
@@ -81,7 +78,7 @@ export default function ForgotPassword() {
 					</View>
 
 					{/* TARJETA */}
-					<View className='mt-5 rounded-3xl bg-blanco p-4'>
+					<AuthCard>
 						{/* ENCABEZADO */}
 						<View className='items-center'>
 							<Text className='text-h1 text-center'>
@@ -97,10 +94,8 @@ export default function ForgotPassword() {
 						{/* CORREO */}
 						<TextField
 							label='Correo electrónico'
-							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
-							invalid={Boolean(error)}
-							iconErrorColor={palette.error}
+							className='mt-8'
+							error={error || undefined}
 							value={email}
 							onChangeText={(value) => {
 								setEmail(value)
@@ -116,36 +111,20 @@ export default function ForgotPassword() {
 							onSubmitEditing={handleRecover}
 						/>
 
-						{/* ERROR */}
-						{error !== '' && (
-							<View className='mt-2.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-meta text-error'>{error}</Text>
-							</View>
-						)}
-
 						{/* ENVIAR INSTRUCCIONES */}
-						<ActionButton
+						<Button
 							title='Enviar instrucciones'
 							onPress={handleRecover}
+							className='mt-8'
 						/>
 
 						{/* VOLVER AL LOGIN */}
-						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-body text-tinta-2'>
-								¿Recuerdas tu contraseña?{' '}
-							</Text>
-
-							<Pressable
-								onPress={() => router.replace('/login')}
-								className='rounded-lg py-1'
-								accessibilityRole='button'
-							>
-								<Text className='font-sans-bold text-[14px] leading-[1.5] text-esmeralda'>
-									Iniciar sesión
-								</Text>
-							</Pressable>
-						</View>
-					</View>
+						<AuthSwitchLink
+							prompt='¿Recuerdas tu contraseña?'
+							label='Inicia sesión'
+							onPress={() => router.replace('/login')}
+						/>
+					</AuthCard>
 				</ScrollView>
 			</ImageBackground>
 		</KeyboardAvoidingView>

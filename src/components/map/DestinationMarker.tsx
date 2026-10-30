@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Text, View } from 'react-native'
 import colors from '@/theme/colors'
 import type { SelectableItem } from '@/types/map'
-import { mapShadow } from '@/components/map/mapShadow'
+import { markerShadow } from '@/components/map/markerShadow'
 
 type DestinationMarkerProps = {
 	selectedItem: SelectableItem
@@ -19,7 +19,7 @@ export function DestinationMarker({ selectedItem }: DestinationMarkerProps) {
 						: 'h-[46px] w-[46px] items-center justify-center overflow-hidden rounded-[23px] border-4 border-blanco'
 				}
 				style={[
-					mapShadow,
+					markerShadow,
 					selectedItem.type === 'marker' && {
 						backgroundColor: selectedItem.color ?? colors.bosque,
 					},

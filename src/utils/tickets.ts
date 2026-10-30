@@ -1,3 +1,4 @@
+import type { BadgeTone } from '@/components/ui/Badge'
 import type { Purchase, Ticket } from '@/types/tickets'
 
 export const getTicketStatus = (ticket?: Ticket) => {
@@ -46,4 +47,23 @@ export const getActiveCount = (purchase: Purchase) => {
 
 		return status === 'active' || status === 'activo'
 	}).length
+}
+
+export const getTicketStatusTone = (ticket?: Ticket): BadgeTone => {
+	switch (String(ticket?.status ?? '').toLowerCase()) {
+		case 'active':
+		case 'activo':
+			return 'success'
+		case 'cancelled':
+		case 'canceled':
+		case 'cancelado':
+			return 'error'
+		case 'used':
+		case 'usado':
+		case 'expired':
+		case 'expirado':
+			return 'neutral'
+		default:
+			return 'pending'
+	}
 }

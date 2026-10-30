@@ -1,19 +1,20 @@
-import ActionButton from '@/components/ActionButton'
+import { AuthCard } from '@/components/auth/AuthCard'
+import { AuthSwitchLink } from '@/components/auth/AuthSwitchLink'
+import { Button } from '@/components/ui/Button'
+import { Notice } from '@/components/ui/Notice'
+import { TextLink } from '@/components/ui/TextLink'
+import { useScrollBottomSpace } from '@/theme/layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ApiValidationError } from '@/services/api'
-import colors from '@/theme/colors'
 import { PasswordField } from '@/components/ui/PasswordField'
 import { TextField } from '@/components/ui/TextField'
-import { LockPasswordIcon, Mail01Icon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
-	ActivityIndicator,
 	Image,
 	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
-	Pressable,
 	ScrollView,
 	Text,
 	View,
@@ -24,12 +25,8 @@ type FormErrors = {
 	password?: string
 }
 
-const palette = {
-	border: colors.inputBorder,
-	error: colors.error,
-}
-
 export default function Login() {
+	const bottomSpace = useScrollBottomSpace(48)
 	const { login } = useAuth()
 
 	const [email, setEmail] = useState('')
@@ -122,7 +119,7 @@ export default function Login() {
 						flexGrow: 1,
 						paddingHorizontal: 24,
 						paddingTop: 36,
-						paddingBottom: 48,
+						paddingBottom: bottomSpace,
 					}}
 					keyboardShouldPersistTaps='handled'
 					keyboardDismissMode='on-drag'
@@ -137,7 +134,7 @@ export default function Login() {
 						/>
 					</View>
 
-					<View className='mt-5 rounded-3xl bg-blanco p-4'>
+					<AuthCard>
 						<View className='items-center'>
 							<Text className='text-h1 text-center'>¡Bienvenido a ZooApp!</Text>
 
@@ -148,12 +145,8 @@ export default function Login() {
 
 						<TextField
 							label='Correo electrónico'
-							icon={Mail01Icon}
-							labelClassName='mb-2 mt-7 text-[14px] font-sans-semibold text-tinta'
+							className='mt-8'
 							error={errors.email}
-							highlightOnFocus={false}
-							iconColor={palette.border}
-							iconErrorColor={palette.error}
 							value={email}
 							onChangeText={(value) => {
 								setEmail(value)
@@ -168,11 +161,7 @@ export default function Login() {
 
 						<PasswordField
 							label='Contraseña'
-							icon={LockPasswordIcon}
 							error={errors.password}
-							highlightOnFocus={false}
-							iconColor={palette.border}
-							iconErrorColor={palette.error}
 							value={password}
 							onChangeText={(value) => {
 								setPassword(value)
@@ -183,46 +172,34 @@ export default function Login() {
 							textContentType='password'
 						/>
 
+						<TextLink
+							label='¿Olvidaste tu contraseña?'
+							onPress={() => router.push('/forgot-password')}
+							className='mt-2 self-end'
+						/>
+
 						{error !== '' && (
-							<View className='mt-3.5 rounded-xl border border-error-border bg-error-bg px-3.5 py-2.5'>
-								<Text className='text-meta text-error'>{error}</Text>
-							</View>
+							<Notice
+								tone='error'
+								title='No se pudo iniciar sesión'
+								message={error}
+								className='mt-4'
+							/>
 						)}
 
-						<Pressable
-							onPress={() => router.push('/forgot-password')}
-							className='mt-3.5 self-end rounded-lg py-1'
-						>
-							<Text className='text-meta text-esmeralda'>
-								¿Olvidaste tu contraseña?
-							</Text>
-						</Pressable>
+						<Button
+							title='Iniciar sesión'
+							onPress={handleLogin}
+							loading={loading}
+							className='mt-6'
+						/>
 
-						<View className='mt-4'>
-							{loading ? (
-								<View className='h-[50px] w-full items-center justify-center rounded-xl bg-apagado'>
-									<ActivityIndicator color={colors.blanco} />
-								</View>
-							) : (
-								<ActionButton title='Iniciar sesión' onPress={handleLogin} />
-							)}
-						</View>
-
-						<View className='mt-6 flex-row flex-wrap items-center justify-center'>
-							<Text className='text-body text-tinta-2'>
-								¿No tienes una cuenta?{' '}
-							</Text>
-
-							<Pressable
-								onPress={() => router.push('/register')}
-								className='rounded-lg py-1'
-							>
-								<Text className='font-sans-bold text-[14px] leading-[1.5] text-esmeralda'>
-									Regístrate
-								</Text>
-							</Pressable>
-						</View>
-					</View>
+						<AuthSwitchLink
+							prompt='¿No tienes una cuenta?'
+							label='Regístrate'
+							onPress={() => router.push('/register')}
+						/>
+					</AuthCard>
 				</ScrollView>
 			</ImageBackground>
 		</KeyboardAvoidingView>

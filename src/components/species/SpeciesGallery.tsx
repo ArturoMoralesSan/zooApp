@@ -1,22 +1,6 @@
-import colors from '@/theme/colors'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import type { SpeciesDetail, SpeciesImage } from '@/types/species'
-import {
-	Dimensions,
-	Image,
-	Pressable,
-	ScrollView,
-	Text,
-	View,
-	type ViewStyle,
-} from 'react-native'
-
-const subtleShadow: ViewStyle = {
-	shadowColor: colors.esmeralda,
-	shadowOffset: { width: 0, height: 3 },
-	shadowOpacity: 0.08,
-	shadowRadius: 7,
-	elevation: 2,
-}
+import { Dimensions, Image, Pressable, ScrollView, View } from 'react-native'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -33,29 +17,28 @@ export function SpeciesGallery({
 }: SpeciesGalleryProps) {
 	return (
 		<View className='mt-7'>
-			<Text className='text-h2 text-tinta'>Galería</Text>
+			<SectionTitle title='Galería' className='' />
 
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				className='-mx-4 mt-3.5'
+				className='-mx-4 mt-3'
 				contentContainerClassName='px-5'
 			>
 				{galleryImages.map((image) => (
 					<View
 						key={image.id}
-						className='mr-2.5 overflow-hidden rounded-[22px] border border-card-border bg-niebla'
-						style={[
-							subtleShadow,
-							{
-								width: SCREEN_WIDTH * 0.68,
-								height: SCREEN_WIDTH * 0.48,
-							},
-						]}
+						className='mr-3 overflow-hidden rounded-2xl border-1.5 border-card-border bg-niebla'
+						style={{
+							width: SCREEN_WIDTH * 0.68,
+							height: SCREEN_WIDTH * 0.48,
+						}}
 					>
 						<Pressable
 							onPress={() => onOpenImage(image)}
 							className='h-full w-full active:opacity-[0.88]'
+							accessibilityRole='imagebutton'
+							accessibilityLabel={`Ver foto de ${species.common_name}`}
 						>
 							<Image
 								source={{ uri: image.url }}

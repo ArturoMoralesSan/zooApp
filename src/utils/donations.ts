@@ -1,3 +1,4 @@
+import type { BadgeTone } from '@/components/ui/Badge'
 import type { Donation } from '@/types/donations'
 
 export function getDonationStatus(donation: Donation): string {
@@ -30,7 +31,7 @@ export function getDonationStatus(donation: Donation): string {
 	}
 }
 
-export function getDonationStatusClassName(donation: Donation): string {
+export function getDonationStatusTone(donation: Donation): BadgeTone {
 	const status = String(donation.status ?? '').toLowerCase()
 
 	if (
@@ -44,14 +45,14 @@ export function getDonationStatusClassName(donation: Donation): string {
 			'fallido',
 		].includes(status)
 	) {
-		return 'bg-hoja'
+		return 'error'
 	}
 
 	if (status === 'pending' || status === 'pendiente') {
-		return 'bg-niebla'
+		return 'pending'
 	}
 
-	return 'bg-lima'
+	return 'success'
 }
 
 export function isCompleted(donation: Donation): boolean {

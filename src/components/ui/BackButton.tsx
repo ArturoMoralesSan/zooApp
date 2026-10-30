@@ -1,26 +1,27 @@
-import colors from '@/theme/colors'
+import { IconButton } from '@/components/ui/IconButton'
 import { ArrowLeft01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
-import { Animated, Pressable } from 'react-native'
+import { Animated } from 'react-native'
 
 type BackButtonProps = {
 	onPress: () => void
 	opacity?: Animated.AnimatedInterpolation<number> | number
-	backgroundColor?: string
-	iconColor?: string
+	// soft: Niebla on light screens; outline: white, for photos and patterns.
+	variant?: 'soft' | 'outline'
 	position?: 'absolute' | 'relative'
 	top?: number
 	left?: number
+	accessibilityLabel?: string
 }
 
+// 40 × 40, radius 12.
 export default function BackButton({
 	onPress,
 	opacity = 1,
-	backgroundColor = colors.niebla,
-	iconColor = colors.tinta2,
+	variant = 'soft',
 	position = 'absolute',
 	top = 56,
 	left = 20,
+	accessibilityLabel = 'Regresar',
 }: BackButtonProps) {
 	return (
 		// Animated.View keeps inline styles: opacity is animated and
@@ -33,20 +34,12 @@ export default function BackButton({
 				alignSelf: 'flex-start',
 			}}
 		>
-			<Pressable
+			<IconButton
+				icon={ArrowLeft01Icon}
 				onPress={onPress}
-				hitSlop={8}
-				android_ripple={{ color: colors.cardBorder }}
-				className='h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-card-border'
-				style={{ backgroundColor }}
-			>
-				<HugeiconsIcon
-					icon={ArrowLeft01Icon}
-					size={27}
-					color={iconColor}
-					strokeWidth={2}
-				/>
-			</Pressable>
+				variant={variant}
+				accessibilityLabel={accessibilityLabel}
+			/>
 		</Animated.View>
 	)
 }

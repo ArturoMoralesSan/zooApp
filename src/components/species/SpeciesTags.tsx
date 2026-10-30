@@ -1,5 +1,7 @@
+import { Chip } from '@/components/ui/Chip'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import type { SpeciesDetail } from '@/types/species'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 
 type SpeciesTagsProps = {
 	species: SpeciesDetail
@@ -7,17 +9,12 @@ type SpeciesTagsProps = {
 
 export function SpeciesTags({ species }: SpeciesTagsProps) {
 	return (
-		<View className='mt-7'>
-			<Text className='text-h2 text-tinta'>Etiquetas</Text>
+		<View className='mt-6'>
+			<SectionTitle title='Etiquetas' />
 
-			<View className='mt-3.5 flex-row flex-wrap gap-2'>
+			<View className='flex-row flex-wrap gap-2'>
 				{species.tags.map((tag) => (
-					<View
-						key={tag.id}
-						className='rounded-full border border-card-border bg-esmeralda px-3.5 py-2'
-					>
-						<Text className='text-meta text-blanco'>{tag.name}</Text>
-					</View>
+					<Chip key={tag.id} label={tag.name} look='hoja' />
 				))}
 			</View>
 		</View>

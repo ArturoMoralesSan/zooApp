@@ -1,9 +1,9 @@
-import BackButton from '@/components/BackButton'
-import { cardShadow } from '@/components/species/speciesStyles'
-import colors from '@/theme/colors'
-import { UserGroupIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
-import { ImageBackground, Pressable, Text, View } from 'react-native'
+import BackButton from '@/components/ui/BackButton'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { IconBox } from '@/components/ui/IconBox'
+import { Alert02Icon } from '@hugeicons/core-free-icons'
+import { ImageBackground, Text, View } from 'react-native'
 
 type SpeciesErrorStateProps = {
 	error: string | null
@@ -27,18 +27,8 @@ export function SpeciesErrorState({
 				<BackButton onPress={onBack} />
 			</View>
 
-			<View
-				className='items-center rounded-[28px] border border-card-border bg-niebla px-6 py-10'
-				style={cardShadow}
-			>
-				<View className='h-16 w-16 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
-					<HugeiconsIcon
-						icon={UserGroupIcon}
-						size={34}
-						strokeWidth={1.8}
-						color={colors.tinta}
-					/>
-				</View>
+			<Card className='mt-6 items-center py-8'>
+				<IconBox icon={Alert02Icon} size='lg' tone='danger' />
 
 				<Text className='text-h2 mt-5 text-center text-tinta'>
 					No fue posible cargar la especie
@@ -48,13 +38,13 @@ export function SpeciesErrorState({
 					{error ?? 'La información no está disponible en este momento.'}
 				</Text>
 
-				<Pressable
+				<Button
+					title='Intentar nuevamente'
+					variant='secondary'
 					onPress={onRetry}
-					className='mt-3.5 self-start rounded-[20px] bg-esmeralda px-5 py-3 active:bg-bosque'
-				>
-					<Text className='text-button text-blanco'>Intentar nuevamente</Text>
-				</Pressable>
-			</View>
+					className='mt-4'
+				/>
+			</Card>
 		</ImageBackground>
 	)
 }

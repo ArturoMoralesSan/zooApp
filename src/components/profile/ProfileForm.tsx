@@ -1,4 +1,4 @@
-import Toast from '@/components/toast'
+import Toast, { type ToastType } from '@/components/ui/Toast'
 import type { FormErrors } from '@/types/profile'
 import { PersonalDataSection } from '@/components/profile/PersonalDataSection'
 import { ProfileProgress } from '@/components/profile/ProfileProgress'
@@ -24,11 +24,13 @@ import {
 	formatDateForDisplay,
 } from '@/utils/date'
 import { getAvatarUrl } from '@/utils/profile'
+import { useScrollBottomSpace } from '@/theme/layout'
 
 type ToastState = {
 	visible: boolean
+	title?: string
 	message: string
-	type: 'success' | 'error' | 'warning'
+	type: ToastType
 }
 
 type ProfileFormProps = {
@@ -39,6 +41,7 @@ type ProfileFormProps = {
 // Keyed by user id in ProfileScreen, so the form state starts from the
 // loaded profile without copying it in an effect.
 export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
+	const bottomSpace = useScrollBottomSpace(0)
 	const { refreshProfile } = useDataRefresh()
 
 	const [saving, setSaving] = useState(false)
@@ -63,7 +66,8 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 		loadError
 			? {
 					visible: true,
-					message: loadError.message || 'No fue posible cargar el perfil.',
+					title: 'No se pudo cargar el perfil',
+					message: loadError.message || 'Intenta de nuevo más tarde.',
 					type: 'error',
 				}
 			: {
@@ -76,9 +80,10 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 	const [scrollY] = useState(() => new Animated.Value(0))
 
 	const showToast = useCallback(
-		(message: string, type: ToastState['type'] = 'success') => {
+		(message: string, type: ToastType = 'success', title?: string) => {
 			setToast({
 				visible: true,
+				title,
 				message,
 				type,
 			})
@@ -147,6 +152,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			showToast(
 				response.message || 'Perfil actualizado correctamente.',
 				'success',
+				'Cambios guardados',
 			)
 		} catch (error) {
 			if (error instanceof ApiValidationError) {
@@ -202,6 +208,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			showToast(
 				avatarResponse.message || 'Foto de perfil actualizada correctamente.',
 				'success',
+				'Foto actualizada',
 			)
 		} catch (error) {
 			console.error('UPLOAD AVATAR ERROR:', error)
@@ -325,6 +332,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			>
 				<Toast
 					visible={toast.visible}
+					title={toast.title}
 					message={toast.message}
 					type={toast.type}
 					onHide={() =>
@@ -337,6 +345,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 
 				<Animated.ScrollView
 					className='flex-1'
+					contentContainerStyle={{ paddingBottom: bottomSpace }}
 					keyboardShouldPersistTaps='handled'
 					showsVerticalScrollIndicator={false}
 					scrollEventThrottle={16}

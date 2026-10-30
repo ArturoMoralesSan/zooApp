@@ -11,7 +11,6 @@ import {
 	ActivityIndicator,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
-	Pressable,
 	RefreshControl,
 	ScrollView,
 	Text,
@@ -19,26 +18,23 @@ import {
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import AppCard from '@/components/AppCard'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { ListCard } from '@/components/ui/ListCard'
+import { SectionTitle } from '@/components/ui/SectionTitle'
 import { EventCard } from '@/components/explore/EventCard'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
-import UserHeader from '@/components/UserHeader'
+import { TabHeader } from '@/components/ui/TabHeader'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
-import { cardShadow } from '@/theme/shadows'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
 const CAROUSEL_GAP = 10
-
-// Cambia este valor para personalizar el fondo de la tarjeta de donación.
-// Si no se define un color diferente, utiliza el verde predeterminado.
-const donationCardBackground = colors.bosque
-const donationAccentBackground = colors.lima
 
 export default function Explorar() {
 	const insets = useSafeAreaInsets()
@@ -95,24 +91,21 @@ export default function Explorar() {
 				}
 			>
 				{/* ENCABEZADO */}
-				<UserHeader title='Explorar' />
+				<TabHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-5'>
-					<Text className='text-h2 mb-2.5 text-tinta'>Eventos destacados</Text>
+				<View className='mt-6'>
+					<SectionTitle title='Eventos destacados' />
 
 					{loading ? (
-						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
+						<Card className='min-h-[190px] items-center justify-center'>
 							<ActivityIndicator size='large' color={PRIMARY} />
 							<Text className='text-body mt-2.5 text-tinta-2'>
 								Cargando eventos...
 							</Text>
-						</View>
+						</Card>
 					) : error ? (
-						<View
-							className='rounded-[22px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
+						<Card>
 							<Text className='text-h3 text-tinta'>
 								No pudimos cargar los eventos
 							</Text>
@@ -121,17 +114,17 @@ export default function Explorar() {
 								{error.message || 'No fue posible cargar los eventos.'}
 							</Text>
 
-							<Pressable
-								className='mt-3.5 self-start rounded-2xl bg-esmeralda px-4 py-2.5 active:opacity-80'
+							<Button
+								title='Reintentar'
+								variant='secondary'
 								onPress={() => {
 									void refresh()
 								}}
-							>
-								<Text className='text-button text-blanco'>Reintentar</Text>
-							</Pressable>
-						</View>
+								className='mt-4'
+							/>
+						</Card>
 					) : events.length === 0 ? (
-						<View className='rounded-[22px] border border-card-border bg-niebla p-5'>
+						<Card>
 							<Text className='text-h3 text-center text-tinta'>
 								No hay eventos destacados
 							</Text>
@@ -139,7 +132,7 @@ export default function Explorar() {
 							<Text className='text-body mt-2 text-center text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
-						</View>
+						</Card>
 					) : (
 						<>
 							<ScrollView
@@ -173,69 +166,55 @@ export default function Explorar() {
 				</View>
 
 				{/* ACCIONES */}
-				<View className='mt-5'>
-					<Text className='text-h2 mb-2.5 text-tinta'>¿Qué quieres hacer?</Text>
+				<View className='mt-6'>
+					<SectionTitle title='¿Qué quieres hacer?' />
 
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
 					<View className='mb-3 flex-row items-stretch gap-3'>
 						<View className='min-w-0 flex-1'>
-							<AppCard
+							<ListCard
+								className='grow'
 								icon={Ticket01Icon}
 								title='Comprar boletos'
-								iconPosition='top'
+								layout='tile'
 								description='Planea tu visita al zoológico.'
 								onPress={() => router.push('/tickets')}
-								backgroundColor={colors.niebla}
-								borderColor={colors.cardBorder}
-								minHeight={130}
-								iconColor={PRIMARY}
-								showArrow={false}
+								showChevron={false}
 							/>
 						</View>
 
 						<View className='min-w-0 flex-1'>
-							<AppCard
+							<ListCard
+								className='grow'
 								icon={UserGroupIcon}
-								iconPosition='top'
+								layout='tile'
 								title='Conoce las especies'
 								description='Descubre nuestros animales.'
 								onPress={() => router.push('/species')}
-								backgroundColor={colors.niebla}
-								borderColor={colors.cardBorder}
-								minHeight={130}
-								iconColor={PRIMARY}
-								showArrow={false}
+								showChevron={false}
 							/>
 						</View>
 					</View>
 
 					{/* MAPA: ANCHO COMPLETO CON FLECHA */}
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Location01Icon}
 						title='Mapa del zoológico'
 						description='Explora caminos, especies y puntos de interés.'
 						onPress={() => router.push('/map')}
-						backgroundColor={colors.niebla}
-						borderColor={colors.cardBorder}
-						iconColor={PRIMARY}
-						showArrow={true}
+						showChevron={true}
 					/>
 
 					{/* DONACIÓN: FONDO CONFIGURABLE */}
-					<AppCard
+					<ListCard
+						className='mb-3'
+						tone='dark'
 						title='Apoya al zoológico'
 						description='Tu donación ayuda a cuidar y proteger a nuestros animales.'
 						icon={HeartIcon}
 						onPress={() => router.push('/donations')}
-						backgroundColor={donationCardBackground}
-						borderColor={colors.cardBorder}
-						iconColor={colors.bosque}
-						iconBackgroundColor={donationAccentBackground}
-						arrowBackgroundColor={donationAccentBackground}
-						arrowColor={colors.bosque}
-						textColor={colors.blanco}
-						descriptionColor={colors.hoja}
-						showArrow
+						showChevron
 					/>
 				</View>
 			</ScrollView>

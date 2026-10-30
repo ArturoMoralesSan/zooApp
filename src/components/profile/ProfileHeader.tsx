@@ -1,7 +1,8 @@
-import BackButton from '@/components/BackButton'
+import BackButton from '@/components/ui/BackButton'
+import { Icon } from '@/components/ui/Icon'
+import { Add01Icon } from '@hugeicons/core-free-icons'
 import { type User } from '@/services/auth'
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import { router } from 'expo-router'
 import {
 	ActivityIndicator,
@@ -48,14 +49,22 @@ export function ProfileHeader({
 				style={{ width: SCREEN_WIDTH, height: coverHeight }}
 			/>
 
-			<BackButton onPress={() => router.back()} opacity={backButtonOpacity} />
+			<BackButton
+				variant='outline'
+				onPress={() => router.back()}
+				opacity={backButtonOpacity}
+			/>
 
 			<View className='absolute left-0 right-0 top-0 items-center pt-20'>
-				<Pressable onPress={onPickAvatar} disabled={uploadingAvatar}>
+				<Pressable
+					onPress={onPickAvatar}
+					disabled={uploadingAvatar}
+					accessibilityRole='button'
+					accessibilityLabel='Cambiar foto de perfil'
+				>
 					<Animated.View
-						className='h-28 w-28 items-center justify-center overflow-hidden rounded-[56px] border-[5px] border-blanco bg-niebla'
+						className='h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[5px] border-blanco bg-niebla'
 						style={[
-							cardShadow,
 							{
 								transform: [
 									{ scale: avatarScale },
@@ -83,11 +92,8 @@ export function ProfileHeader({
 						)}
 					</Animated.View>
 
-					<View
-						className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'
-						style={cardShadow}
-					>
-						<Text className='font-sans-bold text-[20px] text-tinta'>+</Text>
+					<View className='absolute -bottom-px -right-px h-9 w-9 items-center justify-center rounded-full border-[3px] border-blanco bg-lima'>
+						<Icon icon={Add01Icon} size={20} color={colors.bosque} strong />
 					</View>
 				</Pressable>
 

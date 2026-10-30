@@ -1,7 +1,7 @@
 import { Marker } from '@maplibre/maplibre-react-native'
 import { View } from 'react-native'
 import type { Coordinate } from '@/types/map'
-import { mapShadow } from '@/components/map/mapShadow'
+import { markerShadow } from '@/components/map/markerShadow'
 
 type UserLocationMarkerProps = {
 	userLocation: Coordinate
@@ -15,7 +15,7 @@ export function UserLocationMarker({ userLocation }: UserLocationMarkerProps) {
 				<View
 					// eslint-disable-next-line no-restricted-syntax -- user-location blue, standard map convention
 					className='h-[17px] w-[17px] rounded-[9px] border-[3px] border-blanco bg-[#0977B8]'
-					style={mapShadow}
+					style={markerShadow}
 				/>
 			</View>
 		</Marker>

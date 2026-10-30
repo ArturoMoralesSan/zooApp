@@ -1,5 +1,8 @@
 import { type User } from '@/services/auth'
-import { cardShadow } from '@/theme/shadows'
+import { Badge } from '@/components/ui/Badge'
+import { Card } from '@/components/ui/Card'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import { StatCard } from '@/components/ui/StatCard'
 import { Animated, ImageBackground, Text, View } from 'react-native'
 
 type ProfileProgressProps = {
@@ -23,7 +26,7 @@ export function ProfileProgress({
 }: ProfileProgressProps) {
 	return (
 		<Animated.View
-			className='relative z-10 overflow-hidden rounded-t-[30px] bg-blanco'
+			className='relative z-10 overflow-hidden rounded-t-3xl bg-blanco'
 			style={{ marginTop: progressMarginTop }}
 		>
 			<ImageBackground
@@ -33,49 +36,31 @@ export function ProfileProgress({
 				className='bg-blanco'
 			>
 				<View className='px-5 pb-7 pt-6'>
-					<Text className='text-h2 text-tinta'>Tu progreso</Text>
+					<SectionTitle
+						title='Tu progreso'
+						subtitle='Sigue acumulando puntos en ZooApp.'
+						className=''
+					/>
 
-					<Text className='text-body mt-1 text-tinta'>
-						Sigue acumulando puntos en ZooApp.
-					</Text>
+					<View className='mt-5 flex-row gap-3'>
+						<StatCard
+							layout='overline'
+							tone='brand'
+							value={points}
+							label='Puntos'
+						/>
 
-					<View className='mt-5 flex-row'>
-						<View className='flex-1 rounded-[18px] border border-bosque bg-esmeralda p-4'>
-							<Text className='text-overline text-hoja'>Puntos</Text>
-							<Text className='mt-1 font-display-x text-[29px] text-blanco'>
-								{points}
-							</Text>
-						</View>
-
-						<View
-							className='ml-3 flex-1 rounded-[18px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
-							<Text className='text-overline text-tinta'>Nivel</Text>
-							<Text
-								className='mt-1 font-display-x text-[18px] text-tinta'
-								numberOfLines={1}
-							>
-								{currentLevel}
-							</Text>
-						</View>
+						<StatCard layout='overline' value={currentLevel} label='Nivel' />
 					</View>
 
 					{user?.gamification?.next_level && (
-						<View
-							className='mt-5 rounded-[18px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
+						<Card className='mt-3'>
 							<View className='flex-row items-center justify-between'>
 								<Text className='flex-1 font-sans-semibold text-[14px] text-tinta'>
 									Progreso al siguiente nivel
 								</Text>
 
-								<View className='self-start rounded-full bg-lima px-2.5 py-1'>
-									<Text className='font-display-x text-[12px] text-tinta'>
-										{progress}%
-									</Text>
-								</View>
+								<Badge label={`${progress}%`} tone='success' />
 							</View>
 
 							<View className='mt-3 h-2.5 overflow-hidden rounded-full bg-card-border'>
@@ -96,7 +81,7 @@ export function ProfileProgress({
 								</Text>
 								.
 							</Text>
-						</View>
+						</Card>
 					)}
 				</View>
 			</ImageBackground>

@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import { Text, View } from 'react-native'
 import colors from '@/theme/colors'
 import type { SelectableItem } from '@/types/map'
-import { mapShadow } from '@/components/map/mapShadow'
+import { markerShadow } from '@/components/map/markerShadow'
 
 type SpeciesMarkerProps = {
 	item: SelectableItem
@@ -15,7 +15,7 @@ export function SpeciesMarker({ item, onPress }: SpeciesMarkerProps) {
 		<Marker lngLat={item.coordinate} onPress={onPress}>
 			<View
 				className='h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-[21px] border-[3px] border-blanco'
-				style={[mapShadow, { backgroundColor: item.color ?? colors.bosque }]}
+				style={[markerShadow, { backgroundColor: item.color ?? colors.bosque }]}
 			>
 				{item.thumbnail ? (
 					<Image
