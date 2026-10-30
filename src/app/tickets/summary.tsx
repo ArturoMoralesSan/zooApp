@@ -1,5 +1,3 @@
-import { CreditCardIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
@@ -19,8 +17,10 @@ import { formatCurrency } from '@/utils/format'
 import { createOrder } from '@/services/tickets'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
+import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
+import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
-import { cardShadow, ICON_COLOR } from '@/components/tickets/summaryStyles'
+import { ICON_COLOR } from '@/components/tickets/summaryStyles'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -175,44 +175,10 @@ export default function TicketSummaryScreen() {
 				<TicketLinesCard summary={summary} total={total} />
 
 				{/* MÉTODO DE PAGO */}
-				<View
-					className='mb-3.5 w-full flex-row items-center rounded-[20px] border border-card-border bg-niebla p-4'
-					style={cardShadow}
-				>
-					<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
-						<HugeiconsIcon
-							icon={CreditCardIcon}
-							size={25}
-							strokeWidth={1.8}
-							color={ICON_COLOR}
-						/>
-					</View>
-
-					<View className='flex-1'>
-						<Text className='text-[15px] font-extrabold text-tinta'>
-							Método de pago
-						</Text>
-						<Text className='mt-1 text-[13px] leading-[18px] text-tinta-2'>
-							Tarjeta de crédito o débito
-						</Text>
-					</View>
-				</View>
+				<PaymentMethodCard />
 
 				{/* AVISO DE COMPRA SEGURA */}
-				<View className='mb-3.5 w-full flex-row items-center rounded-2xl border border-card-border bg-niebla p-3.5'>
-					<View className='mr-3 h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-esmeralda'>
-						<Text className='text-[18px] font-extrabold text-blanco'>✓</Text>
-					</View>
-
-					<View className='flex-1'>
-						<Text className='text-[14px] font-bold text-tinta'>
-							Compra segura
-						</Text>
-						<Text className='mt-1 text-[12px] leading-[18px] text-tinta-2'>
-							Al confirmar recibirás tus boletos digitales con su código QR.
-						</Text>
-					</View>
-				</View>
+				<SecurePurchaseNotice />
 
 				<View className='h-6' />
 			</ScrollView>
