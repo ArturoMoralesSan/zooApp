@@ -3,7 +3,9 @@ import type { FormErrors } from '@/types/profile'
 import { PersonalDataSection } from '@/components/profile/PersonalDataSection'
 import { ProfileProgress } from '@/components/profile/ProfileProgress'
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
-import { ApiValidationError } from '@/services/api'
+import { ApiValidationError, isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
+import { checkOffline } from '@/hooks/useNetworkStatus'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { redirectIfSignedOut } from '@/hooks/useSessionRedirect'
 import { type User } from '@/services/auth'
@@ -29,20 +31,22 @@ type ToastState = {
 }
 
 type ProfileFormProps = {
-	initialUser: User | null
-	loadError: Error | undefined
+	initialUser: User
 }
+
+const OFFLINE_SAVE =
+	'No guardamos los cambios. Conéctate a internet e inténtalo de nuevo.'
 
 // Keyed by user id in ProfileScreen, so the form state starts from the
 // loaded profile without copying it in an effect.
-export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
+export function ProfileForm({ initialUser }: ProfileFormProps) {
 	const bottomSpace = useScrollBottomSpace(0)
 	const { refreshProfile } = useDataRefresh()
 
 	const [saving, setSaving] = useState(false)
 	const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
-	const [user, setUser] = useState<User | null>(initialUser)
+	const [user, setUser] = useState<User>(initialUser)
 
 	const [name, setName] = useState(initialUser?.name || '')
 	const [email, setEmail] = useState(initialUser?.email || '')
@@ -56,21 +60,11 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const [errors, setErrors] = useState<FormErrors>({})
 
-	// A failed load still opens the form, with the error in the toast.
-	const [toast, setToast] = useState<ToastState>(() =>
-		loadError
-			? {
-					visible: true,
-					title: 'No se pudo cargar el perfil',
-					message: loadError.message || 'Intenta de nuevo más tarde.',
-					type: 'error',
-				}
-			: {
-					visible: false,
-					message: '',
-					type: 'success',
-				},
-	)
+	const [toast, setToast] = useState<ToastState>({
+		visible: false,
+		message: '',
+		type: 'success',
+	})
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
@@ -119,6 +113,11 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			return
 		}
 
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_SAVE)
+			return
+		}
+
 		try {
 			setSaving(true)
 			setErrors({})
@@ -145,7 +144,7 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 			void refreshProfile(response.user)
 
 			showToast(
-				response.message || 'Perfil actualizado correctamente.',
+				'Tu perfil se actualizó correctamente.',
 				'success',
 				'Cambios guardados',
 			)
@@ -173,11 +172,17 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 				return
 			}
 
+			if (isNetworkError(error)) {
+				notifyOffline(OFFLINE_SAVE)
+				return
+			}
+
 			showToast(
 				error instanceof Error
 					? error.message
-					: 'No fue posible actualizar el perfil.',
+					: 'Inténtalo de nuevo en unos minutos.',
 				'error',
+				'No se pudieron guardar los cambios',
 			)
 		} finally {
 			setSaving(false)
@@ -185,6 +190,11 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 	}
 
 	const uploadAvatar = async (asset: ImagePicker.ImagePickerAsset) => {
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_SAVE)
+			return
+		}
+
 		try {
 			setUploadingAvatar(true)
 
@@ -206,13 +216,17 @@ export function ProfileForm({ initialUser, loadError }: ProfileFormProps) {
 				'Foto actualizada',
 			)
 		} catch (error) {
-			console.error('UPLOAD AVATAR ERROR:', error)
+			if (isNetworkError(error)) {
+				notifyOffline(OFFLINE_SAVE)
+				return
+			}
 
 			showToast(
 				error instanceof Error
 					? error.message
-					: 'No fue posible actualizar la foto.',
+					: 'Inténtalo de nuevo en unos minutos.',
 				'error',
+				'No se pudo actualizar la foto',
 			)
 		} finally {
 			setUploadingAvatar(false)

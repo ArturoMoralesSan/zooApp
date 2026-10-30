@@ -15,7 +15,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ListCard } from '@/components/ui/ListCard'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
+import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useProfile } from '@/hooks/useProfile'
+import { isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useAuth } from '@/contexts/AuthContext'
 import { getTabBarExtraSpace } from '@/theme/layout'
@@ -53,9 +56,16 @@ export default function Panel() {
 	// On a failed load the panel falls back to its generic texts, as before.
 	const user = profileError ? null : (profile ?? null)
 
+	const { isOffline } = useNetworkStatus()
+
 	useSessionRedirect()
 
 	const handleShowQr = () => {
+		if (!user?.qr_token && (isOffline || isNetworkError(profileError))) {
+			notifyOffline('Conéctate a internet para ver tu código QR.')
+			return
+		}
+
 		if (!user?.qr_token) {
 			Alert.alert('Código QR', 'No fue posible obtener tu código QR.')
 			return
