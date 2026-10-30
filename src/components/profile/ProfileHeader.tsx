@@ -71,7 +71,7 @@ export function ProfileHeader({
 								resizeMode='cover'
 							/>
 						) : (
-							<Text className='text-[48px] font-bold text-esmeralda'>
+							<Text className='font-display-x text-[48px] text-esmeralda'>
 								{user?.name?.charAt(0).toUpperCase() || '?'}
 							</Text>
 						)}
@@ -87,12 +87,12 @@ export function ProfileHeader({
 						className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'
 						style={cardShadow}
 					>
-						<Text className='text-[20px] font-bold text-tinta'>+</Text>
+						<Text className='font-sans-bold text-[20px] text-tinta'>+</Text>
 					</View>
 				</Pressable>
 
 				<Animated.Text
-					className='mt-5 text-[23px] font-bold text-blanco'
+					className='text-h1 mt-5 text-blanco'
 					style={{
 						// eslint-disable-next-line no-restricted-syntax -- neutral text shadow over the cover photo
 						textShadowColor: 'rgba(0,0,0,0.2)',
@@ -105,7 +105,7 @@ export function ProfileHeader({
 				</Animated.Text>
 
 				<Animated.Text
-					className='mt-1 px-8 text-center text-[14px] text-blanco'
+					className='text-subtitle mt-1 px-8 text-center text-blanco'
 					style={{ opacity: emailOpacity }}
 					numberOfLines={1}
 				>

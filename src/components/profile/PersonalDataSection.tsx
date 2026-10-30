@@ -69,11 +69,9 @@ export function PersonalDataSection({
 					className='rounded-[22px] border border-card-border bg-niebla px-[18px] pb-6 pt-5'
 					style={cardShadow}
 				>
-					<Text className='text-[21px] font-bold text-tinta'>
-						Datos personales
-					</Text>
+					<Text className='text-h2 text-tinta'>Datos personales</Text>
 
-					<Text className='mt-1 text-[14px] text-tinta'>
+					<Text className='text-body mt-1 text-tinta'>
 						Mantén actualizada tu información.
 					</Text>
 
@@ -119,7 +117,7 @@ export function PersonalDataSection({
 					/>
 
 					<View className='mt-5'>
-						<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-tinta'>
+						<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
 							Fecha de nacimiento
 						</Text>
 
@@ -134,7 +132,7 @@ export function PersonalDataSection({
 								color={colors.esmeralda}
 							/>
 
-							<Text className='ml-3 flex-1 text-[16px] text-tinta'>
+							<Text className='text-body ml-3 flex-1 text-tinta'>
 								{birthDate || 'Seleccionar fecha'}
 							</Text>
 						</Pressable>
@@ -150,7 +148,7 @@ export function PersonalDataSection({
 						)}
 
 						{errors.birth_date && (
-							<Text className='mt-1 text-[12px] text-esmeralda'>
+							<Text className='text-meta mt-1 text-esmeralda'>
 								{errors.birth_date}
 							</Text>
 						)}

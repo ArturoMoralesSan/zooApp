@@ -50,22 +50,20 @@ export function ProfileField({
 				autoCapitalize={autoCapitalize}
 				autoCorrect={autoCorrect}
 				editable={editable}
-				className='flex-1 px-3 py-3.5 text-[16px] text-tinta'
+				className='flex-1 px-3 py-3.5 font-sans text-[14px] text-tinta'
 			/>
 		</View>
 	)
 
 	return (
 		<View className='mt-5'>
-			<Text className='mb-2 text-[12px] font-extrabold uppercase tracking-[0.8px] text-tinta'>
+			<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
 				{label}
 			</Text>
 
 			{onPress ? <Pressable onPress={onPress}>{content}</Pressable> : content}
 
-			{error && (
-				<Text className='mt-1 text-[12px] text-esmeralda'>{error}</Text>
-			)}
+			{error && <Text className='text-meta mt-1 text-esmeralda'>{error}</Text>}
 		</View>
 	)
 }

@@ -18,9 +18,7 @@ export default function ProfileScreen() {
 				className='flex-1 items-center justify-center bg-blanco'
 			>
 				<ActivityIndicator size='large' color={colors.esmeralda} />
-				<Text className='mt-4 text-[14px] font-medium text-tinta'>
-					Cargando perfil...
-				</Text>
+				<Text className='text-body mt-4 text-tinta'>Cargando perfil...</Text>
 			</ImageBackground>
 		)
 	}

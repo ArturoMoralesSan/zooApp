@@ -120,9 +120,7 @@ export default function Panel() {
 				{/* MI CUENTA */}
 
 				<View className='mt-6'>
-					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-						Mi cuenta
-					</Text>
+					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi cuenta</Text>
 
 					<AppCard
 						icon={QrCodeIcon}
@@ -135,9 +133,7 @@ export default function Panel() {
 				{/* MI ACTIVIDAD */}
 
 				<View className='mt-4'>
-					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-						Mi actividad
-					</Text>
+					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi actividad</Text>
 
 					<AppCard
 						icon={Ticket01Icon}
@@ -157,9 +153,7 @@ export default function Panel() {
 				{/* AYUDA */}
 
 				<View className='mt-4'>
-					<Text className='mb-3.5 px-1 text-lg font-bold leading-6 text-tinta'>
-						Ayuda
-					</Text>
+					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Ayuda</Text>
 
 					<AppCard
 						icon={Settings01Icon}
@@ -193,13 +187,9 @@ export default function Panel() {
 				{/* PIE DE PÁGINA */}
 
 				<View className='mt-7 items-center'>
-					<Text className='text-[11px] font-extrabold leading-4 text-tinta'>
-						ZooApp
-					</Text>
+					<Text className='font-sans-x text-[12px] text-tinta'>ZooApp</Text>
 
-					<Text className='mt-1 text-[11px] leading-4 text-tinta'>
-						Sahuatoba
-					</Text>
+					<Text className='text-meta mt-1 text-tinta'>Sahuatoba</Text>
 				</View>
 			</ScrollView>
 

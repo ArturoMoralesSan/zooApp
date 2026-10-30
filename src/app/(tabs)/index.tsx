@@ -99,14 +99,12 @@ export default function Explorar() {
 
 				{/* EVENTOS DESTACADOS */}
 				<View className='mt-5'>
-					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
-						Eventos destacados
-					</Text>
+					<Text className='text-h2 mb-2.5 text-tinta'>Eventos destacados</Text>
 
 					{loading ? (
 						<View className='min-h-[190px] items-center justify-center rounded-3xl border border-card-border bg-niebla'>
 							<ActivityIndicator size='large' color={PRIMARY} />
-							<Text className='mt-2.5 text-[13px] text-tinta-2'>
+							<Text className='text-body mt-2.5 text-tinta-2'>
 								Cargando eventos...
 							</Text>
 						</View>
@@ -115,11 +113,11 @@ export default function Explorar() {
 							className='rounded-[22px] border border-card-border bg-niebla p-4'
 							style={cardShadow}
 						>
-							<Text className='text-[16px] font-extrabold leading-[21px] text-tinta'>
+							<Text className='text-h3 text-tinta'>
 								No pudimos cargar los eventos
 							</Text>
 
-							<Text className='mt-2 text-[13px] leading-[18px] text-tinta-2'>
+							<Text className='text-body mt-2 text-tinta-2'>
 								{error.message || 'No fue posible cargar los eventos.'}
 							</Text>
 
@@ -129,16 +127,16 @@ export default function Explorar() {
 									void refresh()
 								}}
 							>
-								<Text className='font-extrabold text-blanco'>Reintentar</Text>
+								<Text className='text-button text-blanco'>Reintentar</Text>
 							</Pressable>
 						</View>
 					) : events.length === 0 ? (
 						<View className='rounded-[22px] border border-card-border bg-niebla p-5'>
-							<Text className='text-center text-[16px] font-extrabold leading-[21px] text-tinta'>
+							<Text className='text-h3 text-center text-tinta'>
 								No hay eventos destacados
 							</Text>
 
-							<Text className='mt-2 text-center text-[13px] leading-[18px] text-tinta-2'>
+							<Text className='text-body mt-2 text-center text-tinta-2'>
 								Pronto tendremos nuevas actividades para ti.
 							</Text>
 						</View>
@@ -176,9 +174,7 @@ export default function Explorar() {
 
 				{/* ACCIONES */}
 				<View className='mt-5'>
-					<Text className='mb-2.5 text-[21px] font-extrabold leading-[27px] text-tinta'>
-						¿Qué quieres hacer?
-					</Text>
+					<Text className='text-h2 mb-2.5 text-tinta'>¿Qué quieres hacer?</Text>
 
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
 					<View className='mb-3 flex-row items-stretch gap-3'>

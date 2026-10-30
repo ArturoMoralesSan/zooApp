@@ -33,18 +33,16 @@ export function ProfileProgress({
 				className='bg-blanco'
 			>
 				<View className='px-5 pb-7 pt-6'>
-					<Text className='text-[21px] font-bold text-tinta'>Tu progreso</Text>
+					<Text className='text-h2 text-tinta'>Tu progreso</Text>
 
-					<Text className='mt-1 text-[14px] text-tinta'>
+					<Text className='text-body mt-1 text-tinta'>
 						Sigue acumulando puntos en ZooApp.
 					</Text>
 
 					<View className='mt-5 flex-row'>
 						<View className='flex-1 rounded-[18px] border border-bosque bg-esmeralda p-4'>
-							<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-hoja'>
-								Puntos
-							</Text>
-							<Text className='mt-1 text-[29px] font-extrabold text-blanco'>
+							<Text className='text-overline text-hoja'>Puntos</Text>
+							<Text className='mt-1 font-display-x text-[29px] text-blanco'>
 								{points}
 							</Text>
 						</View>
@@ -53,11 +51,9 @@ export function ProfileProgress({
 							className='ml-3 flex-1 rounded-[18px] border border-card-border bg-niebla p-4'
 							style={cardShadow}
 						>
-							<Text className='text-[11px] font-bold uppercase tracking-[1.2px] text-tinta'>
-								Nivel
-							</Text>
+							<Text className='text-overline text-tinta'>Nivel</Text>
 							<Text
-								className='mt-1 text-[18px] font-bold text-tinta'
+								className='mt-1 font-display-x text-[18px] text-tinta'
 								numberOfLines={1}
 							>
 								{currentLevel}
@@ -71,12 +67,12 @@ export function ProfileProgress({
 							style={cardShadow}
 						>
 							<View className='flex-row items-center justify-between'>
-								<Text className='flex-1 text-[14px] font-semibold text-tinta'>
+								<Text className='flex-1 font-sans-semibold text-[14px] text-tinta'>
 									Progreso al siguiente nivel
 								</Text>
 
 								<View className='self-start rounded-full bg-lima px-2.5 py-1'>
-									<Text className='text-[12px] font-extrabold text-tinta'>
+									<Text className='font-display-x text-[12px] text-tinta'>
 										{progress}%
 									</Text>
 								</View>
@@ -89,13 +85,16 @@ export function ProfileProgress({
 								/>
 							</View>
 
-							<Text className='mt-3 text-[14px] leading-5 text-tinta'>
+							<Text className='text-body mt-3 text-tinta'>
 								Te faltan{' '}
-								<Text className='font-bold text-tinta'>
+								<Text className='font-sans-bold text-tinta'>
 									{pointsToNextLevel}
 								</Text>{' '}
 								puntos para{' '}
-								<Text className='font-semibold text-tinta'>{nextLevel}</Text>.
+								<Text className='font-sans-semibold text-tinta'>
+									{nextLevel}
+								</Text>
+								.
 							</Text>
 						</View>
 					)}

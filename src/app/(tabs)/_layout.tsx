@@ -84,7 +84,7 @@ export default function TabLayout() {
 										/>
 
 										<Text
-											className={`mt-1 text-[11px] ${isFocused ? 'font-bold text-blanco' : 'font-medium text-apagado'}`}
+											className={`mt-1 text-[12px] ${isFocused ? 'font-sans-bold text-blanco' : 'font-sans-semibold text-apagado'}`}
 										>
 											{options.title}
 										</Text>
