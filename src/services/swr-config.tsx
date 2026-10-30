@@ -6,13 +6,14 @@
 // - failed requests aren't retried while offline (they would fail again and
 //   waste battery); reconnect revalidation picks them up instead. A failed
 //   revalidation keeps the cached data, so screens show it with the offline
-//   banner rather than an error;
+//   banner (OfflineBanner) rather than an error;
 // - a provider is required for SWR to use the custom focus/reconnect hooks.
 //   It gives the app its own cache, so the global `mutate` exported by swr
 //   doesn't reach it; writes go through useSWRConfig() in src/hooks instead.
 import type { ReactNode } from 'react'
 import { isOfflineState } from '@/hooks/useNetworkStatus'
 import { isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import NetInfo from '@react-native-community/netinfo'
 import { AppState, type AppStateStatus } from 'react-native'
 import { SWRConfig, type SWRConfiguration } from 'swr'
@@ -85,6 +86,11 @@ export function DataProvider({ children }: DataProviderProps) {
 				revalidateOnReconnect: true,
 				initReconnect,
 				onErrorRetry,
+				onError: (error) => {
+					if (isNetworkError(error)) {
+						notifyOffline()
+					}
+				},
 			}}
 		>
 			{children}
