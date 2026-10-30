@@ -9,6 +9,7 @@ import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -41,21 +42,24 @@ export default function RootLayout() {
 
 	return (
 		<SafeAreaProvider>
-			<DataProvider>
-				<AuthProvider>
-					<Stack
-						initialRouteName='index'
-						screenOptions={{
-							headerShown: false,
-						}}
-					>
-						<Stack.Screen name='index' />
-						<Stack.Screen name='splash' />
-						<Stack.Screen name='login' />
-						<Stack.Screen name='(tabs)' />
-					</Stack>
-				</AuthProvider>
-			</DataProvider>
+			{/* Tracks the keyboard for KeyboardScrollView on every screen. */}
+			<KeyboardProvider>
+				<DataProvider>
+					<AuthProvider>
+						<Stack
+							initialRouteName='index'
+							screenOptions={{
+								headerShown: false,
+							}}
+						>
+							<Stack.Screen name='index' />
+							<Stack.Screen name='splash' />
+							<Stack.Screen name='login' />
+							<Stack.Screen name='(tabs)' />
+						</Stack>
+					</AuthProvider>
+				</DataProvider>
+			</KeyboardProvider>
 		</SafeAreaProvider>
 	)
 }
