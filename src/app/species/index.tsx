@@ -1,4 +1,4 @@
-import { Search01Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
+import { UserGroupIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
@@ -7,7 +7,6 @@ import {
 	Pressable,
 	ScrollView,
 	Text,
-	TextInput,
 	View,
 	type ViewStyle,
 } from 'react-native'
@@ -18,6 +17,7 @@ import UserHeader from '@/components/UserHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
+import { SearchField } from '@/components/ui/SearchField'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 
 const PROP_COLORS = {
@@ -106,33 +106,13 @@ export default function SpeciesScreen() {
 				/>
 
 				{/* Buscador */}
-				<View className='mb-1 mt-4'>
-					<Text className='mb-2 font-sans-semibold text-[14px] text-tinta'>
-						Buscar especie
-					</Text>
-
-					<View className='h-[54px] flex-row items-center rounded-[18px] border border-card-border bg-blanco'>
-						<View className='items-center justify-center pl-4'>
-							<HugeiconsIcon
-								icon={Search01Icon}
-								size={21}
-								strokeWidth={1.8}
-								color={PROP_COLORS.primary}
-							/>
-						</View>
-
-						<TextInput
-							value={search}
-							onChangeText={setSearch}
-							placeholder='Buscar especie...'
-							placeholderTextColor={PROP_COLORS.text}
-							autoCapitalize='none'
-							autoCorrect={false}
-							className='flex-1 px-3 py-0 font-sans text-[14px] text-tinta'
-							selectionColor={PROP_COLORS.primary}
-						/>
-					</View>
-				</View>
+				<SearchField
+					label='Buscar especie'
+					className='mb-1 mt-4'
+					value={search}
+					onChangeText={setSearch}
+					placeholder='Buscar especie...'
+				/>
 
 				{/* Filtros */}
 				<ScrollView
