@@ -42,6 +42,7 @@ export function EmptyState({
 				<Button
 					title={action.title}
 					icon={action.icon}
+					iconPosition='leading'
 					onPress={action.onPress}
 					className='mt-2'
 				/>

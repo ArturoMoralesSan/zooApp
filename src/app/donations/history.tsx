@@ -4,8 +4,8 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import { HeartAddIcon, HeartIcon } from '@hugeicons/core-free-icons'
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo } from 'react'
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
+import { useMemo } from 'react'
+import { ScrollView, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
@@ -13,11 +13,8 @@ import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { DonationCard } from '@/components/donations/DonationCard'
 import { DonationStatsRow } from '@/components/donations/DonationStatsRow'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { IconBox } from '@/components/ui/IconBox'
+import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
-import colors from '@/theme/colors'
 import { isCompleted } from '@/utils/donations'
 
 const NO_DONATIONS: Donation[] = []
@@ -26,22 +23,10 @@ export default function DonationHistoryScreen() {
 	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
-	const { data, error, isLoading: loading } = useDonations()
-	// A failed load shows the empty list, as before.
-	const donations = error ? NO_DONATIONS : (data ?? NO_DONATIONS)
+	const donationsQuery = useDonations()
+	const donations = donationsQuery.data ?? NO_DONATIONS
 
 	useSessionRedirect()
-
-	useEffect(() => {
-		if (!error) return
-
-		console.error('Error cargando donaciones:', error)
-
-		Alert.alert(
-			'Mis donaciones',
-			error.message || 'No fue posible cargar tus donaciones.',
-		)
-	}, [error])
 
 	const sortedDonations = useMemo(() => {
 		return [...donations].sort((a, b) => {
@@ -89,52 +74,42 @@ export default function DonationHistoryScreen() {
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
 				contentContainerClassName='px-5 pt-0'
 			>
-				{/* Estadísticas */}
-				<DonationStatsRow
-					donations={donations}
-					completedDonations={completedDonations}
-					totalDonated={totalDonated}
-				/>
-
-				{/* Cargando */}
-				{loading ? (
-					<View className='items-center justify-center py-[60px]'>
-						<ActivityIndicator size='large' color={colors.esmeralda} />
-						<Text className='text-body mt-3 text-tinta'>
-							Cargando tus donaciones...
-						</Text>
-					</View>
-				) : sortedDonations.length === 0 ? (
-					/* Estado vacío */
-					<Card className='items-center py-8'>
-						<IconBox icon={HeartIcon} size='lg' className='mb-4' />
-
-						<Text className='text-h3 text-center text-tinta'>
-							No tienes donaciones
-						</Text>
-
-						<Text className='text-body mt-2 text-center text-tinta-2'>
-							Cuando realices una donación aparecerá aquí.
-						</Text>
-
-						<Button
-							title='Hacer una donación'
-							icon={HeartAddIcon}
-							iconPosition='leading'
-							onPress={() => router.push('/donations')}
-							className='mt-6'
-						/>
-					</Card>
-				) : (
-					/* Historial */
-					<View className='w-full'>
-						<SectionTitle title='Historial' />
-
-						{sortedDonations.map((donation) => (
-							<DonationCard key={donation.id} donation={donation} />
-						))}
-					</View>
+				{/* Estadísticas: zeros only for a real empty history (A-42) */}
+				{donationsQuery.data && (
+					<DonationStatsRow
+						donations={donations}
+						completedDonations={completedDonations}
+						totalDonated={totalDonated}
+					/>
 				)}
+
+				<QueryView
+					query={donationsQuery}
+					loadingMessage='Cargando tus donaciones…'
+					errorTitle='No pudimos cargar tus donaciones'
+					isEmpty={(list) => list.length === 0}
+					empty={{
+						icon: HeartIcon,
+						title: 'No tienes donaciones',
+						message: 'Cuando realices una donación aparecerá aquí.',
+						action: {
+							title: 'Hacer una donación',
+							icon: HeartAddIcon,
+							onPress: () => router.push('/donations'),
+						},
+					}}
+				>
+					{/* Historial */}
+					{() => (
+						<View className='w-full'>
+							<SectionTitle title='Historial' />
+
+							{sortedDonations.map((donation) => (
+								<DonationCard key={donation.id} donation={donation} />
+							))}
+						</View>
+					)}
+				</QueryView>
 
 				<View className='h-[30px]' />
 			</ScrollView>
