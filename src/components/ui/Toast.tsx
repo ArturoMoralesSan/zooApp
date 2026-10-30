@@ -1,8 +1,9 @@
+import { Notice, type NoticeTone } from '@/components/ui/Notice'
 import { useEffect } from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export type ToastType = 'success' | 'error' | 'warning'
+export type ToastType = NoticeTone
 
 type ToastProps = {
 	visible: boolean
@@ -14,29 +15,13 @@ type ToastProps = {
 	duration?: number
 }
 
-const config = {
-	success: {
-		box: 'border-bosque bg-bosque',
-		title: 'text-blanco',
-		message: 'text-hoja',
-		defaultTitle: 'Listo',
-	},
-	error: {
-		box: 'border-error-border bg-error-bg',
-		title: 'text-error',
-		message: 'text-tinta',
-		defaultTitle: 'No se pudo completar',
-	},
-	warning: {
-		box: 'border-aviso-text/25 bg-aviso',
-		title: 'text-aviso-text',
-		message: 'text-tinta',
-		defaultTitle: 'Atención',
-	},
+const defaultTitles = {
+	success: 'Listo',
+	error: 'No se pudo completar',
+	warning: 'Atención',
 }
 
-// Success on Bosque, error on Fondo error, warning on Aviso. Depth comes from
-// the solid fill and border, not a shadow.
+// Floating Notice below the status bar that hides itself after `duration`.
 export default function Toast({
 	visible,
 	title,
@@ -63,20 +48,18 @@ export default function Toast({
 		return null
 	}
 
-	const current = config[type]
-
 	return (
 		<View
 			accessibilityRole='alert'
 			accessibilityLiveRegion='polite'
-			className={`absolute left-5 right-5 z-[9999] rounded-xl border-1.5 px-4 py-3 ${current.box}`}
+			className='absolute left-5 right-5 z-[9999]'
 			style={{ top: insets.top + 12 }}
 		>
-			<Text className={`font-sans-bold text-[14px] ${current.title}`}>
-				{title ?? current.defaultTitle}
-			</Text>
-
-			<Text className={`text-body mt-0.5 ${current.message}`}>{message}</Text>
+			<Notice
+				tone={type}
+				title={title ?? defaultTitles[type]}
+				message={message}
+			/>
 		</View>
 	)
 }
