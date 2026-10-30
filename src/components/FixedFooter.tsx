@@ -25,9 +25,8 @@ export default function FixedFooter({
 
 	return (
 		<View
-			className='absolute bottom-0 left-0 right-0 z-[999] border-t border-t-card-border bg-blanco px-5 pt-4'
+			className='absolute bottom-0 left-0 right-0 z-[999] border-t-1.5 border-t-card-border bg-blanco px-5 pt-4'
 			style={{
-				elevation: 15,
 				paddingBottom: getFooterBottomPadding(insets.bottom),
 			}}
 		>

@@ -1,6 +1,5 @@
 import { type User } from '@/services/auth'
 import { StatCard } from '@/components/ui/StatCard'
-import { cardShadow } from '@/theme/shadows'
 import { Animated, ImageBackground, Text, View } from 'react-native'
 
 type ProfileProgressProps = {
@@ -52,10 +51,7 @@ export function ProfileProgress({
 					</View>
 
 					{user?.gamification?.next_level && (
-						<View
-							className='mt-5 rounded-[18px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
+						<View className='mt-5 rounded-[18px] border-1.5 border-card-border bg-niebla p-4'>
 							<View className='flex-row items-center justify-between'>
 								<Text className='flex-1 font-sans-semibold text-[14px] text-tinta'>
 									Progreso al siguiente nivel

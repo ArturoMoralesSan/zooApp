@@ -1,4 +1,3 @@
-import colors from '@/theme/colors'
 import type { SpeciesDetail, SpeciesImage } from '@/types/species'
 import {
 	Dimensions,
@@ -7,16 +6,7 @@ import {
 	ScrollView,
 	Text,
 	View,
-	type ViewStyle,
 } from 'react-native'
-
-const subtleShadow: ViewStyle = {
-	shadowColor: colors.esmeralda,
-	shadowOffset: { width: 0, height: 3 },
-	shadowOpacity: 0.08,
-	shadowRadius: 7,
-	elevation: 2,
-}
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -44,14 +34,11 @@ export function SpeciesGallery({
 				{galleryImages.map((image) => (
 					<View
 						key={image.id}
-						className='mr-2.5 overflow-hidden rounded-[22px] border border-card-border bg-niebla'
-						style={[
-							subtleShadow,
-							{
-								width: SCREEN_WIDTH * 0.68,
-								height: SCREEN_WIDTH * 0.48,
-							},
-						]}
+						className='mr-2.5 overflow-hidden rounded-[22px] border-1.5 border-card-border bg-niebla'
+						style={{
+							width: SCREEN_WIDTH * 0.68,
+							height: SCREEN_WIDTH * 0.48,
+						}}
 					>
 						<Pressable
 							onPress={() => onOpenImage(image)}

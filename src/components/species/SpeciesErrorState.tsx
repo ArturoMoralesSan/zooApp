@@ -1,5 +1,4 @@
 import BackButton from '@/components/ui/BackButton'
-import { cardShadow } from '@/components/species/speciesStyles'
 import colors from '@/theme/colors'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
@@ -27,10 +26,7 @@ export function SpeciesErrorState({
 				<BackButton onPress={onBack} />
 			</View>
 
-			<View
-				className='items-center rounded-[28px] border border-card-border bg-niebla px-6 py-10'
-				style={cardShadow}
-			>
+			<View className='items-center rounded-[28px] border-1.5 border-card-border bg-niebla px-6 py-10'>
 				<View className='h-16 w-16 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
 					<HugeiconsIcon
 						icon={UserGroupIcon}

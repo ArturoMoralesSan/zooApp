@@ -2,14 +2,7 @@ import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-	ActivityIndicator,
-	Alert,
-	ScrollView,
-	Text,
-	View,
-	type ViewStyle,
-} from 'react-native'
+import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
@@ -26,14 +19,6 @@ const ICON_COLORS = {
 	primary: colors.esmeralda,
 	muted: colors.apagado,
 } as const
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.bosque,
-	shadowOffset: { width: 0, height: 2 },
-	shadowOpacity: 0.04,
-	shadowRadius: 4,
-	elevation: 1,
-}
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -145,10 +130,7 @@ export default function TicketsScreen() {
 
 				{/* ESTADO VACÍO */}
 				{ticketTypes.length === 0 ? (
-					<View
-						className='items-center justify-center rounded-[18px] border border-card-border bg-niebla px-6 py-8'
-						style={cardShadow}
-					>
+					<View className='items-center justify-center rounded-[18px] border-1.5 border-card-border bg-niebla px-6 py-8'>
 						<View className='mb-3.5 h-[58px] w-[58px] items-center justify-center rounded-2xl border border-card-border bg-hoja'>
 							<HugeiconsIcon
 								icon={Ticket01Icon}
@@ -175,8 +157,7 @@ export default function TicketsScreen() {
 						return (
 							<View
 								key={ticket.id}
-								className='mb-[13px] w-full rounded-[18px] border border-card-border bg-niebla p-[15px]'
-								style={cardShadow}
+								className='mb-[13px] w-full rounded-[18px] border-1.5 border-card-border bg-niebla p-[15px]'
 							>
 								{/* INFORMACIÓN DEL BOLETO */}
 								<View className='w-full flex-row items-start'>

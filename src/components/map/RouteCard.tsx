@@ -5,7 +5,6 @@ import colors from '@/theme/colors'
 import { getFloatingBottom } from '@/theme/layout'
 import type { Coordinate, RouteResult, SelectableItem } from '@/types/map'
 import { formatDistance, formatMinutes } from '@/utils/map'
-import { mapShadow } from '@/components/map/mapShadow'
 
 type RouteCardProps = {
 	selectedItem: SelectableItem
@@ -30,8 +29,8 @@ export function RouteCard({
 
 	return (
 		<View
-			className='absolute left-3 right-3 rounded-[22px] bg-niebla p-4'
-			style={[mapShadow, { bottom: getFloatingBottom(insets.bottom) }]}
+			className='absolute left-3 right-3 rounded-[22px] border-1.5 border-card-border bg-niebla p-4'
+			style={{ bottom: getFloatingBottom(insets.bottom) }}
 		>
 			<View className='flex-row items-center'>
 				<View
@@ -104,8 +103,7 @@ export function RouteCard({
 
 			<View className='mt-3.5 w-full'>
 				<View
-					className={`h-14 w-full overflow-hidden rounded-2xl border ${!userLocation || !isUserInsideZoo ? 'border-apagado bg-apagado' : 'border-bosque bg-esmeralda'}`}
-					style={mapShadow}
+					className={`h-14 w-full overflow-hidden rounded-2xl border-1.5 ${!userLocation || !isUserInsideZoo ? 'border-apagado bg-apagado' : 'border-bosque bg-esmeralda'}`}
 				>
 					<Pressable
 						onPress={onHowToGetThere}
@@ -152,7 +150,6 @@ export function RouteCard({
 
 					<Pressable
 						className='rounded-2xl bg-bosque px-[15px] py-2.5 active:opacity-70'
-						style={mapShadow}
 						onPress={onShowDestination}
 					>
 						<Text className='font-display text-[13px] text-blanco'>

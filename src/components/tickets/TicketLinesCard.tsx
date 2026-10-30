@@ -1,4 +1,4 @@
-import { cardShadow, ICON_COLOR } from '@/components/tickets/summaryStyles'
+import { ICON_COLOR } from '@/components/tickets/summaryStyles'
 import type { TicketSummaryItem } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
@@ -12,10 +12,7 @@ type TicketLinesCardProps = {
 
 export function TicketLinesCard({ summary, total }: TicketLinesCardProps) {
 	return (
-		<View
-			className='mb-3.5 w-full rounded-[20px] border border-card-border bg-niebla p-4'
-			style={cardShadow}
-		>
+		<View className='mb-3.5 w-full rounded-[20px] border-1.5 border-card-border bg-niebla p-4'>
 			<View className='mb-4 flex-row items-center'>
 				<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[14px] border border-card-border bg-hoja'>
 					<HugeiconsIcon

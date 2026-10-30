@@ -1,7 +1,6 @@
 import BackButton from '@/components/ui/BackButton'
 import { type User } from '@/services/auth'
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import { router } from 'expo-router'
 import {
 	ActivityIndicator,
@@ -55,7 +54,6 @@ export function ProfileHeader({
 					<Animated.View
 						className='h-28 w-28 items-center justify-center overflow-hidden rounded-[56px] border-[5px] border-blanco bg-niebla'
 						style={[
-							cardShadow,
 							{
 								transform: [
 									{ scale: avatarScale },
@@ -83,10 +81,7 @@ export function ProfileHeader({
 						)}
 					</Animated.View>
 
-					<View
-						className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'
-						style={cardShadow}
-					>
+					<View className='absolute -bottom-px -right-px h-[34px] w-[34px] items-center justify-center rounded-[17px] border-[3px] border-blanco bg-lima'>
 						<Text className='font-sans-bold text-[20px] text-tinta'>+</Text>
 					</View>
 				</Pressable>

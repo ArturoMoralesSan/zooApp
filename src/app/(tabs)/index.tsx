@@ -29,7 +29,6 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
-import { cardShadow } from '@/theme/shadows'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
@@ -104,10 +103,7 @@ export default function Explorar() {
 							</Text>
 						</View>
 					) : error ? (
-						<View
-							className='rounded-[22px] border border-card-border bg-niebla p-4'
-							style={cardShadow}
-						>
+						<View className='rounded-[22px] border-1.5 border-card-border bg-niebla p-4'>
 							<Text className='text-h3 text-tinta'>
 								No pudimos cargar los eventos
 							</Text>

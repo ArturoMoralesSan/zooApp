@@ -2,7 +2,7 @@ import { CheckmarkCircle02Icon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo } from 'react'
-import { ScrollView, Text, View, type ViewStyle } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 
 import BackButton from '@/components/ui/BackButton'
@@ -14,14 +14,6 @@ import type { Order } from '@/types/tickets'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.bosque,
-	shadowOffset: { width: 0, height: 2 },
-	shadowOpacity: 0.04,
-	shadowRadius: 4,
-	elevation: 1,
-}
 
 export default function TicketSuccessScreen() {
 	const footerSpace = useFixedFooterSpace()
@@ -68,10 +60,7 @@ export default function TicketSuccessScreen() {
 				</View>
 
 				{/* CONFIRMACIÓN DE COMPRA */}
-				<View
-					className='mb-[15px] w-full items-center rounded-[22px] border border-esmeralda bg-esmeralda p-[22px]'
-					style={cardShadow}
-				>
+				<View className='mb-[15px] w-full items-center rounded-[22px] border-1.5 border-esmeralda bg-esmeralda p-[22px]'>
 					<View className='mb-3.5 h-[68px] w-[68px] items-center justify-center rounded-[22px] border-0 bg-transparent'>
 						<HugeiconsIcon
 							icon={CheckmarkCircle02Icon}
@@ -92,10 +81,7 @@ export default function TicketSuccessScreen() {
 				</View>
 
 				{/* BOLETOS Y CÓDIGOS QR */}
-				<View
-					className='mb-[15px] w-full rounded-[20px] border border-card-border bg-niebla p-4'
-					style={cardShadow}
-				>
+				<View className='mb-[15px] w-full rounded-[20px] border-1.5 border-card-border bg-niebla p-4'>
 					<View className='mb-[17px] flex-row items-center'>
 						<View className='mr-3 h-12 w-12 items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
 							<HugeiconsIcon
@@ -144,10 +130,7 @@ export default function TicketSuccessScreen() {
 				</View>
 
 				{/* TOTAL PAGADO Y FOLIO */}
-				<View
-					className='mb-[15px] mt-0.5 w-full rounded-[18px] border border-card-border bg-niebla p-4'
-					style={cardShadow}
-				>
+				<View className='mb-[15px] mt-0.5 w-full rounded-[18px] border-1.5 border-card-border bg-niebla p-4'>
 					<View>
 						<Text className='font-sans-bold text-[14px] text-tinta-2'>
 							Total pagado

@@ -1,5 +1,4 @@
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import { ArrowRight01Icon, Logout01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
@@ -11,10 +10,7 @@ type LogoutCardProps = {
 
 export function LogoutCard({ loggingOut, onLogout }: LogoutCardProps) {
 	return (
-		<View
-			className='mt-4 overflow-hidden rounded-[18px] border border-card-border bg-niebla'
-			style={cardShadow}
-		>
+		<View className='mt-4 overflow-hidden rounded-[18px] border-1.5 border-card-border bg-niebla'>
 			<Pressable
 				onPress={onLogout}
 				disabled={loggingOut}

@@ -2,7 +2,6 @@ import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
 import { Alert, Image, Pressable, Text, View } from 'react-native'
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import type { ExploreEvent } from '@/types/explore'
 import { formatEventDate, formatEventTime } from '@/utils/format'
 import { getEventImageUrl } from '@/utils/explore'
@@ -17,10 +16,7 @@ export function EventCard({ event, isLast }: EventCardProps) {
 
 	return (
 		<View className={`w-[292px] ${isLast ? '' : 'mr-2.5'}`}>
-			<View
-				className='h-[203px] overflow-hidden rounded-3xl bg-bosque'
-				style={cardShadow}
-			>
+			<View className='h-[203px] overflow-hidden rounded-3xl bg-bosque'>
 				<Pressable
 					className='flex-1 overflow-hidden rounded-[24px] active:opacity-[0.92]'
 					onPress={() =>

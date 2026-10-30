@@ -8,7 +8,6 @@ import { useState } from 'react'
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
@@ -229,10 +228,7 @@ export default function DonationsIndexScreen() {
 						Método de pago
 					</Text>
 
-					<View
-						className='overflow-hidden rounded-[18px] border border-card-border bg-niebla'
-						style={cardShadow}
-					>
+					<View className='overflow-hidden rounded-[18px] border-1.5 border-card-border bg-niebla'>
 						<View className='min-h-[80px] flex-row items-center bg-niebla px-3.5 py-3'>
 							<View className='h-12 w-12 items-center justify-center rounded-2xl border border-card-border bg-hoja'>
 								<Text className='font-sans text-[23px]'>💳</Text>

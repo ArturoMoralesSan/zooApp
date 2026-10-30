@@ -1,5 +1,4 @@
 import { Text, View } from 'react-native'
-import { mapShadow } from '@/components/map/mapShadow'
 
 type MapHeaderCardProps = {
 	isUserInsideZoo: boolean
@@ -7,10 +6,7 @@ type MapHeaderCardProps = {
 
 export function MapHeaderCard({ isUserInsideZoo }: MapHeaderCardProps) {
 	return (
-		<View
-			className='absolute left-3 right-3 top-[60px] rounded-[22px] bg-niebla p-4'
-			style={mapShadow}
-		>
+		<View className='absolute left-3 right-3 top-[60px] rounded-[22px] border-1.5 border-card-border bg-niebla p-4'>
 			<View className='flex-row items-center justify-between'>
 				<View className='flex-1 pr-2.5'>
 					<Text className='text-h2 text-tinta'>Mapa del zoológico</Text>

@@ -1,7 +1,6 @@
 import ActionButton from '@/components/ActionButton'
 import { ProfileField } from '@/components/profile/ProfileField'
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import type { FormErrors } from '@/types/profile'
 import {
 	Calendar03Icon,
@@ -65,10 +64,7 @@ export function PersonalDataSection({
 			className='bg-blanco'
 		>
 			<View className='px-5 pb-12 pt-1'>
-				<View
-					className='rounded-[22px] border border-card-border bg-niebla px-[18px] pb-6 pt-5'
-					style={cardShadow}
-				>
+				<View className='rounded-[22px] border-1.5 border-card-border bg-niebla px-[18px] pb-6 pt-5'>
 					<Text className='text-h2 text-tinta'>Datos personales</Text>
 
 					<Text className='text-body mt-1 text-tinta'>

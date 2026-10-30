@@ -11,7 +11,6 @@ import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { redirectIfSignedOut } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
-import { cardShadow } from '@/theme/shadows'
 import { formatCurrency } from '@/utils/format'
 import { createDonation } from '@/services/donations'
 import { useFixedFooterSpace } from '@/theme/layout'
@@ -106,10 +105,7 @@ export default function DonationsSummaryScreen() {
 				</View>
 
 				{/* DONACIÓN Y DETALLE DEL PAGO */}
-				<View
-					className='mb-[17px] w-full rounded-[18px] border border-card-border bg-niebla p-[17px]'
-					style={cardShadow}
-				>
+				<View className='mb-[17px] w-full rounded-[18px] border-1.5 border-card-border bg-niebla p-[17px]'>
 					<View className='flex-row items-center gap-3.5 pb-[18px]'>
 						<View className='h-[54px] w-[54px] shrink-0 items-center justify-center rounded-[17px] border border-card-border bg-hoja'>
 							<HugeiconsIcon
@@ -161,10 +157,7 @@ export default function DonationsSummaryScreen() {
 				</View>
 
 				{/* PAGO SEGURO */}
-				<View
-					className='mb-[17px] w-full flex-row items-center rounded-[18px] border border-card-border bg-niebla p-[17px]'
-					style={cardShadow}
-				>
+				<View className='mb-[17px] w-full flex-row items-center rounded-[18px] border-1.5 border-card-border bg-niebla p-[17px]'>
 					<View className='mr-[13px] h-12 w-12 items-center justify-center rounded-[15px] border border-bosque bg-bosque'>
 						<HugeiconsIcon
 							icon={ShieldCheckIcon}
@@ -185,10 +178,7 @@ export default function DonationsSummaryScreen() {
 				</View>
 
 				{/* AGRADECIMIENTO */}
-				<View
-					className='w-full rounded-[18px] border border-card-border bg-hoja p-[17px]'
-					style={cardShadow}
-				>
+				<View className='w-full rounded-[18px] border-1.5 border-card-border bg-hoja p-[17px]'>
 					<Text className='text-h3 text-bosque'>
 						Gracias por apoyar al zoológico
 					</Text>

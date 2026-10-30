@@ -7,7 +7,6 @@ import colors from '@/theme/colors'
 import { getFloatingBottom } from '@/theme/layout'
 import type { RouteResult, SelectableItem } from '@/types/map'
 import { formatDistance, formatMinutes } from '@/utils/map'
-import { mapShadow } from '@/components/map/mapShadow'
 
 type CollapsedRouteCardProps = {
 	selectedItem: SelectableItem
@@ -24,8 +23,8 @@ export function CollapsedRouteCard({
 
 	return (
 		<View
-			className='absolute left-3 right-3 h-[72px] rounded-[20px] bg-niebla'
-			style={[mapShadow, { bottom: getFloatingBottom(insets.bottom) }]}
+			className='absolute left-3 right-3 h-[72px] rounded-[20px] border-1.5 border-card-border bg-niebla'
+			style={{ bottom: getFloatingBottom(insets.bottom) }}
 		>
 			<Pressable
 				onPress={onExpand}

@@ -8,7 +8,6 @@ import {
 	ScrollView,
 	Text,
 	View,
-	type ViewStyle,
 } from 'react-native'
 
 import { ListCard } from '@/components/ui/ListCard'
@@ -25,14 +24,6 @@ const PROP_COLORS = {
 	primary: colors.esmeralda,
 	text: colors.tinta,
 } as const
-
-const cardShadow: ViewStyle = {
-	shadowColor: colors.esmeralda,
-	shadowOffset: { width: 0, height: 5 },
-	shadowOpacity: 0.12,
-	shadowRadius: 10,
-	elevation: 4,
-}
 
 const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
 
@@ -181,10 +172,7 @@ export default function SpeciesScreen() {
 					</View>
 				) : filteredSpecies.length === 0 ? (
 					/* Sin resultados */
-					<View
-						className='mt-[15px] items-center rounded-[25px] border border-card-border bg-niebla px-5 py-[35px]'
-						style={cardShadow}
-					>
+					<View className='mt-[15px] items-center rounded-[25px] border-1.5 border-card-border bg-niebla px-5 py-[35px]'>
 						<View className='h-16 w-16 items-center justify-center rounded-[20px] border border-card-border bg-hoja'>
 							<HugeiconsIcon
 								icon={UserGroupIcon}

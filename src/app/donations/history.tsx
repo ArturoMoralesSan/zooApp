@@ -21,7 +21,7 @@ import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { DonationCard } from '@/components/donations/DonationCard'
 import { DonationStatsRow } from '@/components/donations/DonationStatsRow'
-import { cardShadow, ICON_COLOR } from '@/components/donations/historyStyles'
+import { ICON_COLOR } from '@/components/donations/historyStyles'
 import { isCompleted } from '@/utils/donations'
 
 const NO_DONATIONS: Donation[] = []
@@ -110,10 +110,7 @@ export default function DonationHistoryScreen() {
 					</View>
 				) : sortedDonations.length === 0 ? (
 					/* Estado vacío */
-					<View
-						className='w-full items-center rounded-[22px] border border-card-border bg-niebla px-[25px] py-8'
-						style={cardShadow}
-					>
+					<View className='w-full items-center rounded-[22px] border-1.5 border-card-border bg-niebla px-[25px] py-8'>
 						<View className='mb-4 h-[62px] w-[62px] items-center justify-center rounded-[18px] border border-card-border bg-hoja'>
 							<HugeiconsIcon
 								icon={HeartAddIcon}

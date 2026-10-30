@@ -1,5 +1,5 @@
 import ActionButton from '@/components/ActionButton'
-import { cardShadow, ICON_COLORS } from '@/components/tickets/myTicketsStyles'
+import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 import type { MyTicketsTab } from '@/types/tickets'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react-native'
@@ -15,10 +15,7 @@ export function MyTicketsEmptyState({
 	onBuyTickets,
 }: MyTicketsEmptyStateProps) {
 	return (
-		<View
-			className='items-center rounded-3xl border border-card-border bg-niebla px-6 py-8'
-			style={cardShadow}
-		>
+		<View className='items-center rounded-3xl border-1.5 border-card-border bg-niebla px-6 py-8'>
 			<View className='mb-4 h-[66px] w-[66px] items-center justify-center rounded-[21px] bg-hoja'>
 				<HugeiconsIcon
 					icon={Ticket01Icon}

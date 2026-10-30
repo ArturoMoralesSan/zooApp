@@ -1,5 +1,5 @@
 import ActionButton from '@/components/ActionButton'
-import { cardShadow, ICON_COLORS } from '@/components/tickets/myTicketsStyles'
+import { ICON_COLORS } from '@/components/tickets/myTicketsStyles'
 import type { Purchase } from '@/types/tickets'
 import { formatDate, formatTime } from '@/utils/format'
 import {
@@ -22,10 +22,7 @@ type PurchaseCardProps = {
 
 export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 	return (
-		<View
-			className='mb-3.5 w-full rounded-[22px] border border-card-border bg-niebla p-4'
-			style={cardShadow}
-		>
+		<View className='mb-3.5 w-full rounded-[22px] border-1.5 border-card-border bg-niebla p-4'>
 			<View className='flex-row items-center'>
 				<View className='mr-3 h-[46px] w-[46px] items-center justify-center rounded-[15px] bg-hoja'>
 					<HugeiconsIcon

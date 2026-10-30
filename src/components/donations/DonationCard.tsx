@@ -1,4 +1,4 @@
-import { cardShadow, ICON_COLOR } from '@/components/donations/historyStyles'
+import { ICON_COLOR } from '@/components/donations/historyStyles'
 import type { Donation } from '@/types/donations'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 import {
@@ -15,10 +15,7 @@ type DonationCardProps = {
 
 export function DonationCard({ donation }: DonationCardProps) {
 	return (
-		<View
-			className='mb-[13px] w-full rounded-[20px] border border-card-border bg-niebla p-4'
-			style={cardShadow}
-		>
+		<View className='mb-[13px] w-full rounded-[20px] border-1.5 border-card-border bg-niebla p-4'>
 			<View className='flex-row items-center'>
 				<View className='mr-[11px] h-[46px] w-[46px] items-center justify-center rounded-[15px] border border-card-border bg-hoja'>
 					<HugeiconsIcon

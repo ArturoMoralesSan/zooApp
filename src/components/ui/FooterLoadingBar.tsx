@@ -12,9 +12,8 @@ export function FooterLoadingBar({ message }: FooterLoadingBarProps) {
 
 	return (
 		<View
-			className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t border-t-card-border bg-blanco px-5 pt-5'
+			className='absolute bottom-0 left-0 right-0 z-[999] flex-row items-center justify-center gap-2.5 border-t-1.5 border-t-card-border bg-blanco px-5 pt-5'
 			style={{
-				elevation: 15,
 				paddingBottom: getFooterBottomPadding(insets.bottom),
 			}}
 		>

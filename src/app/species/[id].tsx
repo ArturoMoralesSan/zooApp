@@ -1,7 +1,6 @@
 import BackButton from '@/components/ui/BackButton'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
-import { cardShadow } from '@/components/species/speciesStyles'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
 import { SpeciesTags } from '@/components/species/SpeciesTags'
@@ -127,8 +126,8 @@ export default function SpeciesDetailScreen() {
 
 					{/* CONTENIDO */}
 					<Animated.View
-						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border border-card-border bg-niebla'
-						style={[cardShadow, { marginTop: cardMarginTop }]}
+						className='relative z-10 w-full overflow-hidden rounded-t-[30px] border-1.5 border-card-border bg-niebla'
+						style={{ marginTop: cardMarginTop }}
 					>
 						<ImageBackground
 							source={require('@/assets/images/zoo-pattern.png')}
