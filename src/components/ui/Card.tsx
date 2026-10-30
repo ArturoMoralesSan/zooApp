@@ -51,7 +51,7 @@ export function Card({
 					accessibilityRole='button'
 					accessibilityLabel={accessibilityLabel}
 					{...focusProps}
-					className={`${cardClassName} ${pressedTones[tone]} ${focused ? 'border-2 border-bosque' : `border-1.5 ${tones[tone].border}`}`}
+					className={`grow ${cardClassName} ${pressedTones[tone]} ${focused ? 'border-2 border-bosque' : `border-1.5 ${tones[tone].border}`}`}
 				>
 					{children}
 				</Pressable>

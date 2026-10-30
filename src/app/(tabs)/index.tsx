@@ -19,7 +19,7 @@ import {
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import AppCard from '@/components/AppCard'
+import { ListCard } from '@/components/ui/ListCard'
 import { EventCard } from '@/components/explore/EventCard'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
 import UserHeader from '@/components/UserHeader'
@@ -34,11 +34,6 @@ import { cardShadow } from '@/theme/shadows'
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
 const CAROUSEL_GAP = 10
-
-// Cambia este valor para personalizar el fondo de la tarjeta de donación.
-// Si no se define un color diferente, utiliza el verde predeterminado.
-const donationCardBackground = colors.bosque
-const donationAccentBackground = colors.lima
 
 export default function Explorar() {
 	const insets = useSafeAreaInsets()
@@ -179,63 +174,49 @@ export default function Explorar() {
 					{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
 					<View className='mb-3 flex-row items-stretch gap-3'>
 						<View className='min-w-0 flex-1'>
-							<AppCard
+							<ListCard
+								className='flex-1'
 								icon={Ticket01Icon}
 								title='Comprar boletos'
-								iconPosition='top'
+								layout='tile'
 								description='Planea tu visita al zoológico.'
 								onPress={() => router.push('/tickets')}
-								backgroundColor={colors.niebla}
-								borderColor={colors.cardBorder}
-								minHeight={130}
-								iconColor={PRIMARY}
-								showArrow={false}
+								showChevron={false}
 							/>
 						</View>
 
 						<View className='min-w-0 flex-1'>
-							<AppCard
+							<ListCard
+								className='flex-1'
 								icon={UserGroupIcon}
-								iconPosition='top'
+								layout='tile'
 								title='Conoce las especies'
 								description='Descubre nuestros animales.'
 								onPress={() => router.push('/species')}
-								backgroundColor={colors.niebla}
-								borderColor={colors.cardBorder}
-								minHeight={130}
-								iconColor={PRIMARY}
-								showArrow={false}
+								showChevron={false}
 							/>
 						</View>
 					</View>
 
 					{/* MAPA: ANCHO COMPLETO CON FLECHA */}
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Location01Icon}
 						title='Mapa del zoológico'
 						description='Explora caminos, especies y puntos de interés.'
 						onPress={() => router.push('/map')}
-						backgroundColor={colors.niebla}
-						borderColor={colors.cardBorder}
-						iconColor={PRIMARY}
-						showArrow={true}
+						showChevron={true}
 					/>
 
 					{/* DONACIÓN: FONDO CONFIGURABLE */}
-					<AppCard
+					<ListCard
+						className='mb-3'
+						tone='dark'
 						title='Apoya al zoológico'
 						description='Tu donación ayuda a cuidar y proteger a nuestros animales.'
 						icon={HeartIcon}
 						onPress={() => router.push('/donations')}
-						backgroundColor={donationCardBackground}
-						borderColor={colors.cardBorder}
-						iconColor={colors.bosque}
-						iconBackgroundColor={donationAccentBackground}
-						arrowBackgroundColor={donationAccentBackground}
-						arrowColor={colors.bosque}
-						textColor={colors.blanco}
-						descriptionColor={colors.hoja}
-						showArrow
+						showChevron
 					/>
 				</View>
 			</ScrollView>

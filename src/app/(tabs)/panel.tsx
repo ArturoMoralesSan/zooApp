@@ -11,7 +11,7 @@ import { Alert, ScrollView, Text, View } from 'react-native'
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import AppCard from '@/components/AppCard'
+import { ListCard } from '@/components/ui/ListCard'
 import UserHeader from '@/components/UserHeader'
 import { useProfile } from '@/hooks/useProfile'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -108,12 +108,13 @@ export default function Panel() {
 				{/* TARJETA DE PERFIL */}
 
 				<View className='mt-5'>
-					<AppCard
+					<ListCard
+						className='mb-3'
 						avatarUrl={avatarUrl}
 						title={user?.name ?? 'Mi cuenta'}
 						description={user?.email ?? 'Consulta tus datos personales'}
 						onPress={() => router.push('/profile')}
-						showArrow
+						showChevron
 					/>
 				</View>
 
@@ -122,7 +123,8 @@ export default function Panel() {
 				<View className='mt-6'>
 					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi cuenta</Text>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={QrCodeIcon}
 						title='Mi código QR'
 						description='Consulta tu código personal'
@@ -135,14 +137,16 @@ export default function Panel() {
 				<View className='mt-4'>
 					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Mi actividad</Text>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Ticket01Icon}
 						title='Mis entradas'
 						description='Consulta tus entradas al zoológico'
 						onPress={() => router.push('/tickets/my-tickets')}
 					/>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Ticket01Icon}
 						title='Mis donaciones'
 						description='Consulta tus donaciones'
@@ -155,7 +159,8 @@ export default function Panel() {
 				<View className='mt-4'>
 					<Text className='text-h2 mb-3.5 px-1 text-tinta'>Ayuda</Text>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={Settings01Icon}
 						title='Configuración'
 						description='Preferencias de la aplicación'
@@ -167,7 +172,8 @@ export default function Panel() {
 						}
 					/>
 
-					<AppCard
+					<ListCard
+						className='mb-3'
 						icon={HelpCircleIcon}
 						title='Ayuda'
 						description='Preguntas frecuentes y soporte'

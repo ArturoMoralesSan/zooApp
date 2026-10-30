@@ -11,7 +11,7 @@ import {
 	type ViewStyle,
 } from 'react-native'
 
-import AppCard from '@/components/AppCard'
+import { ListCard } from '@/components/ui/ListCard'
 import BackButton from '@/components/ui/BackButton'
 import UserHeader from '@/components/UserHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -218,7 +218,8 @@ export default function SpeciesScreen() {
 					/* Tarjetas de especies */
 					<View className='mt-[15px]'>
 						{filteredSpecies.map((item) => (
-							<AppCard
+							<ListCard
+								className='mb-3'
 								key={item.id}
 								onPress={() => openSpecies(item.id)}
 								image={item.image ? { uri: item.image } : undefined}
@@ -234,16 +235,7 @@ export default function SpeciesScreen() {
 									.filter(Boolean)
 									.join('\n')}
 								icon={!item.image ? UserGroupIcon : undefined}
-								backgroundColor={colors.niebla}
-								borderColor={colors.cardBorder}
-								iconColor={PROP_COLORS.primary}
-								iconBackgroundColor={colors.hoja}
-								arrowColor={colors.blanco}
-								arrowBackgroundColor={PROP_COLORS.primary}
-								textColor={PROP_COLORS.text}
-								descriptionColor={PROP_COLORS.text}
-								showArrow
-								style={{ marginBottom: 15 }}
+								showChevron
 							/>
 						))}
 					</View>

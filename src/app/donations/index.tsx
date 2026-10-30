@@ -1,4 +1,4 @@
-import AppCard from '@/components/AppCard'
+import { ListCard } from '@/components/ui/ListCard'
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import UserHeader from '@/components/UserHeader'
@@ -143,19 +143,13 @@ export default function DonationsIndexScreen() {
 
 				{/* TARJETA INFORMATIVA */}
 				<View className='mt-5'>
-					<AppCard
+					<ListCard
+						className='mb-3'
+						tone='dark'
 						title='Haz la diferencia'
 						description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
 						icon={HeartIcon}
-						backgroundColor={colors.bosque}
-						borderColor={colors.bosque}
-						iconColor={colors.bosque}
-						iconBackgroundColor={colors.lima}
-						arrowBackgroundColor={colors.lima}
-						arrowColor={colors.bosque}
-						textColor={colors.blanco}
-						descriptionColor={colors.hoja}
-						showArrow={false}
+						showChevron={false}
 					/>
 				</View>
 

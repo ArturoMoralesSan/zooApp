@@ -1,5 +1,4 @@
-import AppCard from '@/components/AppCard'
-import colors from '@/theme/colors'
+import { ListCard } from '@/components/ui/ListCard'
 import type { SpeciesDetail } from '@/types/species'
 import {
 	Leaf01Icon,
@@ -21,72 +20,53 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 			<View className='mt-3.5 flex-row flex-wrap justify-between'>
 				{species.habitat && (
 					<View className='mb-3 w-[48.5%]'>
-						<AppCard
+						<ListCard
+							className='flex-1'
 							icon={Location01Icon}
-							iconPosition='top'
+							layout='tile'
 							title='Hábitat'
 							description={species.habitat}
-							backgroundColor={colors.niebla}
-							borderColor={colors.cardBorder}
-							iconColor={colors.esmeralda}
-							iconBackgroundColor={colors.hoja}
-							textColor={colors.bosque}
-							descriptionColor={colors.tinta}
-							showArrow={false}
+							showChevron={false}
 						/>
 					</View>
 				)}
 
 				{species.origin && (
 					<View className='mb-3 w-[48.5%]'>
-						<AppCard
+						<ListCard
+							className='flex-1'
 							icon={Plant01Icon}
-							iconPosition='top'
+							layout='tile'
 							title='Origen'
 							description={species.origin}
-							backgroundColor={colors.niebla}
-							borderColor={colors.cardBorder}
-							iconColor={colors.esmeralda}
-							iconBackgroundColor={colors.hoja}
-							textColor={colors.bosque}
-							descriptionColor={colors.tinta}
-							showArrow={false}
+							showChevron={false}
 						/>
 					</View>
 				)}
 
 				{species.diet && (
 					<View className='mb-3 w-[48.5%]'>
-						<AppCard
+						<ListCard
+							className='flex-1'
 							icon={Leaf01Icon}
 							title='Alimentación'
-							iconPosition='top'
+							layout='tile'
 							description={species.diet}
-							backgroundColor={colors.niebla}
-							borderColor={colors.cardBorder}
-							iconColor={colors.esmeralda}
-							iconBackgroundColor={colors.hoja}
-							textColor={colors.bosque}
-							descriptionColor={colors.tinta}
-							showArrow={false}
+							showChevron={false}
 						/>
 					</View>
 				)}
 
 				{species.conservation_status && (
 					<View className='mb-3 w-[48.5%]'>
-						<AppCard
+						<ListCard
+							className='flex-1'
+							tone='hoja'
 							icon={Shield01Icon}
-							iconPosition='top'
+							layout='tile'
 							title='Conservación'
 							description={species.conservation_status}
-							backgroundColor={colors.hoja}
-							borderColor={colors.cardBorder}
-							iconColor={colors.esmeralda}
-							iconBackgroundColor={colors.niebla}
-							textColor={colors.bosque}
-							descriptionColor={colors.tinta}
-							showArrow={false}
+							showChevron={false}
 						/>
 					</View>
 				)}
