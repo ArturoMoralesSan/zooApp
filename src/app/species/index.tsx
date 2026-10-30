@@ -1,19 +1,16 @@
-import { Alert02Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
+import { UserGroupIcon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 
 import { ListCard } from '@/components/ui/ListCard'
+import { QueryView } from '@/components/ui/QueryView'
 import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
-import colors from '@/theme/colors'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { Chip } from '@/components/ui/Chip'
-import { IconBox } from '@/components/ui/IconBox'
 import { TextLink } from '@/components/ui/TextLink'
 import { SearchField } from '@/components/ui/SearchField'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
@@ -23,18 +20,10 @@ const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
 type Filter = (typeof FILTERS)[number]
 
 export default function SpeciesScreen() {
-	const {
-		data: species = [],
-		error: loadError,
-		isLoading: loading,
-		refresh,
-	} = useSpecies()
+	const speciesQuery = useSpecies()
+	const species = useMemo(() => speciesQuery.data ?? [], [speciesQuery.data])
 	const [search, setSearch] = useState('')
 	const [filter, setFilter] = useState<Filter>('Todas')
-
-	const error = loadError
-		? loadError.message || 'No fue posible cargar las especies.'
-		: ''
 
 	useSessionRedirect()
 
@@ -57,19 +46,6 @@ export default function SpeciesScreen() {
 
 	const openSpecies = (speciesId: number) => {
 		router.push(`/species/${speciesId}`)
-	}
-
-	if (loading) {
-		return (
-			<ScreenBackground>
-				<View className='flex-1 items-center justify-center bg-transparent'>
-					<ActivityIndicator size='large' color={colors.esmeralda} />
-					<Text className='text-body mt-3 text-tinta'>
-						Cargando especies...
-					</Text>
-				</View>
-			</ScreenBackground>
-		)
 	}
 
 	return (
@@ -115,74 +91,67 @@ export default function SpeciesScreen() {
 				</ScrollView>
 
 				{/* Resultados */}
-				<View className='mt-4 h-10 flex-row items-center justify-between'>
-					<Text className='text-meta text-tinta'>
-						{filteredSpecies.length}{' '}
-						{filteredSpecies.length === 1 ? 'especie' : 'especies'}
-					</Text>
-
-					{search.trim() !== '' && (
-						<TextLink label='Limpiar' onPress={() => setSearch('')} />
-					)}
-				</View>
-
-				{/* Error de carga */}
-				{error ? (
-					<Card className='mt-4 items-center'>
-						<IconBox icon={Alert02Icon} size='lg' tone='danger' />
-
-						<Text className='text-h3 mt-3 text-center text-tinta'>
-							No fue posible cargar las especies.
+				{speciesQuery.data && (
+					<View className='mt-4 h-10 flex-row items-center justify-between'>
+						<Text className='text-meta text-tinta'>
+							{filteredSpecies.length}{' '}
+							{filteredSpecies.length === 1 ? 'especie' : 'especies'}
 						</Text>
 
-						<Text className='text-meta mt-1.5 text-center'>{error}</Text>
-
-						<Button
-							title='Intentar nuevamente'
-							variant='secondary'
-							onPress={() => void refresh()}
-							className='mt-4'
-						/>
-					</Card>
-				) : filteredSpecies.length === 0 ? (
-					/* Sin resultados */
-					<Card className='mt-4 items-center py-8'>
-						<IconBox icon={UserGroupIcon} size='lg' />
-
-						<Text className='text-h2 mt-4 text-center text-tinta'>
-							No encontramos especies
-						</Text>
-
-						<Text className='text-body mt-1.5 text-center text-tinta-2'>
-							Intenta con otro nombre o cambia el filtro.
-						</Text>
-					</Card>
-				) : (
-					/* Tarjetas de especies */
-					<View className='mt-4'>
-						{filteredSpecies.map((item) => (
-							<ListCard
-								className='mb-3'
-								key={item.id}
-								onPress={() => openSpecies(item.id)}
-								image={item.image ? { uri: item.image } : undefined}
-								imageHeight={210}
-								title={item.common_name}
-								description={[
-									item.scientific_name,
-									item.category?.name
-										? `Categoría: ${item.category.name}`
-										: null,
-									item.description,
-								]
-									.filter(Boolean)
-									.join('\n')}
-								icon={!item.image ? UserGroupIcon : undefined}
-								showChevron
-							/>
-						))}
+						{search.trim() !== '' && (
+							<TextLink label='Limpiar' onPress={() => setSearch('')} />
+						)}
 					</View>
 				)}
+
+				<QueryView
+					query={speciesQuery}
+					loadingMessage='Cargando especies…'
+					errorTitle='No pudimos cargar las especies'
+					isEmpty={() => filteredSpecies.length === 0}
+					empty={
+						species.length === 0
+							? {
+									icon: UserGroupIcon,
+									title: 'Aún no hay especies',
+									message:
+										'Pronto podrás conocer a los habitantes del zoológico.',
+								}
+							: {
+									icon: UserGroupIcon,
+									title: 'No encontramos especies',
+									message: 'Intenta con otro nombre o cambia el filtro.',
+								}
+					}
+					className='mt-4'
+				>
+					{/* Tarjetas de especies */}
+					{() => (
+						<View className='mt-4'>
+							{filteredSpecies.map((item) => (
+								<ListCard
+									className='mb-3'
+									key={item.id}
+									onPress={() => openSpecies(item.id)}
+									image={item.image ? { uri: item.image } : undefined}
+									imageHeight={210}
+									title={item.common_name}
+									description={[
+										item.scientific_name,
+										item.category?.name
+											? `Categoría: ${item.category.name}`
+											: null,
+										item.description,
+									]
+										.filter(Boolean)
+										.join('\n')}
+									icon={!item.image ? UserGroupIcon : undefined}
+									showChevron
+								/>
+							))}
+						</View>
+					)}
+				</QueryView>
 
 				<View className='h-10' />
 			</KeyboardScrollView>

@@ -1,7 +1,8 @@
 import BackButton from '@/components/ui/BackButton'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { useScrollBottomSpace } from '@/theme/layout'
-import { SpeciesErrorState } from '@/components/species/SpeciesErrorState'
+import { SpeciesStateFrame } from '@/components/species/SpeciesStateFrame'
+import { QueryView } from '@/components/ui/QueryView'
 import { SpeciesHero } from '@/components/species/SpeciesHero'
 import { SpeciesDataGrid } from '@/components/species/SpeciesDataGrid'
 import { SpeciesTags } from '@/components/species/SpeciesTags'
@@ -11,15 +12,8 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
-import {
-	ActivityIndicator,
-	Animated,
-	ImageBackground,
-	Text,
-	View,
-} from 'react-native'
+import { Animated, ImageBackground, Text, View } from 'react-native'
 
-import colors from '@/theme/colors'
 import type { SpeciesImage } from '@/types/species'
 
 export default function SpeciesDetailScreen() {
@@ -29,17 +23,9 @@ export default function SpeciesDetailScreen() {
 
 	const [scrollY] = useState(() => new Animated.Value(0))
 
-	const {
-		data: species,
-		error: loadError,
-		isLoading: loading,
-		refresh,
-	} = useSpeciesDetail(params.id)
+	const detail = useSpeciesDetail(params.id)
+	const species = detail.data
 	const [selectedImage, setSelectedImage] = useState<SpeciesImage | null>(null)
-
-	const error = loadError
-		? loadError.message || 'No fue posible cargar la información de la especie.'
-		: null
 
 	useSessionRedirect()
 
@@ -74,142 +60,132 @@ export default function SpeciesDetailScreen() {
 		)
 	}, [species, heroImage])
 
-	if (loading) {
-		return (
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				className='flex-1 items-center justify-center bg-blanco'
-				resizeMode='repeat'
-				imageClassName='opacity-90'
-			>
-				<ActivityIndicator size='large' color={colors.esmeralda} />
-
-				<Text className='text-meta mt-3.5'>Cargando especie...</Text>
-			</ImageBackground>
-		)
-	}
-
-	if (error || !species) {
-		return (
-			<SpeciesErrorState
-				error={error}
-				onBack={() => router.back()}
-				onRetry={() => void refresh()}
-			/>
-		)
-	}
-
 	return (
-		<View className='relative flex-1'>
-			<Animated.ScrollView
-				className='flex-1 bg-blanco'
-				contentContainerStyle={{ paddingBottom: bottomSpace }}
-				showsVerticalScrollIndicator={false}
-				scrollEventThrottle={16}
-				onScroll={Animated.event(
-					[
-						{
-							nativeEvent: {
-								contentOffset: { y: scrollY },
-							},
-						},
-					],
-					{ useNativeDriver: false },
-				)}
-			>
-				<View className='relative bg-blanco'>
-					{/* IMAGEN PRINCIPAL */}
-					<SpeciesHero
-						heroImage={heroImage}
-						species={species}
-						onOpenImage={setSelectedImage}
-					/>
-
-					{/* CONTENIDO */}
-					<Animated.View
-						className='relative z-10 w-full overflow-hidden rounded-t-3xl border-1.5 border-card-border bg-niebla'
-						style={{ marginTop: cardMarginTop }}
+		<QueryView
+			query={detail}
+			loadingMessage='Cargando especie…'
+			errorTitle='No pudimos cargar la especie'
+			wrapper={(state) => (
+				<SpeciesStateFrame onBack={() => router.back()}>
+					{state}
+				</SpeciesStateFrame>
+			)}
+		>
+			{(species) => (
+				<View className='relative flex-1'>
+					<Animated.ScrollView
+						className='flex-1 bg-blanco'
+						contentContainerStyle={{ paddingBottom: bottomSpace }}
+						showsVerticalScrollIndicator={false}
+						scrollEventThrottle={16}
+						onScroll={Animated.event(
+							[
+								{
+									nativeEvent: {
+										contentOffset: { y: scrollY },
+									},
+								},
+							],
+							{ useNativeDriver: false },
+						)}
 					>
-						<ImageBackground
-							source={require('@/assets/images/zoo-pattern.png')}
-							resizeMode='repeat'
-							imageClassName='opacity-30'
-							className='bg-blanco'
-						>
-							<View className='px-4 pb-7 pt-6'>
-								{/* CATEGORÍA */}
-								{species.category && (
-									<Text className='text-overline text-esmeralda'>
-										{species.category.name}
-									</Text>
-								)}
+						<View className='relative bg-blanco'>
+							{/* IMAGEN PRINCIPAL */}
+							<SpeciesHero
+								heroImage={heroImage}
+								species={species}
+								onOpenImage={setSelectedImage}
+							/>
 
-								{/* NOMBRE */}
-								<Text className='text-h1 mt-1'>{species.common_name}</Text>
+							{/* CONTENIDO */}
+							<Animated.View
+								className='relative z-10 w-full overflow-hidden rounded-t-3xl border-1.5 border-card-border bg-niebla'
+								style={{ marginTop: cardMarginTop }}
+							>
+								<ImageBackground
+									source={require('@/assets/images/zoo-pattern.png')}
+									resizeMode='repeat'
+									imageClassName='opacity-30'
+									className='bg-blanco'
+								>
+									<View className='px-4 pb-7 pt-6'>
+										{/* CATEGORÍA */}
+										{species.category && (
+											<Text className='text-overline text-esmeralda'>
+												{species.category.name}
+											</Text>
+										)}
 
-								{species.scientific_name && (
-									<Text className='text-body mt-1.5 italic text-tinta-2'>
-										{species.scientific_name}
-									</Text>
-								)}
+										{/* NOMBRE */}
+										<Text className='text-h1 mt-1'>{species.common_name}</Text>
 
-								{/* DESCRIPCIÓN */}
-								{species.description && (
-									<View className='mt-6'>
-										<SectionTitle
-											title='Conoce a esta especie'
-											className='mb-2'
-										/>
+										{species.scientific_name && (
+											<Text className='text-body mt-1.5 italic text-tinta-2'>
+												{species.scientific_name}
+											</Text>
+										)}
 
-										<Text className='text-body text-tinta-2'>
-											{species.description}
-										</Text>
+										{/* DESCRIPCIÓN */}
+										{species.description && (
+											<View className='mt-6'>
+												<SectionTitle
+													title='Conoce a esta especie'
+													className='mb-2'
+												/>
+
+												<Text className='text-body text-tinta-2'>
+													{species.description}
+												</Text>
+											</View>
+										)}
+
+										{/* DATOS DE LA ESPECIE */}
+										<SpeciesDataGrid species={species} />
+
+										{/* ETIQUETAS */}
+										{species.tags.length > 0 && (
+											<SpeciesTags species={species} />
+										)}
+
+										{/* GALERÍA */}
+										{galleryImages.length > 0 && (
+											<SpeciesGallery
+												galleryImages={galleryImages}
+												species={species}
+												onOpenImage={setSelectedImage}
+											/>
+										)}
+
+										<View className='h-2' />
 									</View>
-								)}
+								</ImageBackground>
+							</Animated.View>
+						</View>
+					</Animated.ScrollView>
 
-								{/* DATOS DE LA ESPECIE */}
-								<SpeciesDataGrid species={species} />
-
-								{/* ETIQUETAS */}
-								{species.tags.length > 0 && <SpeciesTags species={species} />}
-
-								{/* GALERÍA */}
-								{galleryImages.length > 0 && (
-									<SpeciesGallery
-										galleryImages={galleryImages}
-										species={species}
-										onOpenImage={setSelectedImage}
-									/>
-								)}
-
-								<View className='h-2' />
-							</View>
-						</ImageBackground>
+					{/* BOTÓN REGRESAR SOBRE LA IMAGEN */}
+					<Animated.View
+						pointerEvents='box-none'
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							zIndex: 9999,
+							elevation: 9999,
+							opacity: backButtonOpacity,
+						}}
+					>
+						<BackButton onPress={() => router.back()} />
 					</Animated.View>
+
+					{/* VISOR DE IMÁGENES */}
+					<SpeciesImageViewer
+						selectedImage={selectedImage}
+						species={species}
+						onClose={() => setSelectedImage(null)}
+					/>
 				</View>
-			</Animated.ScrollView>
-
-			{/* BOTÓN REGRESAR SOBRE LA IMAGEN */}
-			<Animated.View
-				pointerEvents='box-none'
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					zIndex: 9999,
-					elevation: 9999,
-					opacity: backButtonOpacity,
-				}}
-			>
-				<BackButton onPress={() => router.back()} />
-			</Animated.View>
-
-			{/* VISOR DE IMÁGENES */}
-			<SpeciesImageViewer
-				selectedImage={selectedImage}
-				species={species}
-				onClose={() => setSelectedImage(null)}
-			/>
-		</View>
+			)}
+		</QueryView>
 	)
 }
