@@ -110,7 +110,7 @@ export default function TicketsScreen() {
 			<ScreenBackground withBackground={false}>
 				<View className='flex-1 items-center justify-center'>
 					<ActivityIndicator size='large' color={ICON_COLORS.primary} />
-					<Text className='mt-3 text-[15px] font-semibold text-tinta-2'>
+					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando boletos...
 					</Text>
 				</View>
@@ -155,11 +155,11 @@ export default function TicketsScreen() {
 							/>
 						</View>
 
-						<Text className='text-center text-[17px] font-extrabold text-tinta'>
+						<Text className='text-h3 text-center text-tinta'>
 							No hay boletos disponibles
 						</Text>
 
-						<Text className='mt-1.5 text-center text-[13px] leading-[19px] text-tinta-2'>
+						<Text className='text-body mt-1.5 text-center text-tinta-2'>
 							Por el momento no hay tipos de boleto para mostrar.
 						</Text>
 					</View>
@@ -190,12 +190,10 @@ export default function TicketsScreen() {
 									</View>
 
 									<View className='min-w-0 flex-1 justify-center'>
-										<Text className='text-[15px] font-extrabold leading-5 text-tinta'>
-											{ticket.name}
-										</Text>
+										<Text className='text-h3 text-tinta'>{ticket.name}</Text>
 
 										{!!ticket.description && (
-											<Text className='mt-[3px] text-[12px] leading-4 text-tinta-2'>
+											<Text className='text-meta mt-[3px]'>
 												{ticket.description}
 											</Text>
 										)}
@@ -207,15 +205,15 @@ export default function TicketsScreen() {
 								{/* PRECIO Y CANTIDAD */}
 								<View className='w-full flex-row items-center justify-between'>
 									<View className='min-w-0 flex-1 justify-center pr-2'>
-										<Text className='text-[11px] font-semibold text-tinta-2'>
+										<Text className='text-overline text-tinta-2'>
 											Precio por boleto
 										</Text>
 
-										<Text className='mt-0.5 text-[20px] font-black text-bosque'>
+										<Text className='mt-0.5 font-display-x text-[20px] text-bosque'>
 											{formatCurrency(price)}
 										</Text>
 
-										<Text className='mt-[3px] text-[12px] font-semibold text-tinta-2'>
+										<Text className='text-meta mt-[3px]'>
 											Monto: {formatCurrency(amount)}
 										</Text>
 									</View>
@@ -242,7 +240,7 @@ export default function TicketsScreen() {
 										{/* CANTIDAD */}
 										<View className='h-10 w-[34px] min-w-[34px] shrink-0 items-center justify-center'>
 											<Text
-												className='text-center text-[15px] font-extrabold text-tinta'
+												className='text-center font-display-x text-[15px] text-tinta'
 												style={{ includeFontPadding: false }}
 											>
 												{quantity}
@@ -258,7 +256,7 @@ export default function TicketsScreen() {
 											className={`h-10 min-h-10 w-10 min-w-10 shrink-0 grow-0 items-center justify-center rounded-xl border-0 p-0 ${canIncrease ? 'bg-esmeralda' : 'bg-card-border'}`}
 										>
 											<Text
-												className='text-center text-[28px] font-semibold leading-8 text-blanco'
+												className='text-center font-display text-[28px] leading-8 text-blanco'
 												style={{ includeFontPadding: false }}
 											>
 												+

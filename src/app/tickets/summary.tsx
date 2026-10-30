@@ -140,7 +140,7 @@ export default function TicketSummaryScreen() {
 			<ScreenBackground patternClassName='opacity-[0.12]'>
 				<View className='flex-1 items-center justify-center'>
 					<ActivityIndicator size='large' color={ICON_COLOR} />
-					<Text className='mt-3 text-[14px] font-medium text-tinta-2'>
+					<Text className='text-body mt-3 text-tinta-2'>
 						Cargando resumen...
 					</Text>
 				</View>

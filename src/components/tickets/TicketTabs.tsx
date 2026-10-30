@@ -21,7 +21,7 @@ export function TicketTabs({
 				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-esmeralda' : ''}`}
 			>
 				<Text
-					className={`text-[13px] ${tab === 'active' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
+					className={`text-[13px] ${tab === 'active' ? 'font-sans-x text-blanco' : 'font-sans-semibold text-tinta-2'}`}
 				>
 					Activas
 				</Text>
@@ -30,7 +30,7 @@ export function TicketTabs({
 					className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
 				>
 					<Text
-						className={`text-[11px] font-bold ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
+						className={`font-display-x text-[12px] ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
 					>
 						{activePurchases.length}
 					</Text>
@@ -42,7 +42,7 @@ export function TicketTabs({
 				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-esmeralda' : ''}`}
 			>
 				<Text
-					className={`text-[13px] ${tab === 'history' ? 'font-extrabold text-blanco' : 'font-semibold text-tinta-2'}`}
+					className={`text-[13px] ${tab === 'history' ? 'font-sans-x text-blanco' : 'font-sans-semibold text-tinta-2'}`}
 				>
 					Historial
 				</Text>
@@ -51,7 +51,7 @@ export function TicketTabs({
 					className={`h-[22px] min-w-[22px] items-center justify-center rounded-[11px] px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
 				>
 					<Text
-						className={`text-[11px] font-bold ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
+						className={`font-display-x text-[12px] ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
 					>
 						{historyPurchases.length}
 					</Text>

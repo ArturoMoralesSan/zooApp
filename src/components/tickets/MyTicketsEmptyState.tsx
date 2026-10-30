@@ -27,11 +27,11 @@ export function MyTicketsEmptyState({
 				/>
 			</View>
 
-			<Text className='text-center text-[18px] font-extrabold text-tinta'>
+			<Text className='text-h2 text-center text-tinta'>
 				{tab === 'active' ? 'No tienes compras activas' : 'No tienes historial'}
 			</Text>
 
-			<Text className='mt-[7px] text-center text-[13px] leading-5 text-tinta-2'>
+			<Text className='text-body mt-[7px] text-center text-tinta-2'>
 				{tab === 'active'
 					? 'Cuando compres una entrada aparecerá aquí.'
 					: 'Tus compras anteriores aparecerán aquí.'}
