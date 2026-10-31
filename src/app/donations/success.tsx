@@ -13,8 +13,8 @@ import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
-import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 function getPaymentMethod(method: PaymentMethod | null | undefined) {
 	return method?.name || method?.code || 'Tarjeta'
@@ -62,13 +62,13 @@ export default function DonationSuccessScreen() {
 
 	return (
 		<ScreenBackground>
-			<ScreenHeader onBack={() => router.back()} scrolled={scrolled} />
+			<TopBar onBack={() => router.back()} scrolled={scrolled} />
 
 			<ScrollView
 				onScroll={onScroll}
 				scrollEventThrottle={16}
 				className='flex-1'
-				contentContainerClassName='px-5 pt-0.5'
+				contentContainerClassName='px-5 pt-2.5'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 			>

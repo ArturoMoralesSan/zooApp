@@ -28,12 +28,13 @@ import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { FooterLoadingBar } from '@/components/ui/FooterLoadingBar'
 import Toast from '@/components/ui/Toast'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 const OFFLINE_DONATION =
 	'No enviamos tu donación. Conéctate a internet e inténtalo de nuevo.'
 
 export default function DonationsSummaryScreen() {
-	const { scrolled, onScroll } = useScrolled()
+	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
@@ -110,22 +111,28 @@ export default function DonationsSummaryScreen() {
 
 	return (
 		<ScreenBackground>
-			{/* ENCABEZADO FIJO */}
-			<ScreenHeader
-				scrolled={scrolled}
+			{/* BARRA SUPERIOR FIJA */}
+			<TopBar
 				onBack={() => router.back()}
 				title='Resumen de donación'
-				subtitle='Revisa los datos antes de continuar con tu aportación.'
+				showTitle={pastTitle}
+				scrolled={scrolled}
 			/>
 
 			<ScrollView
 				onScroll={onScroll}
 				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
-				contentContainerClassName='px-5 pt-4'
+				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				keyboardShouldPersistTaps='handled'
 			>
+				<ScreenHeader
+					title='Resumen de donación'
+					subtitle='Revisa los datos antes de continuar con tu aportación.'
+					onLayout={onTitleLayout}
+				/>
+
 				{/* DONACIÓN Y DETALLE DEL PAGO */}
 				<Card className='mb-3'>
 					<View className='flex-row items-center gap-3'>

@@ -26,6 +26,7 @@ import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
 import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -38,7 +39,7 @@ const OFFLINE_PURCHASE =
 	'No enviamos tu compra. Conéctate a internet e inténtalo de nuevo.'
 
 export default function TicketSummaryScreen() {
-	const { scrolled, onScroll } = useScrolled()
+	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
@@ -137,25 +138,31 @@ export default function TicketSummaryScreen() {
 
 	return (
 		<ScreenBackground>
-			{/* ENCABEZADO FIJO */}
-			<ScreenHeader
-				scrolled={scrolled}
+			{/* BARRA SUPERIOR FIJA */}
+			<TopBar
 				onBack={() => router.back()}
 				title='Resumen de compra'
-				subtitle='Revisa tus boletos antes de continuar.'
+				showTitle={pastTitle}
+				scrolled={scrolled}
 			/>
 
 			<ScrollView
 				onScroll={onScroll}
 				scrollEventThrottle={16}
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-4'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
 				keyboardShouldPersistTaps='handled'
 			>
+				<ScreenHeader
+					title='Resumen de compra'
+					subtitle='Revisa tus boletos antes de continuar.'
+					onLayout={onTitleLayout}
+				/>
+
 				<QueryView
 					query={ticketTypesQuery}
 					loadingMessage='Cargando resumen…'
