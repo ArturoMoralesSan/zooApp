@@ -107,7 +107,7 @@ export function ListCard({
 			)}
 
 			<View
-				className={`gap-3 p-4 ${layout === 'tile' ? 'flex-col items-start' : 'flex-row items-center'}`}
+				className={`gap-3 p-4 ${layout === 'tile' ? 'grow flex-col items-start justify-between' : 'flex-row items-center'}`}
 			>
 				{leading}
 

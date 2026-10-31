@@ -6,7 +6,7 @@ import {
 	Ticket01Icon,
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Alert, ScrollView, Text, View } from 'react-native'
 
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ListCard } from '@/components/ui/ListCard'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
+import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useProfile } from '@/hooks/useProfile'
 import { isNetworkError } from '@/services/api'
@@ -51,6 +52,14 @@ export default function Panel() {
 
 	const [loggingOut, setLoggingOut] = useState(false)
 	const [showQr, setShowQr] = useState(false)
+	const [toast, setToast] = useState<{
+		type: ToastType
+		title: string
+		message: string
+	} | null>(null)
+	const hideToast = useCallback(() => setToast(null), [])
+	const setComingSoon = (message: string) =>
+		setToast({ type: 'warning', title: 'Próximamente', message })
 
 	const { data: profile, error: profileError } = useProfile()
 	// On a failed load the panel falls back to its generic texts, as before.
@@ -67,7 +76,11 @@ export default function Panel() {
 		}
 
 		if (!user?.qr_token) {
-			Alert.alert('Código QR', 'No fue posible obtener tu código QR.')
+			setToast({
+				type: 'error',
+				title: 'Código QR',
+				message: 'No fue posible obtener tu código QR.',
+			})
 			return
 		}
 
@@ -129,7 +142,13 @@ export default function Panel() {
 						description={user?.email ?? 'Consulta tus datos personales'}
 						onPress={() => router.push('/profile')}
 						showChevron
-					/>
+					>
+						{/* One-off: A-07's "Ver perfil" link under the email, aligned
+						    with the text (16 padding + 56 avatar + 12 gap). */}
+						<Text className='-mt-3 pl-[68px] font-sans-bold text-[14px] text-esmeralda underline'>
+							Ver perfil
+						</Text>
+					</ListCard>
 				</View>
 
 				{/* MI CUENTA */}
@@ -179,10 +198,7 @@ export default function Panel() {
 						title='Configuración'
 						description='Preferencias de la aplicación'
 						onPress={() =>
-							Alert.alert(
-								'Configuración',
-								'Esta sección estará disponible próximamente.',
-							)
+							setComingSoon('Configuración estará disponible pronto.')
 						}
 					/>
 
@@ -191,12 +207,7 @@ export default function Panel() {
 						icon={HelpCircleIcon}
 						title='Ayuda'
 						description='Preguntas frecuentes y soporte'
-						onPress={() =>
-							Alert.alert(
-								'Ayuda',
-								'Esta sección estará disponible próximamente.',
-							)
-						}
+						onPress={() => setComingSoon('Ayuda estará disponible pronto.')}
 					/>
 				</View>
 
@@ -219,6 +230,14 @@ export default function Panel() {
 				visible={showQr}
 				user={user}
 				onClose={() => setShowQr(false)}
+			/>
+
+			<Toast
+				visible={toast !== null}
+				type={toast?.type}
+				title={toast?.title}
+				message={toast?.message ?? ''}
+				onHide={hideToast}
 			/>
 		</ScreenBackground>
 	)

@@ -1,7 +1,7 @@
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
-import { Alert, Image, Pressable, Text, View } from 'react-native'
+import { Image, Pressable, Text, View } from 'react-native'
 import colors from '@/theme/colors'
 import type { ExploreEvent } from '@/types/explore'
 import { formatEventDate, formatEventTime } from '@/utils/format'
@@ -10,24 +10,16 @@ import { getEventImageUrl } from '@/utils/explore'
 type EventCardProps = {
 	event: ExploreEvent
 	isLast: boolean
+	onPress: () => void
 }
 
-export function EventCard({ event, isLast }: EventCardProps) {
+export function EventCard({ event, isLast, onPress }: EventCardProps) {
 	const imageUrl = getEventImageUrl(event.image)
 
 	return (
 		<View className={`w-[292px] ${isLast ? '' : 'mr-2.5'}`}>
 			<View className='h-[203px] overflow-hidden rounded-2xl bg-bosque'>
-				<Pressable
-					className='flex-1 active:opacity-[0.92]'
-					onPress={() =>
-						Alert.alert(
-							event.name,
-							event.description ||
-								'Consulta próximamente todos los detalles de este evento.',
-						)
-					}
-				>
+				<Pressable className='flex-1 active:opacity-[0.92]' onPress={onPress}>
 					<View className='flex-1'>
 						{imageUrl ? (
 							<Image
@@ -72,13 +64,7 @@ export function EventCard({ event, isLast }: EventCardProps) {
 								<Pressable
 									accessibilityRole='button'
 									accessibilityLabel={`Ver evento ${event.name}`}
-									onPress={() =>
-										Alert.alert(
-											event.name,
-											event.description ||
-												'Consulta próximamente todos los detalles de este evento.',
-										)
-									}
+									onPress={onPress}
 									hitSlop={4}
 									className='h-8 w-8 items-center justify-center rounded-full bg-lima'
 								>
