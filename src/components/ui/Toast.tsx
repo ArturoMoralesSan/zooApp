@@ -1,6 +1,6 @@
 import { Notice, type NoticeTone } from '@/components/ui/Notice'
 import { useEffect } from 'react'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export type ToastType = NoticeTone
@@ -12,7 +12,14 @@ type ToastProps = {
 	message: string
 	type?: ToastType
 	onHide: () => void
+	// Defaults to a reading time based on the text length.
 	duration?: number
+}
+
+// ~70ms per character (a relaxed reading pace) on top of 3s to notice the
+// toast, kept between 6 and 12 seconds.
+function readingTime(text: string) {
+	return Math.min(12000, Math.max(6000, 3000 + text.length * 70))
 }
 
 const defaultTitles = {
@@ -21,16 +28,19 @@ const defaultTitles = {
 	warning: 'Atención',
 }
 
-// Floating Notice below the status bar that hides itself after `duration`.
+// Floating Notice below the status bar that hides itself after `duration`
+// (long enough to read the whole message) or when tapped.
 export default function Toast({
 	visible,
 	title,
 	message,
 	type = 'success',
 	onHide,
-	duration = 3000,
+	duration,
 }: ToastProps) {
 	const insets = useSafeAreaInsets()
+	const shownTitle = title ?? defaultTitles[type]
+	const timeout = duration ?? readingTime(`${shownTitle} ${message}`)
 
 	useEffect(() => {
 		if (!visible) {
@@ -39,10 +49,10 @@ export default function Toast({
 
 		const timer = setTimeout(() => {
 			onHide()
-		}, duration)
+		}, timeout)
 
 		return () => clearTimeout(timer)
-	}, [visible, duration, onHide])
+	}, [visible, timeout, onHide])
 
 	if (!visible) {
 		return null
@@ -55,11 +65,9 @@ export default function Toast({
 			className='absolute left-5 right-5 z-[9999]'
 			style={{ top: insets.top + 12 }}
 		>
-			<Notice
-				tone={type}
-				title={title ?? defaultTitles[type]}
-				message={message}
-			/>
+			<Pressable onPress={onHide} accessibilityHint='Toca para cerrar el aviso'>
+				<Notice tone={type} title={shownTitle} message={message} />
+			</Pressable>
 		</View>
 	)
 }

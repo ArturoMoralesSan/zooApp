@@ -42,7 +42,6 @@ export function OfflineBanner() {
 			title='Sin conexión'
 			message={notice?.message ?? ''}
 			onHide={hide}
-			duration={5000}
 		/>
 	)
 }
