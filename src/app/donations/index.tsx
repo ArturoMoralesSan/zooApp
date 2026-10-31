@@ -1,6 +1,8 @@
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { IconBox } from '@/components/ui/IconBox'
-import { ListCard } from '@/components/ui/ListCard'
+import { Card } from '@/components/ui/Card'
+import { Icon } from '@/components/ui/Icon'
+import colors from '@/theme/colors'
 import { OptionButton } from '@/components/ui/OptionButton'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TextField } from '@/components/ui/TextField'
@@ -84,16 +86,20 @@ export default function DonationsIndexScreen() {
 				/>
 
 				{/* TARJETA INFORMATIVA */}
-				<View>
-					<ListCard
-						className='mb-3'
-						tone='dark'
-						title='Haz la diferencia'
-						description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
-						icon={HeartIcon}
-						showChevron={false}
-					/>
-				</View>
+				{/* One-off A-38 banner: text on Bosque with a large outline heart. */}
+				<Card tone='dark' padding='md' className='mb-3'>
+					<View className='absolute right-3 top-3' pointerEvents='none'>
+						<Icon icon={HeartIcon} size={64} color={colors.esmeralda} />
+					</View>
+
+					<View className='pr-16'>
+						<Text className='text-h3 text-blanco'>Haz la diferencia</Text>
+						<Text className='text-body mt-1 text-hoja'>
+							Cada aportación contribuye al cuidado de los animales y a la
+							conservación del zoológico.
+						</Text>
+					</View>
+				</Card>
 
 				{/* SELECCIÓN DE MONTO */}
 				<View className='mt-6'>
