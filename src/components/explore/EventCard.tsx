@@ -17,8 +17,8 @@ export function EventCard({ event, isLast, onPress }: EventCardProps) {
 	const imageUrl = getEventImageUrl(event.image)
 
 	return (
-		<View className={`w-[292px] ${isLast ? '' : 'mr-2.5'}`}>
-			<View className='h-[203px] overflow-hidden rounded-2xl bg-bosque'>
+		<View className={`w-[312px] ${isLast ? '' : 'mr-3'}`}>
+			<View className='h-[240px] overflow-hidden rounded-2xl bg-bosque'>
 				<Pressable className='flex-1 active:opacity-[0.92]' onPress={onPress}>
 					<View className='flex-1'>
 						{imageUrl ? (
@@ -33,7 +33,7 @@ export function EventCard({ event, isLast, onPress }: EventCardProps) {
 							</View>
 						)}
 
-						<View className='absolute bottom-0 left-0 right-0 h-[55%] bg-bosque opacity-[0.98]' />
+						<View className='absolute bottom-0 left-0 right-0 h-[56%] bg-bosque' />
 
 						<Badge
 							label={(event.type || 'Educativo').toUpperCase()}
@@ -42,54 +42,48 @@ export function EventCard({ event, isLast, onPress }: EventCardProps) {
 						/>
 
 						<View className='absolute bottom-0 left-0 right-0 p-4'>
-							<View className='flex-row items-end'>
-								<View className='flex-1 pr-2'>
+							<Text
+								className='font-display text-[22px] leading-7 text-blanco'
+								numberOfLines={1}
+							>
+								{event.name}
+							</Text>
+
+							{event.description ? (
+								<Text className='text-body mt-1 text-hoja' numberOfLines={1}>
+									{event.description}
+								</Text>
+							) : null}
+
+							<View className='mt-3 flex-row items-center justify-between gap-3'>
+								<View className='min-w-0 flex-1 flex-row items-center'>
 									<Text
-										className='font-display text-[23px] leading-7 text-blanco'
+										className='font-sans-bold text-[13px] text-blanco'
 										numberOfLines={1}
 									>
-										{event.name}
+										{formatEventDate(event.start_at)}
 									</Text>
 
-									{event.description ? (
-										<Text
-											className='text-meta mt-1 text-blanco'
-											numberOfLines={1}
-										>
-											{event.description}
-										</Text>
-									) : null}
+									<Text className='mx-2 font-sans-x text-lima'>•</Text>
+
+									<Text className='font-sans-bold text-[13px] text-blanco'>
+										{formatEventTime(event.start_at)}
+									</Text>
 								</View>
 
 								<Pressable
 									accessibilityRole='button'
 									accessibilityLabel={`Ver evento ${event.name}`}
 									onPress={onPress}
-									hitSlop={4}
-									className='h-8 w-8 items-center justify-center rounded-full bg-lima'
+									className='h-10 w-10 items-center justify-center rounded-full bg-lima active:opacity-80'
 								>
 									<Icon
 										icon={ArrowRight01Icon}
-										size={20}
+										size={22}
 										color={colors.bosque}
 										strong
 									/>
 								</Pressable>
-							</View>
-
-							<View className='mt-2.5 flex-row items-center'>
-								<Text
-									className='font-sans-bold text-[12px] text-blanco'
-									numberOfLines={1}
-								>
-									{formatEventDate(event.start_at)}
-								</Text>
-
-								<Text className='mx-2 font-sans-x text-lima'>•</Text>
-
-								<Text className='font-sans-bold text-[12px] text-blanco'>
-									{formatEventTime(event.start_at)}
-								</Text>
 							</View>
 						</View>
 					</View>

@@ -33,8 +33,8 @@ import { getTabBarExtraSpace } from '@/theme/layout'
 import { useScrolled } from '@/hooks/useScrolled'
 
 const PRIMARY = colors.esmeralda
-const EVENT_CARD_WIDTH = 292
-const CAROUSEL_GAP = 10
+const EVENT_CARD_WIDTH = 312
+const CAROUSEL_GAP = 12
 
 export default function Explorar() {
 	const { scrolled, onScroll } = useScrolled()
