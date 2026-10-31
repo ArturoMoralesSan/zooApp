@@ -129,7 +129,7 @@ export default function Panel() {
 			>
 				{/* ENCABEZADO */}
 
-				<TabHeader title='Panel' subtitle='Tu espacio personal en ZooApp.' />
+				<TabHeader title='Panel' />
 
 				{/* TARJETA DE PERFIL */}
 
