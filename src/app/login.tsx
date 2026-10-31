@@ -6,7 +6,9 @@ import { TextLink } from '@/components/ui/TextLink'
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { useAuth } from '@/contexts/AuthContext'
-import { ApiValidationError } from '@/services/api'
+import { checkOffline } from '@/hooks/useNetworkStatus'
+import { ApiValidationError, isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import { PasswordField } from '@/components/ui/PasswordField'
 import { TextField } from '@/components/ui/TextField'
 import { router } from 'expo-router'
@@ -18,6 +20,8 @@ type FormErrors = {
 	email?: string
 	password?: string
 }
+
+const OFFLINE_MESSAGE = 'Conéctate a internet para iniciar sesión.'
 
 export default function Login() {
 	const bottomSpace = useScrollBottomSpace(48)
@@ -56,6 +60,12 @@ export default function Login() {
 			return
 		}
 
+		// Not sent while offline: the request would only fail.
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_MESSAGE)
+			return
+		}
+
 		try {
 			setLoading(true)
 
@@ -66,6 +76,11 @@ export default function Login() {
 
 			router.replace('/(tabs)')
 		} catch (err) {
+			if (isNetworkError(err)) {
+				notifyOffline(OFFLINE_MESSAGE)
+				return
+			}
+
 			if (err instanceof ApiValidationError) {
 				const apiErrors: FormErrors = {}
 

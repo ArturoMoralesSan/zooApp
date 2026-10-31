@@ -7,7 +7,9 @@ import { useScrollBottomSpace } from '@/theme/layout'
 import BackButton from '@/components/ui/BackButton'
 import { RegisterHeader } from '@/components/auth/RegisterHeader'
 import { useAuth } from '@/contexts/AuthContext'
-import { ApiValidationError } from '@/services/api'
+import { checkOffline } from '@/hooks/useNetworkStatus'
+import { ApiValidationError, isNetworkError } from '@/services/api'
+import { notifyOffline } from '@/services/offline-notice'
 import { PasswordField } from '@/components/ui/PasswordField'
 import { TextField } from '@/components/ui/TextField'
 import type { RegisterFormErrors as FormErrors } from '@/types/auth'
@@ -16,6 +18,8 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { Image, ImageBackground, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
+
+const OFFLINE_MESSAGE = 'Conéctate a internet para crear tu cuenta.'
 
 export default function Register() {
 	const bottomSpace = useScrollBottomSpace(48)
@@ -56,6 +60,12 @@ export default function Register() {
 			return
 		}
 
+		// Not sent while offline: the request would only fail.
+		if (await checkOffline()) {
+			notifyOffline(OFFLINE_MESSAGE)
+			return
+		}
+
 		try {
 			setLoading(true)
 
@@ -68,6 +78,11 @@ export default function Register() {
 
 			router.replace('/(tabs)')
 		} catch (err) {
+			if (isNetworkError(err)) {
+				notifyOffline(OFFLINE_MESSAGE)
+				return
+			}
+
 			if (err instanceof ApiValidationError) {
 				const apiErrors: FormErrors = {}
 
