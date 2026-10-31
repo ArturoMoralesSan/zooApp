@@ -21,9 +21,9 @@ export function MapHeaderCard({ isUserInsideZoo, onBack }: MapHeaderCardProps) {
 		>
 			<BackButton variant='outline' position='relative' onPress={onBack} />
 
-			<View className='flex-1 flex-row items-center justify-between rounded-2xl border-1.5 border-card-border bg-blanco p-4'>
+			<View className='flex-1 flex-row items-center justify-between rounded-2xl border-1.5 border-card-border bg-blanco px-4 py-3'>
 				<View className='flex-1 pr-2.5'>
-					<Text className='text-h2 text-tinta'>Mapa del zoológico</Text>
+					<Text className='text-h3 text-tinta'>Mapa del zoológico</Text>
 
 					<Text className='text-meta mt-1'>
 						Explora zonas, caminos y especies

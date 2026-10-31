@@ -9,6 +9,7 @@ import type { Coordinate, SelectableItem, Zone } from '@/types/map'
 import { CollapsedRouteCard } from '@/components/map/CollapsedRouteCard'
 import { DestinationMarker } from '@/components/map/DestinationMarker'
 import { LocationBadge } from '@/components/map/LocationBadge'
+import { MapControls } from '@/components/map/MapControls'
 import { MapHeaderCard } from '@/components/map/MapHeaderCard'
 import { MapLayers } from '@/components/map/MapLayers'
 import { QueryView } from '@/components/ui/QueryView'
@@ -86,6 +87,29 @@ export default function MapScreen() {
 				center: coordinate,
 				zoom: 18,
 				duration,
+			})
+		} catch {
+			return
+		}
+	}
+
+	const zoomBy = async (delta: number) => {
+		try {
+			const zoom = await mapRef.current?.getZoom()
+			if (typeof zoom !== 'number') return
+
+			cameraRef.current?.easeTo({ zoom: zoom + delta, duration: 250 })
+		} catch {
+			return
+		}
+	}
+
+	const locateUser = () => {
+		try {
+			cameraRef.current?.flyTo({
+				center: userLocation ?? ZOO_CENTER,
+				zoom: userLocation ? USER_ZOOM : DEFAULT_ZOOM,
+				duration: 500,
 			})
 		} catch {
 			return
@@ -199,6 +223,12 @@ export default function MapScreen() {
 						onBack={() => router.back()}
 					/>
 
+					<MapControls
+						onLocate={locateUser}
+						onZoomIn={() => void zoomBy(1)}
+						onZoomOut={() => void zoomBy(-1)}
+					/>
+
 					{userLocation && (
 						<LocationBadge locationAccuracy={locationAccuracy} />
 					)}
@@ -213,6 +243,11 @@ export default function MapScreen() {
 							onHowToGetThere={handleHowToGetThere}
 							onShowDestination={() =>
 								flyToDestination(selectedItem.coordinate, 500)
+							}
+							onViewSpecies={
+								selectedItem.species
+									? () => router.push(`/species/${selectedItem.species?.id}`)
+									: undefined
 							}
 						/>
 					)}
