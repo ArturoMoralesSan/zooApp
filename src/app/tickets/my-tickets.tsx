@@ -6,7 +6,6 @@ import { useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
@@ -87,13 +86,10 @@ export default function MyTicketsScreen() {
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
-				contentContainerClassName='px-5 pt-2.5'
+				contentContainerClassName='px-5 pt-2'
 			>
-				<View className='mb-4'>
-					<BackButton onPress={() => router.back()} position='relative' />
-				</View>
-
 				<ScreenHeader
+					onBack={() => router.back()}
 					title='Mis entradas'
 					subtitle='Consulta tus compras y entradas.'
 				/>

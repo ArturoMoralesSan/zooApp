@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Alert, ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -83,7 +82,7 @@ export default function TicketsScreen() {
 		<ScreenBackground>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-3'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
@@ -91,16 +90,11 @@ export default function TicketsScreen() {
 				keyboardShouldPersistTaps='handled'
 			>
 				{/* ENCABEZADO */}
-				<View className='pb-3'>
-					<View className='mb-3'>
-						<BackButton onPress={() => router.back()} position='relative' />
-					</View>
-
-					<ScreenHeader
-						title='Comprar boletos'
-						subtitle='Selecciona los boletos que necesitas.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Comprar boletos'
+					subtitle='Selecciona los boletos que necesitas.'
+				/>
 
 				<QueryView
 					query={ticketTypesQuery}

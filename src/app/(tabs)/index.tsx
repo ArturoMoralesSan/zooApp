@@ -94,7 +94,7 @@ export default function Explorar() {
 				<TabHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-6'>
+				<View>
 					<SectionTitle title='Eventos destacados' />
 
 					<QueryView

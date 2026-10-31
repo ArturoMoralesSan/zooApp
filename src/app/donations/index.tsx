@@ -4,7 +4,6 @@ import { ListCard } from '@/components/ui/ListCard'
 import { OptionButton } from '@/components/ui/OptionButton'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TextField } from '@/components/ui/TextField'
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import {
@@ -74,21 +73,18 @@ export default function DonationsIndexScreen() {
 	return (
 		<ScreenBackground>
 			<KeyboardScrollView
-				contentContainerClassName='px-5 pt-3'
+				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 			>
 				{/* ENCABEZADO */}
-				<BackButton position='relative' onPress={() => router.back()} />
-
-				<View className='mt-3'>
-					<ScreenHeader
-						title='Apoya al zoológico'
-						subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Apoya al zoológico'
+					subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+				/>
 
 				{/* TARJETA INFORMATIVA */}
-				<View className='mt-5'>
+				<View>
 					<ListCard
 						className='mb-3'
 						tone='dark'

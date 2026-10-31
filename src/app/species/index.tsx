@@ -5,7 +5,6 @@ import { ScrollView, Text, View } from 'react-native'
 
 import { ListCard } from '@/components/ui/ListCard'
 import { QueryView } from '@/components/ui/QueryView'
-import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
@@ -54,11 +53,8 @@ export default function SpeciesScreen() {
 				className='flex-1'
 				contentContainerClassName='grow px-3 pb-[120px] pt-2'
 			>
-				<View className='mb-4'>
-					<BackButton onPress={() => router.back()} position='relative' />
-				</View>
-
 				<ScreenHeader
+					onBack={() => router.back()}
 					title='Especies'
 					subtitle='Conoce a los habitantes del zoológico.'
 				/>
@@ -66,7 +62,7 @@ export default function SpeciesScreen() {
 				{/* Buscador */}
 				<SearchField
 					label='Buscar especie'
-					className='mb-1 mt-4'
+					className='mb-1'
 					value={search}
 					onChangeText={setSearch}
 					placeholder='Buscar especie...'

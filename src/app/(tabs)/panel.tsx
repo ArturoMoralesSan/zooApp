@@ -120,7 +120,7 @@ export default function Panel() {
 
 				{/* TARJETA DE PERFIL */}
 
-				<View className='mt-5'>
+				<View>
 					<ListCard
 						className='mb-3'
 						avatarUrl={avatarUrl}

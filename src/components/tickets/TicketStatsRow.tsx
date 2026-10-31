@@ -13,7 +13,7 @@ export function TicketStatsRow({
 	historyPurchases,
 }: TicketStatsRowProps) {
 	return (
-		<View className='mb-4 mt-6 flex-row gap-3'>
+		<View className='mb-4 flex-row gap-3'>
 			<StatCard
 				icon={Ticket01Icon}
 				value={activePurchases.length}
