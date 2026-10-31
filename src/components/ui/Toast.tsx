@@ -16,10 +16,10 @@ type ToastProps = {
 	duration?: number
 }
 
-// ~70ms per character (a relaxed reading pace) on top of 3s to notice the
-// toast, kept between 6 and 12 seconds.
+// ~100ms per character (an unhurried reading pace) on top of 5s to notice
+// the toast, kept between 10 and 20 seconds. Tapping closes it earlier.
 function readingTime(text: string) {
-	return Math.min(12000, Math.max(6000, 3000 + text.length * 70))
+	return Math.min(20000, Math.max(10000, 5000 + text.length * 100))
 }
 
 const defaultTitles = {
