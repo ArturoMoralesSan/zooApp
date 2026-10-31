@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import { QrFrame } from '@/components/ui/QrFrame'
 
 import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
@@ -88,13 +89,13 @@ export default function TicketSuccessScreen() {
 									className='mb-3 self-center'
 								/>
 
-								<View className='items-center justify-center rounded-2xl border-1.5 border-card-border bg-blanco p-3'>
+								<QrFrame>
 									<QRCode
 										value={ticket.qr_token ?? ''}
 										size={190}
 										backgroundColor={colors.blanco}
 									/>
-								</View>
+								</QrFrame>
 							</View>
 						))
 					) : (

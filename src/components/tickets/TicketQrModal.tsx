@@ -11,6 +11,7 @@ import { getTicketStatus, getTicketStatusTone } from '@/utils/tickets'
 import { Cancel01Icon, QrCodeIcon } from '@hugeicons/core-free-icons'
 import { ScrollView, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import { QrFrame } from '@/components/ui/QrFrame'
 
 type TicketQrModalProps = {
 	selectedPurchase: Purchase | null
@@ -66,7 +67,7 @@ export function TicketQrModal({
 							/>
 						</View>
 
-						<View className='mt-4 min-h-[236px] min-w-[236px] items-center justify-center self-center rounded-2xl border-1.5 border-card-border bg-blanco p-3'>
+						<QrFrame className='mt-4 min-h-[236px] min-w-[236px]'>
 							{ticket.qr_token && ticket.qr_token.trim() !== '' ? (
 								<QRCode
 									value={ticket.qr_token}
@@ -87,7 +88,7 @@ export function TicketQrModal({
 									</Text>
 								</View>
 							)}
-						</View>
+						</QrFrame>
 					</Card>
 				))}
 			</ScrollView>
