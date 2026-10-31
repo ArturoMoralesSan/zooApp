@@ -1,6 +1,12 @@
 import { Redirect } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ImageBackground, View } from 'react-native'
+import {
+	ActivityIndicator,
+	Image,
+	ImageBackground,
+	Text,
+	View,
+} from 'react-native'
 
 import { useAuth } from '@/contexts/AuthContext'
 import colors from '@/theme/colors'
@@ -41,6 +47,8 @@ export default function SplashScreen() {
 				/>
 
 				<ActivityIndicator size='large' color={colors.lima} className='mt-8' />
+
+				<Text className='text-meta mt-3 text-blanco'>Cargando…</Text>
 			</View>
 		</ImageBackground>
 	)

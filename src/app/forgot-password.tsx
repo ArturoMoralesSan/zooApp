@@ -1,12 +1,14 @@
 import { AuthCard } from '@/components/auth/AuthCard'
 import { AuthSwitchLink } from '@/components/auth/AuthSwitchLink'
 import { Button } from '@/components/ui/Button'
+import { IconBox } from '@/components/ui/IconBox'
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { useScrollBottomSpace } from '@/theme/layout'
 import BackButton from '@/components/ui/BackButton'
+import { Key01Icon } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Image, ImageBackground, Text, View } from 'react-native'
+import { ImageBackground, Text, View } from 'react-native'
 import { TextField } from '@/components/ui/TextField'
 
 export default function ForgotPassword() {
@@ -52,64 +54,56 @@ export default function ForgotPassword() {
 				{/* REGRESAR */}
 				<BackButton variant='outline' onPress={() => router.back()} />
 
-				{/* LOGO */}
-				<View className='mt-20 items-center'>
-					<Image
-						source={require('../../assets/images/zooapp-logo.png')}
-						resizeMode='contain'
-						accessibilityLabel='Logo de ZooApp'
-						className='h-28 w-32'
-					/>
+				{/* TARJETA (centrada, como en A-03) */}
+				<View className='flex-1 justify-center pt-14'>
+					<AuthCard>
+						{/* ENCABEZADO */}
+						<View>
+							<IconBox icon={Key01Icon} />
+
+							<Text className='text-h1 mt-4'>¿Olvidaste tu contraseña?</Text>
+
+							<Text className='text-subtitle mt-2'>
+								Ingresa tu correo electrónico y te enviaremos instrucciones para
+								recuperar el acceso a tu cuenta.
+							</Text>
+						</View>
+
+						{/* CORREO */}
+						<TextField
+							label='Correo electrónico'
+							className='mt-8'
+							error={error || undefined}
+							value={email}
+							onChangeText={(value) => {
+								setEmail(value)
+								setError('')
+							}}
+							placeholder='correo@ejemplo.com'
+							autoCapitalize='none'
+							autoCorrect={false}
+							keyboardType='email-address'
+							textContentType='emailAddress'
+							autoComplete='email'
+							returnKeyType='done'
+							onSubmitEditing={handleRecover}
+						/>
+
+						{/* ENVIAR INSTRUCCIONES */}
+						<Button
+							title='Enviar instrucciones'
+							onPress={handleRecover}
+							className='mt-8'
+						/>
+
+						{/* VOLVER AL LOGIN */}
+						<AuthSwitchLink
+							prompt='¿Recuerdas tu contraseña?'
+							label='Inicia sesión'
+							onPress={() => router.replace('/login')}
+						/>
+					</AuthCard>
 				</View>
-
-				{/* TARJETA */}
-				<AuthCard>
-					{/* ENCABEZADO */}
-					<View className='items-center'>
-						<Text className='text-h1 text-center'>
-							¿Olvidaste tu contraseña?
-						</Text>
-
-						<Text className='text-subtitle mt-2.5 text-center'>
-							Ingresa tu correo electrónico y te enviaremos instrucciones para
-							recuperar el acceso a tu cuenta.
-						</Text>
-					</View>
-
-					{/* CORREO */}
-					<TextField
-						label='Correo electrónico'
-						className='mt-8'
-						error={error || undefined}
-						value={email}
-						onChangeText={(value) => {
-							setEmail(value)
-							setError('')
-						}}
-						placeholder='correo@ejemplo.com'
-						autoCapitalize='none'
-						autoCorrect={false}
-						keyboardType='email-address'
-						textContentType='emailAddress'
-						autoComplete='email'
-						returnKeyType='done'
-						onSubmitEditing={handleRecover}
-					/>
-
-					{/* ENVIAR INSTRUCCIONES */}
-					<Button
-						title='Enviar instrucciones'
-						onPress={handleRecover}
-						className='mt-8'
-					/>
-
-					{/* VOLVER AL LOGIN */}
-					<AuthSwitchLink
-						prompt='¿Recuerdas tu contraseña?'
-						label='Inicia sesión'
-						onPress={() => router.replace('/login')}
-					/>
-				</AuthCard>
 			</KeyboardScrollView>
 		</ImageBackground>
 	)
