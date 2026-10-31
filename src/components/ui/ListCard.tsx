@@ -26,7 +26,8 @@ type ListCardProps = {
 	onPress?: () => void
 	// Defaults to true for pressable rows.
 	showChevron?: boolean
-	// Large faint icon behind the content, cut by the right edge (A-05 Entradas tile).
+	// Tile only: large faint icon between the icon box and the text, cut by
+	// the right edge (A-05 Entradas tile).
 	watermark?: IconSvgElement
 	children?: ReactNode
 	className?: string
@@ -100,12 +101,6 @@ export function ListCard({
 			accessibilityLabel={description ? `${title}, ${description}` : title}
 			className={className}
 		>
-			{watermark && (
-				<View pointerEvents='none' className='absolute -right-4 top-[32%]'>
-					<Icon icon={watermark} size={104} color={colors.hoja} />
-				</View>
-			)}
-
 			{image && (
 				<Image
 					source={image}
@@ -119,6 +114,20 @@ export function ListCard({
 				className={`gap-3 p-4 ${layout === 'tile' ? 'grow flex-col items-start justify-between' : 'flex-row items-center'}`}
 			>
 				{leading}
+
+				{/* Watermark: a spacer between the icon and the text, with the
+				    icon centered in it and running past the card's right edge. */}
+				{watermark && layout === 'tile' && (
+					<View
+						pointerEvents='none'
+						className='self-stretch'
+						style={{ flex: 1 }}
+					>
+						<View className='absolute -right-8 top-1/2 -mt-[52px]'>
+							<Icon icon={watermark} size={104} color={colors.hoja} />
+						</View>
+					</View>
+				)}
 
 				{/* Inline on purpose: NativeWind's flex-1 expands to grow/shrink/basis,
 				    which collapses this block in the tile (column) layout. */}
