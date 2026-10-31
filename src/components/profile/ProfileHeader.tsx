@@ -1,10 +1,8 @@
-import BackButton from '@/components/ui/BackButton'
 import { Icon } from '@/components/ui/Icon'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { type User } from '@/services/auth'
 import { getInitials } from '@/utils/profile'
 import colors from '@/theme/colors'
-import { router } from 'expo-router'
 import {
 	ActivityIndicator,
 	Animated,
@@ -19,7 +17,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 type ProfileHeaderProps = {
 	coverHeight: Animated.AnimatedInterpolation<number>
-	backButtonOpacity: Animated.AnimatedInterpolation<number>
 	avatarScale: Animated.AnimatedInterpolation<number>
 	avatarTranslateY: Animated.AnimatedInterpolation<number>
 	nameTranslateY: Animated.AnimatedInterpolation<number>
@@ -32,7 +29,6 @@ type ProfileHeaderProps = {
 
 export function ProfileHeader({
 	coverHeight,
-	backButtonOpacity,
 	avatarScale,
 	avatarTranslateY,
 	nameTranslateY,
@@ -48,12 +44,6 @@ export function ProfileHeader({
 				source={require('@/assets/images/profile-background.png')}
 				resizeMode='cover'
 				style={{ width: SCREEN_WIDTH, height: coverHeight }}
-			/>
-
-			<BackButton
-				variant='outline'
-				onPress={() => router.back()}
-				opacity={backButtonOpacity}
 			/>
 
 			<View className='absolute left-0 right-0 top-0 items-center pt-20'>

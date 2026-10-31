@@ -22,6 +22,10 @@ import {
 import { getAvatarUrl } from '@/utils/profile'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
+import { TopBar } from '@/components/ui/TopBar'
+import { useScrolled } from '@/hooks/useScrolled'
+import { router } from 'expo-router'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type ToastState = {
 	visible: boolean
@@ -317,11 +321,12 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 		extrapolate: 'clamp',
 	})
 
-	const backButtonOpacity = scrollY.interpolate({
-		inputRange: [0, 70, 130],
-		outputRange: [1, 0.65, 0],
-		extrapolate: 'clamp',
-	})
+	// The cover (300 → 145 over the first 180px) slides under the bar's
+	// bottom edge here; from then on the bar is solid with the name.
+	const insets = useSafeAreaInsets()
+	const { pastTitle: pastCover, onScroll } = useScrolled(
+		(300 - (insets.top + 56)) / (1 + 155 / 180),
+	)
 
 	const progressMarginTop = scrollY.interpolate({
 		inputRange: [0, 180],
@@ -344,6 +349,14 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 				}
 			/>
 
+			<TopBar
+				overlay
+				onBack={() => router.back()}
+				title={user?.name ?? 'Perfil'}
+				showTitle={pastCover}
+				scrolled={pastCover}
+			/>
+
 			<KeyboardScrollView
 				className='flex-1'
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
@@ -355,13 +368,12 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 							},
 						},
 					],
-					{ useNativeDriver: false },
+					{ useNativeDriver: false, listener: onScroll },
 				)}
 			>
 				{/* HEADER */}
 				<ProfileHeader
 					coverHeight={coverHeight}
-					backButtonOpacity={backButtonOpacity}
 					avatarScale={avatarScale}
 					avatarTranslateY={avatarTranslateY}
 					nameTranslateY={nameTranslateY}

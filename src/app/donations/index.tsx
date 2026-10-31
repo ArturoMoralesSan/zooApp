@@ -21,11 +21,12 @@ import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 const DONATION_AMOUNTS = [10, 20, 50, 100, 200]
 
 export default function DonationsIndexScreen() {
-	const { scrolled, onScroll } = useScrolled()
+	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
 	const [customAmount, setCustomAmount] = useState('')
@@ -76,20 +77,26 @@ export default function DonationsIndexScreen() {
 
 	return (
 		<ScreenBackground>
-			{/* ENCABEZADO FIJO */}
-			<ScreenHeader
-				scrolled={scrolled}
+			{/* BARRA SUPERIOR FIJA */}
+			<TopBar
 				onBack={() => router.back()}
 				title='Apoya al zoológico'
-				subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+				showTitle={pastTitle}
+				scrolled={scrolled}
 			/>
 
 			<KeyboardScrollView
 				onScroll={onScroll}
 				scrollEventThrottle={16}
-				contentContainerClassName='px-5 pt-4'
+				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 			>
+				<ScreenHeader
+					title='Apoya al zoológico'
+					subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+					onLayout={onTitleLayout}
+				/>
+
 				{/* TARJETA INFORMATIVA */}
 				{/* One-off A-38 banner: text on Bosque with a large outline heart. */}
 				<Card tone='dark' padding='md' className='mb-3'>

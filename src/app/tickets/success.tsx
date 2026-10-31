@@ -23,8 +23,8 @@ import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { useTicketTypes } from '@/hooks/useTickets'
-import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 export default function TicketSuccessScreen() {
 	const { scrolled, onScroll } = useScrolled()
@@ -54,13 +54,13 @@ export default function TicketSuccessScreen() {
 	return (
 		<ScreenBackground>
 			{/* CONTENIDO DESPLAZABLE */}
-			<ScreenHeader onBack={() => router.back()} scrolled={scrolled} />
+			<TopBar onBack={() => router.back()} scrolled={scrolled} />
 
 			<ScrollView
 				onScroll={onScroll}
 				scrollEventThrottle={16}
 				className='min-h-0 flex-1'
-				contentContainerClassName='w-full grow items-stretch px-5 pt-0'
+				contentContainerClassName='w-full grow items-stretch px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces

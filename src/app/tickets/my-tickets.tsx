@@ -17,9 +17,10 @@ import { QueryView } from '@/components/ui/QueryView'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { TicketQrModal } from '@/components/tickets/TicketQrModal'
 import { useScrolled } from '@/hooks/useScrolled'
+import { TopBar } from '@/components/ui/TopBar'
 
 export default function MyTicketsScreen() {
-	const { scrolled, onScroll } = useScrolled()
+	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
 	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
@@ -84,12 +85,12 @@ export default function MyTicketsScreen() {
 
 	return (
 		<ScreenBackground>
-			{/* ENCABEZADO FIJO */}
-			<ScreenHeader
-				scrolled={scrolled}
+			{/* BARRA SUPERIOR FIJA */}
+			<TopBar
 				onBack={() => router.back()}
 				title='Mis entradas'
-				subtitle='Consulta tus compras y entradas.'
+				showTitle={pastTitle}
+				scrolled={scrolled}
 			/>
 
 			<ScrollView
@@ -98,8 +99,14 @@ export default function MyTicketsScreen() {
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
-				contentContainerClassName='px-5 pt-4'
+				contentContainerClassName='px-5 pt-2'
 			>
+				<ScreenHeader
+					title='Mis entradas'
+					subtitle='Consulta tus compras y entradas.'
+					onLayout={onTitleLayout}
+				/>
+
 				{/* Counts and tabs only once there's data, never zeros from a failed load */}
 				{myTickets.data && (
 					<>

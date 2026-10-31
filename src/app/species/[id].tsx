@@ -1,4 +1,6 @@
-import BackButton from '@/components/ui/BackButton'
+import { TopBar } from '@/components/ui/TopBar'
+import { useScrolled } from '@/hooks/useScrolled'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { useScrollBottomSpace } from '@/theme/layout'
 import { SpeciesStateFrame } from '@/components/species/SpeciesStateFrame'
@@ -35,11 +37,12 @@ export default function SpeciesDetailScreen() {
 		extrapolate: 'clamp',
 	})
 
-	const backButtonOpacity = scrollY.interpolate({
-		inputRange: [0, 80, 150],
-		outputRange: [1, 0.6, 0],
-		extrapolate: 'clamp',
-	})
+	// The sheet (470 hero, -40 overlap, rising 2px per scrolled px) meets
+	// the bar's bottom edge here.
+	const insets = useSafeAreaInsets()
+	const { pastTitle: pastHero, onScroll } = useScrolled(
+		(470 - 40 - (insets.top + 56)) / 2,
+	)
 
 	const heroImage = useMemo(() => {
 		if (!species) return null
@@ -91,7 +94,7 @@ export default function SpeciesDetailScreen() {
 									},
 								},
 							],
-							{ useNativeDriver: false },
+							{ useNativeDriver: false, listener: onScroll },
 						)}
 					>
 						<View className='relative bg-blanco'>
@@ -163,20 +166,15 @@ export default function SpeciesDetailScreen() {
 						</View>
 					</Animated.ScrollView>
 
-					{/* BOTÓN REGRESAR SOBRE LA IMAGEN */}
-					<Animated.View
-						pointerEvents='box-none'
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							zIndex: 9999,
-							elevation: 9999,
-							opacity: backButtonOpacity,
-						}}
-					>
-						<BackButton onPress={() => router.back()} />
-					</Animated.View>
+					{/* BARRA SUPERIOR: transparent over the photo, solid with the
+					    species name once the sheet reaches it */}
+					<TopBar
+						overlay
+						onBack={() => router.back()}
+						title={species.common_name}
+						showTitle={pastHero}
+						scrolled={pastHero}
+					/>
 
 					{/* VISOR DE IMÁGENES */}
 					<SpeciesImageViewer
