@@ -16,8 +16,10 @@ import { PurchaseCard } from '@/components/tickets/PurchaseCard'
 import { QueryView } from '@/components/ui/QueryView'
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { TicketQrModal } from '@/components/tickets/TicketQrModal'
+import { useScrolled } from '@/hooks/useScrolled'
 
 export default function MyTicketsScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
@@ -82,18 +84,22 @@ export default function MyTicketsScreen() {
 
 	return (
 		<ScreenBackground>
+			{/* ENCABEZADO FIJO */}
+			<ScreenHeader
+				scrolled={scrolled}
+				onBack={() => router.back()}
+				title='Mis entradas'
+				subtitle='Consulta tus compras y entradas.'
+			/>
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
-				contentContainerClassName='px-5 pt-2'
+				contentContainerClassName='px-5 pt-4'
 			>
-				<ScreenHeader
-					onBack={() => router.back()}
-					title='Mis entradas'
-					subtitle='Consulta tus compras y entradas.'
-				/>
-
 				{/* Counts and tabs only once there's data, never zeros from a failed load */}
 				{myTickets.data && (
 					<>

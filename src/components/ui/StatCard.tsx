@@ -52,7 +52,7 @@ export function StatCard({
 		<View
 			accessible
 			accessibilityLabel={`${label}: ${value}`}
-			className={`min-w-0 rounded-2xl border-1.5 p-4 ${brand ? 'border-bosque bg-esmeralda' : 'border-card-border bg-niebla'} ${layout === 'row' ? 'flex-row items-center gap-3' : layout === 'stack' ? 'items-center justify-center px-2' : ''} ${className}`}
+			className={`min-w-0 rounded-2xl border-1.5 p-4 ${brand ? 'border-esmeralda bg-esmeralda' : 'border-card-border bg-niebla'} ${layout === 'row' ? 'flex-row items-center gap-3' : layout === 'stack' ? 'items-center justify-center px-2' : ''} ${className}`}
 		>
 			{layout === 'row' && icon && <IconBox icon={icon} />}
 

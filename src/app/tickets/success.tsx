@@ -9,7 +9,6 @@ import { ScrollView, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { QrFrame } from '@/components/ui/QrFrame'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { Chip } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
@@ -24,8 +23,11 @@ import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { useTicketTypes } from '@/hooks/useTickets'
+import { ScreenHeader } from '@/components/ui/TabHeader'
+import { useScrolled } from '@/hooks/useScrolled'
 
 export default function TicketSuccessScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
@@ -52,19 +54,18 @@ export default function TicketSuccessScreen() {
 	return (
 		<ScreenBackground>
 			{/* CONTENIDO DESPLAZABLE */}
+			<ScreenHeader onBack={() => router.back()} scrolled={scrolled} />
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='min-h-0 flex-1'
-				contentContainerClassName='w-full grow items-stretch px-5 pt-3'
+				contentContainerClassName='w-full grow items-stretch px-5 pt-0'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
 			>
-				{/* BOTÓN REGRESAR (el título lo da SuccessBanner) */}
-				<View className='mb-4'>
-					<BackButton onPress={() => router.back()} position='relative' />
-				</View>
-
 				{/* CONFIRMACIÓN DE COMPRA */}
 				<SuccessBanner
 					title='¡Compra realizada!'

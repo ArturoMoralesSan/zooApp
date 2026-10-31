@@ -1,9 +1,8 @@
 import { Home01Icon, StarIcon } from '@hugeicons/core-free-icons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { Card } from '@/components/ui/Card'
 import { DetailRow } from '@/components/ui/DetailRow'
@@ -14,12 +13,15 @@ import type { Donation, PaymentMethod } from '@/types/donations'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { ScreenHeader } from '@/components/ui/TabHeader'
+import { useScrolled } from '@/hooks/useScrolled'
 
 function getPaymentMethod(method: PaymentMethod | null | undefined) {
 	return method?.name || method?.code || 'Tarjeta'
 }
 
 export default function DonationSuccessScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	// donations/summary passes the created donation as JSON, plus the amount
 	// on its own in case the donation can't be read.
@@ -60,17 +62,16 @@ export default function DonationSuccessScreen() {
 
 	return (
 		<ScreenBackground>
+			<ScreenHeader onBack={() => router.back()} scrolled={scrolled} />
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='flex-1'
-				contentContainerClassName='px-5 pt-2.5'
+				contentContainerClassName='px-5 pt-0.5'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* BOTÓN REGRESAR (el título lo da SuccessBanner) */}
-				<View className='mb-4'>
-					<BackButton position='relative' onPress={() => router.back()} />
-				</View>
-
 				{/* CONFIRMACIÓN DE DONACIÓN */}
 				<SuccessBanner
 					title='¡Donación realizada!'

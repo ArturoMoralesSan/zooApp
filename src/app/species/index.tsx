@@ -13,12 +13,14 @@ import { Chip } from '@/components/ui/Chip'
 import { TextLink } from '@/components/ui/TextLink'
 import { SearchField } from '@/components/ui/SearchField'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { useScrolled } from '@/hooks/useScrolled'
 
 const FILTERS = ['Todas', 'Mamíferos', 'Aves', 'Reptiles'] as const
 
 type Filter = (typeof FILTERS)[number]
 
 export default function SpeciesScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const speciesQuery = useSpecies()
 	const species = useMemo(() => speciesQuery.data ?? [], [speciesQuery.data])
 	const [search, setSearch] = useState('')
@@ -49,16 +51,20 @@ export default function SpeciesScreen() {
 
 	return (
 		<ScreenBackground>
-			<KeyboardScrollView
-				className='flex-1'
-				contentContainerClassName='grow px-5 pb-[120px] pt-2'
-			>
-				<ScreenHeader
-					onBack={() => router.back()}
-					title='Especies'
-					subtitle='Conoce a los habitantes del zoológico.'
-				/>
+			{/* ENCABEZADO FIJO */}
+			<ScreenHeader
+				scrolled={scrolled}
+				onBack={() => router.back()}
+				title='Especies'
+				subtitle='Conoce a los habitantes del zoológico.'
+			/>
 
+			<KeyboardScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
+				className='flex-1'
+				contentContainerClassName='grow px-5 pb-[120px] pt-4'
+			>
 				{/* Buscador */}
 				<SearchField
 					label='Buscar especie'
