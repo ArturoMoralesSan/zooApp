@@ -26,7 +26,7 @@ type ListCardProps = {
 	onPress?: () => void
 	// Defaults to true for pressable rows.
 	showChevron?: boolean
-	// Large faint icon centered behind the content (A-05 Entradas tile).
+	// Large faint icon behind the content, cut by the right edge (A-05 Entradas tile).
 	watermark?: IconSvgElement
 	children?: ReactNode
 	className?: string
@@ -101,11 +101,8 @@ export function ListCard({
 			className={className}
 		>
 			{watermark && (
-				<View
-					pointerEvents='none'
-					className='absolute inset-0 items-center justify-center pb-16'
-				>
-					<Icon icon={watermark} size={112} color={colors.hoja} />
+				<View pointerEvents='none' className='absolute -right-4 top-[32%]'>
+					<Icon icon={watermark} size={104} color={colors.hoja} />
 				</View>
 			)}
 
