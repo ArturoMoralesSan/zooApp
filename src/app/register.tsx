@@ -115,7 +115,7 @@ export default function Register() {
 				className='flex-1'
 				contentContainerStyle={{
 					flexGrow: 1,
-					paddingHorizontal: 24,
+					paddingHorizontal: 20,
 					paddingTop: 36,
 					paddingBottom: bottomSpace,
 				}}

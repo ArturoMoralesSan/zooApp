@@ -32,7 +32,7 @@ export default function SplashScreen() {
 			{/* Capa blanca con 10 % de opacidad */}
 			<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
-			<View className='w-full items-center justify-center px-6'>
+			<View className='w-full items-center justify-center px-5'>
 				<Image
 					source={require('../../assets/images/zooapp-logo.png')}
 					resizeMode='contain'

@@ -108,7 +108,7 @@ export default function Panel() {
 		<ScreenBackground>
 			<ScrollView
 				className='flex-1'
-				contentContainerClassName='px-3 pt-2'
+				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{
 					paddingBottom: 120 + getTabBarExtraSpace(insets.bottom),
 				}}

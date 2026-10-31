@@ -16,7 +16,7 @@ export function MapHeaderCard({ isUserInsideZoo, onBack }: MapHeaderCardProps) {
 
 	return (
 		<View
-			className='absolute left-4 right-4 flex-row items-start gap-2'
+			className='absolute left-5 right-5 flex-row items-start gap-2'
 			style={{ top: insets.top + 16 }}
 		>
 			<BackButton variant='outline' position='relative' onPress={onBack} />

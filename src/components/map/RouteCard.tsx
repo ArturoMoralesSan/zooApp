@@ -39,7 +39,7 @@ export function RouteCard({
 
 	return (
 		<View
-			className='absolute left-4 right-4 rounded-3xl border-1.5 border-card-border bg-blanco p-5'
+			className='absolute left-5 right-5 rounded-3xl border-1.5 border-card-border bg-blanco p-5'
 			style={{ bottom: getFloatingBottom(insets.bottom) }}
 		>
 			<View className='flex-row items-center gap-3'>

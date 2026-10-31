@@ -51,7 +51,7 @@ export default function SpeciesScreen() {
 		<ScreenBackground>
 			<KeyboardScrollView
 				className='flex-1'
-				contentContainerClassName='grow px-3 pb-[120px] pt-2'
+				contentContainerClassName='grow px-5 pb-[120px] pt-2'
 			>
 				<ScreenHeader
 					onBack={() => router.back()}

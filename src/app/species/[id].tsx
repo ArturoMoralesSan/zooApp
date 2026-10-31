@@ -108,7 +108,7 @@ export default function SpeciesDetailScreen() {
 									imageClassName='opacity-30'
 									className='bg-blanco'
 								>
-									<View className='px-4 pb-7 pt-6'>
+									<View className='px-5 pb-7 pt-6'>
 										{/* CATEGORÍA */}
 										{species.category && (
 											<Text className='text-overline text-esmeralda'>

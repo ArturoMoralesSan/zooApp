@@ -22,7 +22,7 @@ export function SpeciesGallery({
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				className='-mx-4 mt-3'
+				className='-mx-5 mt-3'
 				contentContainerClassName='px-5'
 			>
 				{galleryImages.map((image) => (

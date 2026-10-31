@@ -74,7 +74,7 @@ export default function Explorar() {
 		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
 			<ScrollView
 				className='flex-1'
-				contentContainerClassName='grow px-3 pt-2'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{
 					paddingBottom: 140 + getTabBarExtraSpace(insets.bottom),
 				}}
@@ -120,7 +120,8 @@ export default function Explorar() {
 									snapToAlignment='start'
 									disableIntervalMomentum
 									onMomentumScrollEnd={handleCarouselScroll}
-									contentContainerClassName='pr-2'
+									className='-mx-5'
+									contentContainerClassName='px-5'
 								>
 									{events.map((event, index) => (
 										<EventCard

@@ -19,7 +19,7 @@ export function SpeciesStateFrame({
 	return (
 		<ImageBackground
 			source={require('@/assets/images/zoo-pattern.png')}
-			className='flex-1 bg-blanco px-4'
+			className='flex-1 bg-blanco px-5'
 			style={{ paddingTop: insets.top + 8 }}
 			resizeMode='repeat'
 			imageClassName='opacity-90'
