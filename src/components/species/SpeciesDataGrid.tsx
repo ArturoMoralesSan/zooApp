@@ -1,16 +1,52 @@
+import { Badge, type BadgeTone } from '@/components/ui/Badge'
+import { Card } from '@/components/ui/Card'
+import { IconBox } from '@/components/ui/IconBox'
 import { SectionTitle } from '@/components/ui/SectionTitle'
-import { ListCard } from '@/components/ui/ListCard'
 import type { SpeciesDetail } from '@/types/species'
 import {
-	Leaf01Icon,
 	Location01Icon,
-	Plant01Icon,
+	NaturalFoodIcon,
 	Shield01Icon,
+	Tree01Icon,
 } from '@hugeicons/core-free-icons'
-import { View } from 'react-native'
+import type { IconSvgElement } from '@hugeicons/react-native'
+import type { ReactNode } from 'react'
+import { Text, View } from 'react-native'
 
 type SpeciesDataGridProps = {
 	species: SpeciesDetail
+}
+
+type DataTileProps = {
+	icon: IconSvgElement
+	label: string
+	children: ReactNode
+}
+
+// A-11 tile: 32 icon tile, overline label and the value below.
+function DataTile({ icon, label, children }: DataTileProps) {
+	return (
+		<View className='mb-3 w-[48.5%]'>
+			<Card padding='none' className='grow p-3'>
+				<IconBox icon={icon} size='sm' />
+
+				<Text className='text-overline mt-3 text-tinta-2'>{label}</Text>
+
+				<View className='mt-1'>{children}</View>
+			</Card>
+		</View>
+	)
+}
+
+// Status tone, always with its text (never color alone).
+function conservationTone(status: string): BadgeTone {
+	if (/menor|least/i.test(status)) return 'success'
+	if (/cr[ií]tic|extint|extinct/i.test(status)) return 'error'
+	return 'pending'
+}
+
+function DataValue({ value }: { value: string }) {
+	return <Text className='font-sans-bold text-[14px] text-tinta'>{value}</Text>
 }
 
 export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
@@ -20,56 +56,31 @@ export function SpeciesDataGrid({ species }: SpeciesDataGridProps) {
 
 			<View className='flex-row flex-wrap justify-between'>
 				{species.habitat && (
-					<View className='mb-3 w-[48.5%]'>
-						<ListCard
-							className='grow'
-							icon={Location01Icon}
-							layout='tile'
-							title='Hábitat'
-							description={species.habitat}
-							showChevron={false}
-						/>
-					</View>
+					<DataTile icon={Tree01Icon} label='Hábitat'>
+						<DataValue value={species.habitat} />
+					</DataTile>
 				)}
 
 				{species.origin && (
-					<View className='mb-3 w-[48.5%]'>
-						<ListCard
-							className='grow'
-							icon={Plant01Icon}
-							layout='tile'
-							title='Origen'
-							description={species.origin}
-							showChevron={false}
-						/>
-					</View>
+					<DataTile icon={Location01Icon} label='Origen'>
+						<DataValue value={species.origin} />
+					</DataTile>
 				)}
 
 				{species.diet && (
-					<View className='mb-3 w-[48.5%]'>
-						<ListCard
-							className='grow'
-							icon={Leaf01Icon}
-							title='Alimentación'
-							layout='tile'
-							description={species.diet}
-							showChevron={false}
-						/>
-					</View>
+					<DataTile icon={NaturalFoodIcon} label='Alimentación'>
+						<DataValue value={species.diet} />
+					</DataTile>
 				)}
 
 				{species.conservation_status && (
-					<View className='mb-3 w-[48.5%]'>
-						<ListCard
-							className='grow'
-							tone='hoja'
-							icon={Shield01Icon}
-							layout='tile'
-							title='Conservación'
-							description={species.conservation_status}
-							showChevron={false}
+					<DataTile icon={Shield01Icon} label='Conservación'>
+						<Badge
+							dot
+							label={species.conservation_status}
+							tone={conservationTone(species.conservation_status)}
 						/>
-					</View>
+					</DataTile>
 				)}
 			</View>
 		</View>

@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
-import { ListCard } from '@/components/ui/ListCard'
+import { SpeciesCard } from '@/components/species/SpeciesCard'
 import { QueryView } from '@/components/ui/QueryView'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -125,24 +125,11 @@ export default function SpeciesScreen() {
 					{() => (
 						<View className='mt-4'>
 							{filteredSpecies.map((item) => (
-								<ListCard
-									className='mb-3'
+								<SpeciesCard
 									key={item.id}
+									species={item}
 									onPress={() => openSpecies(item.id)}
-									image={item.image ? { uri: item.image } : undefined}
-									imageHeight={210}
-									title={item.common_name}
-									description={[
-										item.scientific_name,
-										item.category?.name
-											? `Categoría: ${item.category.name}`
-											: null,
-										item.description,
-									]
-										.filter(Boolean)
-										.join('\n')}
-									icon={!item.image ? UserGroupIcon : undefined}
-									showChevron
+									className='mb-3'
 								/>
 							))}
 						</View>
