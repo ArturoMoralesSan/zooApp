@@ -165,6 +165,7 @@ export default function Explorar() {
 									icon={Ticket01Icon}
 									title='Comprar boletos'
 									layout='tile'
+									watermark={Ticket01Icon}
 									description='Compra tus entradas en la app y llega directo a disfrutar.'
 									onPress={() => router.push('/tickets')}
 									showChevron={false}
