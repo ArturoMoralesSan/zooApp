@@ -26,6 +26,7 @@ import { TopBar } from '@/components/ui/TopBar'
 import { useScrolled } from '@/hooks/useScrolled'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StatusBar } from 'expo-status-bar'
 
 type ToastState = {
 	visible: boolean
@@ -348,6 +349,9 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 					}))
 				}
 			/>
+
+			{/* Light icons over the jungle cover, dark once the bar is white */}
+			<StatusBar style={pastCover ? 'dark' : 'light'} />
 
 			<TopBar
 				overlay

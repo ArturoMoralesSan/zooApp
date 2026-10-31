@@ -4,6 +4,7 @@ import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import type { SpeciesDetail, SpeciesImage } from '@/types/species'
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useOverlayStatusBar } from '@/hooks/useOverlayStatusBar'
 
 type SpeciesImageViewerProps = {
 	selectedImage: SpeciesImage | null
@@ -23,12 +24,13 @@ export function SpeciesImageViewer({
 	onSelect,
 	onClose,
 }: SpeciesImageViewerProps) {
+	const shown = useOverlayStatusBar(selectedImage !== null)
 	const insets = useSafeAreaInsets()
 	const index = images.findIndex((image) => image.url === selectedImage?.url)
 
 	return (
 		<Modal
-			visible={selectedImage !== null}
+			visible={shown}
 			transparent
 			animationType='fade'
 			statusBarTranslucent

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Modal as RNModal, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useOverlayStatusBar } from '@/hooks/useOverlayStatusBar'
 
 type BottomSheetProps = {
 	visible: boolean
@@ -11,11 +12,12 @@ type BottomSheetProps = {
 // Sheet from the bottom edge: padding 24 × 20, top radius 24, a grab handle
 // and a Tinta 78% backdrop. The content stays above the navigation bar.
 export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
+	const shown = useOverlayStatusBar(visible)
 	const insets = useSafeAreaInsets()
 
 	return (
 		<RNModal
-			visible={visible}
+			visible={shown}
 			transparent
 			animationType='slide'
 			statusBarTranslucent
