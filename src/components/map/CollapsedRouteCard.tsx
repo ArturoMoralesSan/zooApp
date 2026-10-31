@@ -24,7 +24,7 @@ export function CollapsedRouteCard({
 
 	return (
 		<View
-			className='absolute left-4 right-4'
+			className='absolute left-5 right-5'
 			style={{ bottom: getFloatingBottom(insets.bottom) }}
 		>
 			<Pressable

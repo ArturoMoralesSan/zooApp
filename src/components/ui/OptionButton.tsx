@@ -14,8 +14,9 @@ type OptionButtonProps = {
 	className?: string
 }
 
-// Selectable option: 2px Borde de input, radius 12; selected is solid
-// Esmeralda for short labels and an Esmeralda border on Hoja for rich rows.
+// Selectable option with a 2px border. Short labels (amounts): radius 12,
+// selected is solid Esmeralda. Rich rows (payment method): a radius 16 card
+// on Niebla, selected with the 2px Borde de input edge.
 export function OptionButton({
 	selected,
 	onPress,
@@ -28,16 +29,20 @@ export function OptionButton({
 	const { focused, focusProps } = useFocusRing()
 	const rich = children !== undefined
 
-	const background = selected
-		? rich
-			? 'bg-hoja'
-			: 'bg-esmeralda'
-		: 'bg-blanco'
+	const background = rich
+		? 'bg-niebla'
+		: selected
+			? 'bg-esmeralda'
+			: 'bg-blanco'
 	const border = focused
 		? 'border-bosque'
-		: selected
-			? 'border-esmeralda'
-			: `border-input-border ${dashed ? 'border-dashed' : ''}`
+		: rich
+			? selected
+				? 'border-input-border'
+				: 'border-card-border'
+			: selected
+				? 'border-esmeralda'
+				: `border-input-border ${dashed ? 'border-dashed' : ''}`
 
 	return (
 		<View className={className}>
@@ -47,7 +52,7 @@ export function OptionButton({
 				accessibilityState={{ checked: selected }}
 				accessibilityLabel={accessibilityLabel ?? label}
 				{...focusProps}
-				className={`min-h-[52px] justify-center rounded-xl border-2 active:opacity-80 ${rich ? 'p-4' : 'items-center px-2'} ${background} ${border}`}
+				className={`min-h-[52px] justify-center border-2 active:opacity-80 ${rich ? 'rounded-2xl p-4' : 'items-center rounded-xl px-2'} ${background} ${border}`}
 			>
 				{rich ? (
 					children
@@ -62,7 +67,10 @@ export function OptionButton({
 				)}
 			</Pressable>
 
-			<FocusRing visible={focused} />
+			<FocusRing
+				visible={focused}
+				radiusClassName={rich ? 'rounded-[19px]' : undefined}
+			/>
 		</View>
 	)
 }

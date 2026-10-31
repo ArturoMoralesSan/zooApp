@@ -13,7 +13,7 @@ type ListCardProps = {
 	icon?: IconSvgElement
 	// Overrides the tone's icon box, e.g. a solid icon on a hoja card.
 	iconTone?: IconBoxTone
-	// Round 40px photo in place of the icon box (user avatar).
+	// Round 56px photo in place of the icon box (user avatar).
 	avatarUrl?: string | null
 	// Shown in an Esmeralda circle when there is no avatar photo.
 	avatarInitials?: string
@@ -77,11 +77,11 @@ export function ListCard({
 		<Image
 			source={{ uri: avatarUrl }}
 			resizeMode='cover'
-			className='h-10 w-10 rounded-full border-1.5 border-card-border bg-hoja'
+			className='h-14 w-14 rounded-full border-1.5 border-card-border bg-hoja'
 		/>
 	) : avatarInitials ? (
-		<View className='h-10 w-10 items-center justify-center rounded-full bg-esmeralda'>
-			<Text className='font-display text-[16px] text-blanco'>
+		<View className='h-14 w-14 items-center justify-center rounded-full bg-esmeralda'>
+			<Text className='font-display text-[20px] text-blanco'>
 				{avatarInitials}
 			</Text>
 		</View>
@@ -107,7 +107,7 @@ export function ListCard({
 			)}
 
 			<View
-				className={`gap-3 p-4 ${layout === 'tile' ? 'flex-col items-start' : 'flex-row items-center'}`}
+				className={`gap-3 p-4 ${layout === 'tile' ? 'grow flex-col items-start justify-between' : 'flex-row items-center'}`}
 			>
 				{leading}
 

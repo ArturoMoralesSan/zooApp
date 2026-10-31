@@ -1,9 +1,8 @@
 import { Ticket01Icon } from '@hugeicons/core-free-icons'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { Alert, ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -63,13 +62,8 @@ export default function TicketsScreen() {
 	}, 0)
 
 	const continuePurchase = () => {
-		if (selectedTickets.length === 0) {
-			Alert.alert(
-				'Selecciona boletos',
-				'Selecciona al menos un boleto para continuar.',
-			)
-			return
-		}
+		// Continuar is disabled until a ticket is selected.
+		if (selectedTickets.length === 0) return
 
 		router.push({
 			pathname: '/tickets/summary',
@@ -80,10 +74,10 @@ export default function TicketsScreen() {
 	}
 
 	return (
-		<ScreenBackground withBackground={false}>
+		<ScreenBackground>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-3'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
@@ -91,16 +85,11 @@ export default function TicketsScreen() {
 				keyboardShouldPersistTaps='handled'
 			>
 				{/* ENCABEZADO */}
-				<View className='pb-3'>
-					<View className='mb-3'>
-						<BackButton onPress={() => router.back()} position='relative' />
-					</View>
-
-					<ScreenHeader
-						title='Comprar boletos'
-						subtitle='Selecciona los boletos que necesitas.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Comprar boletos'
+					subtitle='Selecciona los boletos que necesitas.'
+				/>
 
 				<QueryView
 					query={ticketTypesQuery}
@@ -118,7 +107,6 @@ export default function TicketsScreen() {
 							const quantity = quantities[ticket.id] ?? 0
 							const parsedPrice = Number(ticket.price)
 							const price = Number.isFinite(parsedPrice) ? parsedPrice : 0
-							const amount = price * quantity
 
 							return (
 								<Card key={ticket.id} className='mb-3'>
@@ -142,16 +130,10 @@ export default function TicketsScreen() {
 									{/* PRECIO Y CANTIDAD */}
 									<View className='w-full flex-row items-center justify-between'>
 										<View className='min-w-0 flex-1 justify-center pr-2'>
-											<Text className='text-overline text-tinta-2'>
-												Precio por boleto
-											</Text>
+											<Text className='text-overline text-tinta-2'>Precio</Text>
 
 											<Text className='mt-0.5 font-display-x text-[20px] text-bosque'>
 												{formatCurrency(price)}
-											</Text>
-
-											<Text className='text-meta mt-[3px]'>
-												Monto: {formatCurrency(amount)}
 											</Text>
 										</View>
 

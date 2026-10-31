@@ -22,16 +22,16 @@ export function SpeciesGallery({
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				className='-mx-4 mt-3'
+				className='-mx-5 mt-3'
 				contentContainerClassName='px-5'
 			>
 				{galleryImages.map((image) => (
 					<View
 						key={image.id}
-						className='mr-3 overflow-hidden rounded-2xl border-1.5 border-card-border bg-niebla'
+						className='mr-3 overflow-hidden rounded-xl border-1.5 border-card-border bg-niebla'
 						style={{
-							width: SCREEN_WIDTH * 0.68,
-							height: SCREEN_WIDTH * 0.48,
+							width: SCREEN_WIDTH * 0.62,
+							height: SCREEN_WIDTH * 0.41,
 						}}
 					>
 						<Pressable

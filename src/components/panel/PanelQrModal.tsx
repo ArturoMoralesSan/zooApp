@@ -7,6 +7,7 @@ import colors from '@/theme/colors'
 import { QrCodeIcon } from '@hugeicons/core-free-icons'
 import { ActivityIndicator, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import { QrFrame } from '@/components/ui/QrFrame'
 
 type PanelQrModalProps = {
 	visible: boolean
@@ -33,7 +34,7 @@ export function PanelQrModal({ visible, user, onClose }: PanelQrModalProps) {
 
 			{/* CÓDIGO QR */}
 
-			<View className='mt-5 self-center rounded-2xl border-1.5 border-card-border bg-blanco p-3'>
+			<QrFrame className='mt-5'>
 				{user?.qr_token ? (
 					<QRCode
 						value={user.qr_token}
@@ -46,7 +47,7 @@ export function PanelQrModal({ visible, user, onClose }: PanelQrModalProps) {
 						<ActivityIndicator size='large' color={colors.esmeralda} />
 					</View>
 				)}
-			</View>
+			</QrFrame>
 
 			{/* INFORMACIÓN */}
 

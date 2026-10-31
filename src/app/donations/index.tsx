@@ -1,10 +1,11 @@
 import { KeyboardScrollView } from '@/components/ui/KeyboardScrollView'
 import { IconBox } from '@/components/ui/IconBox'
-import { ListCard } from '@/components/ui/ListCard'
+import { Card } from '@/components/ui/Card'
+import { Icon } from '@/components/ui/Icon'
+import colors from '@/theme/colors'
 import { OptionButton } from '@/components/ui/OptionButton'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TextField } from '@/components/ui/TextField'
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import {
@@ -74,30 +75,31 @@ export default function DonationsIndexScreen() {
 	return (
 		<ScreenBackground>
 			<KeyboardScrollView
-				contentContainerClassName='px-5 pt-3'
+				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 			>
 				{/* ENCABEZADO */}
-				<BackButton position='relative' onPress={() => router.back()} />
-
-				<View className='mt-3'>
-					<ScreenHeader
-						title='Apoya al zoológico'
-						subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Apoya al zoológico'
+					subtitle='Tu donación ayuda a conservar y proteger nuestra fauna.'
+				/>
 
 				{/* TARJETA INFORMATIVA */}
-				<View className='mt-5'>
-					<ListCard
-						className='mb-3'
-						tone='dark'
-						title='Haz la diferencia'
-						description='Cada aportación contribuye al cuidado de los animales y a la conservación del zoológico.'
-						icon={HeartIcon}
-						showChevron={false}
-					/>
-				</View>
+				{/* One-off A-38 banner: text on Bosque with a large outline heart. */}
+				<Card tone='dark' padding='md' className='mb-3'>
+					<View className='absolute right-3 top-3' pointerEvents='none'>
+						<Icon icon={HeartIcon} size={64} color={colors.esmeralda} />
+					</View>
+
+					<View className='pr-16'>
+						<Text className='text-h3 text-blanco'>Haz la diferencia</Text>
+						<Text className='text-body mt-1 text-hoja'>
+							Cada aportación contribuye al cuidado de los animales y a la
+							conservación del zoológico.
+						</Text>
+					</View>
+				</Card>
 
 				{/* SELECCIÓN DE MONTO */}
 				<View className='mt-6'>

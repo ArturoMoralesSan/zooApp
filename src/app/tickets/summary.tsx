@@ -1,8 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 
@@ -90,13 +89,8 @@ export default function TicketSummaryScreen() {
 	const confirmPurchase = async () => {
 		if (purchasing) return
 
-		if (summary.length === 0) {
-			Alert.alert(
-				'Sin boletos',
-				'No hay boletos seleccionados para realizar la compra.',
-			)
-			return
-		}
+		// The footer button is disabled while there are no tickets.
+		if (summary.length === 0) return
 
 		if (await checkOffline()) {
 			notifyOffline(OFFLINE_PURCHASE)
@@ -140,10 +134,10 @@ export default function TicketSummaryScreen() {
 	}
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.12]'>
+		<ScreenBackground>
 			<ScrollView
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-3'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
@@ -151,16 +145,11 @@ export default function TicketSummaryScreen() {
 				keyboardShouldPersistTaps='handled'
 			>
 				{/* ENCABEZADO */}
-				<View className='pb-3'>
-					<View className='mb-3'>
-						<BackButton onPress={() => router.back()} position='relative' />
-					</View>
-
-					<ScreenHeader
-						title='Resumen de compra'
-						subtitle='Revisa tus boletos antes de continuar.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Resumen de compra'
+					subtitle='Revisa tus boletos antes de continuar.'
+				/>
 
 				<QueryView
 					query={ticketTypesQuery}

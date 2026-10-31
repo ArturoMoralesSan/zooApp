@@ -27,11 +27,11 @@ const variants = {
 	primary: {
 		base: 'border-b-[3px] border-b-bosque bg-esmeralda active:bg-bosque',
 		focused: 'border-2 border-b-[3px] border-bosque bg-esmeralda',
-		disabled: 'border-b-[3px] border-b-tinta-2 bg-apagado',
+		disabled: 'border-b-[3px] border-b-card-border bg-niebla',
 		text: 'text-blanco',
-		disabledText: 'text-blanco',
+		disabledText: 'text-apagado',
 		icon: colors.blanco,
-		disabledIcon: colors.blanco,
+		disabledIcon: colors.apagado,
 	},
 	secondary: {
 		base: 'border-2 border-esmeralda bg-blanco active:bg-hoja',

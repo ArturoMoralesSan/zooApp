@@ -3,9 +3,8 @@ import { router } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
-import { ListCard } from '@/components/ui/ListCard'
+import { SpeciesCard } from '@/components/species/SpeciesCard'
 import { QueryView } from '@/components/ui/QueryView'
-import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
@@ -52,13 +51,10 @@ export default function SpeciesScreen() {
 		<ScreenBackground>
 			<KeyboardScrollView
 				className='flex-1'
-				contentContainerClassName='grow px-3 pb-[120px] pt-2'
+				contentContainerClassName='grow px-5 pb-[120px] pt-2'
 			>
-				<View className='mb-4'>
-					<BackButton onPress={() => router.back()} position='relative' />
-				</View>
-
 				<ScreenHeader
+					onBack={() => router.back()}
 					title='Especies'
 					subtitle='Conoce a los habitantes del zoológico.'
 				/>
@@ -66,7 +62,7 @@ export default function SpeciesScreen() {
 				{/* Buscador */}
 				<SearchField
 					label='Buscar especie'
-					className='mb-1 mt-4'
+					className='mb-1'
 					value={search}
 					onChangeText={setSearch}
 					placeholder='Buscar especie...'
@@ -129,24 +125,11 @@ export default function SpeciesScreen() {
 					{() => (
 						<View className='mt-4'>
 							{filteredSpecies.map((item) => (
-								<ListCard
-									className='mb-3'
+								<SpeciesCard
 									key={item.id}
+									species={item}
 									onPress={() => openSpecies(item.id)}
-									image={item.image ? { uri: item.image } : undefined}
-									imageHeight={210}
-									title={item.common_name}
-									description={[
-										item.scientific_name,
-										item.category?.name
-											? `Categoría: ${item.category.name}`
-											: null,
-										item.description,
-									]
-										.filter(Boolean)
-										.join('\n')}
-									icon={!item.image ? UserGroupIcon : undefined}
-									showChevron
+									className='mb-3'
 								/>
 							))}
 						</View>

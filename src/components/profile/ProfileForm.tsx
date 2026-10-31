@@ -12,7 +12,7 @@ import { type User } from '@/services/auth'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useCallback, useState } from 'react'
-import { Alert, Animated, ImageBackground } from 'react-native'
+import { Alert, Animated, View } from 'react-native'
 import { updateAvatar, updateProfile } from '@/services/profile'
 import {
 	formatDateForApi,
@@ -330,11 +330,7 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 	})
 
 	return (
-		<ImageBackground
-			source={require('@/assets/images/zoo-pattern.png')}
-			resizeMode='repeat'
-			className='flex-1 bg-blanco'
-		>
+		<View className='flex-1 bg-blanco'>
 			<Toast
 				visible={toast.visible}
 				title={toast.title}
@@ -409,6 +405,6 @@ export function ProfileForm({ initialUser }: ProfileFormProps) {
 					onSave={handleSave}
 				/>
 			</KeyboardScrollView>
-		</ImageBackground>
+		</View>
 	)
 }

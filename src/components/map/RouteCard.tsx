@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button'
 import { IconButton } from '@/components/ui/IconButton'
 import { Notice } from '@/components/ui/Notice'
 import { StatCard } from '@/components/ui/StatCard'
-import { getFloatingBottom } from '@/theme/layout'
 import type { Coordinate, RouteResult, SelectableItem } from '@/types/map'
 import { formatDistance, formatMinutes } from '@/utils/map'
 import {
@@ -22,9 +21,12 @@ type RouteCardProps = {
 	onCollapse: () => void
 	onHowToGetThere: () => void
 	onShowDestination: () => void
+	// Species only: opens its detail ("Ver especie").
+	onViewSpecies?: () => void
 }
 
-// Floating sheet over the map: radius 24, padding 20, above the navigation bar.
+// Bottom sheet over the map (A-13..A-15): top radius 24, grab handle,
+// padding 20, content above the navigation bar.
 export function RouteCard({
 	selectedItem,
 	route,
@@ -33,15 +35,18 @@ export function RouteCard({
 	onCollapse,
 	onHowToGetThere,
 	onShowDestination,
+	onViewSpecies,
 }: RouteCardProps) {
 	const insets = useSafeAreaInsets()
 	const canRoute = Boolean(userLocation) && isUserInsideZoo
 
 	return (
 		<View
-			className='absolute left-4 right-4 rounded-3xl border-1.5 border-card-border bg-blanco p-5'
-			style={{ bottom: getFloatingBottom(insets.bottom) }}
+			className='absolute bottom-0 left-0 right-0 rounded-t-3xl border-1.5 border-b-0 border-card-border bg-blanco px-5 pt-3'
+			style={{ paddingBottom: insets.bottom + 20 }}
 		>
+			<View className='mb-4 h-1 w-10 self-center rounded-full bg-card-border' />
+
 			<View className='flex-row items-center gap-3'>
 				<SelectedItemThumb selectedItem={selectedItem} size={48} />
 
@@ -122,14 +127,27 @@ export function RouteCard({
 						</Text>
 					)}
 
-					<Button
-						title='Cómo llegar'
-						icon={WalkingIcon}
-						iconPosition='leading'
-						onPress={onHowToGetThere}
-						disabled={!canRoute}
-						className='mt-4'
-					/>
+					<View className='mt-4 flex-row gap-3'>
+						{onViewSpecies && (
+							<View className='flex-1'>
+								<Button
+									title='Ver especie'
+									variant='secondary'
+									onPress={onViewSpecies}
+								/>
+							</View>
+						)}
+
+						<View className='flex-1'>
+							<Button
+								title='Cómo llegar'
+								icon={WalkingIcon}
+								iconPosition='leading'
+								onPress={onHowToGetThere}
+								disabled={!canRoute}
+							/>
+						</View>
+					</View>
 				</>
 			)}
 		</View>

@@ -2,6 +2,7 @@ import BackButton from '@/components/ui/BackButton'
 import { Icon } from '@/components/ui/Icon'
 import { Add01Icon } from '@hugeicons/core-free-icons'
 import { type User } from '@/services/auth'
+import { getInitials } from '@/utils/profile'
 import colors from '@/theme/colors'
 import { router } from 'expo-router'
 import {
@@ -63,7 +64,7 @@ export function ProfileHeader({
 					accessibilityLabel='Cambiar foto de perfil'
 				>
 					<Animated.View
-						className='h-28 w-28 items-center justify-center overflow-hidden rounded-full border-[5px] border-blanco bg-niebla'
+						className='h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-full border-[3px] border-blanco bg-esmeralda'
 						style={[
 							{
 								transform: [
@@ -80,8 +81,8 @@ export function ProfileHeader({
 								resizeMode='cover'
 							/>
 						) : (
-							<Text className='font-display-x text-[48px] text-esmeralda'>
-								{user?.name?.charAt(0).toUpperCase() || '?'}
+							<Text className='font-display-x text-[32px] text-blanco'>
+								{getInitials(user?.name)}
 							</Text>
 						)}
 
@@ -92,7 +93,7 @@ export function ProfileHeader({
 						)}
 					</Animated.View>
 
-					<View className='absolute -bottom-px -right-px h-9 w-9 items-center justify-center rounded-full border-[3px] border-blanco bg-lima'>
+					<View className='absolute -bottom-1 -right-1 h-8 w-8 items-center justify-center rounded-full border-2 border-blanco bg-lima'>
 						<Icon icon={Add01Icon} size={20} color={colors.bosque} strong />
 					</View>
 				</Pressable>

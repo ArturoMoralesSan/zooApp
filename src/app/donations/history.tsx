@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import type { Donation } from '@/types/donations'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
@@ -54,19 +53,14 @@ export default function DonationHistoryScreen() {
 	)
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.15]' withBackground={false}>
+		<ScreenBackground>
 			{/* Encabezado */}
 			<View className='px-5 pt-2'>
-				<View className='mb-3'>
-					<BackButton onPress={() => router.back()} position='relative' />
-				</View>
-
-				<View className='mb-5'>
-					<ScreenHeader
-						title='Mis donaciones'
-						subtitle='Consulta el historial de tus donaciones.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Mis donaciones'
+					subtitle='Consulta el historial de tus donaciones.'
+				/>
 			</View>
 
 			<ScrollView

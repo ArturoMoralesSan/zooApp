@@ -12,7 +12,7 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpeciesDetail } from '@/hooks/useSpecies'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { Animated, ImageBackground, Text, View } from 'react-native'
+import { Animated, Text, View } from 'react-native'
 
 import type { SpeciesImage } from '@/types/species'
 
@@ -60,6 +60,11 @@ export default function SpeciesDetailScreen() {
 		)
 	}, [species, heroImage])
 
+	const viewerImages = useMemo(
+		() => (heroImage ? [heroImage, ...galleryImages] : galleryImages),
+		[heroImage, galleryImages],
+	)
+
 	return (
 		<QueryView
 			query={detail}
@@ -99,16 +104,11 @@ export default function SpeciesDetailScreen() {
 
 							{/* CONTENIDO */}
 							<Animated.View
-								className='relative z-10 w-full overflow-hidden rounded-t-3xl border-1.5 border-card-border bg-niebla'
+								className='relative z-10 w-full overflow-hidden rounded-t-3xl border-t-1.5 border-t-card-border bg-blanco'
 								style={{ marginTop: cardMarginTop }}
 							>
-								<ImageBackground
-									source={require('@/assets/images/zoo-pattern.png')}
-									resizeMode='repeat'
-									imageClassName='opacity-30'
-									className='bg-blanco'
-								>
-									<View className='px-4 pb-7 pt-6'>
+								<View className='bg-blanco'>
+									<View className='px-5 pb-7 pt-6'>
 										{/* CATEGORÍA */}
 										{species.category && (
 											<Text className='text-overline text-esmeralda'>
@@ -158,7 +158,7 @@ export default function SpeciesDetailScreen() {
 
 										<View className='h-2' />
 									</View>
-								</ImageBackground>
+								</View>
 							</Animated.View>
 						</View>
 					</Animated.ScrollView>
@@ -181,7 +181,9 @@ export default function SpeciesDetailScreen() {
 					{/* VISOR DE IMÁGENES */}
 					<SpeciesImageViewer
 						selectedImage={selectedImage}
+						images={viewerImages}
 						species={species}
+						onSelect={setSelectedImage}
 						onClose={() => setSelectedImage(null)}
 					/>
 				</View>

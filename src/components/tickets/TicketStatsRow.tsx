@@ -1,6 +1,6 @@
 import { StatCard } from '@/components/ui/StatCard'
 import type { Purchase } from '@/types/tickets'
-import { Ticket01Icon, TicketCheckIcon } from '@hugeicons/core-free-icons'
+import { Clock01Icon, Ticket01Icon } from '@hugeicons/core-free-icons'
 import { View } from 'react-native'
 
 type TicketStatsRowProps = {
@@ -13,7 +13,7 @@ export function TicketStatsRow({
 	historyPurchases,
 }: TicketStatsRowProps) {
 	return (
-		<View className='mb-4 mt-6 flex-row gap-3'>
+		<View className='mb-4 flex-row gap-3'>
 			<StatCard
 				icon={Ticket01Icon}
 				value={activePurchases.length}
@@ -21,7 +21,7 @@ export function TicketStatsRow({
 			/>
 
 			<StatCard
-				icon={TicketCheckIcon}
+				icon={Clock01Icon}
 				value={historyPurchases.length}
 				label='Historial'
 			/>

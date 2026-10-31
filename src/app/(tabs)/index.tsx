@@ -6,7 +6,7 @@ import {
 	UserGroupIcon,
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import {
 	NativeScrollEvent,
@@ -23,6 +23,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle'
 import { EventCard } from '@/components/explore/EventCard'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
 import { TabHeader } from '@/components/ui/TabHeader'
+import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -46,6 +47,8 @@ export default function Explorar() {
 
 	const [refreshing, setRefreshing] = useState(false)
 	const [activeEventIndex, setActiveEventIndex] = useState(0)
+	const [comingSoon, setComingSoon] = useState<string | null>(null)
+	const hideComingSoon = useCallback(() => setComingSoon(null), [])
 
 	useSessionRedirect()
 
@@ -74,7 +77,7 @@ export default function Explorar() {
 		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
 			<ScrollView
 				className='flex-1'
-				contentContainerClassName='grow px-3 pt-2'
+				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{
 					paddingBottom: 140 + getTabBarExtraSpace(insets.bottom),
 				}}
@@ -94,7 +97,7 @@ export default function Explorar() {
 				<TabHeader title='Explorar' />
 
 				{/* EVENTOS DESTACADOS */}
-				<View className='mt-6'>
+				<View>
 					<SectionTitle title='Eventos destacados' />
 
 					<QueryView
@@ -120,13 +123,19 @@ export default function Explorar() {
 									snapToAlignment='start'
 									disableIntervalMomentum
 									onMomentumScrollEnd={handleCarouselScroll}
-									contentContainerClassName='pr-2'
+									className='-mx-5'
+									contentContainerClassName='px-5'
 								>
 									{events.map((event, index) => (
 										<EventCard
 											key={event.id}
 											event={event}
 											isLast={index === events.length - 1}
+											onPress={() =>
+												setComingSoon(
+													'El detalle de los eventos estará disponible pronto.',
+												)
+											}
 										/>
 									))}
 								</ScrollView>
@@ -147,7 +156,8 @@ export default function Explorar() {
 					<View className='mt-6'>
 						<SectionTitle title='¿Qué quieres hacer?' />
 
-						{/* BOLETOS Y ESPECIES: DOS COLUMNAS SIN FLECHAS */}
+						{/* A-05: tall Entradas tile at the left, Mapa and Especies stacked
+						    at the right */}
 						<View className='mb-3 flex-row items-stretch gap-3'>
 							<View className='min-w-0 flex-1'>
 								<ListCard
@@ -155,34 +165,32 @@ export default function Explorar() {
 									icon={Ticket01Icon}
 									title='Comprar boletos'
 									layout='tile'
-									description='Planea tu visita al zoológico.'
+									description='Compra tus entradas en la app y llega directo a disfrutar.'
 									onPress={() => router.push('/tickets')}
 									showChevron={false}
 								/>
 							</View>
 
-							<View className='min-w-0 flex-1'>
+							<View className='min-w-0 flex-1 gap-3'>
 								<ListCard
-									className='grow'
+									icon={Location01Icon}
+									layout='tile'
+									title='Mapa interactivo'
+									description='Zonas, caminos y rutas'
+									onPress={() => router.push('/map')}
+									showChevron={false}
+								/>
+
+								<ListCard
 									icon={UserGroupIcon}
 									layout='tile'
 									title='Conoce las especies'
-									description='Descubre nuestros animales.'
+									description='Descubre las especies del zoológico.'
 									onPress={() => router.push('/species')}
 									showChevron={false}
 								/>
 							</View>
 						</View>
-
-						{/* MAPA: ANCHO COMPLETO CON FLECHA */}
-						<ListCard
-							className='mb-3'
-							icon={Location01Icon}
-							title='Mapa del zoológico'
-							description='Explora caminos, especies y puntos de interés.'
-							onPress={() => router.push('/map')}
-							showChevron={true}
-						/>
 
 						{/* DONACIÓN: FONDO CONFIGURABLE */}
 						<ListCard
@@ -197,6 +205,14 @@ export default function Explorar() {
 					</View>
 				)}
 			</ScrollView>
+
+			<Toast
+				visible={comingSoon !== null}
+				type='warning'
+				title='Próximamente'
+				message={comingSoon ?? ''}
+				onHide={hideComingSoon}
+			/>
 		</SafeAreaView>
 	)
 }

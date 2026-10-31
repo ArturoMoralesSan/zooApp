@@ -115,7 +115,7 @@ export default function Register() {
 				className='flex-1'
 				contentContainerStyle={{
 					flexGrow: 1,
-					paddingHorizontal: 24,
+					paddingHorizontal: 20,
 					paddingTop: 36,
 					paddingBottom: bottomSpace,
 				}}
@@ -123,13 +123,13 @@ export default function Register() {
 				{/* REGRESAR */}
 				<BackButton variant='outline' onPress={() => router.back()} />
 
-				{/* LOGO */}
-				<View className='mt-7 items-center'>
+				{/* LOGO: small, at the right of the back button row (A-04) */}
+				<View className='mt-4 items-end'>
 					<Image
 						source={require('../../assets/images/zooapp-logo.png')}
 						resizeMode='contain'
 						accessibilityLabel='Logo de ZooApp'
-						className='h-28 w-32'
+						className='h-12 w-16'
 					/>
 				</View>
 

@@ -7,7 +7,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
-import BackButton from '@/components/ui/BackButton'
 import FixedFooter from '@/components/FixedFooter'
 import { Card } from '@/components/ui/Card'
 import { DetailRow } from '@/components/ui/DetailRow'
@@ -115,19 +114,15 @@ export default function DonationsSummaryScreen() {
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				keyboardShouldPersistTaps='handled'
 			>
-				{/* BOTÓN REGRESAR */}
-				<BackButton position='relative' onPress={() => router.back()} />
-
 				{/* ENCABEZADO */}
-				<View className='mt-px'>
-					<ScreenHeader
-						title='Resumen de donación'
-						subtitle='Revisa los datos antes de continuar con tu aportación.'
-					/>
-				</View>
+				<ScreenHeader
+					onBack={() => router.back()}
+					title='Resumen de donación'
+					subtitle='Revisa los datos antes de continuar con tu aportación.'
+				/>
 
 				{/* DONACIÓN Y DETALLE DEL PAGO */}
-				<Card className='mb-3 mt-6'>
+				<Card className='mb-3'>
 					<View className='flex-row items-center gap-3'>
 						<IconBox icon={HeartAddIcon} />
 
