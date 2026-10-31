@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { StatCard } from '@/components/ui/StatCard'
-import { Animated, ImageBackground, Text, View } from 'react-native'
+import { Animated, Text, View } from 'react-native'
 
 type ProfileProgressProps = {
 	progressMarginTop: Animated.AnimatedInterpolation<number>
@@ -29,12 +29,7 @@ export function ProfileProgress({
 			className='relative z-10 overflow-hidden rounded-t-3xl bg-blanco'
 			style={{ marginTop: progressMarginTop }}
 		>
-			<ImageBackground
-				source={require('@/assets/images/zoo-pattern.png')}
-				resizeMode='repeat'
-				imageClassName='opacity-[0.12]'
-				className='bg-blanco'
-			>
+			<View className='bg-blanco'>
 				<View className='px-5 pb-7 pt-6'>
 					<SectionTitle
 						title='Tu progreso'
@@ -84,7 +79,7 @@ export function ProfileProgress({
 						</Card>
 					)}
 				</View>
-			</ImageBackground>
+			</View>
 		</Animated.View>
 	)
 }

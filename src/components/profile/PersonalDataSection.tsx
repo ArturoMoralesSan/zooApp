@@ -12,7 +12,7 @@ import {
 	UserIcon,
 } from '@hugeicons/core-free-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { ImageBackground, Platform, View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { formatDateForApi, parseApiDate } from '@/utils/date'
 
 type PersonalDataSectionProps = {
@@ -57,12 +57,7 @@ export function PersonalDataSection({
 	onSave,
 }: PersonalDataSectionProps) {
 	return (
-		<ImageBackground
-			source={require('@/assets/images/zoo-pattern.png')}
-			resizeMode='repeat'
-			imageClassName='opacity-[0.12]'
-			className='bg-blanco'
-		>
+		<View className='bg-blanco'>
 			<View className='px-5 pb-12 pt-1'>
 				<Card>
 					<SectionTitle
@@ -163,6 +158,6 @@ export function PersonalDataSection({
 					/>
 				</Card>
 			</View>
-		</ImageBackground>
+		</View>
 	)
 }
