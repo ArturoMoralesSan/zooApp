@@ -1,4 +1,8 @@
-import { InformationCircleIcon, Ticket01Icon } from '@hugeicons/core-free-icons'
+import {
+	Home01Icon,
+	InformationCircleIcon,
+	Ticket01Icon,
+} from '@hugeicons/core-free-icons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
@@ -140,6 +144,7 @@ export default function TicketSuccessScreen() {
 				}`}
 				amount={formatCurrency(total)}
 				buttonTitle='Ir al inicio'
+				buttonIcon={Home01Icon}
 				onButtonPress={() => router.replace('/')}
 			/>
 		</ScreenBackground>

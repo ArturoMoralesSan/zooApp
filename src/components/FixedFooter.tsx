@@ -1,3 +1,4 @@
+import type { IconSvgElement } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -9,6 +10,8 @@ type FixedFooterProps = {
 	description: string
 	amount: string
 	buttonTitle: string
+	// Leading icon, e.g. home on "Ir al inicio".
+	buttonIcon?: IconSvgElement
 	onButtonPress: () => void
 	disabled?: boolean
 }
@@ -18,6 +21,7 @@ export default function FixedFooter({
 	description,
 	amount,
 	buttonTitle,
+	buttonIcon,
 	onButtonPress,
 	disabled = false,
 }: FixedFooterProps) {
@@ -25,7 +29,7 @@ export default function FixedFooter({
 
 	return (
 		<View
-			className='absolute bottom-0 left-0 right-0 z-[999] border-t-1.5 border-t-card-border bg-blanco px-5 pt-4'
+			className='absolute bottom-0 left-0 right-0 z-[999] border-t-1.5 border-t-card-border bg-blanco px-5 pt-5'
 			style={{
 				paddingBottom: getFooterBottomPadding(insets.bottom),
 			}}
@@ -44,6 +48,8 @@ export default function FixedFooter({
 
 			<Button
 				title={buttonTitle}
+				icon={buttonIcon}
+				iconPosition='leading'
 				onPress={onButtonPress}
 				disabled={disabled}
 				className='mt-4'

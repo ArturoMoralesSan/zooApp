@@ -1,4 +1,4 @@
-import { StarIcon } from '@hugeicons/core-free-icons'
+import { Home01Icon, StarIcon } from '@hugeicons/core-free-icons'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
@@ -116,6 +116,7 @@ export default function DonationSuccessScreen() {
 				description='Gracias por tu aportación'
 				amount={formatCurrency(amount)}
 				buttonTitle='Ir al inicio'
+				buttonIcon={Home01Icon}
 				onButtonPress={handleGoHome}
 			/>
 		</ScreenBackground>
