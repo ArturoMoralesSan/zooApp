@@ -15,10 +15,12 @@ import { DonationStatsRow } from '@/components/donations/DonationStatsRow'
 import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { isCompleted } from '@/utils/donations'
+import { useScrolled } from '@/hooks/useScrolled'
 
 const NO_DONATIONS: Donation[] = []
 
 export default function DonationHistoryScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const bottomSpace = useScrollBottomSpace(40)
 	const router = useRouter()
 
@@ -54,19 +56,20 @@ export default function DonationHistoryScreen() {
 
 	return (
 		<ScreenBackground>
-			{/* Encabezado */}
-			<View className='px-5 pt-2'>
-				<ScreenHeader
-					onBack={() => router.back()}
-					title='Mis donaciones'
-					subtitle='Consulta el historial de tus donaciones.'
-				/>
-			</View>
+			{/* ENCABEZADO FIJO */}
+			<ScreenHeader
+				scrolled={scrolled}
+				onBack={() => router.back()}
+				title='Mis donaciones'
+				subtitle='Consulta el historial de tus donaciones.'
+			/>
 
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: bottomSpace }}
-				contentContainerClassName='px-5 pt-0'
+				contentContainerClassName='px-5 pt-4'
 			>
 				{/* Estadísticas: zeros only for a real empty history (A-42) */}
 				{donationsQuery.data && (

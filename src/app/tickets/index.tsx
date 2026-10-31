@@ -15,6 +15,7 @@ import { IconBox } from '@/components/ui/IconBox'
 import { QuantityStepper } from '@/components/ui/QuantityStepper'
 import { QueryView } from '@/components/ui/QueryView'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
+import { useScrolled } from '@/hooks/useScrolled'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -24,6 +25,7 @@ type SelectedTicket = {
 const MAX_QUANTITY = 20
 
 export default function TicketsScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
@@ -75,22 +77,25 @@ export default function TicketsScreen() {
 
 	return (
 		<ScreenBackground>
+			{/* ENCABEZADO FIJO */}
+			<ScreenHeader
+				scrolled={scrolled}
+				onBack={() => router.back()}
+				title='Comprar boletos'
+				subtitle='Selecciona los boletos que necesitas.'
+			/>
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-2'
+				contentContainerClassName='grow px-5 pt-4'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
 				keyboardShouldPersistTaps='handled'
 			>
-				{/* ENCABEZADO */}
-				<ScreenHeader
-					onBack={() => router.back()}
-					title='Comprar boletos'
-					subtitle='Selecciona los boletos que necesitas.'
-				/>
-
 				<QueryView
 					query={ticketTypesQuery}
 					loadingMessage='Cargando boletos…'

@@ -27,6 +27,7 @@ import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { LogoutCard } from '@/components/panel/LogoutCard'
 import { PanelQrModal } from '@/components/panel/PanelQrModal'
 import { getInitials } from '@/utils/profile'
+import { useScrolled } from '@/hooks/useScrolled'
 
 function getAvatarUrl(avatar?: string | null): string | null {
 	if (!avatar) return null
@@ -46,6 +47,7 @@ function getAvatarUrl(avatar?: string | null): string | null {
 }
 
 export default function Panel() {
+	const { scrolled, onScroll } = useScrolled()
 	const insets = useSafeAreaInsets()
 
 	const { logout } = useAuth()
@@ -119,7 +121,12 @@ export default function Panel() {
 
 	return (
 		<ScreenBackground>
+			{/* ENCABEZADO FIJO */}
+			<TabHeader scrolled={scrolled} title='Panel' />
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='flex-1'
 				contentContainerClassName='px-5 pt-2'
 				contentContainerStyle={{
@@ -127,10 +134,6 @@ export default function Panel() {
 				}}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* ENCABEZADO */}
-
-				<TabHeader title='Panel' />
-
 				{/* TARJETA DE PERFIL */}
 
 				<View>

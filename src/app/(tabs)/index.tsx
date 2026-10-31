@@ -30,12 +30,14 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
+import { useScrolled } from '@/hooks/useScrolled'
 
 const PRIMARY = colors.esmeralda
 const EVENT_CARD_WIDTH = 292
 const CAROUSEL_GAP = 10
 
 export default function Explorar() {
+	const { scrolled, onScroll } = useScrolled()
 	const insets = useSafeAreaInsets()
 
 	const { refreshUser } = useAuth()
@@ -75,7 +77,12 @@ export default function Explorar() {
 
 	return (
 		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
+			{/* ENCABEZADO FIJO */}
+			<TabHeader scrolled={scrolled} title='Explorar' />
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='flex-1'
 				contentContainerClassName='grow px-5 pt-2'
 				contentContainerStyle={{
@@ -93,9 +100,6 @@ export default function Explorar() {
 					/>
 				}
 			>
-				{/* ENCABEZADO */}
-				<TabHeader title='Explorar' />
-
 				{/* EVENTOS DESTACADOS */}
 				<View>
 					<SectionTitle title='Eventos destacados' />

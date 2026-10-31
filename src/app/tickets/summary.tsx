@@ -25,6 +25,7 @@ import Toast from '@/components/ui/Toast'
 import { PaymentMethodCard } from '@/components/tickets/PaymentMethodCard'
 import { SecurePurchaseNotice } from '@/components/tickets/SecurePurchaseNotice'
 import { TicketLinesCard } from '@/components/tickets/TicketLinesCard'
+import { useScrolled } from '@/hooks/useScrolled'
 
 type SelectedTicket = {
 	ticket_type_id: number
@@ -37,6 +38,7 @@ const OFFLINE_PURCHASE =
 	'No enviamos tu compra. Conéctate a internet e inténtalo de nuevo.'
 
 export default function TicketSummaryScreen() {
+	const { scrolled, onScroll } = useScrolled()
 	const footerSpace = useFixedFooterSpace()
 	const router = useRouter()
 
@@ -135,22 +137,25 @@ export default function TicketSummaryScreen() {
 
 	return (
 		<ScreenBackground>
+			{/* ENCABEZADO FIJO */}
+			<ScreenHeader
+				scrolled={scrolled}
+				onBack={() => router.back()}
+				title='Resumen de compra'
+				subtitle='Revisa tus boletos antes de continuar.'
+			/>
+
 			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
 				className='min-h-0 flex-1'
-				contentContainerClassName='grow px-5 pt-2'
+				contentContainerClassName='grow px-5 pt-4'
 				contentContainerStyle={{ paddingBottom: footerSpace }}
 				showsVerticalScrollIndicator={false}
 				bounces
 				nestedScrollEnabled
 				keyboardShouldPersistTaps='handled'
 			>
-				{/* ENCABEZADO */}
-				<ScreenHeader
-					onBack={() => router.back()}
-					title='Resumen de compra'
-					subtitle='Revisa tus boletos antes de continuar.'
-				/>
-
 				<QueryView
 					query={ticketTypesQuery}
 					loadingMessage='Cargando resumen…'
