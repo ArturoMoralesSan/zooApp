@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Modal as RNModal, Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useOverlayStatusBar } from '@/hooks/useOverlayStatusBar'
 
 type ModalProps = {
 	visible: boolean
@@ -18,11 +19,12 @@ export function Modal({
 	children,
 	dismissible = true,
 }: ModalProps) {
+	const shown = useOverlayStatusBar(visible)
 	const insets = useSafeAreaInsets()
 
 	return (
 		<RNModal
-			visible={visible}
+			visible={shown}
 			transparent
 			animationType='fade'
 			statusBarTranslucent

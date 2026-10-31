@@ -2,6 +2,9 @@ import type { SpeciesDetail, SpeciesImage } from '@/types/species'
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
 import { IconBox } from '@/components/ui/IconBox'
 import { Image, Pressable, View } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import colors from '@/theme/colors'
 
 type SpeciesHeroProps = {
 	heroImage: SpeciesImage | null
@@ -14,6 +17,8 @@ export function SpeciesHero({
 	species,
 	onOpenImage,
 }: SpeciesHeroProps) {
+	const insets = useSafeAreaInsets()
+
 	return (
 		<View className='h-[470px] w-full overflow-hidden bg-niebla'>
 			{heroImage ? (
@@ -38,6 +43,22 @@ export function SpeciesHero({
 				className='absolute inset-0 bg-bosque/[0.08]'
 				pointerEvents='none'
 			/>
+
+			{/* Soft Tinta scrim so the light status bar icons stay legible on
+			    bright photos */}
+			{heroImage && (
+				<LinearGradient
+					pointerEvents='none'
+					colors={[`${colors.tinta}66`, `${colors.tinta}00`]}
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						height: insets.top + 72,
+					}}
+				/>
+			)}
 		</View>
 	)
 }

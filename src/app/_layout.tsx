@@ -15,6 +15,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { OfflineBanner } from '@/components/ui/OfflineBanner'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { DataProvider } from '@/services/swr-config'
+import { StatusBar } from 'expo-status-bar'
 import '../global.css'
 
 // Keep the native splash up until the fonts are ready, so the first screen
@@ -47,6 +48,10 @@ export default function RootLayout() {
 			<KeyboardProvider>
 				<DataProvider>
 					<AuthProvider>
+						{/* Dark icons by default: every screen is white, so the
+						    phone's dark theme must not switch them to light. */}
+						<StatusBar style='dark' />
+
 						<Stack
 							initialRouteName='index'
 							screenOptions={{

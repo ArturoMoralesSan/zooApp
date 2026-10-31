@@ -10,6 +10,7 @@ import { router } from 'expo-router'
 import { useState } from 'react'
 import { ImageBackground, Text, View } from 'react-native'
 import { TextField } from '@/components/ui/TextField'
+import { StatusBar } from 'expo-status-bar'
 
 export default function ForgotPassword() {
 	const bottomSpace = useScrollBottomSpace(48)
@@ -40,6 +41,8 @@ export default function ForgotPassword() {
 			resizeMode='cover'
 			className='flex-1'
 		>
+			<StatusBar style='light' />
+
 			<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
 			<KeyboardScrollView
