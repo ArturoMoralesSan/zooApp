@@ -212,7 +212,6 @@ export default function DonationsSummaryScreen() {
 				title='No se pudo completar el pago'
 				message={paymentError ?? ''}
 				onHide={hidePaymentError}
-				duration={5000}
 			/>
 		</ScreenBackground>
 	)

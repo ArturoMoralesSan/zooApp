@@ -207,7 +207,6 @@ export default function TicketSummaryScreen() {
 				title='No se pudo completar el pago'
 				message={paymentError ?? ''}
 				onHide={hidePaymentError}
-				duration={5000}
 			/>
 		</ScreenBackground>
 	)
