@@ -58,18 +58,13 @@ export function PurchaseCard({ purchase, onShowQr }: PurchaseCardProps) {
 
 				<View className='items-end'>
 					<Text className='text-overline text-tinta-2'>Total</Text>
-					<Text className='mt-1 font-display-x text-[17px] text-esmeralda'>
+					<Text className='mt-1 font-display-x text-[17px] text-bosque'>
 						{formatCurrency(purchase.total)}
 					</Text>
 				</View>
 			</View>
 
-			<Chip
-				look='hoja'
-				icon={Ticket01Icon}
-				label={getTicketSummary(purchase)}
-				className='mt-3'
-			/>
+			<Chip look='hoja' label={getTicketSummary(purchase)} className='mt-3' />
 
 			<Button
 				title='Ver códigos QR'

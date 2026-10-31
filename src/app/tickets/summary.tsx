@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import FixedFooter from '@/components/FixedFooter'
 import { ScreenHeader } from '@/components/ui/TabHeader'
@@ -89,13 +89,8 @@ export default function TicketSummaryScreen() {
 	const confirmPurchase = async () => {
 		if (purchasing) return
 
-		if (summary.length === 0) {
-			Alert.alert(
-				'Sin boletos',
-				'No hay boletos seleccionados para realizar la compra.',
-			)
-			return
-		}
+		// The footer button is disabled while there are no tickets.
+		if (summary.length === 0) return
 
 		if (await checkOffline()) {
 			notifyOffline(OFFLINE_PURCHASE)
