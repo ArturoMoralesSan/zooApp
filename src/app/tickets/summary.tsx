@@ -140,7 +140,7 @@ export default function TicketSummaryScreen() {
 	}
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.12]'>
+		<ScreenBackground>
 			<ScrollView
 				className='min-h-0 flex-1'
 				contentContainerClassName='grow px-5 pt-3'

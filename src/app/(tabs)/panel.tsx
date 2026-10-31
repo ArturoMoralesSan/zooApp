@@ -105,7 +105,7 @@ export default function Panel() {
 	const avatarUrl = getAvatarUrl(user?.profile?.avatar)
 
 	return (
-		<ScreenBackground withSafeAreaBackground={false}>
+		<ScreenBackground>
 			<ScrollView
 				className='flex-1'
 				contentContainerClassName='px-3 pt-2'

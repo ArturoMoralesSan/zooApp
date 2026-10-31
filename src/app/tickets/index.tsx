@@ -80,7 +80,7 @@ export default function TicketsScreen() {
 	}
 
 	return (
-		<ScreenBackground withBackground={false}>
+		<ScreenBackground>
 			<ScrollView
 				className='min-h-0 flex-1'
 				contentContainerClassName='grow px-5 pt-3'

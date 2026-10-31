@@ -59,7 +59,7 @@ export default function DonationSuccessScreen() {
 	}
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.13]'>
+		<ScreenBackground>
 			<ScrollView
 				className='flex-1'
 				contentContainerClassName='px-5 pt-2.5'

@@ -54,7 +54,7 @@ export default function DonationHistoryScreen() {
 	)
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.15]' withBackground={false}>
+		<ScreenBackground>
 			{/* Encabezado */}
 			<View className='px-5 pt-2'>
 				<View className='mb-3'>

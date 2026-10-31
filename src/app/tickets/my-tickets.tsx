@@ -82,7 +82,7 @@ export default function MyTicketsScreen() {
 	const visiblePurchases = tab === 'active' ? activePurchases : historyPurchases
 
 	return (
-		<ScreenBackground patternClassName='opacity-[0.12]'>
+		<ScreenBackground>
 			<ScrollView
 				className='flex-1'
 				showsVerticalScrollIndicator={false}
