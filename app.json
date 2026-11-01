@@ -53,6 +53,13 @@
           }
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ZooApp usa la cámara para escanear los códigos QR de los recintos.",
+          "recordAudioAndroid": false
+        }
+      ],
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "@maplibre/maplibre-react-native",
