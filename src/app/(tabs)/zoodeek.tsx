@@ -1,16 +1,22 @@
-import { Cards01Icon, QrCodeScanIcon } from '@hugeicons/core-free-icons'
+import {
+	Cards01Icon,
+	QrCodeScanIcon,
+	SwordsIcon,
+} from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CardGrid } from '@/components/deck/CardGrid'
 import { CollectionTile } from '@/components/deck/CollectionTile'
+import { MapPreviewCard } from '@/components/deck/MapPreviewCard'
 import { ListCard } from '@/components/ui/ListCard'
 import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
 import { TextLink } from '@/components/ui/TextLink'
+import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCards } from '@/hooks/useCards'
 import { useScrolled } from '@/hooks/useScrolled'
@@ -28,6 +34,8 @@ export default function ZooDeck() {
 
 	const cards = useCards()
 	const [refreshing, setRefreshing] = useState(false)
+	const [comingSoon, setComingSoon] = useState<string | null>(null)
+	const hideComingSoon = useCallback(() => setComingSoon(null), [])
 
 	useSessionRedirect()
 
@@ -65,9 +73,28 @@ export default function ZooDeck() {
 					/>
 				}
 			>
-				{/* Secondary to the dark "Duelos" card of A-16: a Niebla card with the
-				    Esmeralda chevron. "Duelos" will go above it. */}
+				{/* MAPA: placeholder until the zoo map is shown here */}
+				<MapPreviewCard
+					onOpenMap={() =>
+						setComingSoon('El mapa de ZooDeck estará disponible pronto.')
+					}
+				/>
+
+				{/* DUELOS: the main game action, so the dark primary card. The QR
+				    card below is its secondary: a Niebla card with the Esmeralda
+				    chevron. */}
 				<ListCard
+					className='mt-6'
+					tone='dark'
+					icon={SwordsIcon}
+					title='Duelos'
+					description='Reta a los animales del zoológico y gana su tarjeta.'
+					onPress={() =>
+						setComingSoon('Los duelos del mapa estarán disponibles pronto.')
+					}
+				/>
+				<ListCard
+					className='mt-3'
 					icon={QrCodeScanIcon}
 					title='Escanear QR'
 					description='Escanea la placa de un recinto y reta al animal.'
@@ -119,6 +146,14 @@ export default function ZooDeck() {
 					</QueryView>
 				</View>
 			</ScrollView>
+
+			<Toast
+				visible={comingSoon !== null}
+				type='warning'
+				title='Próximamente'
+				message={comingSoon ?? ''}
+				onHide={hideComingSoon}
+			/>
 		</SafeAreaView>
 	)
 }
