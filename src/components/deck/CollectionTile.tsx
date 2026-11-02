@@ -1,5 +1,5 @@
 import { SquareLock02Icon } from '@hugeicons/core-free-icons'
-import { Image, Text, View } from 'react-native'
+import { Image, Pressable, Text, View } from 'react-native'
 
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
@@ -8,12 +8,18 @@ import { rarityLabel } from '@/utils/cards'
 
 type CollectionTileProps = {
 	card: DeckCard
+	// Owned cards open the 3D view.
+	onPress?: () => void
 	className?: string
 }
 
 // Small "Mi colección" tile (A-06): photo with the name and rarity on a
 // Bosque label; a dashed, locked placeholder for unowned cards.
-export function CollectionTile({ card, className = '' }: CollectionTileProps) {
+export function CollectionTile({
+	card,
+	onPress,
+	className = '',
+}: CollectionTileProps) {
 	if (!card.encountered) {
 		return (
 			<View
@@ -28,10 +34,12 @@ export function CollectionTile({ card, className = '' }: CollectionTileProps) {
 	}
 
 	return (
-		<View
-			accessible
+		<Pressable
+			onPress={onPress}
+			disabled={!onPress}
+			accessibilityRole='button'
 			accessibilityLabel={`${card.name}, ${rarityLabel(card.rarity)}`}
-			className={`aspect-[0.75] overflow-hidden rounded-xl border-1.5 border-bosque bg-bosque ${className}`}
+			className={`aspect-[0.75] overflow-hidden rounded-xl border-1.5 border-bosque bg-bosque active:opacity-80 ${className}`}
 		>
 			{card.thumbnail_image ? (
 				<Image
@@ -56,6 +64,6 @@ export function CollectionTile({ card, className = '' }: CollectionTileProps) {
 					{rarityLabel(card.rarity)}
 				</Text>
 			</View>
-		</View>
+		</Pressable>
 	)
 }

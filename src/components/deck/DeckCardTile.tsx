@@ -2,6 +2,7 @@ import { CubeIcon } from '@hugeicons/core-free-icons'
 import { Image, Text, View } from 'react-native'
 
 import { CardStats } from '@/components/deck/CardStats'
+import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
 import type { DeckCard } from '@/types/cards'
@@ -9,12 +10,18 @@ import { cardSubtitle } from '@/utils/cards'
 
 type DeckCardTileProps = {
 	card: DeckCard
+	// Owned cards open the 3D view; unowned ones aren't pressable.
+	onPress?: () => void
 	className?: string
 }
 
 // Mi Deck grid tile (A-24/A-25): photo, name, rarity · category and stats.
 // Unowned cards reveal nothing, so they get a dashed placeholder.
-export function DeckCardTile({ card, className = '' }: DeckCardTileProps) {
+export function DeckCardTile({
+	card,
+	onPress,
+	className = '',
+}: DeckCardTileProps) {
 	if (!card.encountered) {
 		return (
 			<View
@@ -36,8 +43,11 @@ export function DeckCardTile({ card, className = '' }: DeckCardTileProps) {
 	}
 
 	return (
-		<View
-			className={`overflow-hidden rounded-2xl border-1.5 border-card-border bg-niebla ${className}`}
+		<Card
+			padding='none'
+			onPress={onPress}
+			accessibilityLabel={`${card.name}, ${cardSubtitle(card.rarity, card.category_name)}`}
+			className={className}
 		>
 			{card.thumbnail_image ? (
 				<Image
@@ -62,6 +72,6 @@ export function DeckCardTile({ card, className = '' }: DeckCardTileProps) {
 				</Text>
 				<CardStats stats={card.stats} className='mt-1.5' />
 			</View>
-		</View>
+		</Card>
 	)
 }

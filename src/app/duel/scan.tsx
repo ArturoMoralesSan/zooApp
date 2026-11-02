@@ -42,7 +42,7 @@ export default function ScanScreen() {
 	const [permission, requestPermission] = useCameraPermissions()
 	const { isOffline } = useNetworkStatus()
 	const { begin } = useDuel()
-	const { refreshCards } = useDataRefresh()
+	const { addOwnedCard } = useDataRefresh()
 
 	const [state, setState] = useState<ScanState>({ kind: 'scanning' })
 	const lastScan = useRef<{ code: string; at: number } | null>(null)
@@ -99,9 +99,11 @@ export default function ScanScreen() {
 		router.replace('/duel/play')
 	}
 
-	const openDeck = () => {
-		void refreshCards()
-		router.replace('/deck')
+	const openCard = () => {
+		if (state.kind !== 'owned') return
+
+		void addOwnedCard(state.card)
+		router.replace(`/deck/${state.card.id}`)
 	}
 
 	const scanning = state.kind === 'scanning'
@@ -220,7 +222,7 @@ export default function ScanScreen() {
 				align='center'
 				title={state.kind === 'owned' ? state.card.name : undefined}
 				message={state.kind === 'owned' ? state.message : undefined}
-				primary={{ title: 'Ver Mi Deck', icon: Cards01Icon, onPress: openDeck }}
+				primary={{ title: 'Ver tarjeta', icon: Cards01Icon, onPress: openCard }}
 				secondary={{ title: 'Seguir escaneando', onPress: resume }}
 				onRequestClose={resume}
 			/>

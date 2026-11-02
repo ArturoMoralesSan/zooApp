@@ -5,6 +5,7 @@ import { cardsKeys } from '@/services/cards'
 import { donationsKeys } from '@/services/donations'
 import { profileKeys } from '@/services/profile'
 import { ticketsKeys } from '@/services/tickets'
+import type { DeckCard, OwnedCard } from '@/types/cards'
 import type { User } from '@/types/user'
 
 // Revalidate cached reads after a write. Uses the provider's mutate: the
@@ -16,6 +17,11 @@ export function useDataRefresh() {
 		refreshMyTickets: () => mutate(ticketsKeys.mine),
 		refreshDonations: () => mutate(donationsKeys.list),
 		refreshCards: () => mutate(cardsKeys.list),
+		// Show a card that was just won right away, then revalidate the list.
+		addOwnedCard: (card: OwnedCard) =>
+			mutate<DeckCard[]>(cardsKeys.list, (cards) =>
+				cards?.map((item) => (item.id === card.id ? card : item)),
+			),
 		// Pass the user returned by a write to show it right away.
 		refreshProfile: (user?: User) =>
 			Promise.all([

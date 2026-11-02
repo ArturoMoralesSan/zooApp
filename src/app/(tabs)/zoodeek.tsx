@@ -104,7 +104,16 @@ export default function ZooDeck() {
 								cards={data.slice(0, COLLECTION_PREVIEW)}
 								columns={3}
 								gapClassName='gap-2'
-								renderCard={(card) => <CollectionTile card={card} />}
+								renderCard={(card) => (
+									<CollectionTile
+										card={card}
+										onPress={
+											card.encountered
+												? () => router.push(`/deck/${card.id}`)
+												: undefined
+										}
+									/>
+								)}
 							/>
 						)}
 					</QueryView>

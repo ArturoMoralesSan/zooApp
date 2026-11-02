@@ -38,7 +38,7 @@ type ToastState = { title: string; message: string } | null
 export default function DuelPlayScreen() {
 	const insets = useSafeAreaInsets()
 	const { isOffline } = useNetworkStatus()
-	const { refreshCards } = useDataRefresh()
+	const { addOwnedCard } = useDataRefresh()
 	const { duel, answers, result, submitting, choose, retry, submit } = useDuel()
 
 	const modelUrl = duel?.card.model_url ?? null
@@ -161,9 +161,18 @@ export default function DuelPlayScreen() {
 		}
 	}
 
+	// A-22 → A-26: the won card goes into the cached list so its view opens
+	// right away, then the list revalidates.
 	const takeCard = () => {
-		void refreshCards()
-		router.replace('/deck')
+		const won = result?.data.card
+
+		if (!won) {
+			router.replace('/deck')
+			return
+		}
+
+		void addOwnedCard(won)
+		router.replace(`/deck/${won.id}`)
 	}
 
 	const outcome = result?.data.outcome

@@ -135,7 +135,16 @@ export default function DeckScreen() {
 							<CardGrid
 								cards={visibleCards}
 								columns={2}
-								renderCard={(card) => <DeckCardTile card={card} />}
+								renderCard={(card) => (
+									<DeckCardTile
+										card={card}
+										onPress={
+											card.encountered
+												? () => router.push(`/deck/${card.id}`)
+												: undefined
+										}
+									/>
+								)}
 							/>
 						</View>
 					)}
