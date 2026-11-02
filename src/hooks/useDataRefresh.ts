@@ -1,6 +1,7 @@
 import { useSWRConfig } from 'swr'
 
 import { userKeys } from '@/services/auth'
+import { cardsKeys } from '@/services/cards'
 import { donationsKeys } from '@/services/donations'
 import { profileKeys } from '@/services/profile'
 import { ticketsKeys } from '@/services/tickets'
@@ -14,6 +15,7 @@ export function useDataRefresh() {
 	return {
 		refreshMyTickets: () => mutate(ticketsKeys.mine),
 		refreshDonations: () => mutate(donationsKeys.list),
+		refreshCards: () => mutate(cardsKeys.list),
 		// Pass the user returned by a write to show it right away.
 		refreshProfile: (user?: User) =>
 			Promise.all([
