@@ -125,11 +125,17 @@ export default function ZooDeck() {
 					</QueryView>
 				</View>
 
-				{/* DUELOS: the main game action, so the dark primary card. The QR
-				    card below is its secondary: a Niebla card with the Esmeralda
-				    chevron. */}
+				{/* DUELOS: the dark card stays the primary game action; the QR card
+				    above it is the secondary (Niebla card, Esmeralda chevron). */}
 				<ListCard
 					className='mt-6'
+					icon={QrCodeScanIcon}
+					title='Escanear QR'
+					description='Escanea la placa de un recinto y reta al animal.'
+					onPress={() => router.push('/duel/scan')}
+				/>
+				<ListCard
+					className='mt-3'
 					tone='dark'
 					icon={SwordsIcon}
 					title='Duelos'
@@ -137,13 +143,6 @@ export default function ZooDeck() {
 					onPress={() =>
 						setComingSoon('Los duelos del mapa estarán disponibles pronto.')
 					}
-				/>
-				<ListCard
-					className='mt-3'
-					icon={QrCodeScanIcon}
-					title='Escanear QR'
-					description='Escanea la placa de un recinto y reta al animal.'
-					onPress={() => router.push('/duel/scan')}
 				/>
 			</ScrollView>
 
