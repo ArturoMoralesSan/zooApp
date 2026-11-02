@@ -4,7 +4,6 @@ import {
 	ViroAmbientLight,
 	ViroDirectionalLight,
 	ViroImage,
-	ViroCamera,
 	ViroNode,
 	ViroScene,
 	ViroSkyBox,
@@ -45,9 +44,12 @@ type BoundingBox = {
 // Both the card and the animal fit a box of this size (world units), so
 // each one fills the viewer the same way.
 const FIT_SIZE = 1.4
-// Viro's default field of view is wide: this distance makes FIT_SIZE fill
-// about two thirds of the viewer's height.
-const CAMERA_POSITION: Vec3 = [0, 0, 1.25]
+// Viro's default camera sits at the origin looking down -Z, with a wide
+// field of view: at this distance FIT_SIZE fills about two thirds of the
+// viewer's height. There's no camera component on purpose: Fabric creates
+// a ViroCamera before Viro's renderer is ready on the first launch, and
+// that crashes natively.
+const SUBJECT_POSITION: Vec3 = [0, 0, -1.25]
 const ORIGIN: Vec3 = [0, 0, 0]
 // The card's back GLB is a real-size card (5.72 × 10.16 cm), centered and
 // upright, as a thin slab whose front face is at z = 0.
@@ -87,10 +89,6 @@ export function CardViewerScene(props?: CardViewerSceneNavigatorProps) {
 	return (
 		<ViroScene>
 			<ViroSkyBox color={colors.niebla} />
-			{/* Fixed camera: the drag turns the object instead (see CardViewerFrame).
-			    Viro's orbit camera has no touch handling in a non-AR scene. */}
-			<ViroCamera active position={CAMERA_POSITION} />
-
 			{/* eslint-disable-next-line no-restricted-syntax -- 3D light color, not a UI color */}
 			<ViroAmbientLight color='#fff' intensity={300} />
 			<ViroDirectionalLight
@@ -100,7 +98,12 @@ export function CardViewerScene(props?: CardViewerSceneNavigatorProps) {
 				intensity={600}
 			/>
 
-			<ViroNode rotation={[scene.rotation[0], scene.rotation[1], 0]}>
+			{/* The drag turns the object (see CardViewerFrame): Viro's orbit
+			    camera has no touch handling in a non-AR scene. */}
+			<ViroNode
+				position={SUBJECT_POSITION}
+				rotation={[scene.rotation[0], scene.rotation[1], 0]}
+			>
 				{scene.mode === 'card' ? (
 					<>
 						{scene.cardImageUrl && (
@@ -134,7 +137,7 @@ type Fit = { scale: Vec3; position: Vec3 }
 
 // The animal GLB is real scale (1 unit = 1 m, origin at the bottom center),
 // so it loads hidden at scale 1, gets measured, then is scaled to FIT_SIZE
-// and centered on the orbit's focal point.
+// and centered on the point the drag turns around.
 function AnimalModel({
 	modelUrl,
 	playing,
@@ -152,20 +155,17 @@ function AnimalModel({
 
 			if (!box) throw new Error('Sin medidas')
 
-			const size = Math.max(
-				box.maxX - box.minX,
-				box.maxY - box.minY,
-				box.maxZ - box.minZ,
-			)
+			// The box is in world space (moved and turned with the parent
+			// nodes), so only its extents are used, never its position.
+			const height = box.maxY - box.minY
+			const size = Math.max(box.maxX - box.minX, height, box.maxZ - box.minZ)
 			const scale = size > 0 ? FIT_SIZE / size : 1
 
+			// Origin at the bottom center: lowering it by half its height
+			// centers it on the point the drag turns around.
 			setFit({
 				scale: [scale, scale, scale],
-				position: [
-					-((box.minX + box.maxX) / 2) * scale,
-					-((box.minY + box.maxY) / 2) * scale,
-					-((box.minZ + box.maxZ) / 2) * scale,
-				],
+				position: [0, -(height / 2) * scale, 0],
 			})
 		} catch {
 			// Unmeasurable: show it at real scale rather than not at all.
