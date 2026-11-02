@@ -20,6 +20,10 @@ type DuelArSceneProps = {
 
 const noop = () => {}
 
+// Every card model embeds an "idle" clip; it loops from the moment the
+// animal is placed.
+const IDLE_ANIMATION = { name: 'idle', run: true, loop: true }
+
 const NO_SCENE_PROPS: DuelSceneProps = {
 	modelUrl: null,
 	onPlaced: noop,
@@ -67,6 +71,7 @@ export function DuelArScene(props?: DuelArSceneProps) {
 					type='GLB'
 					scale={[1, 1, 1]}
 					position={position}
+					animation={IDLE_ANIMATION}
 					onLoadEnd={onModelLoaded}
 					onError={onModelError}
 				/>
