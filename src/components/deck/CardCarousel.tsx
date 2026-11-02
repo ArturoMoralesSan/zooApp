@@ -26,10 +26,10 @@ type CardCarouselProps = {
 }
 
 // Real card proportions (5.72 × 10.16 cm, same as the card image).
-const ITEM_WIDTH = 80
+const ITEM_WIDTH = 104
 const ITEM_HEIGHT = Math.round(ITEM_WIDTH / 0.563)
 // Distance between card centers: smaller than the width, so they overlap.
-const STEP = 52
+const STEP = 68
 
 // Straight carousel of card images (A-26/A-27). The centered card is on top
 // and full size; the others shrink and stack behind it the further they are.
@@ -164,10 +164,10 @@ function CarouselItem({
 						source={{ uri: image }}
 						resizeMode='cover'
 						accessibilityIgnoresInvertColors
-						className='h-full w-full rounded-lg bg-hoja'
+						className='h-full w-full rounded-xl bg-hoja'
 					/>
 				) : (
-					<View className='h-full w-full rounded-lg bg-hoja' />
+					<View className='h-full w-full rounded-xl bg-hoja' />
 				)}
 			</Pressable>
 		</Animated.View>
