@@ -1,13 +1,115 @@
-import { Text, View } from 'react-native'
+import { Cards01Icon, QrCodeScanIcon } from '@hugeicons/core-free-icons'
+import { router } from 'expo-router'
+import { useState } from 'react'
+import { RefreshControl, ScrollView, View } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export default function ZooDeek() {
+import { CardGrid } from '@/components/deck/CardGrid'
+import { CollectionTile } from '@/components/deck/CollectionTile'
+import { ListCard } from '@/components/ui/ListCard'
+import { QueryView } from '@/components/ui/QueryView'
+import { SectionTitle } from '@/components/ui/SectionTitle'
+import { TabHeader } from '@/components/ui/TabHeader'
+import { TextLink } from '@/components/ui/TextLink'
+import { useAuth } from '@/contexts/AuthContext'
+import { useCards } from '@/hooks/useCards'
+import { useScrolled } from '@/hooks/useScrolled'
+import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import colors from '@/theme/colors'
+import { getTabBarExtraSpace } from '@/theme/layout'
+
+const PRIMARY = colors.esmeralda
+const COLLECTION_PREVIEW = 6
+
+export default function ZooDeck() {
+	const { scrolled, onScroll } = useScrolled()
+	const insets = useSafeAreaInsets()
+	const { refreshUser } = useAuth()
+
+	const cards = useCards()
+	const [refreshing, setRefreshing] = useState(false)
+
+	useSessionRedirect()
+
+	const handleRefresh = async () => {
+		setRefreshing(true)
+
+		try {
+			await Promise.all([cards.refresh(), refreshUser()])
+		} finally {
+			setRefreshing(false)
+		}
+	}
+
+	const owned = cards.data?.filter((card) => card.encountered).length ?? 0
+	const total = cards.data?.length ?? 0
+
 	return (
-		<View className='flex-1 bg-niebla px-5 pt-12'>
-			<Text className='text-h1'>ZooDeek</Text>
+		<SafeAreaView className='flex-1 bg-blanco' edges={['top']}>
+			<TabHeader scrolled={scrolled} title='ZooDeck' />
 
-			<Text className='text-subtitle mt-2'>
-				Explora el mapa y descubre el zoológico.
-			</Text>
-		</View>
+			<ScrollView
+				onScroll={onScroll}
+				scrollEventThrottle={16}
+				className='flex-1'
+				contentContainerClassName='grow px-5 pt-2'
+				contentContainerStyle={{
+					paddingBottom: 140 + getTabBarExtraSpace(insets.bottom),
+				}}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
+						tintColor={PRIMARY}
+						colors={[PRIMARY]}
+					/>
+				}
+			>
+				{/* Secondary to the dark "Duelos" card of A-16: a Niebla card with the
+				    Esmeralda chevron. "Duelos" will go above it. */}
+				<ListCard
+					icon={QrCodeScanIcon}
+					title='Escanear QR'
+					description='Escanea la placa de un recinto y reta al animal.'
+					onPress={() => router.push('/duel/scan')}
+				/>
+
+				{/* MI COLECCIÓN */}
+				<View className='mt-6'>
+					<SectionTitle
+						title='Mi colección'
+						subtitle={cards.data ? `${owned} de ${total} tarjetas` : undefined}
+						trailing={
+							<TextLink
+								label='Ver todas'
+								onPress={() => router.push('/deck')}
+							/>
+						}
+					/>
+
+					<QueryView
+						query={cards}
+						loadingMessage='Cargando tu colección…'
+						loadingLayout='tiles'
+						errorTitle='No pudimos cargar tu colección'
+						isEmpty={(data) => data.length === 0}
+						empty={{
+							icon: Cards01Icon,
+							title: 'Aún no hay tarjetas',
+							message: 'Pronto podrás retar a los animales del zoológico.',
+						}}
+					>
+						{(data) => (
+							<CardGrid
+								cards={data.slice(0, COLLECTION_PREVIEW)}
+								columns={3}
+								gapClassName='gap-2'
+								renderCard={(card) => <CollectionTile card={card} />}
+							/>
+						)}
+					</QueryView>
+				</View>
+			</ScrollView>
+		</SafeAreaView>
 	)
 }
