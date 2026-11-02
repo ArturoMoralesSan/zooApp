@@ -30,6 +30,8 @@ export type CardViewerSceneProps = {
 	offsetY: number
 	onModelReady: () => void
 	onModelError: () => void
+	// The card image finished loading, or failed.
+	onCardImageSettled: () => void
 }
 
 type CardViewerSceneNavigatorProps = {
@@ -80,6 +82,7 @@ const NO_SCENE_PROPS: CardViewerSceneProps = {
 	offsetY: 0,
 	onModelReady: noop,
 	onModelError: noop,
+	onCardImageSettled: noop,
 }
 
 // Viewer for the 3D card (A-26) and the animal (A-27). Data comes in
@@ -122,6 +125,8 @@ export function CardViewerScene(props?: CardViewerSceneNavigatorProps) {
 								width={CARD_WIDTH * cardScale}
 								height={CARD_HEIGHT * cardScale}
 								position={CARD_FRONT_POSITION}
+								onLoadEnd={scene.onCardImageSettled}
+								onError={scene.onCardImageSettled}
 							/>
 						)}
 						<Viro3DObject

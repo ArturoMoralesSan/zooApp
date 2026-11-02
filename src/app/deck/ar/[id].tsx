@@ -44,7 +44,8 @@ export default function CardArScreen() {
 	const [resetKey, setResetKey] = useState(0)
 
 	const viroReady = useViroHandoff()
-	const { exiting, exit } = useViroExit('ar')
+	// Leaving mid-load would break the next Viro view: wait for the model.
+	const { exiting, exit } = useViroExit('ar', phase === 'loading')
 
 	useSessionRedirect()
 

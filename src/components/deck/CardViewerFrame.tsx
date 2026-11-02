@@ -1,6 +1,6 @@
 import { CubeIcon } from '@hugeicons/core-free-icons'
 import { Viro3DSceneNavigator, type ViroScene } from '@reactvision/react-viro'
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, PanResponder, Text, View } from 'react-native'
 
 import {
@@ -24,6 +24,9 @@ type CardViewerFrameProps = {
 	// the subject is sized and centered in the space between them.
 	overlayTop: number
 	overlayBottom: number
+	// True while the shown card image or model is still loading: releasing
+	// Viro mid-load breaks the next Viro view (see useViroExit).
+	onBusyChange?: (busy: boolean) => void
 }
 
 type ModelStatus = 'loading' | 'ready' | 'error'
@@ -69,6 +72,7 @@ export function CardViewerFrame({
 	onModelTap,
 	overlayTop,
 	overlayBottom,
+	onBusyChange,
 }: CardViewerFrameProps) {
 	// Status per model URL, so switching cards starts from "loading".
 	const [status, setStatus] = useState<{ url: string; value: ModelStatus }>()
@@ -152,11 +156,25 @@ export function CardViewerFrame({
 	const modelUrl = card.model_url
 	const modelStatus: ModelStatus =
 		status?.url === modelUrl ? status.value : 'loading'
+	const cardImageUrl = card.card_image_url ?? card.thumbnail_image
+	// URL of the last card image that finished loading (or failed).
+	const [cardImageSettled, setCardImageSettled] = useState<string | null>()
+
+	// Only while Viro is mounted: nothing loads before that.
+	const busy =
+		Boolean(layout && viroReady) &&
+		(mode === 'model'
+			? Boolean(modelUrl) && modelStatus === 'loading'
+			: Boolean(cardImageUrl) && cardImageSettled !== cardImageUrl)
+
+	useEffect(() => {
+		onBusyChange?.(busy)
+	}, [busy, onBusyChange])
 
 	const sceneProps = useMemo<CardViewerSceneProps>(
 		() => ({
 			mode,
-			cardImageUrl: card.card_image_url ?? card.thumbnail_image,
+			cardImageUrl,
 			modelUrl,
 			playing,
 			rotation,
@@ -167,8 +185,9 @@ export function CardViewerFrame({
 				modelUrl && setStatus({ url: modelUrl, value: 'ready' }),
 			onModelError: () =>
 				modelUrl && setStatus({ url: modelUrl, value: 'error' }),
+			onCardImageSettled: () => setCardImageSettled(cardImageUrl),
 		}),
-		[mode, card, modelUrl, playing, rotation, layout],
+		[mode, cardImageUrl, modelUrl, playing, rotation, layout],
 	)
 
 	const showModelState = mode === 'model'

@@ -5,9 +5,9 @@ import {
 	Touch01Icon,
 	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Text, View } from 'react-native'
+import { BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CardCarousel } from '@/components/deck/CardCarousel'
@@ -53,8 +53,9 @@ export default function CardViewScreen() {
 
 	// null until the user moves: then it follows the carousel.
 	const [selected, setSelected] = useState<number | null>(null)
+	// The animal first; the card only when coming back to it from AR.
 	const [mode, setMode] = useState<ViewerMode>(
-		initialMode === 'model' ? 'model' : 'card',
+		initialMode === 'card' ? 'card' : 'model',
 	)
 	const [playing, setPlaying] = useState(false)
 	const [hintVisible, setHintVisible] = useState(false)
@@ -62,7 +63,25 @@ export default function CardViewScreen() {
 	const [overlayTop, setOverlayTop] = useState(0)
 	const [overlayBottom, setOverlayBottom] = useState(0)
 	// Leaving releases the 3D view first (see useViroHandoff).
-	const { exiting, exit } = useViroExit('scene3d')
+	const [viewerBusy, setViewerBusy] = useState(false)
+	const { exiting, exit } = useViroExit('scene3d', viewerBusy)
+	const leave = useCallback(() => exit(() => router.back()), [exit])
+
+	// Android back (button or gesture) leaves the same way as the back
+	// button, so reopening a card right away can't overlap two Viro views.
+	useFocusEffect(
+		useCallback(() => {
+			const subscription = BackHandler.addEventListener(
+				'hardwareBackPress',
+				() => {
+					leave()
+					return true
+				},
+			)
+
+			return () => subscription.remove()
+		}, [leave]),
+	)
 
 	useSessionRedirect()
 
@@ -130,6 +149,7 @@ export default function CardViewScreen() {
 										onModelTap={togglePlaying}
 										overlayTop={overlayTop}
 										overlayBottom={overlayBottom}
+										onBusyChange={setViewerBusy}
 									/>
 								)}
 							</View>
@@ -152,7 +172,7 @@ export default function CardViewScreen() {
 										className='flex-row items-center justify-between gap-3 px-5 pt-2'
 									>
 										<BackButton
-											onPress={() => exit(() => router.back())}
+											onPress={leave}
 											position='relative'
 											variant='outline'
 										/>
