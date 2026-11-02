@@ -1,5 +1,5 @@
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs'
 import type { MyTicketsTab, Purchase } from '@/types/tickets'
-import { Pressable, Text, View } from 'react-native'
 
 type TicketTabsProps = {
 	tab: MyTicketsTab
@@ -15,55 +15,13 @@ export function TicketTabs({
 	onChangeTab,
 }: TicketTabsProps) {
 	return (
-		<View
-			className='mb-4 flex-row rounded-2xl border-1.5 border-card-border bg-niebla p-1'
-			accessibilityRole='tablist'
-		>
-			<Pressable
-				onPress={() => onChangeTab('active')}
-				accessibilityRole='tab'
-				accessibilityState={{ selected: tab === 'active' }}
-				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'active' ? 'bg-esmeralda' : ''}`}
-			>
-				<Text
-					className={`text-[13px] ${tab === 'active' ? 'font-sans-x text-blanco' : 'font-sans-semibold text-tinta-2'}`}
-				>
-					Activas
-				</Text>
-
-				<View
-					className={`h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 ${tab === 'active' ? 'bg-blanco' : 'bg-hoja'}`}
-				>
-					<Text
-						className={`font-display-x text-[12px] ${tab === 'active' ? 'text-esmeralda' : 'text-tinta'}`}
-					>
-						{activePurchases.length}
-					</Text>
-				</View>
-			</Pressable>
-
-			<Pressable
-				onPress={() => onChangeTab('history')}
-				accessibilityRole='tab'
-				accessibilityState={{ selected: tab === 'history' }}
-				className={`min-h-11 flex-1 flex-row items-center justify-center gap-[7px] rounded-xl ${tab === 'history' ? 'bg-esmeralda' : ''}`}
-			>
-				<Text
-					className={`text-[13px] ${tab === 'history' ? 'font-sans-x text-blanco' : 'font-sans-semibold text-tinta-2'}`}
-				>
-					Historial
-				</Text>
-
-				<View
-					className={`h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 ${tab === 'history' ? 'bg-blanco' : 'bg-hoja'}`}
-				>
-					<Text
-						className={`font-display-x text-[12px] ${tab === 'history' ? 'text-esmeralda' : 'text-tinta'}`}
-					>
-						{historyPurchases.length}
-					</Text>
-				</View>
-			</Pressable>
-		</View>
+		<SegmentedTabs
+			value={tab}
+			onChange={onChangeTab}
+			tabs={[
+				{ key: 'active', label: 'Activas', count: activePurchases.length },
+				{ key: 'history', label: 'Historial', count: historyPurchases.length },
+			]}
+		/>
 	)
 }
