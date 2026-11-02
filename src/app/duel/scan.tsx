@@ -12,7 +12,7 @@ import { ActivityIndicator, Linking, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CardStats } from '@/components/deck/CardStats'
-import { CameraNotice } from '@/components/duel/CameraNotice'
+import { CameraNotice } from '@/components/ui/CameraNotice'
 import { DuelDialog } from '@/components/duel/DuelDialog'
 import { ScanFrame } from '@/components/duel/ScanFrame'
 import { Badge } from '@/components/ui/Badge'

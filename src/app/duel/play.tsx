@@ -14,8 +14,11 @@ import { ActivityIndicator, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CardStats } from '@/components/deck/CardStats'
-import { CameraNotice } from '@/components/duel/CameraNotice'
-import { DuelArScene, type DuelSceneProps } from '@/components/duel/DuelArScene'
+import { CameraNotice } from '@/components/ui/CameraNotice'
+import {
+	ModelPlacementScene,
+	type ModelPlacementSceneProps,
+} from '@/components/ar/ModelPlacementScene'
 import { DuelAnswer, type DuelAnswerState } from '@/components/duel/DuelAnswer'
 import { DuelDialog } from '@/components/duel/DuelDialog'
 import { Badge } from '@/components/ui/Badge'
@@ -51,7 +54,7 @@ export default function DuelPlayScreen() {
 	const hideToast = useCallback(() => setToast(null), [])
 
 	// Stable props: the scene keeps its placement across overlay re-renders.
-	const sceneProps = useMemo<DuelSceneProps>(
+	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
 			onPlaced: () => setModelStatus('loading'),
@@ -184,7 +187,7 @@ export default function DuelPlayScreen() {
 
 			<ViroARSceneNavigator
 				autofocus
-				initialScene={{ scene: DuelArScene }}
+				initialScene={{ scene: ModelPlacementScene }}
 				viroAppProps={sceneProps}
 				style={{ flex: 1 }}
 			/>
@@ -233,7 +236,10 @@ export default function DuelPlayScreen() {
 							<Text className='text-h1 text-blanco' accessibilityRole='header'>
 								{card.name}
 							</Text>
-							<Badge tone='success' label={rarityLabel(card.rarity)} />
+							{/* Badge is self-start; its wrapper is what gets centered. */}
+							<View>
+								<Badge tone='success' label={rarityLabel(card.rarity)} />
+							</View>
 						</View>
 
 						<View pointerEvents='box-none' style={{ flex: 1 }} />
