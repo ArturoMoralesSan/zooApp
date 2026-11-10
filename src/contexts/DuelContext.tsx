@@ -16,6 +16,16 @@ import {
 	type DuelStartResult,
 } from '@/services/duels'
 import type { DuelStart, DuelSubmitResponse } from '@/types/cards'
+import {
+	createDebugDuel,
+	DEBUG_DUEL_CODE,
+	gradeDebugDuel,
+	ZOODECK_QUIZ_DEBUG,
+} from '@/utils/zoodeckDebug'
+
+// The fake duel of the debug mode, graded locally (see zoodeckDebug).
+const isDebugDuel = (code: string | null) =>
+	ZOODECK_QUIZ_DEBUG && code === DEBUG_DUEL_CODE
 
 type DuelContextType = {
 	// The scanned QR: "Reintentar" starts the duel again with it.
@@ -85,14 +95,20 @@ export function DuelProvider({ children }: DuelProviderProps) {
 	const retry = useCallback(async () => {
 		if (!code) throw new Error('No hay un duelo en curso.')
 
-		const started = await startDuel(code)
+		// Debug duel: a new local attempt with what's left.
+		const started: DuelStartResult = isDebugDuel(code)
+			? {
+					kind: 'started',
+					duel: createDebugDuel(result?.data.attempts?.left),
+				}
+			: await startDuel(code)
 
 		if (started.kind === 'started') {
 			begin(code, started.duel)
 		}
 
 		return started
-	}, [code, begin])
+	}, [code, begin, result])
 
 	const submit = useCallback(async () => {
 		if (!duel) throw new Error('No hay un duelo en curso.')
@@ -102,15 +118,17 @@ export function DuelProvider({ children }: DuelProviderProps) {
 		setSubmitting(true)
 
 		try {
-			const coordinates = await getLastKnownCoordinates()
-			const response = await submitDuel(
-				duel.attempt_id,
-				duel.questions.map((question) => ({
-					question_id: question.id,
-					answer_id: answers[question.id],
-				})),
-				coordinates,
-			)
+			const picked = duel.questions.map((question) => ({
+				question_id: question.id,
+				answer_id: answers[question.id],
+			}))
+			const response = isDebugDuel(code)
+				? gradeDebugDuel(duel, picked)
+				: await submitDuel(
+						duel.attempt_id,
+						picked,
+						await getLastKnownCoordinates(),
+					)
 
 			setResult(response)
 
@@ -119,7 +137,7 @@ export function DuelProvider({ children }: DuelProviderProps) {
 			inFlight.current = false
 			setSubmitting(false)
 		}
-	}, [duel, answers])
+	}, [code, duel, answers])
 
 	const reset = useCallback(() => {
 		setCode(null)

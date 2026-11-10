@@ -19,6 +19,7 @@ import {
 	ModelPlacementScene,
 	type ModelPlacementSceneProps,
 } from '@/components/ar/ModelPlacementScene'
+import { DebugQuizBackground } from '@/components/duel/DebugQuizBackground'
 import { DuelAnswer, type DuelAnswerState } from '@/components/duel/DuelAnswer'
 import { DuelDialog } from '@/components/duel/DuelDialog'
 import { Badge } from '@/components/ui/Badge'
@@ -32,6 +33,7 @@ import { isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
 import colors from '@/theme/colors'
 import { formatUnlockTime, rarityLabel } from '@/utils/cards'
+import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
 type Phase = 'placing' | 'ready' | 'quiz'
 type ModelStatus = 'waiting' | 'loading' | 'loaded' | 'error'
@@ -42,11 +44,16 @@ export default function DuelPlayScreen() {
 	const insets = useSafeAreaInsets()
 	const { isOffline } = useNetworkStatus()
 	const { addOwnedCard } = useDataRefresh()
-	const { duel, answers, result, submitting, choose, retry, submit } = useDuel()
+	const { code, duel, answers, result, submitting, choose, retry, submit } =
+		useDuel()
 
+	// Debug duel: a 3D view replaces the AR camera, so nothing is placed.
+	const debug = ZOODECK_QUIZ_DEBUG && code === DEBUG_DUEL_CODE
 	const modelUrl = duel?.card.model_url ?? null
 	// Without a model there's nothing to place: straight to A-20.
-	const [phase, setPhase] = useState<Phase>(modelUrl ? 'placing' : 'ready')
+	const [phase, setPhase] = useState<Phase>(
+		modelUrl && !debug ? 'placing' : 'ready',
+	)
 	const [modelStatus, setModelStatus] = useState<ModelStatus>('waiting')
 	const [index, setIndex] = useState(0)
 	const [retrying, setRetrying] = useState(false)
@@ -185,12 +192,20 @@ export default function DuelPlayScreen() {
 		<View className='flex-1 bg-tinta'>
 			<StatusBar style='light' />
 
-			<ViroARSceneNavigator
-				autofocus
-				initialScene={{ scene: ModelPlacementScene }}
-				viroAppProps={sceneProps}
-				style={{ flex: 1 }}
-			/>
+			{debug ? (
+				<DebugQuizBackground
+					modelUrl={modelUrl}
+					onModelReady={sceneProps.onModelLoaded}
+					onModelError={sceneProps.onModelError}
+				/>
+			) : (
+				<ViroARSceneNavigator
+					autofocus
+					initialScene={{ scene: ModelPlacementScene }}
+					viroAppProps={sceneProps}
+					style={{ flex: 1 }}
+				/>
+			)}
 
 			{/* Over the camera: lets taps through to the AR view while placing. */}
 			<View

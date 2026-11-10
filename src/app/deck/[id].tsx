@@ -29,6 +29,7 @@ import colors from '@/theme/colors'
 import { markHintShown, wasHintShown } from '@/services/hints'
 import type { OwnedCard } from '@/types/cards'
 import { rarityLabel } from '@/utils/cards'
+import { DEBUG_CARD, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
 const noop = () => {}
 
@@ -43,13 +44,14 @@ export default function CardViewScreen() {
 	const insets = useSafeAreaInsets()
 	const cardsQuery = useCards()
 
-	const owned = useMemo(
-		() =>
-			(cardsQuery.data ?? []).filter(
-				(card): card is OwnedCard => card.encountered,
-			),
-		[cardsQuery.data],
-	)
+	const owned = useMemo(() => {
+		const cards = (cardsQuery.data ?? []).filter(
+			(card): card is OwnedCard => card.encountered,
+		)
+
+		// Debug mode: the fake card won in the debug duel.
+		return ZOODECK_QUIZ_DEBUG ? [...cards, DEBUG_CARD] : cards
+	}, [cardsQuery.data])
 
 	// null until the user moves: then it follows the carousel.
 	const [selected, setSelected] = useState<number | null>(null)

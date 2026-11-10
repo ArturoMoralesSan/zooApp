@@ -1,4 +1,5 @@
 import {
+	Bug01Icon,
 	Cards01Icon,
 	QrCodeScanIcon,
 	SwordsIcon,
@@ -23,6 +24,7 @@ import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
+import { ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
 const PRIMARY = colors.esmeralda
 const COLLECTION_PREVIEW = 6
@@ -124,6 +126,18 @@ export default function ZooDeck() {
 						)}
 					</QueryView>
 				</View>
+
+				{/* Debug mode only (EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1). */}
+				{ZOODECK_QUIZ_DEBUG && (
+					<ListCard
+						className='mt-6'
+						tone='hoja'
+						icon={Bug01Icon}
+						title='Duelo de prueba'
+						description='Quiz falso sin QR ni AR que termina en la vista 3D.'
+						onPress={() => router.push('/duel/debug')}
+					/>
+				)}
 
 				{/* DUELOS: the dark card stays the primary game action; the QR card
 				    above it is the secondary (Niebla card, Esmeralda chevron). */}
