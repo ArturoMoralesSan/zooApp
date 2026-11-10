@@ -7,10 +7,10 @@ import {
 	Touch01Icon,
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useCallback, useMemo, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CardStats } from '@/components/deck/CardStats'
@@ -29,6 +29,7 @@ import Toast from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import { useViroExit } from '@/hooks/useViroHandoff'
 import { isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
 import colors from '@/theme/colors'
@@ -78,7 +79,27 @@ export default function DuelPlayScreen() {
 		[modelUrl],
 	)
 
-	const leave = () => router.back()
+	// Every way out releases the AR (or debug 3D) view first: the card view
+	// started while it was still alive came up blank (see useViroHandoff).
+	const { exiting, exit } = useViroExit(
+		debug ? 'scene3d' : 'ar',
+		modelStatus === 'loading',
+	)
+	const leave = useCallback(() => exit(() => router.back()), [exit])
+
+	useFocusEffect(
+		useCallback(() => {
+			const subscription = BackHandler.addEventListener(
+				'hardwareBackPress',
+				() => {
+					leave()
+					return true
+				},
+			)
+
+			return () => subscription.remove()
+		}, [leave]),
+	)
 
 	if (!duel) {
 		// Reached without a scan (e.g. after a reload): nothing to play.
@@ -177,12 +198,12 @@ export default function DuelPlayScreen() {
 		const won = result?.data.card
 
 		if (!won) {
-			router.replace('/deck')
+			exit(() => router.replace('/deck'))
 			return
 		}
 
 		void addOwnedCard(won)
-		router.replace(`/deck/${won.id}`)
+		exit(() => router.replace(`/deck/${won.id}`))
 	}
 
 	const outcome = result?.data.outcome
@@ -192,7 +213,7 @@ export default function DuelPlayScreen() {
 		<View className='flex-1 bg-tinta'>
 			<StatusBar style='light' />
 
-			{debug ? (
+			{exiting ? null : debug ? (
 				<DebugQuizBackground
 					modelUrl={modelUrl}
 					onModelReady={sceneProps.onModelLoaded}
@@ -358,6 +379,7 @@ export default function DuelPlayScreen() {
 				primary={{
 					title: 'Tomar tarjeta',
 					icon: Cards01Icon,
+					loading: exiting,
 					onPress: takeCard,
 				}}
 				onRequestClose={takeCard}
@@ -404,7 +426,7 @@ export default function DuelPlayScreen() {
 						? {
 								title: 'Ver respuestas',
 								icon: ArrowRight01Icon,
-								onPress: () => router.replace('/duel/review'),
+								onPress: () => exit(() => router.replace('/duel/review')),
 							}
 						: { title: 'Salir', onPress: leave }
 				}
