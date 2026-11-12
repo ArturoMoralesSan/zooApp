@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import { useDuel } from '@/contexts/DuelContext'
+import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -45,6 +46,14 @@ export default function ScanScreen() {
 	const { addOwnedCard } = useDataRefresh()
 
 	const [state, setState] = useState<ScanState>({ kind: 'scanning' })
+	const startedCard = state.kind === 'started' ? state.duel.card : null
+	const challengerImage = useCardAsset(
+		undefined,
+		'thumbnail',
+		startedCard?.pack?.thumbnail,
+		startedCard?.thumbnail_image ?? null,
+	).uri
+	const ownedImage = useCardFace(state.kind === 'owned' ? state.card : null).uri
 	const lastScan = useRef<{ code: string; at: number } | null>(null)
 
 	useSessionRedirect()
@@ -188,9 +197,7 @@ export default function ScanScreen() {
 			{/* A-19 RETO */}
 			<DuelDialog
 				visible={state.kind === 'started'}
-				image={
-					state.kind === 'started' ? state.duel.card.thumbnail_image : null
-				}
+				image={challengerImage}
 				overline={
 					state.kind === 'started'
 						? ['Nuevo duelo', state.duel.card.category_name]
@@ -217,7 +224,7 @@ export default function ScanScreen() {
 			{/* 409: the card is already in the deck */}
 			<DuelDialog
 				visible={state.kind === 'owned'}
-				image={state.kind === 'owned' ? state.card.card_image_url : null}
+				image={ownedImage}
 				imageLook='card'
 				align='center'
 				title={state.kind === 'owned' ? state.card.name : undefined}

@@ -1,6 +1,7 @@
 import { SquareLock02Icon } from '@hugeicons/core-free-icons'
-import { Image, Pressable, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 
+import { CardThumbnail } from '@/components/deck/CardThumbnail'
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
 import type { DeckCard } from '@/types/cards'
@@ -41,17 +42,7 @@ export function CollectionTile({
 			accessibilityLabel={`${card.name}, ${rarityLabel(card.rarity)}`}
 			className={`aspect-[0.75] overflow-hidden rounded-xl border-1.5 border-bosque bg-bosque active:opacity-80 ${className}`}
 		>
-			{card.thumbnail_image ? (
-				<Image
-					source={{ uri: card.thumbnail_image }}
-					resizeMode='cover'
-					accessibilityIgnoresInvertColors
-					className='w-full bg-hoja'
-					style={{ flex: 1 }}
-				/>
-			) : (
-				<View className='w-full bg-hoja' style={{ flex: 1 }} />
-			)}
+			<CardThumbnail card={card} className='w-full' fill />
 
 			<View className='px-2 py-1.5'>
 				<Text

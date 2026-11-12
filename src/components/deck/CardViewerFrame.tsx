@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
+import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useViroHandoff } from '@/hooks/useViroHandoff'
 import type { OwnedCard } from '@/types/cards'
 
@@ -153,10 +154,12 @@ export function CardViewerFrame({
 		}
 	}, [size, overlayTop, overlayBottom])
 
-	const modelUrl = card.model_url
+	// Pack copy or URL; `loading` while it's decrypted or downloaded.
+	const model = useCardAsset(card.id, 'model', card.pack?.model, card.model_url)
+	const modelUrl = model.uri
 	const modelStatus: ModelStatus =
-		status?.url === modelUrl ? status.value : 'loading'
-	const cardImageUrl = card.card_image_url ?? card.thumbnail_image
+		model.loading || status?.url !== modelUrl ? 'loading' : status.value
+	const cardImageUrl = useCardFace(card).uri
 	// URL of the last card image that finished loading (or failed).
 	const [cardImageSettled, setCardImageSettled] = useState<string | null>()
 
@@ -164,7 +167,7 @@ export function CardViewerFrame({
 	const busy =
 		Boolean(layout && viroReady) &&
 		(mode === 'model'
-			? Boolean(modelUrl) && modelStatus === 'loading'
+			? (model.loading || Boolean(modelUrl)) && modelStatus === 'loading'
 			: Boolean(cardImageUrl) && cardImageSettled !== cardImageUrl)
 
 	useEffect(() => {
@@ -227,7 +230,7 @@ export function CardViewerFrame({
 				/>
 			)}
 
-			{showModelState && !modelUrl && (
+			{showModelState && !modelUrl && !model.loading && (
 				<ViewerOverlay layout={layout}>
 					<Icon icon={CubeIcon} size={32} color={colors.apagado} />
 					<Text className='text-body mt-2 text-center text-tinta-2'>
@@ -236,12 +239,14 @@ export function CardViewerFrame({
 				</ViewerOverlay>
 			)}
 
-			{showModelState && modelUrl && modelStatus === 'loading' && (
-				<ViewerOverlay layout={layout}>
-					<ActivityIndicator size='large' color={colors.esmeralda} />
-					<Text className='text-meta mt-2'>Cargando a {card.name}…</Text>
-				</ViewerOverlay>
-			)}
+			{showModelState &&
+				(model.loading || modelUrl) &&
+				modelStatus === 'loading' && (
+					<ViewerOverlay layout={layout}>
+						<ActivityIndicator size='large' color={colors.esmeralda} />
+						<Text className='text-meta mt-2'>Cargando a {card.name}…</Text>
+					</ViewerOverlay>
+				)}
 
 			{showModelState && modelUrl && modelStatus === 'error' && (
 				<ViewerOverlay layout={layout} interactive>

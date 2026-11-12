@@ -1,7 +1,8 @@
 import { CubeIcon } from '@hugeicons/core-free-icons'
-import { Image, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { CardStats } from '@/components/deck/CardStats'
+import { CardThumbnail } from '@/components/deck/CardThumbnail'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
@@ -49,16 +50,7 @@ export function DeckCardTile({
 			accessibilityLabel={`${card.name}, ${cardSubtitle(card.rarity, card.category_name)}`}
 			className={className}
 		>
-			{card.thumbnail_image ? (
-				<Image
-					source={{ uri: card.thumbnail_image }}
-					resizeMode='cover'
-					accessibilityIgnoresInvertColors
-					className='aspect-[1.4] w-full bg-hoja'
-				/>
-			) : (
-				<View className='aspect-[1.4] w-full bg-hoja' />
-			)}
+			<CardThumbnail card={card} className='aspect-[1.4] w-full' />
 
 			<View className='p-3'>
 				<Text

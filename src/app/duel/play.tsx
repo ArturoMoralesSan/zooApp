@@ -27,6 +27,7 @@ import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import Toast from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
+import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useViroExit } from '@/hooks/useViroHandoff'
@@ -50,10 +51,25 @@ export default function DuelPlayScreen() {
 
 	// Debug duel: a 3D view replaces the AR camera, so nothing is placed.
 	const debug = ZOODECK_QUIZ_DEBUG && code === DEBUG_DUEL_CODE
-	const modelUrl = duel?.card.model_url ?? null
+	// From the offline pack when it's on the phone, else its URL (a rare
+	// download at the zoo, announced in the placing notice).
+	const model = useCardAsset(
+		undefined,
+		'model',
+		duel?.card.pack?.model,
+		duel?.card.model_url ?? null,
+	)
+	const modelUrl = model.uri
+	const thumbnail = useCardAsset(
+		undefined,
+		'thumbnail',
+		duel?.card.pack?.thumbnail,
+		duel?.card.thumbnail_image ?? null,
+	).uri
+	const wonImage = useCardFace(result?.data.card).uri
 	// Without a model there's nothing to place: straight to A-20.
 	const [phase, setPhase] = useState<Phase>(
-		modelUrl && !debug ? 'placing' : 'ready',
+		duel?.card.model_url && !debug ? 'placing' : 'ready',
 	)
 	const [modelStatus, setModelStatus] = useState<ModelStatus>('waiting')
 	const [index, setIndex] = useState(0)
@@ -253,13 +269,15 @@ export default function DuelPlayScreen() {
 					<CameraNotice
 						icon={Touch01Icon}
 						message={
-							modelStatus === 'loading'
-								? `Cargando a ${card.name}…`
-								: `Toca el plano donde quieras colocar a ${card.name}.`
+							model.downloading
+								? 'Descargando el animal…'
+								: modelStatus === 'loading'
+									? `Cargando a ${card.name}…`
+									: `Toca el plano donde quieras colocar a ${card.name}.`
 						}
 						className='mt-4'
 					>
-						{modelStatus === 'loading' && (
+						{(model.loading || modelStatus === 'loading') && (
 							<ActivityIndicator color={colors.lima} />
 						)}
 					</CameraNotice>
@@ -372,7 +390,7 @@ export default function DuelPlayScreen() {
 			{/* A-22 GANASTE */}
 			<DuelDialog
 				visible={outcome === 'won'}
-				image={result?.data.card?.card_image_url ?? null}
+				image={wonImage}
 				imageLook='card'
 				align='center'
 				title={result?.message}
@@ -388,7 +406,7 @@ export default function DuelPlayScreen() {
 			{/* A-23 PERDISTE */}
 			<DuelDialog
 				visible={outcome === 'retry'}
-				image={card.thumbnail_image}
+				image={thumbnail}
 				align='center'
 				title={result?.message}
 				primary={{
@@ -418,7 +436,7 @@ export default function DuelPlayScreen() {
 			{/* LOCKED: last attempt failed */}
 			<DuelDialog
 				visible={outcome === 'locked'}
-				image={card.thumbnail_image}
+				image={thumbnail}
 				align='center'
 				title={result?.message}
 				primary={

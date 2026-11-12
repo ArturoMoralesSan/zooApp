@@ -15,6 +15,7 @@ import { SurfaceDetectedPill } from '@/components/ar/SurfaceDetectedPill'
 import { CardStats } from '@/components/deck/CardStats'
 import BackButton from '@/components/ui/BackButton'
 import { CameraNotice } from '@/components/ui/CameraNotice'
+import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
@@ -37,7 +38,13 @@ export default function CardArScreen() {
 	const card = data?.find(
 		(item): item is OwnedCard => item.encountered && String(item.id) === id,
 	)
-	const modelUrl = card?.model_url ?? null
+	const model = useCardAsset(
+		card?.id,
+		'model',
+		card?.pack?.model,
+		card?.model_url ?? null,
+	)
+	const modelUrl = model.uri
 
 	const [phase, setPhase] = useState<Phase>('placing')
 	const [planeFound, setPlaneFound] = useState(false)
@@ -128,6 +135,17 @@ export default function CardArScreen() {
 
 					{exiting ? (
 						<CameraNotice message='Cerrando la cámara…' className='mt-4'>
+							<ActivityIndicator color={colors.lima} />
+						</CameraNotice>
+					) : model.loading ? (
+						<CameraNotice
+							message={
+								model.downloading
+									? 'Descargando el animal…'
+									: `Cargando a ${name}…`
+							}
+							className='mt-4'
+						>
 							<ActivityIndicator color={colors.lima} />
 						</CameraNotice>
 					) : !modelUrl ? (

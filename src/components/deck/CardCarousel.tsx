@@ -17,6 +17,7 @@ import Animated, {
 	useSharedValue,
 } from 'react-native-reanimated'
 
+import { useCardFace } from '@/hooks/useCardAsset'
 import type { OwnedCard } from '@/types/cards'
 
 type CardCarouselProps = {
@@ -138,7 +139,7 @@ function CarouselItem({
 		}
 	})
 
-	const image = card.card_image_url ?? card.thumbnail_image
+	const { uri: image } = useCardFace(card)
 
 	return (
 		<Animated.View
