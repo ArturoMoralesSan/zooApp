@@ -5,7 +5,7 @@ import { isCellularState, isOfflineState } from '@/hooks/useNetworkStatus'
 import type { OwnedCard } from '@/types/cards'
 import type { PackFile, PackKind, PackRef } from '@/types/pack'
 
-import { clearCardsCache, getStoredCards } from './cards'
+import { clearCardsCache, getCards, getStoredCards } from './cards'
 import { getCellularUpdates, getPackManifest } from './pack'
 import { decrypt, sha256 } from './packCrypto'
 import {
@@ -210,7 +210,8 @@ function setProgress(id: string, progress: number) {
 
 // State on disk ----------------------------------------------------------------
 
-function loadState() {
+// Reads the pack and the user's copies from disk; safe to call repeatedly.
+export function loadState() {
 	loading ??= (async () => {
 		index = await readPackIndex()
 		userId = await getLastUserId()
@@ -728,6 +729,15 @@ async function runSync(userTriggered: boolean) {
 		await refreshManifest()
 	} catch {
 		// Offline or server down: keep the stored catalog. Never a modal.
+	}
+
+	try {
+		// The owned cards and their keys, so they're decrypted right after a
+		// login too, not only once a screen loads the list. A 304 when nothing
+		// changed.
+		await getCards()
+	} catch {
+		// The saved list (if any) is used instead.
 	}
 
 	if (userTriggered) {
