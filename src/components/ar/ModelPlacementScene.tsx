@@ -3,6 +3,7 @@ import {
 	ViroAmbientLight,
 	ViroARPlaneSelector,
 	ViroARScene,
+	ViroNode,
 } from '@reactvision/react-viro'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -22,6 +23,12 @@ type ModelPlacementSceneNavigatorProps = {
 	sceneNavigator: { viroAppProps: ModelPlacementSceneProps }
 }
 
+type Vec3 = [number, number, number]
+
+// Where the model stands: the tapped point in world space, turned to face
+// the camera at that moment.
+type Placement = { position: Vec3; yaw: number }
+
 const noop = () => {}
 
 // Every card model embeds an "idle" clip; it loops from the moment the
@@ -35,11 +42,19 @@ const NO_SCENE_PROPS: ModelPlacementSceneProps = {
 	onModelError: noop,
 }
 
+// Yaw (degrees around Y) that turns the model's front (+Z, the glTF
+// convention) toward the camera.
+function yawToward(from: Vec3, to: number[]) {
+	return (Math.atan2(to[0] - from[0], to[2] - from[2]) * 180) / Math.PI
+}
+
 // Places a card's animal at life size on a horizontal plane, where the user
-// taps (duel A-20, AR view A-28/A-29). The model is a child of the plane
-// selector, so it stays locked to that surface; `resetKey` re-shows the
-// planes to place it again. Data and callbacks come in through viroAppProps;
-// Viro types scenes as () => Element but always passes sceneNavigator.
+// taps (duel A-20, AR view A-28/A-29). The plane selector only picks the
+// spot: the model is pinned to that world point, not to the plane, whose
+// center ARCore keeps moving as it refines it (the model drifted with it).
+// `resetKey` re-shows the planes to place it again. Data and callbacks come
+// in through viroAppProps; Viro types scenes as () => Element but always
+// passes sceneNavigator.
 export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 	const {
 		modelUrl,
@@ -49,23 +64,22 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 		onModelLoaded,
 		onModelError,
 	} = props?.sceneNavigator.viroAppProps ?? NO_SCENE_PROPS
+	const sceneRef = useRef<ViroARScene>(null)
 	const selectorRef = useRef<ViroARPlaneSelector>(null)
-	// The plane holding the model. ARCore drops and re-creates anchors when
-	// the app is paused (Gemini, a system dialog); forwarding that removal
-	// would clear the selection, hiding the model and showing the planes
-	// again. It stays at its last pose, and updates to the same anchor
-	// still move it.
+	// The plane the user picked. ARCore drops and re-creates anchors when the
+	// app is paused (Gemini, a system dialog); forwarding that removal would
+	// clear the selection and show the planes again.
 	const selectedAnchorRef = useRef<string | null>(null)
 	// Same object between renders, so Viro doesn't load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
-	const [placed, setPlaced] = useState(false)
+	const [placement, setPlacement] = useState<Placement | null>(null)
 	const [placedFor, setPlacedFor] = useState(resetKey)
 
 	// A new reset key clears the selection: the planes show again and the
 	// model is removed until the next tap.
 	if (placedFor !== resetKey) {
 		setPlacedFor(resetKey)
-		setPlaced(false)
+		setPlacement(null)
 	}
 
 	useEffect(() => {
@@ -73,8 +87,26 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 		selectorRef.current?.reset()
 	}, [resetKey])
 
+	const place = async (anchorId: string, position: Vec3) => {
+		selectedAnchorRef.current = anchorId
+
+		let yaw = 0
+
+		try {
+			const camera = await sceneRef.current?.getCameraOrientationAsync()
+
+			if (camera) yaw = yawToward(position, camera.position)
+		} catch {
+			// Facing the default direction is fine.
+		}
+
+		setPlacement({ position, yaw })
+		onPlaced()
+	}
+
 	return (
 		<ViroARScene
+			ref={sceneRef}
 			anchorDetectionTypes={['PlanesHorizontal']}
 			onAnchorFound={(anchor) => {
 				if (anchor.type === 'plane') onPlaneFound()
@@ -96,24 +128,27 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 					minHeight={0}
 					minWidth={0}
 					alignment='HorizontalUpward'
-					onPlaneSelected={(plane) => {
-						selectedAnchorRef.current = plane.anchorId
-						setPlaced(true)
-						onPlaced()
+					onPlaneSelected={(plane, tapPosition) => {
+						void place(plane.anchorId, tapPosition ?? (plane.position as Vec3))
 					}}
+				/>
+			)}
+
+			{/* Mounted only once placed, so loading starts at the tap. */}
+			{modelUrl && placement && (
+				<ViroNode
+					position={placement.position}
+					rotation={[0, placement.yaw, 0]}
 				>
-					{/* Mounted only once placed, so loading starts at the tap. */}
-					{placed && (
-						<Viro3DObject
-							source={source}
-							type='GLB'
-							scale={[1, 1, 1]}
-							animation={IDLE_ANIMATION}
-							onLoadEnd={onModelLoaded}
-							onError={onModelError}
-						/>
-					)}
-				</ViroARPlaneSelector>
+					<Viro3DObject
+						source={source}
+						type='GLB'
+						scale={[1, 1, 1]}
+						animation={IDLE_ANIMATION}
+						onLoadEnd={onModelLoaded}
+						onError={onModelError}
+					/>
+				</ViroNode>
 			)}
 		</ViroARScene>
 	)
