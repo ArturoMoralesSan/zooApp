@@ -210,7 +210,12 @@ export default function OfflinePackScreen() {
 						/>
 
 						<View style={{ flex: 1, minWidth: 0 }}>
-							<Text className='text-h3 text-tinta'>{summary.text}</Text>
+							<Text className='text-h3 text-tinta'>
+								{/* The footer already shows the size to download. */}
+								{summary.kind === 'empty'
+									? 'Aún no hay nada descargado'
+									: summary.text}
+							</Text>
 							<Text className='text-meta mt-1'>
 								{status.doneCount} de {status.totalCount} archivos ·{' '}
 								{formatBytes(status.doneBytes)} de{' '}
