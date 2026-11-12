@@ -1,3 +1,5 @@
+import type { CardPack } from './pack'
+
 export type Rarity = 'comun' | 'rara' | 'epica' | 'edicion_especial'
 
 export type CardStats = {
@@ -23,6 +25,8 @@ export type OwnedCard = {
 	card_image_url: string | null
 	stats: CardStats
 	model_url: string | null
+	// Missing on servers without offline packs.
+	pack?: CardPack
 }
 
 // Unowned cards reveal nothing about the animal.
@@ -47,6 +51,8 @@ export type DuelCard = {
 	thumbnail_image: string | null
 	stats: CardStats
 	model_url: string | null
+	// Only `model` and `thumbnail`: the card image's key arrives on a win.
+	pack?: CardPack
 }
 
 export type DuelOption = {
