@@ -8,15 +8,27 @@ const API_URL = `${ENV_URL}/api`
 
 export type ApiErrors = Record<string, string[]>
 
-export class ApiValidationError extends Error {
-	errors: ApiErrors
+// An error response from the server. `data` is the envelope's `data`, when
+// the endpoint sends one with the error (e.g. the locked duel's attempts).
+export class ApiError extends Error {
 	status: number
+	data: unknown
+
+	constructor(message: string, status: number, data?: unknown) {
+		super(message)
+		this.name = 'ApiError'
+		this.status = status
+		this.data = data
+	}
+}
+
+export class ApiValidationError extends ApiError {
+	errors: ApiErrors
 
 	constructor(message: string, errors: ApiErrors, status: number) {
-		super(message)
+		super(message, status)
 		this.name = 'ApiValidationError'
 		this.errors = errors
-		this.status = status
 	}
 }
 
@@ -34,10 +46,13 @@ export function isNetworkError(error: unknown) {
 	return error instanceof NetworkError || error instanceof TypeError
 }
 
-export async function api<T>(
+// Sends a request with the JSON headers and the session token, and returns
+// the raw response. Most callers want api(); this is for the ones that read
+// headers or statuses without a body (ETag / 304).
+export async function request(
 	endpoint: string,
 	options: RequestInit = {},
-): Promise<T> {
+): Promise<Response> {
 	const headers = new Headers({
 		Accept: 'application/json',
 		'Content-Type': 'application/json',
@@ -54,17 +69,25 @@ export async function api<T>(
 		}
 	}
 
-	let response: Response
-
 	try {
-		response = await fetch(`${API_URL}${endpoint}`, {
+		return await fetch(`${API_URL}${endpoint}`, {
 			...options,
 			headers,
 		})
 	} catch {
 		throw new NetworkError()
 	}
+}
 
+export async function api<T>(
+	endpoint: string,
+	options: RequestInit = {},
+): Promise<T> {
+	return readResponse<T>(await request(endpoint, options))
+}
+
+// Parses a JSON response, throwing ApiError/ApiValidationError when it failed.
+export async function readResponse<T>(response: Response): Promise<T> {
 	let data: T
 
 	try {
@@ -79,6 +102,7 @@ export async function api<T>(
 		const errorData = data as {
 			message?: string
 			errors?: ApiErrors
+			data?: unknown
 		}
 
 		if (response.status === 422 && errorData.errors) {
@@ -93,11 +117,15 @@ export async function api<T>(
 			const firstError = Object.values(errorData.errors)[0]?.[0]
 
 			if (firstError) {
-				throw new Error(firstError)
+				throw new ApiError(firstError, response.status, errorData.data)
 			}
 		}
 
-		throw new Error(errorData.message || `Error de API (${response.status})`)
+		throw new ApiError(
+			errorData.message || `Error de API (${response.status})`,
+			response.status,
+			errorData.data,
+		)
 	}
 
 	return data

@@ -3,6 +3,7 @@ import { createContext, useContext, type ReactNode } from 'react'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { isNetworkError } from '@/services/api'
+import { resetPackUser } from '@/services/packSync'
 
 import {
 	login as authLogin,
@@ -76,6 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		try {
 			await authLogout()
 		} finally {
+			// The user's decrypted cards go; the shared encrypted pack stays.
+			await resetPackUser()
 			await clearCache()
 		}
 	}

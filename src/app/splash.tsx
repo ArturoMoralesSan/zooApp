@@ -10,7 +10,7 @@ import {
 
 import { useAuth } from '@/contexts/AuthContext'
 import colors from '@/theme/colors'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 
 const MIN_SPLASH_TIME = 5000
 
@@ -36,7 +36,7 @@ export default function SplashScreen() {
 			resizeMode='cover'
 			className='flex-1 items-center justify-center'
 		>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			{/* Capa blanca con 10 % de opacidad */}
 			<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />

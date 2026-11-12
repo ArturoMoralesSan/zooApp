@@ -17,7 +17,7 @@ import { useMemo, useState } from 'react'
 import { Animated, Text, View } from 'react-native'
 
 import type { SpeciesImage } from '@/types/species'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 
 export default function SpeciesDetailScreen() {
 	const bottomSpace = useScrollBottomSpace(0)
@@ -171,7 +171,7 @@ export default function SpeciesDetailScreen() {
 					    species name once the sheet reaches it */}
 					{/* Light icons over the photo; dark on the placeholder and once
 					    the bar turns white */}
-					<StatusBar style={heroImage && !pastHero ? 'light' : 'dark'} />
+					<ScreenStatusBar style={heroImage && !pastHero ? 'light' : 'dark'} />
 
 					<TopBar
 						overlay

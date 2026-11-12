@@ -1,4 +1,4 @@
-import hipoModel from '@/assets/models/hipo_test.glb'
+import hipoModel from '@/assets/models/model_test.glb'
 import {
 	Viro3DObject,
 	ViroAmbientLight,

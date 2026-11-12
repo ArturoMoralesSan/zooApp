@@ -1,4 +1,5 @@
 import { Notice, type NoticeTone } from '@/components/ui/Notice'
+import type { IconSvgElement } from '@hugeicons/react-native'
 import { useEffect } from 'react'
 import { Pressable, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,6 +12,8 @@ type ToastProps = {
 	title?: string
 	message: string
 	type?: ToastType
+	// Replaces the type's default icon, e.g. a hint with a touch icon.
+	icon?: IconSvgElement
 	onHide: () => void
 	// Defaults to a reading time based on the text length.
 	duration?: number
@@ -35,6 +38,7 @@ export default function Toast({
 	title,
 	message,
 	type = 'success',
+	icon,
 	onHide,
 	duration,
 }: ToastProps) {
@@ -66,7 +70,7 @@ export default function Toast({
 			style={{ top: insets.top + 12 }}
 		>
 			<Pressable onPress={onHide} accessibilityHint='Toca para cerrar el aviso'>
-				<Notice tone={type} title={shownTitle} message={message} />
+				<Notice tone={type} icon={icon} title={shownTitle} message={message} />
 			</Pressable>
 		</View>
 	)
