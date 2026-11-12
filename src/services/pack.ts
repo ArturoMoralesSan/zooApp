@@ -8,13 +8,27 @@ export const packKeys = {
 	manifest: '/cards/pack',
 }
 
+const MANIFEST_TIMEOUT_MS = 15000
+
 // null when the server answers 304: the stored catalog is still current.
 export async function getPackManifest(
 	etag: string | null,
 ): Promise<{ etag: string | null; manifest: PackManifest } | null> {
-	const response = await request(packKeys.manifest, {
-		headers: etag ? { 'If-None-Match': etag } : undefined,
-	})
+	// A hung connection (weak signal) mustn't stall the sync: give up and
+	// keep the stored catalog.
+	const controller = new AbortController()
+	const timeout = setTimeout(() => controller.abort(), MANIFEST_TIMEOUT_MS)
+
+	let response: Response
+
+	try {
+		response = await request(packKeys.manifest, {
+			headers: etag ? { 'If-None-Match': etag } : undefined,
+			signal: controller.signal,
+		})
+	} finally {
+		clearTimeout(timeout)
+	}
 
 	if (response.status === 304) return null
 

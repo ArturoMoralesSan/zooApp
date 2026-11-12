@@ -41,7 +41,8 @@ export function useOfflinePackPrompts() {
 		status.totalCount > 0 &&
 		status.doneCount === 0 &&
 		!status.enabled &&
-		status.activity === 'idle'
+		// A background check (possibly slow on mobile data) doesn't hide it.
+		status.activity !== 'downloading'
 
 	const canPrompt = hints !== null && !isOffline && nothingDownloaded
 	const introVisible = canPrompt && focused && !hints.intro
