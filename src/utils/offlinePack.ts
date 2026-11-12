@@ -13,7 +13,11 @@ import {
 } from '@hugeicons/core-free-icons'
 import type { IconSvgElement } from '@hugeicons/react-native'
 
-import type { PackFileStatus, PackStatus } from '@/services/packSync'
+import type {
+	PackFileStatus,
+	PackStatus,
+	SyncResult,
+} from '@/services/packSync'
 import colors from '@/theme/colors'
 import type { PackKind } from '@/types/pack'
 
@@ -225,4 +229,61 @@ export function cardPackRank(files: PackFileStatus[]) {
 		return 0
 
 	return files.some((file) => file.state !== 'done') ? 1 : 2
+}
+
+export type SyncFeedback = {
+	type: 'success' | 'warning' | 'error'
+	title: string
+	message: string
+}
+
+// What to tell the user after they tap "Descargar" or "Buscar
+// actualizaciones"; null when there's nothing to say (paused) or when the
+// offline banner says it.
+export function syncFeedback(result: SyncResult): SyncFeedback | null {
+	switch (result.kind) {
+		case 'checkFailed':
+			return {
+				type: 'warning',
+				title: 'No pudimos revisar el paquete',
+				message: 'El servidor no responde. Inténtalo de nuevo en un momento.',
+			}
+		case 'upToDate':
+			return {
+				type: 'success',
+				title: 'Todo está al día',
+				message: 'No hay actualizaciones nuevas.',
+			}
+		case 'waiting':
+			return {
+				type: 'warning',
+				title: 'Esperando al Wi-Fi',
+				message: 'Las descargas empiezan al conectarte a Wi-Fi.',
+			}
+		case 'noSpace':
+			return {
+				type: 'error',
+				title: 'No hay espacio suficiente',
+				message: 'Libera espacio en tu teléfono e inténtalo de nuevo.',
+			}
+		case 'downloaded':
+			if (result.failed > 0) {
+				return {
+					type: 'warning',
+					title: 'Faltaron algunos archivos',
+					message: `${plural(result.failed, 'archivo no se descargó', 'archivos no se descargaron')}. Se reintentará automáticamente.`,
+				}
+			}
+
+			return {
+				type: 'success',
+				title: 'Paquete listo',
+				message:
+					result.count > 0
+						? `Se ${result.count === 1 ? 'descargó' : 'descargaron'} ${plural(result.count, 'archivo', 'archivos')}.`
+						: 'No hay actualizaciones nuevas.',
+			}
+		default:
+			return null
+	}
 }

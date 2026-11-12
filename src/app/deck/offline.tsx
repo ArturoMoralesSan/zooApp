@@ -6,7 +6,7 @@ import {
 	Refresh01Icon,
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { RefreshControl, ScrollView, Text, View } from 'react-native'
 
 import FixedFooter from '@/components/FixedFooter'
@@ -22,6 +22,7 @@ import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { TextLink } from '@/components/ui/TextLink'
+import Toast from '@/components/ui/Toast'
 import { Toggle } from '@/components/ui/Toggle'
 import { TopBar } from '@/components/ui/TopBar'
 import { useCards } from '@/hooks/useCards'
@@ -34,6 +35,7 @@ import { getCellularUpdates, setCellularUpdates } from '@/services/pack'
 import {
 	freePackSpace,
 	type PackFileStatus,
+	type SyncResult,
 	syncPack,
 } from '@/services/packSync'
 import colors from '@/theme/colors'
@@ -41,11 +43,18 @@ import { useFixedFooterSpace } from '@/theme/layout'
 import type { OwnedCard } from '@/types/cards'
 import { formatTimeAgo } from '@/utils/date'
 import { formatBytes } from '@/utils/format'
-import { cardPackRank, getPackSummary } from '@/utils/offlinePack'
+import {
+	cardPackRank,
+	getPackSummary,
+	type SyncFeedback,
+	syncFeedback,
+} from '@/utils/offlinePack'
 
 const PRIMARY = colors.esmeralda
 
 type Confirm = 'cellular' | 'free' | null
+
+const OFFLINE_MESSAGE = 'Conéctate a internet para revisar el paquete.'
 
 // Offline pack detail (no A-xx design yet): overall progress, each card
 // expandable to its files, and the download, mobile data and free space
@@ -62,6 +71,8 @@ export default function OfflinePackScreen() {
 	const [confirm, setConfirm] = useState<Confirm>(null)
 	const [freeing, setFreeing] = useState(false)
 	const [refreshing, setRefreshing] = useState(false)
+	const [feedback, setFeedback] = useState<SyncFeedback | null>(null)
+	const hideFeedback = useCallback(() => setFeedback(null), [])
 	// Per-card open state the user chose; the rest follow `expandAll` or
 	// open by themselves while downloading or failing.
 	const [expandAll, setExpandAll] = useState(false)
@@ -106,14 +117,24 @@ export default function OfflinePackScreen() {
 		setOverrides({})
 	}
 
+	// Offline goes through the app's offline banner (with this screen's
+	// message), so two notices never stack in the same spot.
+	const showResult = (result: SyncResult) => {
+		if (result.kind === 'offline') {
+			notifyOffline(OFFLINE_MESSAGE)
+		} else {
+			setFeedback(syncFeedback(result))
+		}
+	}
+
 	const startDownload = () => {
 		setConfirm(null)
-		void syncPack({ userTriggered: true })
+		void syncPack({ userTriggered: true }).then(showResult)
 	}
 
 	const handleDownload = () => {
 		if (isOffline) {
-			notifyOffline()
+			showResult({ kind: 'offline' })
 
 			return
 		}
@@ -304,6 +325,8 @@ export default function OfflinePackScreen() {
 
 			{status.activity === 'downloading' ? (
 				<FooterLoadingBar message={summary.text} />
+			) : status.activity === 'checking' ? (
+				<FooterLoadingBar message='Revisando el paquete…' />
 			) : (
 				<FixedFooter
 					label={
@@ -331,6 +354,14 @@ export default function OfflinePackScreen() {
 					disabled={busy || (!status.hasManifest && isOffline)}
 				/>
 			)}
+
+			<Toast
+				visible={feedback !== null}
+				type={feedback?.type}
+				title={feedback?.title}
+				message={feedback?.message ?? ''}
+				onHide={hideFeedback}
+			/>
 
 			{/* Confirm: download on mobile data */}
 			<Modal visible={confirm === 'cellular'} onClose={() => setConfirm(null)}>
