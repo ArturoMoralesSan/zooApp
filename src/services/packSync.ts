@@ -1,5 +1,5 @@
 import NetInfo, { type NetInfoState } from '@react-native-community/netinfo'
-import { DownloadTask, File, Paths } from 'expo-file-system'
+import { Directory, DownloadTask, File, Paths } from 'expo-file-system'
 
 import { isCellularState, isOfflineState } from '@/hooks/useNetworkStatus'
 import type { OwnedCard } from '@/types/cards'
@@ -89,8 +89,7 @@ let userId: number | null = null
 let userIndex: UserIndex = {}
 let loading: Promise<void> | null = null
 
-let running: Promise<void> | null = null
-let rerunAsUser = false
+let running: Promise<SyncResult> | null = null
 let stopRequested = false
 let currentTask: DownloadTask | null = null
 let current: { id: string; progress: number } | null = null
@@ -131,6 +130,7 @@ export function subscribePack(listener: () => void) {
 }
 
 export const getPackStatus = () => status
+export const getPackVersion = () => status.version
 
 function emit(patch: Partial<PackStatus> = {}) {
 	status = { ...status, ...patch, ...summarize() }
@@ -330,6 +330,43 @@ async function decryptToCopy(cardId: number, kind: PackKind, ref: PackRef) {
 	return storeCopy(cardId, kind, ref.id, temp)
 }
 
+const duelDir = new Directory(Paths.cache, 'duel')
+
+function clearDuelCache() {
+	try {
+		if (duelDir.exists) duelDir.delete()
+	} catch {
+		// It's the cache: the system clears it eventually.
+	}
+}
+
+// One decrypted file per version, reused while the duel lasts.
+async function decryptToCache(kind: PackKind, ref: PackRef) {
+	const target = new File(
+		duelDir,
+		`${ref.id}.${kind === 'model' ? 'glb' : 'webp'}`,
+	)
+
+	if (target.exists) return target.uri
+	if (!index.files[ref.id] || !binFile(ref.id).exists) return null
+
+	try {
+		const plain = await decrypt(binFile(ref.id), ref.key)
+
+		if (!duelDir.exists)
+			duelDir.create({ intermediates: true, idempotent: true })
+
+		const temp = new File(duelDir, `${ref.id}.tmp`)
+
+		temp.write(plain)
+		temp.moveSync(target, { overwrite: true })
+
+		return target.uri
+	} catch {
+		return null
+	}
+}
+
 // Asset resolution ---------------------------------------------------------------
 
 async function mustSaveData(state?: NetInfoState) {
@@ -412,6 +449,17 @@ async function resolve({
 		return { uri: copy.uri, source: 'local' }
 	}
 
+	// A duel's card isn't owned yet: decrypt it to the cache, outside the
+	// user's copies, which the sync prunes to owned cards (it would delete
+	// the model while the AR view shows it).
+	if (cardId === undefined && ref) {
+		const uri = await decryptToCache(kind, ref)
+
+		if (uri) return { uri, source: 'pack' }
+
+		return remote
+	}
+
 	if (ref) {
 		const uri = await withUser(() => decryptToCopy(id, kind, ref))
 
@@ -468,7 +516,9 @@ async function downloadCopy(
 // Sync ------------------------------------------------------------------------------
 
 const ownedCards = async () =>
-	(await getStoredCards()).filter((card): card is OwnedCard => card.encountered)
+	((await getStoredCards()) ?? []).filter(
+		(card): card is OwnedCard => card.encountered,
+	)
 
 // Re-reads the catalog; with `force` it ignores the ETag (after a 404 or a
 // bad hash, the stored catalog is probably out of date).
@@ -545,7 +595,7 @@ async function reconcile() {
 	// unknown list (never loaded) leaves them alone.
 	const cards = await getStoredCards()
 
-	if (userId === null || cards.length === 0) return
+	if (userId === null || cards === null) return
 
 	await withUser(async () => {
 		const owned = new Map(
@@ -708,10 +758,23 @@ function hasSpaceFor(files: PackFile[]) {
 	return Paths.availableDiskSpace > bytes * 2 + SPACE_MARGIN
 }
 
-async function runSync(userTriggered: boolean) {
+// What a sync did, so a button the user tapped can say so.
+export type SyncResult =
+	| { kind: 'offline' }
+	// The catalog couldn't be read (server down, timeout).
+	| { kind: 'checkFailed' }
+	| { kind: 'upToDate' }
+	// Files left to download, but not allowed now (mobile data, not asked).
+	| { kind: 'waiting' }
+	| { kind: 'noSpace' }
+	| { kind: 'downloaded'; count: number; failed: number }
+	// Paused (app in the background) or no user.
+	| { kind: 'stopped' }
+
+async function runSync(userTriggered: boolean): Promise<SyncResult> {
 	await loadState()
 
-	if (userId === null) return
+	if (userId === null) return { kind: 'stopped' }
 
 	stopRequested = false
 
@@ -720,24 +783,29 @@ async function runSync(userTriggered: boolean) {
 	if (isOfflineState(net)) {
 		emit({ activity: 'idle' })
 
-		return
+		return { kind: 'offline' }
 	}
 
 	emit({ activity: 'checking' })
+
+	let checked = true
 
 	try {
 		await refreshManifest()
 	} catch {
 		// Offline or server down: keep the stored catalog. Never a modal.
+		checked = false
 	}
 
-	try {
-		// The owned cards and their keys, so they're decrypted right after a
-		// login too, not only once a screen loads the list. A 304 when nothing
-		// changed.
-		await getCards()
-	} catch {
-		// The saved list (if any) is used instead.
+	// The owned cards and their keys, so they're decrypted right after a
+	// login too, not only once a screen loads the list. A 304 when nothing
+	// changed; skipped when the server just didn't answer.
+	if (checked) {
+		try {
+			await getCards()
+		} catch {
+			// The saved list (if any) is used instead.
+		}
 	}
 
 	if (userTriggered) {
@@ -758,7 +826,9 @@ async function runSync(userTriggered: boolean) {
 		noSpace = false
 		emit({ activity: 'idle' })
 
-		return
+		if (!checked) return { kind: 'checkFailed' }
+
+		return { kind: queue.length === 0 ? 'upToDate' : 'waiting' }
 	}
 
 	noSpace = !hasSpaceFor(queue)
@@ -766,39 +836,52 @@ async function runSync(userTriggered: boolean) {
 	if (noSpace) {
 		emit({ activity: 'noSpace' })
 
-		return
+		return { kind: 'noSpace' }
 	}
 
 	emit({ activity: 'downloading' })
+
+	const before = Object.keys(index.files).length
+
 	await downloadAll()
 	current = null
 	await decryptOwned()
 	emit({ activity: 'idle' })
+
+	if (stopRequested) return { kind: 'stopped' }
+
+	return {
+		kind: 'downloaded',
+		count: Object.keys(index.files).length - before,
+		failed: failed.size,
+	}
 }
 
 // Runs a sync, or joins the one in progress. A user-triggered request
-// during an automatic run runs again afterwards, so it can use mobile data.
-export function syncPack({ userTriggered = false } = {}) {
+// during an automatic run runs again afterwards (it may use mobile data),
+// and its result is the one returned.
+export function syncPack({ userTriggered = false } = {}): Promise<SyncResult> {
 	if (running) {
-		if (userTriggered) rerunAsUser = true
+		const joined = running
 
-		return running
+		return userTriggered
+			? joined.then(() => syncPack({ userTriggered: true }))
+			: joined
 	}
 
-	running = runSync(userTriggered)
-		.catch(() => {
+	const run = runSync(userTriggered)
+		.catch((): SyncResult => {
 			emit({ activity: 'idle' })
+
+			return { kind: 'checkFailed' }
 		})
 		.finally(() => {
 			running = null
-
-			if (rerunAsUser) {
-				rerunAsUser = false
-				syncPack({ userTriggered: true })
-			}
 		})
 
-	return running
+	running = run
+
+	return run
 }
 
 // App in the background or connection lost: pause the file in progress so
@@ -813,8 +896,22 @@ export async function setPackUser(id: number) {
 
 	if (userId === id) return
 
+	// Another account was left signed in (e.g. an expired session, which
+	// skips logout): its copies and card list go before this one's load.
+	const previous = userId
+
+	if (previous !== null) {
+		pausePackSync()
+		await running
+		wipeUser(previous)
+		clearDuelCache()
+	}
+
 	userId = id
 	await setLastUserId(id)
+
+	if (previous !== null) clearCardsCache()
+
 	userIndex = await readUserIndex(id)
 	bumpVersion()
 }
@@ -826,6 +923,8 @@ export async function resetPackUser() {
 	await running
 
 	if (userId !== null) wipeUser(userId)
+
+	clearDuelCache()
 
 	userId = null
 	userIndex = {}

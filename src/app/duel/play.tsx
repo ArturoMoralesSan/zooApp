@@ -59,7 +59,13 @@ export default function DuelPlayScreen() {
 		duel?.card.pack?.model,
 		duel?.card.model_url ?? null,
 	)
-	const modelUrl = model.uri
+	// Fixed once known: a new URI (e.g. the URL replaced by a local copy)
+	// would reload the model and reset the placement.
+	const [modelUrl, setModelUrl] = useState<string | null>(null)
+
+	if (modelUrl === null && model.uri && !model.loading) {
+		setModelUrl(model.uri)
+	}
 	const thumbnail = useCardAsset(
 		undefined,
 		'thumbnail',

@@ -28,11 +28,12 @@ async function loadStored() {
 	if (userId !== null && !cached) cached = await readStoredCards(userId)
 }
 
-// The cached list without a request, for the offline pack sync.
-export async function getStoredCards(): Promise<DeckCard[]> {
+// The cached list without a request, for the offline pack sync; null when
+// it was never loaded (not the same as an account with no cards).
+export async function getStoredCards(): Promise<DeckCard[] | null> {
 	await loadStored()
 
-	return cached?.cards ?? []
+	return cached?.cards ?? null
 }
 
 // On logout, so the next account never sees this list.

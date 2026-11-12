@@ -44,7 +44,12 @@ export default function CardArScreen() {
 		card?.pack?.model,
 		card?.model_url ?? null,
 	)
-	const modelUrl = model.uri
+	// Fixed once known, so a later copy change can't reset the placement.
+	const [modelUrl, setModelUrl] = useState<string | null>(null)
+
+	if (modelUrl === null && model.uri && !model.loading) {
+		setModelUrl(model.uri)
+	}
 
 	const [phase, setPhase] = useState<Phase>('placing')
 	const [planeFound, setPlaneFound] = useState(false)

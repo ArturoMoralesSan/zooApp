@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 import {
 	type AssetSource,
+	getPackVersion,
 	isOnDevice,
 	peekCardAsset,
 	resolveCardAsset,
+	subscribePack,
 } from '@/services/packSync'
 import type { CardPack, PackKind, PackRef } from '@/types/pack'
-
-import { usePackStatus } from './usePackStatus'
 
 export type CardAssetResult = {
 	uri: string | null
@@ -27,7 +27,9 @@ export function useCardAsset(
 	ref: PackRef | null | undefined,
 	url: string | null,
 ): CardAssetResult {
-	const { version } = usePackStatus()
+	// Only the copies' version: progress updates mustn't re-render (and
+	// re-resolve) every screen showing a card, AR scenes included.
+	const version = useSyncExternalStore(subscribePack, getPackVersion)
 	const refId = ref?.id
 	const refKey = ref?.key
 
