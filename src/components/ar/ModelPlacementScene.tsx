@@ -50,6 +50,12 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 		onModelError,
 	} = props?.sceneNavigator.viroAppProps ?? NO_SCENE_PROPS
 	const selectorRef = useRef<ViroARPlaneSelector>(null)
+	// The plane holding the model. ARCore drops and re-creates anchors when
+	// the app is paused (Gemini, a system dialog); forwarding that removal
+	// would clear the selection, hiding the model and showing the planes
+	// again. It stays at its last pose, and updates to the same anchor
+	// still move it.
+	const selectedAnchorRef = useRef<string | null>(null)
 	// Same object between renders, so Viro doesn't load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
 	const [placed, setPlaced] = useState(false)
@@ -63,6 +69,7 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 	}
 
 	useEffect(() => {
+		selectedAnchorRef.current = null
 		selectorRef.current?.reset()
 	}, [resetKey])
 
@@ -74,7 +81,11 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 				selectorRef.current?.handleAnchorFound(anchor)
 			}}
 			onAnchorUpdated={(a) => selectorRef.current?.handleAnchorUpdated(a)}
-			onAnchorRemoved={(a) => a && selectorRef.current?.handleAnchorRemoved(a)}
+			onAnchorRemoved={(a) => {
+				if (a && a.anchorId !== selectedAnchorRef.current) {
+					selectorRef.current?.handleAnchorRemoved(a)
+				}
+			}}
 		>
 			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
 			<ViroAmbientLight color='#fff' intensity={250} />
@@ -85,7 +96,8 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 					minHeight={0}
 					minWidth={0}
 					alignment='HorizontalUpward'
-					onPlaneSelected={() => {
+					onPlaneSelected={(plane) => {
+						selectedAnchorRef.current = plane.anchorId
 						setPlaced(true)
 						onPlaced()
 					}}
