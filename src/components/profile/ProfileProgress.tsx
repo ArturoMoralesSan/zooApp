@@ -1,6 +1,7 @@
 import { type User } from '@/services/auth'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { StatCard } from '@/components/ui/StatCard'
 import { Animated, Text, View } from 'react-native'
@@ -58,12 +59,11 @@ export function ProfileProgress({
 								<Badge label={`${progress}%`} tone='success' />
 							</View>
 
-							<View className='mt-3 h-2.5 overflow-hidden rounded-full bg-card-border'>
-								<View
-									className='h-full rounded-full bg-esmeralda'
-									style={{ width: `${progress}%` }}
-								/>
-							</View>
+							<ProgressBar
+								progress={progress / 100}
+								accessibilityLabel='Progreso al siguiente nivel'
+								className='mt-3'
+							/>
 
 							<Text className='text-body mt-3 text-tinta'>
 								Te faltan{' '}
