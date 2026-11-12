@@ -3,7 +3,12 @@ import { useEffect } from 'react'
 import { AppState } from 'react-native'
 
 import { useAuth } from '@/contexts/AuthContext'
-import { pausePackSync, setPackUser, syncPack } from '@/services/packSync'
+import {
+	loadState,
+	pausePackSync,
+	setPackUser,
+	syncPack,
+} from '@/services/packSync'
 
 import { isOfflineState } from './useNetworkStatus'
 
@@ -13,6 +18,12 @@ import { isOfflineState } from './useNetworkStatus'
 export function usePackSync() {
 	const { user } = useAuth()
 	const userId = user?.id ?? null
+
+	// Right away, not after /user: on a bad connection that request can take
+	// long, and the pack's state on disk doesn't depend on it.
+	useEffect(() => {
+		void loadState()
+	}, [])
 
 	useEffect(() => {
 		if (userId === null) return

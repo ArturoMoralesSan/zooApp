@@ -41,9 +41,29 @@ export function clearCardsCache() {
 	loaded = false
 }
 
+// With a saved list, a slow connection shows it after this long instead of
+// leaving the collection loading; the request still finishes and updates it.
+const SLOW_NETWORK_MS = 5000
+
 export async function getCards(): Promise<DeckCard[]> {
 	await loadStored()
 
+	const fresh = fetchCards()
+	const saved = cached
+
+	if (!saved) return fresh
+
+	const slow = new Promise<DeckCard[]>((resolve) =>
+		setTimeout(() => resolve(saved.cards), SLOW_NETWORK_MS),
+	)
+
+	// The late result is kept in `cached` for the next revalidation.
+	fresh.catch(() => undefined)
+
+	return Promise.race([fresh, slow])
+}
+
+async function fetchCards(): Promise<DeckCard[]> {
 	let response: Response
 
 	try {
