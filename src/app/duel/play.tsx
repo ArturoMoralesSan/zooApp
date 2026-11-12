@@ -9,7 +9,7 @@ import {
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -33,6 +33,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useViroExit } from '@/hooks/useViroHandoff'
 import { isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
+import { clearDuelCache } from '@/services/packSync'
 import colors from '@/theme/colors'
 import { formatUnlockTime, rarityLabel } from '@/utils/cards'
 import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
@@ -108,6 +109,10 @@ export default function DuelPlayScreen() {
 		modelStatus === 'loading',
 	)
 	const leave = useCallback(() => exit(() => router.back()), [exit])
+
+	// The card isn't owned (or is now copied as owned): its decrypted files
+	// were only for this duel. Every way out releases the AR view first.
+	useEffect(() => clearDuelCache, [])
 
 	useFocusEffect(
 		useCallback(() => {

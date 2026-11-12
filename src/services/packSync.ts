@@ -332,7 +332,8 @@ async function decryptToCopy(cardId: number, kind: PackKind, ref: PackRef) {
 
 const duelDir = new Directory(Paths.cache, 'duel')
 
-function clearDuelCache() {
+// The duel's decrypted files, once the duel screen closes (and on logout).
+export function clearDuelCache() {
 	try {
 		if (duelDir.exists) duelDir.delete()
 	} catch {
