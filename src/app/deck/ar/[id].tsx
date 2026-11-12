@@ -1,7 +1,7 @@
 import { CubeIcon, Touch01Icon } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, BackHandler, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -100,7 +100,7 @@ export default function CardArScreen() {
 
 	return (
 		<View className='flex-1 bg-tinta'>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			{modelUrl && viroReady && !exiting && (
 				<ViroARSceneNavigator

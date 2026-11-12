@@ -8,7 +8,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -124,7 +124,7 @@ export default function DuelPlayScreen() {
 				className='flex-1 justify-center gap-4 bg-tinta px-5'
 				style={{ paddingBottom: insets.bottom }}
 			>
-				<StatusBar style='light' />
+				<ScreenStatusBar style='light' />
 				<CameraNotice message='Este duelo ya no está disponible. Escanea el QR del recinto otra vez.' />
 				<Button title='Volver' onPress={leave} />
 			</View>
@@ -227,7 +227,7 @@ export default function DuelPlayScreen() {
 
 	return (
 		<View className='flex-1 bg-tinta'>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			{exiting ? null : debug ? (
 				<DebugQuizBackground

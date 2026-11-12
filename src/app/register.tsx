@@ -17,7 +17,7 @@ import { validateRegisterForm } from '@/utils/auth'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Image, ImageBackground, View } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 
 const OFFLINE_MESSAGE = 'Conéctate a internet para crear tu cuenta.'
 
@@ -125,7 +125,7 @@ export default function Register() {
 			resizeMode='cover'
 			className='flex-1'
 		>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 

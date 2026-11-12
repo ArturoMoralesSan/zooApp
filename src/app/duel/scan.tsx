@@ -6,7 +6,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { router } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 import { useRef, useState } from 'react'
 import { ActivityIndicator, Linking, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -119,7 +119,7 @@ export default function ScanScreen() {
 
 	return (
 		<View className='flex-1 bg-tinta'>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			{permission?.granted && (
 				<View className='absolute inset-0'>

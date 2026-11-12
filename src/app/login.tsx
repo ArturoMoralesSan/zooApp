@@ -14,7 +14,7 @@ import { TextField } from '@/components/ui/TextField'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Image, ImageBackground, Text, View } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
+import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
 
 type FormErrors = {
 	email?: string
@@ -115,7 +115,7 @@ export default function Login() {
 			resizeMode='cover'
 			className='flex-1'
 		>
-			<StatusBar style='light' />
+			<ScreenStatusBar style='light' />
 
 			<View pointerEvents='none' className='absolute inset-0 bg-blanco/10' />
 
