@@ -2,7 +2,11 @@ import * as SecureStore from 'expo-secure-store'
 
 // One-time UI hints, remembered per device. SecureStore is the only key-value
 // store the app ships with, and a flag doesn't justify a native module.
-export type HintKey = 'deck_model_tap'
+export type HintKey =
+	| 'deck_model_tap'
+	// ZooDeck's offline pack: the first-visit modal and the mobile-data notice.
+	| 'deck_offline_intro'
+	| 'deck_offline_mobile'
 
 const prefix = 'zooapp_hint_'
 

@@ -11,6 +11,16 @@ export function isOfflineState(
 	return state.isConnected === false || state.isInternetReachable === false
 }
 
+// Mobile data (or a metered connection): large downloads ask first.
+export function isCellularState(state: Pick<NetInfoState, 'type' | 'details'>) {
+	return (
+		state.type === 'cellular' ||
+		(state.details !== null &&
+			'isConnectionExpensive' in state.details &&
+			state.details.isConnectionExpensive)
+	)
+}
+
 // One-off check for writes, so they aren't sent while offline.
 export async function checkOffline() {
 	return isOfflineState(await NetInfo.fetch())
@@ -21,5 +31,8 @@ export async function checkOffline() {
 export function useNetworkStatus() {
 	const state = useNetInfo()
 
-	return { isOffline: isOfflineState(state) }
+	return {
+		isOffline: isOfflineState(state),
+		isCellular: isCellularState(state),
+	}
 }

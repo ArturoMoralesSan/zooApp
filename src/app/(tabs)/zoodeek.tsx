@@ -12,7 +12,10 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CardGrid } from '@/components/deck/CardGrid'
 import { CollectionTile } from '@/components/deck/CollectionTile'
 import { MapPreviewCard } from '@/components/deck/MapPreviewCard'
+import { OfflinePackCard } from '@/components/deck/OfflinePackCard'
+import { OfflinePackIntroModal } from '@/components/deck/OfflinePackIntroModal'
 import { ListCard } from '@/components/ui/ListCard'
+import { Notice } from '@/components/ui/Notice'
 import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
@@ -20,10 +23,14 @@ import { TextLink } from '@/components/ui/TextLink'
 import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCards } from '@/hooks/useCards'
+import { useOfflinePackPrompts } from '@/hooks/useOfflinePackPrompts'
+import { usePackStatus } from '@/hooks/usePackStatus'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { syncPack } from '@/services/packSync'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
+import { formatBytes } from '@/utils/format'
 import { ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
 const PRIMARY = colors.esmeralda
@@ -35,6 +42,8 @@ export default function ZooDeck() {
 	const { refreshUser } = useAuth()
 
 	const cards = useCards()
+	const pack = usePackStatus()
+	const prompts = useOfflinePackPrompts()
 	const [refreshing, setRefreshing] = useState(false)
 	const [comingSoon, setComingSoon] = useState<string | null>(null)
 	const hideComingSoon = useCallback(() => setComingSoon(null), [])
@@ -45,7 +54,7 @@ export default function ZooDeck() {
 		setRefreshing(true)
 
 		try {
-			await Promise.all([cards.refresh(), refreshUser()])
+			await Promise.all([cards.refresh(), refreshUser(), syncPack()])
 		} finally {
 			setRefreshing(false)
 		}
@@ -80,6 +89,19 @@ export default function ZooDeck() {
 					onOpenMap={() =>
 						setComingSoon('El mapa de ZooDeck estará disponible pronto.')
 					}
+				/>
+
+				{/* PAQUETE SIN CONEXIÓN: prepared at home for the visit */}
+				{prompts.mobileNoticeVisible && (
+					<Notice
+						tone='warning'
+						title='Ahorra datos en tu visita'
+						message='Descarga el paquete en casa con Wi-Fi.'
+						className='mt-6'
+					/>
+				)}
+				<OfflinePackCard
+					className={prompts.mobileNoticeVisible ? 'mt-3' : 'mt-6'}
 				/>
 
 				{/* MI COLECCIÓN */}
@@ -159,6 +181,14 @@ export default function ZooDeck() {
 					}
 				/>
 			</ScrollView>
+
+			<OfflinePackIntroModal
+				visible={prompts.introVisible}
+				size={formatBytes(pack.totalBytes)}
+				cellular={prompts.isCellular}
+				onDownload={prompts.download}
+				onLater={prompts.later}
+			/>
 
 			<Toast
 				visible={comingSoon !== null}

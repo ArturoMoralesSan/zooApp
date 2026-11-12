@@ -1,7 +1,7 @@
 import NetInfo, { type NetInfoState } from '@react-native-community/netinfo'
 import { DownloadTask, File, Paths } from 'expo-file-system'
 
-import { isOfflineState } from '@/hooks/useNetworkStatus'
+import { isCellularState, isOfflineState } from '@/hooks/useNetworkStatus'
 import type { OwnedCard } from '@/types/cards'
 import type { PackFile, PackKind, PackRef } from '@/types/pack'
 
@@ -336,16 +336,7 @@ async function mustSaveData(state?: NetInfoState) {
 
 	if (isOfflineState(net)) return true
 
-	return isCellular(net) && !(await getCellularUpdates())
-}
-
-function isCellular(net: NetInfoState) {
-	return (
-		net.type === 'cellular' ||
-		(net.details !== null &&
-			'isConnectionExpensive' in net.details &&
-			net.details.isConnectionExpensive)
-	)
+	return isCellularState(net) && !(await getCellularUpdates())
 }
 
 const inflight = new Map<string, Promise<CardAsset>>()
@@ -751,7 +742,7 @@ async function runSync(userTriggered: boolean) {
 	const queue = pendingFiles()
 	const allowed =
 		index.enabled &&
-		(userTriggered || !isCellular(net) || (await getCellularUpdates()))
+		(userTriggered || !isCellularState(net) || (await getCellularUpdates()))
 
 	if (queue.length === 0 || !allowed) {
 		noSpace = false

@@ -60,3 +60,12 @@ export function formatEventDate(date: string): string {
 export function formatEventTime(date: string): string {
 	return formatTime(date, { format: { hour: 'numeric', minute: '2-digit' } })
 }
+
+// File sizes for the offline pack: "820 KB", "4.3 MB".
+export function formatBytes(bytes: number): string {
+	if (bytes < 1024 * 1024) {
+		return `${Math.max(1, Math.round(bytes / 1024))} KB`
+	}
+
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
