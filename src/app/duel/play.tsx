@@ -9,7 +9,7 @@ import {
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -19,7 +19,8 @@ import {
 	ModelPlacementScene,
 	type ModelPlacementSceneProps,
 } from '@/components/ar/ModelPlacementScene'
-import { DebugQuizBackground } from '@/components/duel/DebugQuizBackground'
+import { SurfaceOffer } from '@/components/ar/SurfaceOffer'
+import { Viewer360 } from '@/components/ar/Viewer360'
 import { DuelAnswer, type DuelAnswerState } from '@/components/duel/DuelAnswer'
 import { DuelDialog } from '@/components/duel/DuelDialog'
 import { DuelPoints } from '@/components/duel/DuelPoints'
@@ -28,9 +29,11 @@ import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
+import { useArAvailability } from '@/hooks/useArAvailability'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import { useSurfaceOffer } from '@/hooks/useSurfaceOffer'
 import { useViroExit } from '@/hooks/useViroHandoff'
 import { ApiError, isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
@@ -56,8 +59,19 @@ export default function DuelPlayScreen() {
 	const { code, duel, answers, result, submitting, choose, retry, submit } =
 		useDuel()
 
-	// Debug duel: a 3D view replaces the AR camera, so nothing is placed.
+	// Debug duel: no QR, no AR. The 360° view stands in for the camera.
 	const debug = ZOODECK_QUIZ_DEBUG && code === DEBUG_DUEL_CODE
+	// The camera was already allowed to scan the QR.
+	const availability = useArAvailability({ camera: false })
+	// The user chose the 360° view from AR ("¿No encuentras una superficie?").
+	const [chose360, setChose360] = useState(false)
+	// Without AR the animal shows in the 360° view, with nothing to place.
+	const view =
+		debug || chose360 || (availability !== 'ar' && availability !== 'checking')
+			? '360'
+			: availability === 'checking'
+				? null
+				: 'ar'
 	// From the offline pack when it's on the phone, else its URL (a rare
 	// download at the zoo, announced in the placing notice).
 	const model = useCardAsset(
@@ -81,9 +95,13 @@ export default function DuelPlayScreen() {
 	).uri
 	const wonImage = useCardFace(result?.data.card).uri
 	// Without a model there's nothing to place: straight to A-20.
-	const [phase, setPhase] = useState<Phase>(
-		duel?.card.model_url && !debug ? 'placing' : 'ready',
+	const [placingPhase, setPhase] = useState<Phase>(
+		duel?.card.model_url ? 'placing' : 'ready',
 	)
+	// The 360° view has nothing to place either.
+	const phase =
+		view === '360' && placingPhase === 'placing' ? 'ready' : placingPhase
+	const [planeFound, setPlaneFound] = useState(false)
 	const [modelStatus, setModelStatus] = useState<ModelStatus>('waiting')
 	const [index, setIndex] = useState(0)
 	const [retrying, setRetrying] = useState(false)
@@ -94,6 +112,7 @@ export default function DuelPlayScreen() {
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
+			onPlaneFound: () => setPlaneFound(true),
 			onPlaced: () => setModelStatus('loading'),
 			onModelLoaded: () => {
 				setModelStatus('loaded')
@@ -108,13 +127,48 @@ export default function DuelPlayScreen() {
 		[modelUrl],
 	)
 
-	// Every way out releases the AR (or debug 3D) view first: the card view
+	// Every way out releases the AR (or 360°) view first: the card view
 	// started while it was still alive came up blank (see useViroHandoff).
-	const { exiting, exit } = useViroExit(
-		debug ? 'scene3d' : 'ar',
-		modelStatus === 'loading',
+	const arExit = useViroExit('ar', modelStatus === 'loading')
+	const view360Exit = useViroExit(
+		'scene3d',
+		view === '360' && Boolean(modelUrl) && modelStatus === 'waiting',
+	)
+	// Leaving while AR closes for the 360° view: the switch leaves instead.
+	// The ref is read by the pending switch, the state by the overlay.
+	const afterSwitchRef = useRef<(() => void) | null>(null)
+	const [leaving, setLeaving] = useState(false)
+	const exiting = view === '360' ? view360Exit.exiting : arExit.exiting
+	const switching = arExit.exiting && !leaving && view === 'ar'
+
+	const exit = useCallback(
+		(then: () => void) => {
+			if (view === '360') {
+				view360Exit.exit(then)
+				return
+			}
+
+			afterSwitchRef.current = then
+			setLeaving(true)
+			arExit.exit(then)
+		},
+		[view, arExit, view360Exit],
 	)
 	const leave = useCallback(() => exit(() => router.back()), [exit])
+
+	const switchTo360 = () =>
+		arExit.exit(() => {
+			if (afterSwitchRef.current) afterSwitchRef.current()
+			else setChose360(true)
+		})
+
+	const offer360 = useSurfaceOffer(
+		view === 'ar' &&
+			!exiting &&
+			phase === 'placing' &&
+			!planeFound &&
+			modelStatus === 'waiting',
+	)
 
 	// The card isn't owned (or is now copied as owned): its decrypted files
 	// were only for this duel. Every way out releases the AR view first.
@@ -264,10 +318,10 @@ export default function DuelPlayScreen() {
 		<View className='flex-1 bg-tinta'>
 			<ScreenStatusBar style='light' />
 
-			{exiting ? null : debug ? (
-				<DebugQuizBackground
+			{exiting || view === null ? null : view === '360' ? (
+				<Viewer360
 					modelUrl={modelUrl}
-					onModelReady={sceneProps.onModelLoaded}
+					onModelLoaded={sceneProps.onModelLoaded}
 					onModelError={sceneProps.onModelError}
 				/>
 			) : (
@@ -300,19 +354,29 @@ export default function DuelPlayScreen() {
 					)}
 				</View>
 
-				{phase === 'placing' && (
+				{phase === 'placing' && switching && (
+					<CameraNotice message='Abriendo la Vista 360°…' className='mt-4'>
+						<ActivityIndicator color={colors.lima} />
+					</CameraNotice>
+				)}
+
+				{phase === 'placing' && !switching && offer360 && (
+					<SurfaceOffer onAccept={switchTo360} className='mt-4' />
+				)}
+
+				{phase === 'placing' && !switching && !offer360 && (
 					<CameraNotice
 						icon={Touch01Icon}
 						message={
 							model.downloading
 								? 'Descargando el animal…'
-								: modelStatus === 'loading'
+								: modelStatus === 'loading' || view === null
 									? `Cargando a ${card.name}…`
 									: `Toca el plano donde quieras colocar a ${card.name}.`
 						}
 						className='mt-4'
 					>
-						{(model.loading || modelStatus === 'loading') && (
+						{(model.loading || modelStatus === 'loading' || view === null) && (
 							<ActivityIndicator color={colors.lima} />
 						)}
 					</CameraNotice>
