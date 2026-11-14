@@ -1,10 +1,8 @@
 import { CameraSmile01Icon, Refresh01Icon } from '@hugeicons/core-free-icons'
-import type { IconSvgElement } from '@hugeicons/react-native'
 import { Pressable, View } from 'react-native'
 
+import { RoundCameraButton } from '@/components/ar/RoundCameraButton'
 import { FocusRing, useFocusRing } from '@/components/ui/FocusRing'
-import { Icon } from '@/components/ui/Icon'
-import colors from '@/theme/colors'
 
 type ArCameraControlsProps = {
 	onReset: () => void
@@ -36,38 +34,6 @@ export function ArCameraControls({
 				onPress={onSelfie}
 				tone='lima'
 			/>
-		</View>
-	)
-}
-
-type RoundCameraButtonProps = {
-	icon: IconSvgElement
-	label: string
-	onPress: () => void
-	tone: 'white' | 'lima'
-}
-
-function RoundCameraButton({
-	icon,
-	label,
-	onPress,
-	tone,
-}: RoundCameraButtonProps) {
-	const { focused, focusProps } = useFocusRing()
-
-	return (
-		<View>
-			<Pressable
-				onPress={onPress}
-				accessibilityRole='button'
-				accessibilityLabel={label}
-				{...focusProps}
-				className={`h-[52px] w-[52px] items-center justify-center rounded-full active:opacity-80 ${tone === 'lima' ? 'bg-lima' : 'bg-blanco'} ${focused ? 'border-2 border-bosque' : ''}`}
-			>
-				<Icon icon={icon} color={colors.bosque} strong />
-			</Pressable>
-
-			<FocusRing visible={focused} radiusClassName='rounded-full' />
 		</View>
 	)
 }
