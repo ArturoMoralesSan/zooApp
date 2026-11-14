@@ -9,7 +9,7 @@ import {
 	ViroQuad,
 	ViroScene,
 } from '@reactvision/react-viro'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ImageSourcePropType } from 'react-native'
 
 import contactShadow from '@/assets/images/view360/contact-shadow.png'
@@ -21,6 +21,8 @@ export type Viewer360SceneProps = {
 	modelUrl: string | null
 	// Degrees around Y, from the drag gesture.
 	yaw: number
+	// Each new value moves the animal in front of where the phone points.
+	centerKey: number
 	// Equirectangular image around the user. The neutral sky for now; a
 	// habitat's own 360° photo can replace it later.
 	background?: ImageSourcePropType
@@ -83,6 +85,7 @@ const noop = () => {}
 const NO_SCENE_PROPS: Viewer360SceneProps = {
 	modelUrl: null,
 	yaw: 0,
+	centerKey: 0,
 	onModelLoaded: noop,
 	onModelError: noop,
 }
@@ -97,6 +100,29 @@ function circle(radius: number): [number, number][] {
 
 type Dimensions = { size: number; footprint: number }
 
+// Below this horizontal length the phone points almost straight up or down
+// and its forward has no useful heading.
+const MIN_HORIZONTAL = 0.35
+// How often the scene checks where the phone points until the animal is
+// placed.
+const PLACE_POLL_MS = 250
+
+const hasHeading = (forward: number[]) =>
+	Math.hypot(forward[0], forward[2]) >= MIN_HORIZONTAL
+
+// Degrees around Y that turn -Z (where the animal stands) toward where the
+// phone points. Pointing down, the top of the phone shows the way the user
+// faces; pointing up, its bottom does.
+function headingOf(forward: number[], up: number[]) {
+	const [fx, fy, fz] = forward
+	const level = hasHeading(forward)
+	const sign = fy < 0 ? 1 : -1
+	const x = level ? fx : up[0] * sign
+	const z = level ? fz : up[2] * sign
+
+	return (Math.atan2(-x, -z) * 180) / Math.PI
+}
+
 // Vista 360°: the animal stands in front of the user in a neutral
 // environment, and the gyroscope turns the camera (no AR, no camera feed).
 // Data comes in through viroAppProps; Viro types scenes as () => Element but
@@ -105,12 +131,19 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 	const {
 		modelUrl,
 		yaw,
+		centerKey,
 		background = neutralSky,
 		onModelLoaded,
 		onModelError,
 	} = props?.sceneNavigator.viroAppProps ?? NO_SCENE_PROPS
+	const sceneRef = useRef<ViroScene>(null)
 	const modelRef = useRef<Viro3DObject>(null)
 	const [dimensions, setDimensions] = useState<Dimensions | null>(null)
+	// GVR's own recenter isn't reliable without a headset (it can leave the
+	// view facing away), so the animal turns to the camera instead.
+	const [heading, setHeading] = useState(0)
+	// Shown only once placed in front of the user (see below).
+	const [placed, setPlaced] = useState(false)
 	// Same object between renders: the scene re-renders on every drag frame,
 	// and a new source would load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
@@ -123,6 +156,42 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		: MIN_DISTANCE
 	const ground = useMemo(() => circle(distance + GROUND_MARGIN), [distance])
 	const shadowSize = (dimensions?.footprint ?? 1) * SHADOW_SPREAD
+
+	const faceCamera = async () => {
+		try {
+			const camera = await sceneRef.current?.getCameraOrientationAsync()
+
+			if (camera) setHeading(headingOf(camera.forward, camera.up))
+		} catch {
+			// Keeps the last heading.
+		}
+	}
+
+	useEffect(() => {
+		if (centerKey > 0) void faceCamera()
+	}, [centerKey])
+
+	// Placed where the phone points, but only once it points somewhere: head
+	// tracking can take a while to start (it reads straight down until then),
+	// and a phone lying flat has no direction yet. Raising it shows the animal.
+	useEffect(() => {
+		if (!dimensions || placed) return
+
+		const interval = setInterval(async () => {
+			try {
+				const camera = await sceneRef.current?.getCameraOrientationAsync()
+
+				if (!camera || !hasHeading(camera.forward)) return
+
+				setHeading(headingOf(camera.forward, camera.up))
+				setPlaced(true)
+			} catch {
+				// Tries again on the next tick.
+			}
+		}, PLACE_POLL_MS)
+
+		return () => clearInterval(interval)
+	}, [dimensions, placed])
 
 	// Measured hidden first: its size decides how far away it stands.
 	const measure = async () => {
@@ -147,7 +216,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 	}
 
 	return (
-		<ViroScene>
+		<ViroScene ref={sceneRef}>
 			<Viro360Image source={background} />
 
 			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
@@ -168,28 +237,30 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 			/>
 
 			{modelUrl && (
-				<ViroNode position={[0, -EYE_HEIGHT, -distance]}>
-					<ViroQuad
-						width={shadowSize}
-						height={shadowSize}
-						position={[0, SHADOW_LIFT, 0]}
-						rotation={FLAT}
-						materials={['view360Shadow']}
-						visible={dimensions !== null}
-					/>
+				<ViroNode rotation={[0, heading, 0]}>
+					<ViroNode position={[0, -EYE_HEIGHT, -distance]}>
+						<ViroQuad
+							width={shadowSize}
+							height={shadowSize}
+							position={[0, SHADOW_LIFT, 0]}
+							rotation={FLAT}
+							materials={['view360Shadow']}
+							visible={placed}
+						/>
 
-					{/* Its front (+Z) already faces the camera; the drag turns it. */}
-					<Viro3DObject
-						ref={modelRef}
-						source={source}
-						type='GLB'
-						scale={[1, 1, 1]}
-						rotation={[0, yaw, 0]}
-						visible={dimensions !== null}
-						animation={IDLE_ANIMATION}
-						onLoadEnd={() => void measure()}
-						onError={onModelError}
-					/>
+						{/* Its front (+Z) already faces the camera; the drag turns it. */}
+						<Viro3DObject
+							ref={modelRef}
+							source={source}
+							type='GLB'
+							scale={[1, 1, 1]}
+							rotation={[0, yaw, 0]}
+							visible={placed}
+							animation={IDLE_ANIMATION}
+							onLoadEnd={() => void measure()}
+							onError={onModelError}
+						/>
+					</ViroNode>
 				</ViroNode>
 			)}
 		</ViroScene>

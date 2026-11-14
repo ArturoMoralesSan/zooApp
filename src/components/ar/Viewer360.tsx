@@ -6,7 +6,6 @@ import {
 	useEffect,
 	useImperativeHandle,
 	useMemo,
-	useRef,
 	useState,
 } from 'react'
 import { PanResponder, View } from 'react-native'
@@ -46,9 +45,9 @@ export function Viewer360({
 	onModelError,
 	ref,
 }: Viewer360Props) {
-	const navigatorRef = useRef<ViroVRSceneNavigator>(null)
 	const navigation = useNavigation()
 	const [drag, setDrag] = useState<Drag>({ yaw: 0, from: null })
+	const [centerKey, setCenterKey] = useState(0)
 
 	const lockPortrait = useCallback(() => {
 		navigation.setOptions({ orientation: 'portrait' })
@@ -63,9 +62,9 @@ export function Viewer360({
 		return () => clearTimeout(timeout)
 	}, [lockPortrait])
 
-	const recenter = () => navigatorRef.current?.sceneNavigator.recenterTracking()
-
-	useImperativeHandle(ref, () => ({ recenter }))
+	useImperativeHandle(ref, () => ({
+		recenter: () => setCenterKey((value) => value + 1),
+	}))
 
 	const panResponder = useMemo(
 		() =>
@@ -93,21 +92,19 @@ export function Viewer360({
 		() => ({
 			modelUrl,
 			yaw: drag.yaw,
+			centerKey,
 			onModelLoaded: () => {
-				// Wherever the phone pointed while loading, start facing it.
-				navigatorRef.current?.sceneNavigator.recenterTracking()
 				lockPortrait()
 				onModelLoaded()
 			},
 			onModelError,
 		}),
-		[modelUrl, drag.yaw, onModelLoaded, onModelError, lockPortrait],
+		[modelUrl, drag.yaw, centerKey, onModelLoaded, onModelError, lockPortrait],
 	)
 
 	return (
 		<View style={{ flex: 1 }}>
 			<ViroVRSceneNavigator
-				ref={navigatorRef}
 				vrModeEnabled={false}
 				initialScene={{ scene: Viewer360Scene }}
 				viroAppProps={sceneProps}
