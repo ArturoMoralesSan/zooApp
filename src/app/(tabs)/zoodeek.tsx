@@ -5,7 +5,7 @@ import {
 	SwordsIcon,
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -20,7 +20,6 @@ import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
 import { TextLink } from '@/components/ui/TextLink'
-import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCards } from '@/hooks/useCards'
 import { useOfflinePackPrompts } from '@/hooks/useOfflinePackPrompts'
@@ -45,8 +44,6 @@ export default function ZooDeck() {
 	const pack = usePackStatus()
 	const prompts = useOfflinePackPrompts()
 	const [refreshing, setRefreshing] = useState(false)
-	const [comingSoon, setComingSoon] = useState<string | null>(null)
-	const hideComingSoon = useCallback(() => setComingSoon(null), [])
 
 	useSessionRedirect()
 
@@ -84,12 +81,8 @@ export default function ZooDeck() {
 					/>
 				}
 			>
-				{/* MAPA: placeholder until the zoo map is shown here */}
-				<MapPreviewCard
-					onOpenMap={() =>
-						setComingSoon('El mapa de ZooDeck estará disponible pronto.')
-					}
-				/>
+				{/* MAPA: opens the A-17 map of the animals to challenge */}
+				<MapPreviewCard onOpenMap={() => router.push('/deck/map')} />
 
 				{/* PAQUETE SIN CONEXIÓN: prepared at home for the visit */}
 				{prompts.mobileNoticeVisible && (
@@ -176,9 +169,7 @@ export default function ZooDeck() {
 					icon={SwordsIcon}
 					title='Duelos'
 					description='Reta a los animales del zoológico y gana su tarjeta.'
-					onPress={() =>
-						setComingSoon('Los duelos del mapa estarán disponibles pronto.')
-					}
+					onPress={() => router.push('/deck/map')}
 				/>
 			</ScrollView>
 
@@ -188,14 +179,6 @@ export default function ZooDeck() {
 				cellular={prompts.isCellular}
 				onDownload={prompts.download}
 				onLater={prompts.later}
-			/>
-
-			<Toast
-				visible={comingSoon !== null}
-				type='warning'
-				title='Próximamente'
-				message={comingSoon ?? ''}
-				onHide={hideComingSoon}
 			/>
 		</SafeAreaView>
 	)
