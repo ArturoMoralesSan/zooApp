@@ -1,3 +1,5 @@
+import type { Attempts, Rarity } from './cards'
+
 export type Coordinate = [number, number]
 
 export type ImageCorners = [
@@ -36,6 +38,8 @@ export type MapSpecies = {
 	scientific_name?: string | null
 	description?: string | null
 	images?: MapSpeciesImage[]
+	// Only on the ZooDeck map (GET /map/species).
+	cards?: ZooDeckCard[]
 }
 
 export type SpeciesLocation = {
@@ -117,6 +121,8 @@ export type Zone = {
 	markers?: MapMarker[]
 	species_locations?: SpeciesLocation[]
 	paths?: MapPath[]
+	// ZooDeck map only: species that can be challenged in the zone.
+	species_count?: number
 }
 
 export type MapResponse = {
@@ -124,6 +130,50 @@ export type MapResponse = {
 	data: {
 		zones: Zone[]
 	}
+}
+
+// Why the visit blocks duels: the server checks them in this order.
+export type VisitReason = 'location_required' | 'outside_zoo' | 'no_ticket'
+
+export type ZooDeckCardReason =
+	VisitReason | 'owned' | 'locked' | 'no_questions'
+
+// `status` is independent of the visit: use it for badges, and `reason` for
+// why "Escanear QR" can't start this duel.
+export type ZooDeckCard = {
+	id: number
+	name: string
+	rarity: Rarity
+	thumbnail_image: string | null
+	status: 'owned' | 'locked' | 'available'
+	attempts: Attempts
+	can_duel: boolean
+	reason: ZooDeckCardReason | null
+	// Label and expiry only: the token is on the plate.
+	qr_codes: {
+		id: number
+		label: string | null
+		expires_at: string | null
+	}[]
+}
+
+// With `enforced` false, `can_duel` is always true and the rest are hints.
+export type Visit = {
+	enforced: boolean
+	ticket: boolean
+	inside_zoo: boolean | null
+	can_duel: boolean
+	reason: VisitReason | null
+}
+
+export type ZooDeckMap = {
+	visit: Visit
+	zones: Zone[]
+}
+
+export type ZooDeckMapResponse = {
+	success: boolean
+	data: ZooDeckMap
 }
 
 export type SelectableItem = {
