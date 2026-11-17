@@ -15,6 +15,13 @@ import type {
 export const ZOODECK_QUIZ_DEBUG =
 	process.env.EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG === '1'
 
+// EXPO_PUBLIC_ZOODECK_VISIT_CHECKS=0 lets duels be tested away from the zoo:
+// the app stops asking for location for duels and visit reasons (location,
+// outside the zoo, no ticket) no longer disable anything. The server still
+// decides with its own APP_ZOODECK_ENFORCE_VALIDATIONS flag.
+export const ZOODECK_VISIT_CHECKS =
+	process.env.EXPO_PUBLIC_ZOODECK_VISIT_CHECKS !== '0'
+
 // Stands in for the scanned QR; the duel session uses it to spot the debug
 // duel.
 export const DEBUG_DUEL_CODE = 'zoodeck-debug'

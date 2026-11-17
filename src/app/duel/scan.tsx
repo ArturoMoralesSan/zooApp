@@ -1,13 +1,16 @@
 import {
 	ArrowRight01Icon,
 	Cards01Icon,
+	Location01Icon,
 	QrCodeScanIcon,
 	SwordsIcon,
+	Ticket01Icon,
 } from '@hugeicons/core-free-icons'
 import { CameraView, useCameraPermissions } from 'expo-camera'
+import * as Location from 'expo-location'
 import { router } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, Linking, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -25,9 +28,12 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { isNetworkError } from '@/services/api'
 import { startDuel, type DuelStartResult } from '@/services/duels'
+import { getDuelCoordinates } from '@/services/location'
 import { notifyOffline } from '@/services/offline-notice'
 import colors from '@/theme/colors'
+import type { VisitReason } from '@/types/map'
 import { formatUnlockTime } from '@/utils/cards'
+import { ZOODECK_VISIT_CHECKS } from '@/utils/zoodeckDebug'
 
 type ScanState =
 	| { kind: 'scanning' }
@@ -37,6 +43,12 @@ type ScanState =
 // After a refusal or "Rechazar" the QR is usually still in view: ignore the
 // same code for a moment so the dialog doesn't open again right away.
 const SAME_CODE_COOLDOWN_MS = 3000
+
+const VISIT_TITLES: Record<VisitReason, string> = {
+	location_required: 'Activa tu ubicación',
+	outside_zoo: 'Estás fuera del zoológico',
+	no_ticket: 'Necesitas un boleto para hoy',
+}
 
 export default function ScanScreen() {
 	const insets = useSafeAreaInsets()
@@ -57,6 +69,12 @@ export default function ScanScreen() {
 	const lastScan = useRef<{ code: string; at: number } | null>(null)
 
 	useSessionRedirect()
+
+	// The duel needs the location when the visit is checked: ask on arrival,
+	// not in the middle of a scan.
+	useEffect(() => {
+		if (ZOODECK_VISIT_CHECKS) void getDuelCoordinates(true)
+	}, [])
 
 	const resume = () => {
 		if (lastScan.current) lastScan.current.at = Date.now()
@@ -80,7 +98,10 @@ export default function ScanScreen() {
 		setState({ kind: 'loading' })
 
 		try {
-			const result = await startDuel(code)
+			const result = await startDuel(
+				code,
+				await getDuelCoordinates(ZOODECK_VISIT_CHECKS),
+			)
 
 			setState({ ...result, code })
 		} catch (error) {
@@ -113,6 +134,16 @@ export default function ScanScreen() {
 
 		void addOwnedCard(state.card)
 		router.replace(`/deck/${state.card.id}`)
+	}
+
+	const allowLocation = async () => {
+		const permission = await Location.requestForegroundPermissionsAsync()
+
+		if (!permission.granted && !permission.canAskAgain) {
+			void Linking.openSettings()
+		}
+
+		resume()
 	}
 
 	const scanning = state.kind === 'scanning'
@@ -267,6 +298,40 @@ export default function ScanScreen() {
 					icon: ArrowRight01Icon,
 					onPress: resume,
 				}}
+				onRequestClose={resume}
+			/>
+
+			{/* 403 / 422 with a reason: the visit checks (location, zone, ticket) */}
+			<DuelDialog
+				visible={state.kind === 'visit'}
+				align='center'
+				title={state.kind === 'visit' ? VISIT_TITLES[state.reason] : undefined}
+				message={state.kind === 'visit' ? state.message : undefined}
+				primary={
+					state.kind === 'visit' && state.reason === 'no_ticket'
+						? {
+								title: 'Comprar boleto',
+								icon: Ticket01Icon,
+								onPress: () => router.replace('/tickets'),
+							}
+						: state.kind === 'visit' && state.reason === 'location_required'
+							? {
+									title: 'Permitir ubicación',
+									icon: Location01Icon,
+									onPress: () => void allowLocation(),
+								}
+							: {
+									title: 'Seguir escaneando',
+									icon: ArrowRight01Icon,
+									onPress: resume,
+								}
+				}
+				// Outside the zoo there's nothing to do here but keep scanning.
+				secondary={
+					state.kind === 'visit' && state.reason !== 'outside_zoo'
+						? { title: 'Seguir escaneando', onPress: resume }
+						: undefined
+				}
 				onRequestClose={resume}
 			/>
 		</View>

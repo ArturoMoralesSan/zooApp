@@ -6,6 +6,7 @@ import type {
 	DuelSubmitResponse,
 	OwnedCard,
 } from '@/types/cards'
+import type { VisitReason } from '@/types/map'
 
 import { api, ApiError } from './api'
 
@@ -16,17 +17,45 @@ export type DuelStartResult =
 	| { kind: 'owned'; message: string; card: OwnedCard }
 	| { kind: 'locked'; message: string; attempts: Attempts }
 	| { kind: 'unavailable'; message: string }
+	// The visit checks: no location, outside the zoo or no ticket for today.
+	| { kind: 'visit'; message: string; reason: VisitReason }
 
-export async function startDuel(code: string): Promise<DuelStartResult> {
+const VISIT_REASONS: VisitReason[] = [
+	'location_required',
+	'outside_zoo',
+	'no_ticket',
+]
+
+// The visit refusal of a duel request (422 location_required, 403 outside
+// the zoo or no ticket), if that's what the error is.
+function visitReason(error: unknown): VisitReason | null {
+	if (!(error instanceof ApiError)) return null
+
+	const reason = (error.data as { reason?: unknown } | undefined)?.reason
+
+	return VISIT_REASONS.find((item) => item === reason) ?? null
+}
+
+export async function startDuel(
+	code: string,
+	coordinates?: Coordinates | null,
+): Promise<DuelStartResult> {
 	try {
 		const response = await api<DuelStartResponse>('/duels', {
 			method: 'POST',
-			body: JSON.stringify({ code }),
+			body: JSON.stringify({ code, ...coordinates }),
 		})
 
 		return { kind: 'started', duel: response.data }
 	} catch (error) {
 		if (!(error instanceof ApiError)) throw error
+
+		// Before the 422 branch below: location_required is a 422 too.
+		const reason = visitReason(error)
+
+		if (reason) {
+			return { kind: 'visit', message: error.message, reason }
+		}
 
 		const data = error.data as
 			{ card?: OwnedCard; attempts?: Attempts } | undefined

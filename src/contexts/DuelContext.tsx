@@ -1,4 +1,3 @@
-import * as Location from 'expo-location'
 import {
 	createContext,
 	useCallback,
@@ -9,18 +8,15 @@ import {
 	type ReactNode,
 } from 'react'
 
-import {
-	startDuel,
-	submitDuel,
-	type Coordinates,
-	type DuelStartResult,
-} from '@/services/duels'
+import { startDuel, submitDuel, type DuelStartResult } from '@/services/duels'
+import { getDuelCoordinates } from '@/services/location'
 import type { DuelStart, DuelSubmitResponse } from '@/types/cards'
 import {
 	createDebugDuel,
 	DEBUG_DUEL_CODE,
 	gradeDebugDuel,
 	ZOODECK_QUIZ_DEBUG,
+	ZOODECK_VISIT_CHECKS,
 } from '@/utils/zoodeckDebug'
 
 // The fake duel of the debug mode, graded locally (see zoodeckDebug).
@@ -49,26 +45,6 @@ const DuelContext = createContext<DuelContextType | undefined>(undefined)
 
 type DuelProviderProps = {
 	children: ReactNode
-}
-
-// Only if location is already allowed: the duel never asks for it.
-async function getLastKnownCoordinates(): Promise<Coordinates | null> {
-	try {
-		const permission = await Location.getForegroundPermissionsAsync()
-
-		if (!permission.granted) return null
-
-		const position = await Location.getLastKnownPositionAsync()
-
-		return position
-			? {
-					latitude: position.coords.latitude,
-					longitude: position.coords.longitude,
-				}
-			: null
-	} catch {
-		return null
-	}
 }
 
 // Holds one duel session (scan → quiz → result → review) in memory.
@@ -101,7 +77,7 @@ export function DuelProvider({ children }: DuelProviderProps) {
 					kind: 'started',
 					duel: createDebugDuel(result?.data.attempts?.left),
 				}
-			: await startDuel(code)
+			: await startDuel(code, await getDuelCoordinates(ZOODECK_VISIT_CHECKS))
 
 		if (started.kind === 'started') {
 			begin(code, started.duel)
@@ -127,7 +103,7 @@ export function DuelProvider({ children }: DuelProviderProps) {
 				: await submitDuel(
 						duel.attempt_id,
 						picked,
-						await getLastKnownCoordinates(),
+						await getDuelCoordinates(ZOODECK_VISIT_CHECKS),
 					)
 
 			setResult(response)
