@@ -41,9 +41,7 @@ export function DuelSpeciesCard({
 					{item.name}
 				</Text>
 
-				<Text className='text-meta mt-0.5' numberOfLines={1}>
-					{meta}
-				</Text>
+				<Text className='text-meta mt-0.5'>{meta}</Text>
 
 				{status.detail && (
 					<Text className='text-meta mt-0.5'>{status.detail}</Text>
