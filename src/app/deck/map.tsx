@@ -71,14 +71,7 @@ export default function ZooDeckMapScreen() {
 	)
 
 	const species = useMemo(
-		() =>
-			selectableItems.filter(
-				(item) =>
-					item.type === 'species' &&
-					// Without active questions there's no duel to play. The server
-					// only reports it when no visit reason comes first.
-					duelCardOf(item.species)?.reason !== 'no_questions',
-			),
+		() => selectableItems.filter((item) => item.type === 'species'),
 		[selectableItems],
 	)
 	const zoneNames = useMemo(() => zoneNamesByItem(zones), [zones])

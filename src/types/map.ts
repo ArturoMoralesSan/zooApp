@@ -135,8 +135,7 @@ export type MapResponse = {
 // Why the visit blocks duels: the server checks them in this order.
 export type VisitReason = 'location_required' | 'outside_zoo' | 'no_ticket'
 
-export type ZooDeckCardReason =
-	VisitReason | 'owned' | 'locked' | 'no_questions'
+export type ZooDeckCardReason = VisitReason | 'owned' | 'locked'
 
 // `status` is independent of the visit: use it for badges, and `reason` for
 // why "Escanear QR" can't start this duel.
