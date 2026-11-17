@@ -1,5 +1,5 @@
 import * as Location from 'expo-location'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Coordinate } from '@/types/map'
 
@@ -11,6 +11,12 @@ export function useUserLocation() {
 	const [userLocation, setUserLocation] = useState<Coordinate | null>(null)
 
 	const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null)
+
+	// True until the first fix or until it fails (no permission, GPS off).
+	const [locating, setLocating] = useState(true)
+
+	// Bumped by retry() to ask for permission and start tracking again.
+	const [attempt, setAttempt] = useState(0)
 
 	useEffect(() => {
 		let mounted = true
@@ -69,6 +75,8 @@ export function useUserLocation() {
 				)
 			} catch {
 				return
+			} finally {
+				if (mounted) setLocating(false)
 			}
 		}
 
@@ -79,7 +87,12 @@ export function useUserLocation() {
 			locationSubscription.current?.remove()
 			locationSubscription.current = null
 		}
+	}, [attempt])
+
+	const retry = useCallback(() => {
+		setLocating(true)
+		setAttempt((current) => current + 1)
 	}, [])
 
-	return { userLocation, locationAccuracy }
+	return { userLocation, locationAccuracy, locating, retry }
 }

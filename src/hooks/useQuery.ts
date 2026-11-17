@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import useSWR from 'swr'
 
 // Shared shape for the domain hooks, so screens never touch SWR directly.
@@ -24,5 +25,8 @@ export function useQuery<T>(
 		options,
 	)
 
-	return { data, error, isLoading, refresh: () => mutate() }
+	// Stable, so screens can use it in focus effects.
+	const refresh = useCallback(() => mutate(), [mutate])
+
+	return { data, error, isLoading, refresh }
 }

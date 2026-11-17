@@ -10,6 +10,8 @@ type MapControlsProps = {
 	onLocate: () => void
 	onZoomIn: () => void
 	onZoomOut: () => void
+	// Vertical position: lower it where a tall sheet covers the bottom.
+	className?: string
 }
 
 // A-13 map controls: locate, zoom in and zoom out stacked at the right
@@ -18,9 +20,10 @@ export function MapControls({
 	onLocate,
 	onZoomIn,
 	onZoomOut,
+	className = 'top-[38%]',
 }: MapControlsProps) {
 	return (
-		<View className='absolute right-5 top-[38%] gap-2'>
+		<View className={`absolute right-5 gap-2 ${className}`}>
 			<IconButton
 				icon={GpsSignal01Icon}
 				variant='outline'

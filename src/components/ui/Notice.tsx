@@ -2,6 +2,7 @@ import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
 import { Alert02Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import type { IconSvgElement } from '@hugeicons/react-native'
+import type { ReactNode } from 'react'
 import { Text, View } from 'react-native'
 
 export type NoticeTone = 'success' | 'error' | 'warning'
@@ -13,6 +14,8 @@ type NoticeProps = {
 	// Replaces the tone's default icon (check or alert).
 	icon?: IconSvgElement
 	className?: string
+	// An action under the text (e.g. a TextLink).
+	children?: ReactNode
 }
 
 const tones = {
@@ -50,6 +53,7 @@ export function Notice({
 	message,
 	icon,
 	className = '',
+	children,
 }: NoticeProps) {
 	const style = tones[tone]
 
@@ -76,6 +80,8 @@ export function Notice({
 				{message && (
 					<Text className={`text-meta mt-0.5 ${style.message}`}>{message}</Text>
 				)}
+
+				{children}
 			</View>
 		</View>
 	)
