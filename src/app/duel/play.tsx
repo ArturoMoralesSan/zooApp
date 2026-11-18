@@ -26,7 +26,7 @@ import { DuelPoints } from '@/components/duel/DuelPoints'
 import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
-import Toast from '@/components/ui/Toast'
+import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
@@ -42,7 +42,12 @@ import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 type Phase = 'placing' | 'ready' | 'quiz'
 type ModelStatus = 'waiting' | 'loading' | 'loaded' | 'error'
 
-type ToastState = { title: string; message: string } | null
+type ToastState = {
+	title: string
+	message: string
+	// Errors by default; a 409 isn't one.
+	type?: ToastType
+} | null
 
 export default function DuelPlayScreen() {
 	const insets = useSafeAreaInsets()
@@ -190,6 +195,7 @@ export default function DuelPlayScreen() {
 				void refreshProfile()
 				void refreshCards()
 				setToast({
+					type: 'warning',
 					title: 'Ya recibimos tus respuestas',
 					message: 'Revisa tu colección y tus puntos.',
 				})
@@ -495,7 +501,7 @@ export default function DuelPlayScreen() {
 
 			<Toast
 				visible={toast !== null}
-				type='error'
+				type={toast?.type ?? 'error'}
 				title={toast?.title}
 				message={toast?.message ?? ''}
 				onHide={hideToast}
