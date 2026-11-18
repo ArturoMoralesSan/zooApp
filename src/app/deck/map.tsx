@@ -1,6 +1,6 @@
 import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
 import * as Location from 'expo-location'
-import { router, useFocusEffect } from 'expo-router'
+import { router, useFocusEffect, useIsFocused } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Linking, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -41,6 +41,7 @@ export default function ZooDeckMapScreen() {
 	const { userLocation, locationAccuracy, locating, retry } = useUserLocation()
 	const zoodeck = useZooDeckMap(userLocation, locationAccuracy)
 	const { isOffline } = useNetworkStatus()
+	const focused = useIsFocused()
 
 	const zones = zoodeck.data?.zones ?? NO_ZONES
 	const visit = zoodeck.data?.visit ?? null
@@ -202,36 +203,42 @@ export default function ZooDeckMapScreen() {
 					className='flex-1 bg-screen'
 					edges={['top', 'left', 'right']}
 				>
-					<MapView
-						ref={camera.mapRef}
-						style={{ flex: 1 }}
-						mapStyle={{ version: 8, sources: {}, layers: [] }}
-						onDidFinishLoadingMap={camera.onMapReady}
-					>
-						<Camera
-							ref={camera.cameraRef}
-							initialViewState={camera.initialViewState}
-						/>
-
-						<MapLayers
-							mapImages={mapImages}
-							zonesGeoJson={zonesGeoJson}
-							pathsGeoJson={pathsGeoJson}
-							routeGeoJson={routeGeoJson}
-						/>
-
-						{species.map((item) => (
-							<DuelMarker
-								key={item.id}
-								item={item}
-								card={duelCardOf(item.species)}
-								selected={item.id === selected?.id}
-								onPress={() => selectItem(item)}
+					{/* Unmounted under the duel: a live map stops the 360° view's
+					head tracking (GVR). */}
+					{focused && (
+						<MapView
+							ref={camera.mapRef}
+							style={{ flex: 1 }}
+							mapStyle={{ version: 8, sources: {}, layers: [] }}
+							onDidFinishLoadingMap={camera.onMapReady}
+						>
+							<Camera
+								ref={camera.cameraRef}
+								initialViewState={camera.initialViewState}
 							/>
-						))}
 
-						{userLocation && <UserLocationMarker userLocation={userLocation} />}
-					</MapView>
+							<MapLayers
+								mapImages={mapImages}
+								zonesGeoJson={zonesGeoJson}
+								pathsGeoJson={pathsGeoJson}
+								routeGeoJson={routeGeoJson}
+							/>
+
+							{species.map((item) => (
+								<DuelMarker
+									key={item.id}
+									item={item}
+									card={duelCardOf(item.species)}
+									selected={item.id === selected?.id}
+									onPress={() => selectItem(item)}
+								/>
+							))}
+
+							{userLocation && (
+								<UserLocationMarker userLocation={userLocation} />
+							)}
+						</MapView>
+					)}
 
 					<DuelMapHeader onBack={() => router.back()} />
 

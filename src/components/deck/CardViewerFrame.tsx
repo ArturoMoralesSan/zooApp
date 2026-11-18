@@ -43,7 +43,7 @@ type Turns = {
 
 // Drag sensitivity in degrees per pixel; pitch is clamped so the object
 // never flips upside down.
-const YAW_PER_PX = 0.5
+export const YAW_PER_PX = 0.5
 const PITCH_PER_PX = 0.35
 const MAX_PITCH = 60
 // A touch that moves less than this is a tap (play/pause), not a drag.

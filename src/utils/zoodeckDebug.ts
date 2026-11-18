@@ -23,6 +23,11 @@ export const ZOODECK_QUIZ_DEBUG =
 export const ZOODECK_VISIT_CHECKS =
 	process.env.EXPO_PUBLIC_ZOODECK_VISIT_CHECKS !== '0'
 
+// Dev only (EXPO_PUBLIC_ZOODECK_FORCE_360=1): the 360° view replaces AR on
+// a phone that supports it, to test the fallback. Ignored in production.
+export const ZOODECK_FORCE_360 =
+	__DEV__ && process.env.EXPO_PUBLIC_ZOODECK_FORCE_360 === '1'
+
 // Stands in for the scanned QR; the duel session uses it to spot the debug
 // duel.
 export const DEBUG_DUEL_CODE = 'zoodeck-debug'

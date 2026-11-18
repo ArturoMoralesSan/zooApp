@@ -59,6 +59,10 @@ export default function RootLayout() {
 							initialRouteName='index'
 							screenOptions={{
 								headerShown: false,
+								// Same as app.json. Set here too so a screen can lock it
+								// again at runtime (see Viewer360): once one screen sets an
+								// orientation, screens without one would unlock it.
+								orientation: 'portrait_up',
 							}}
 						>
 							<Stack.Screen name='index' />
