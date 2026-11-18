@@ -13,35 +13,45 @@ type DuelMarkerProps = {
 	card: ZooDeckCard | null
 	selected: boolean
 	onPress: () => void
+	// 28 instead of 44, for the small preview on the ZooDeck tab.
+	compact?: boolean
 }
 
 // A-17 marker: a "?" for a card still to win, a lock while it's locked, the
 // animal's photo once it's in the collection. The selected one gets a Lima
 // ring, so the state never depends on color alone.
-export function DuelMarker({ item, card, selected, onPress }: DuelMarkerProps) {
+export function DuelMarker({
+	item,
+	card,
+	selected,
+	onPress,
+	compact = false,
+}: DuelMarkerProps) {
 	const owned = card?.status === 'owned'
 	const locked = card?.status === 'locked'
 	const ring = selected ? 'border-lima' : 'border-blanco'
+	const size = compact ? 'h-7 w-7 border-2' : 'h-11 w-11 border-[3px]'
+	const imageSize = compact ? 24 : 38
 
 	return (
 		<Marker lngLat={item.coordinate} onPress={onPress}>
 			<View
 				accessibilityRole='button'
 				accessibilityLabel={item.name}
-				className={`h-11 w-11 items-center justify-center overflow-hidden rounded-full border-[3px] ${ring} ${locked ? 'bg-niebla' : 'bg-bosque'}`}
+				className={`items-center justify-center overflow-hidden rounded-full ${size} ${ring} ${locked ? 'bg-niebla' : 'bg-bosque'}`}
 				style={markerShadow}
 			>
 				{owned && item.thumbnail ? (
 					<Image
 						source={{ uri: item.thumbnail }}
-						style={{ width: 38, height: 38 }}
+						style={{ width: imageSize, height: imageSize }}
 						contentFit='cover'
 						cachePolicy='memory-disk'
 					/>
 				) : (
 					<Icon
 						icon={locked ? SquareLock02Icon : HelpCircleIcon}
-						size={22}
+						size={compact ? 16 : 22}
 						color={locked ? colors.apagado : colors.lima}
 						strong
 					/>
