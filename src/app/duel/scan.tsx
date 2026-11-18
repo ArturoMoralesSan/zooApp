@@ -3,14 +3,15 @@ import {
 	Cards01Icon,
 	Location01Icon,
 	QrCodeScanIcon,
+	Refresh01Icon,
 	SwordsIcon,
 	Ticket01Icon,
 } from '@hugeicons/core-free-icons'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import * as Location from 'expo-location'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { ActivityIndicator, Linking, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -21,13 +22,19 @@ import { ScanFrame } from '@/components/duel/ScanFrame'
 import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
+import { VISIT_COPY } from '@/components/zoodeck/VisitNotice'
 import { useDuel } from '@/contexts/DuelContext'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useZooDeckMap } from '@/hooks/useZooDeckMap'
 import { isNetworkError } from '@/services/api'
-import { startDuel, type DuelStartResult } from '@/services/duels'
+import {
+	startDuel,
+	type Coordinates,
+	type DuelStartResult,
+} from '@/services/duels'
 import { getDuelCoordinates } from '@/services/location'
 import { notifyOffline } from '@/services/offline-notice'
 import colors from '@/theme/colors'
@@ -70,11 +77,45 @@ export default function ScanScreen() {
 
 	useSessionRedirect()
 
-	// The duel needs the location when the visit is checked: ask on arrival,
-	// not in the middle of a scan.
-	useEffect(() => {
-		if (ZOODECK_VISIT_CHECKS) void getDuelCoordinates(true)
+	// The visit (location, zone, ticket) is checked on arrival with the same
+	// rules as POST /duels, so nobody scans a plate only to be turned away.
+	// Asking here also keeps the permission prompt out of the middle of a scan.
+	const [position, setPosition] = useState<Coordinates | null>(null)
+	const [located, setLocated] = useState(false)
+	const visitCheck = useZooDeckMap(
+		position ? [position.longitude, position.latitude] : null,
+		position?.accuracy,
+		// The raw fix, as POST /duels gets it: a rounded one could turn away
+		// someone at the edge the server would accept.
+		{ enabled: ZOODECK_VISIT_CHECKS && located, exact: true },
+	)
+	const visit = visitCheck.data?.visit
+	// Without an answer (offline, error, still loading) scanning stays on:
+	// the server checks again on every scan.
+	const blockedBy =
+		ZOODECK_VISIT_CHECKS && visit?.enforced && visit.reason
+			? visit.reason
+			: null
+
+	const locate = useCallback(async (fresh = false) => {
+		setPosition(await getDuelCoordinates(true, fresh))
+		setLocated(true)
 	}, [])
+
+	// Back from buying a ticket or from the settings: check again. The fix may
+	// be the same (same key), so the answer is refreshed too.
+	const { refresh: refreshVisit } = visitCheck
+	const focusedBefore = useRef(false)
+
+	useFocusEffect(
+		useCallback(() => {
+			if (!ZOODECK_VISIT_CHECKS) return
+
+			void locate()
+			if (focusedBefore.current) void refreshVisit()
+			focusedBefore.current = true
+		}, [locate, refreshVisit]),
+	)
 
 	const resume = () => {
 		if (lastScan.current) lastScan.current.at = Date.now()
@@ -144,9 +185,34 @@ export default function ScanScreen() {
 		}
 
 		resume()
+		if (permission.granted) void locate()
 	}
 
-	const scanning = state.kind === 'scanning'
+	const retryLocation = async () => {
+		await locate(true)
+		void refreshVisit()
+	}
+
+	const scanning = state.kind === 'scanning' && !blockedBy
+
+	const visitAction =
+		blockedBy === 'location_required'
+			? {
+					title: 'Permitir ubicación',
+					icon: Location01Icon,
+					onPress: () => void allowLocation(),
+				}
+			: blockedBy === 'no_ticket'
+				? {
+						title: 'Comprar boleto',
+						icon: Ticket01Icon,
+						onPress: () => router.push('/tickets'),
+					}
+				: {
+						title: 'Reintentar ubicación',
+						icon: Refresh01Icon,
+						onPress: () => void retryLocation(),
+					}
 
 	return (
 		<View className='flex-1 bg-tinta'>
@@ -181,15 +247,32 @@ export default function ScanScreen() {
 						position='relative'
 					/>
 
-					<CameraNotice
-						icon={QrCodeScanIcon}
-						message='Apunta a la placa del recinto. El QR se escanea solo.'
-						className='mt-4'
-					/>
+					{/* Scanning hints, only while the camera reads QRs. */}
+					{!blockedBy && (
+						<CameraNotice
+							icon={QrCodeScanIcon}
+							message='Apunta a la placa del recinto. El QR se escanea solo.'
+							className='mt-4'
+						/>
+					)}
 				</View>
 
 				<View className='items-center'>
-					{permission && !permission.granted ? (
+					{blockedBy ? (
+						// The scanner is off until the visit allows a duel.
+						<CameraNotice
+							icon={blockedBy === 'no_ticket' ? Ticket01Icon : Location01Icon}
+							message={`${VISIT_TITLES[blockedBy]}. ${VISIT_COPY[blockedBy].message}`}
+							className='w-full'
+						>
+							<Button
+								title={visitAction.title}
+								icon={visitAction.icon}
+								iconPosition='leading'
+								onPress={visitAction.onPress}
+							/>
+						</CameraNotice>
+					) : permission && !permission.granted ? (
 						<CameraNotice
 							message='Necesitamos tu cámara para escanear el código QR del recinto.'
 							className='w-full'
@@ -220,9 +303,14 @@ export default function ScanScreen() {
 					)}
 				</View>
 
-				<Text className='text-center font-sans-semibold text-[14px] text-blanco'>
-					¿No lo detecta? Acércate a 30 cm
-				</Text>
+				{blockedBy ? (
+					// Keeps the panel centered (justify-between).
+					<View />
+				) : (
+					<Text className='text-center font-sans-semibold text-[14px] text-blanco'>
+						¿No lo detecta? Acércate a 30 cm
+					</Text>
+				)}
 			</View>
 
 			{/* A-19 RETO */}
