@@ -1,4 +1,4 @@
-import { Coins01Icon, Crown02Icon } from '@hugeicons/core-free-icons'
+import { Coins02Icon, Crown02Icon } from '@hugeicons/core-free-icons'
 import type { ReactNode } from 'react'
 import { type LayoutChangeEvent, Text, View } from 'react-native'
 
@@ -74,7 +74,7 @@ export function TabHeader({ title, subtitle, scrolled }: TabHeaderProps) {
 						/>
 						<Chip
 							look='soft'
-							icon={Coins01Icon}
+							icon={Coins02Icon}
 							label={`${points} pts`}
 							accessibilityLabel={`${points} puntos`}
 						/>

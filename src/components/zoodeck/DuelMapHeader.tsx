@@ -1,4 +1,4 @@
-import { Coins01Icon } from '@hugeicons/core-free-icons'
+import { Coins02Icon } from '@hugeicons/core-free-icons'
 import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -33,7 +33,7 @@ export function DuelMapHeader({ onBack }: DuelMapHeaderProps) {
 
 			<Chip
 				look='outline'
-				icon={Coins01Icon}
+				icon={Coins02Icon}
 				label={`${points} pts`}
 				accessibilityLabel={`${points} puntos`}
 			/>
