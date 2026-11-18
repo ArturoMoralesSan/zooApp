@@ -476,6 +476,37 @@ export function normalizeSimplePathCoordinates(
 		.filter((item): item is Coordinate => item !== null)
 }
 
+// Every vertex of a zone's Polygon or MultiPolygon, e.g. to frame it.
+export function geometryCoordinates(geometry: GeoJSONGeometry): Coordinate[] {
+	if (!geometry) return []
+
+	const polygons =
+		geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates
+
+	return polygons.flatMap((polygon) =>
+		polygon.flatMap((ring) =>
+			ring.map((point): Coordinate => [Number(point[0]), Number(point[1])]),
+		),
+	)
+}
+
+// [west, south, east, north] around the coordinates, or null without any.
+export function boundsOf(
+	coordinates: Coordinate[],
+): [number, number, number, number] | null {
+	if (coordinates.length === 0) return null
+
+	const lngs = coordinates.map(([lng]) => lng)
+	const lats = coordinates.map(([, lat]) => lat)
+
+	return [
+		Math.min(...lngs),
+		Math.min(...lats),
+		Math.max(...lngs),
+		Math.max(...lats),
+	]
+}
+
 export function haversineDistance(a: Coordinate, b: Coordinate): number {
 	const earthRadius = 6371000
 

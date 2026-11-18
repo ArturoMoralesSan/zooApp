@@ -26,6 +26,7 @@ import { useOfflinePackPrompts } from '@/hooks/useOfflinePackPrompts'
 import { usePackStatus } from '@/hooks/usePackStatus'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useZooDeckMap } from '@/hooks/useZooDeckMap'
 import { syncPack } from '@/services/packSync'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
@@ -42,6 +43,9 @@ export default function ZooDeck() {
 
 	const cards = useCards()
 	const pack = usePackStatus()
+	// No location here: the preview only frames the zones and animals, and
+	// the tab shouldn't ask for it. Same key as the duels map before its fix.
+	const zoodeckMap = useZooDeckMap(null)
 	const prompts = useOfflinePackPrompts()
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -51,7 +55,12 @@ export default function ZooDeck() {
 		setRefreshing(true)
 
 		try {
-			await Promise.all([cards.refresh(), refreshUser(), syncPack()])
+			await Promise.all([
+				cards.refresh(),
+				refreshUser(),
+				syncPack(),
+				zoodeckMap.refresh(),
+			])
 		} finally {
 			setRefreshing(false)
 		}
@@ -82,7 +91,10 @@ export default function ZooDeck() {
 				}
 			>
 				{/* MAPA: opens the A-17 map of the animals to challenge */}
-				<MapPreviewCard onOpenMap={() => router.push('/deck/map')} />
+				<MapPreviewCard
+					zones={zoodeckMap.data?.zones}
+					onOpenMap={() => router.push('/deck/map')}
+				/>
 
 				{/* PAQUETE SIN CONEXIÓN: prepared at home for the visit */}
 				{prompts.mobileNoticeVisible && (
