@@ -1,5 +1,6 @@
 import { MapIcon } from '@hugeicons/core-free-icons'
 import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
+import { useIsFocused } from 'expo-router'
 import { useMemo } from 'react'
 import { Pressable, View } from 'react-native'
 
@@ -56,6 +57,10 @@ export function MapPreviewCard({
 		[zones, species],
 	)
 
+	// A map kept alive under another screen stops the 360° view's head
+	// tracking (GVR), so it's only mounted while the tab is in view.
+	const focused = useIsFocused()
+
 	return (
 		<Pressable
 			onPress={onOpenMap}
@@ -63,7 +68,7 @@ export function MapPreviewCard({
 			accessible={false}
 			className={`h-36 justify-end overflow-hidden rounded-2xl border-1.5 border-card-border bg-hoja p-3 ${className}`}
 		>
-			{bounds && (
+			{bounds && focused && (
 				<View
 					className='absolute inset-0'
 					pointerEvents='none'
