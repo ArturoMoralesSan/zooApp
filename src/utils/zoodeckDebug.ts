@@ -4,6 +4,7 @@ import cardTestImage from '@/assets/models/card_test.png'
 import modelTest from '@/assets/models/model_test.glb'
 import type {
 	DuelAnswer,
+	DuelPoints,
 	DuelStart,
 	DuelSubmitResponse,
 	OwnedCard,
@@ -80,6 +81,21 @@ export function createDebugDuel(attemptsLeft = MAX_ATTEMPTS): DuelStart {
 	}
 }
 
+// Fake capture points, one case per debug win in turn, so every A-22 state
+// can be checked: points, level up, disabled rule (0) and an older server.
+const DEBUG_POINTS: (DuelPoints | null)[] = [
+	{
+		awarded: 50,
+		total: 320,
+		level: { id: 1, name: 'Bronce' },
+		level_up: false,
+	},
+	{ awarded: 100, total: 500, level: { id: 2, name: 'Plata' }, level_up: true },
+	{ awarded: 0, total: 500, level: { id: 2, name: 'Plata' }, level_up: false },
+	null,
+]
+let debugWins = 0
+
 // Same rules as the server: won only if every answer is right; otherwise
 // one attempt is used, and the last one locks with the review.
 export function gradeDebugDuel(
@@ -102,6 +118,7 @@ export function gradeDebugDuel(
 				attempts: null,
 				review: null,
 				card: DEBUG_CARD,
+				points: DEBUG_POINTS[debugWins++ % DEBUG_POINTS.length],
 			},
 		}
 	}
