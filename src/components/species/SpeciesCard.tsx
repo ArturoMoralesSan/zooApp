@@ -27,10 +27,10 @@ export function SpeciesCard({ species, onPress, className }: SpeciesCardProps) {
 				<Image
 					source={{ uri: species.image }}
 					resizeMode='cover'
-					className='h-[165px] w-full'
+					className='h-[232px] w-full'
 				/>
 			) : (
-				<View className='h-[165px] w-full items-center justify-center bg-hoja'>
+				<View className='h-[232px] w-full items-center justify-center bg-hoja'>
 					<Icon icon={UserGroupIcon} size={40} color={colors.esmeralda} />
 				</View>
 			)}
@@ -64,7 +64,7 @@ export function SpeciesCard({ species, onPress, className }: SpeciesCardProps) {
 				)}
 
 				{species.description && (
-					<Text className='text-body mt-3 text-tinta' numberOfLines={3}>
+					<Text className='text-body mt-3 text-tinta' numberOfLines={2}>
 						{species.description}
 					</Text>
 				)}
