@@ -29,6 +29,9 @@ type ListCardProps = {
 	// Tile only: large faint icon between the icon box and the text, cut by
 	// the right edge (A-05 Entradas tile).
 	watermark?: IconSvgElement
+	// Row only: content at the right, before the chevron (a points badge, a
+	// "2/3" count…).
+	trailing?: ReactNode
 	children?: ReactNode
 	className?: string
 }
@@ -72,6 +75,7 @@ export function ListCard({
 	onPress,
 	showChevron = Boolean(onPress) && layout === 'row',
 	watermark,
+	trailing,
 	children,
 	className = '',
 }: ListCardProps) {
@@ -140,6 +144,8 @@ export function ListCard({
 						</Text>
 					)}
 				</View>
+
+				{trailing && layout === 'row' && trailing}
 
 				{showChevron && (
 					<View
