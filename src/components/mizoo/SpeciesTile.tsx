@@ -1,6 +1,7 @@
 import { UserGroupIcon } from '@hugeicons/core-free-icons'
-import { Image, Pressable, Text, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 
+import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import colors from '@/theme/colors'
 import type { Species } from '@/types/species'
@@ -10,50 +11,46 @@ type SpeciesTileProps = {
 	onPress: () => void
 }
 
-// MiZoo carousel tile: same look as the collection tile (photo over a
-// Bosque label with the name and, in Lima, the category).
+// MiZoo carousel tile: a light card led by a tall photo, with a compact name
+// and category, so it doesn't read as one of ZooDeck's dark collectible cards.
 export function SpeciesTile({ species, onPress }: SpeciesTileProps) {
 	const category = species.category?.name
 
 	return (
-		<Pressable
+		<Card
+			padding='none'
 			onPress={onPress}
-			accessibilityRole='button'
 			accessibilityLabel={
 				category ? `${species.common_name}, ${category}` : species.common_name
 			}
-			className='aspect-[0.75] w-[120px] overflow-hidden rounded-xl border-1.5 border-bosque bg-bosque active:opacity-80'
+			className='w-[152px]'
 		>
 			{species.image ? (
 				<Image
 					source={{ uri: species.image }}
 					resizeMode='cover'
-					className='w-full'
-					style={{ flex: 1 }}
+					className='h-[176px] w-full'
 				/>
 			) : (
-				<View
-					className='w-full items-center justify-center bg-hoja'
-					style={{ flex: 1 }}
-				>
+				<View className='h-[176px] w-full items-center justify-center bg-hoja'>
 					<Icon icon={UserGroupIcon} size={32} color={colors.esmeralda} />
 				</View>
 			)}
 
-			<View className='px-2 py-1.5'>
+			<View className='px-3 py-2'>
 				<Text
-					className='font-sans-bold text-[12px] text-blanco'
+					className='font-sans-bold text-[14px] text-tinta'
 					numberOfLines={1}
 				>
 					{species.common_name}
 				</Text>
-				<Text
-					className='font-sans-semibold text-[12px] text-lima'
-					numberOfLines={1}
-				>
-					{category ?? 'Especie'}
-				</Text>
+
+				{category && (
+					<Text className='text-meta' numberOfLines={1}>
+						{category}
+					</Text>
+				)}
 			</View>
-		</Pressable>
+		</Card>
 	)
 }

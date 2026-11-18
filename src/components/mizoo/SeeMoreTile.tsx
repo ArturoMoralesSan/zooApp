@@ -9,7 +9,8 @@ type SeeMoreTileProps = {
 	onPress: () => void
 }
 
-// Last carousel tile: opens the full species list.
+// Last carousel tile: as tall as the species tiles (the row stretches it),
+// opens the full species list.
 export function SeeMoreTile({ remaining, onPress }: SeeMoreTileProps) {
 	const label = `${remaining} ${remaining === 1 ? 'especie más' : 'especies más'}`
 
@@ -18,7 +19,7 @@ export function SeeMoreTile({ remaining, onPress }: SeeMoreTileProps) {
 			onPress={onPress}
 			accessibilityRole='button'
 			accessibilityLabel={`Ver más, ${label}`}
-			className='aspect-[0.75] w-[120px] items-center justify-center gap-2 rounded-xl border-1.5 border-dashed border-card-border bg-niebla px-2 active:bg-hoja'
+			className='w-[152px] items-center justify-center gap-2 rounded-2xl border-1.5 border-dashed border-card-border bg-niebla px-2 active:bg-hoja'
 		>
 			<IconBox icon={ArrowRight01Icon} tone='solid' />
 			<Text className='text-h3 text-tinta'>Ver más</Text>
