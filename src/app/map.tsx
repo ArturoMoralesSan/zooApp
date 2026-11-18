@@ -1,11 +1,11 @@
 import { Camera, Map as MapView } from '@maplibre/maplibre-react-native'
 
 import { router } from 'expo-router'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { View } from 'react-native'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
-import type { Coordinate, SelectableItem, Zone } from '@/types/map'
+import type { SelectableItem, Zone } from '@/types/map'
 import { CollapsedRouteCard } from '@/components/map/CollapsedRouteCard'
 import { DestinationMarker } from '@/components/map/DestinationMarker'
 import { LocationBadge } from '@/components/map/LocationBadge'
@@ -19,23 +19,15 @@ import { RouteCard } from '@/components/map/RouteCard'
 import { SpeciesMarker } from '@/components/map/SpeciesMarker'
 import { UserLocationMarker } from '@/components/map/UserLocationMarker'
 import { useMapData } from '@/hooks/useMapData'
+import { useMapCamera } from '@/hooks/useMapCamera'
 import { useMapFeatures } from '@/hooks/useMapFeatures'
 import { useRoute } from '@/hooks/useRoute'
 import { useUserLocation } from '@/hooks/useUserLocation'
-import {
-	DEFAULT_ZOOM,
-	normalizeZoneGeometry,
-	pointInGeometry,
-	USER_ZOOM,
-	ZOO_CENTER,
-} from '@/utils/map'
+import { normalizeZoneGeometry, pointInGeometry } from '@/utils/map'
 
 const NO_ZONES: Zone[] = []
 
 export default function MapScreen() {
-	const mapRef = useRef<any>(null)
-	const cameraRef = useRef<any>(null)
-
 	const mapData = useMapData()
 
 	const zones = mapData.data ?? NO_ZONES
@@ -46,12 +38,20 @@ export default function MapScreen() {
 
 	const { route, setRoute, calculateRoute, routeGeoJson } = useRoute(zones)
 
-	const [mapReady, setMapReady] = useState(false)
-
 	const [routeCardCollapsed, setRouteCardCollapsed] = useState(false)
 
 	const { zonesGeoJson, mapImages, pathsGeoJson, selectableItems } =
 		useMapFeatures(zones)
+
+	const {
+		mapRef,
+		cameraRef,
+		initialViewState,
+		onMapReady,
+		flyTo: flyToDestination,
+		zoomBy,
+		locateUser,
+	} = useMapCamera(userLocation)
 
 	const isUserInsideZoo =
 		userLocation !== null &&
@@ -60,61 +60,6 @@ export default function MapScreen() {
 
 			return pointInGeometry(userLocation, geometry)
 		})
-
-	useEffect(() => {
-		if (!userLocation || !mapReady) {
-			return
-		}
-
-		const timer = setTimeout(() => {
-			try {
-				cameraRef.current?.flyTo({
-					center: userLocation,
-					zoom: USER_ZOOM,
-					duration: 500,
-				})
-			} catch {
-				return
-			}
-		}, 300)
-
-		return () => clearTimeout(timer)
-	}, [mapReady, userLocation])
-
-	const flyToDestination = (coordinate: Coordinate, duration = 800) => {
-		try {
-			cameraRef.current?.flyTo({
-				center: coordinate,
-				zoom: 18,
-				duration,
-			})
-		} catch {
-			return
-		}
-	}
-
-	const zoomBy = async (delta: number) => {
-		try {
-			const zoom = await mapRef.current?.getZoom()
-			if (typeof zoom !== 'number') return
-
-			cameraRef.current?.easeTo({ zoom: zoom + delta, duration: 250 })
-		} catch {
-			return
-		}
-	}
-
-	const locateUser = () => {
-		try {
-			cameraRef.current?.flyTo({
-				center: userLocation ?? ZOO_CENTER,
-				zoom: userLocation ? USER_ZOOM : DEFAULT_ZOOM,
-				duration: 500,
-			})
-		} catch {
-			return
-		}
-	}
 
 	const selectItem = (item: SelectableItem) => {
 		setSelectedItem(item)
@@ -176,15 +121,9 @@ export default function MapScreen() {
 							sources: {},
 							layers: [],
 						}}
-						onDidFinishLoadingMap={() => {
-							setMapReady(true)
-						}}
+						onDidFinishLoadingMap={onMapReady}
 					>
-						<Camera
-							ref={cameraRef}
-							center={userLocation ?? ZOO_CENTER}
-							zoom={userLocation ? USER_ZOOM : DEFAULT_ZOOM}
-						/>
+						<Camera ref={cameraRef} initialViewState={initialViewState} />
 
 						<MapLayers
 							mapImages={mapImages}

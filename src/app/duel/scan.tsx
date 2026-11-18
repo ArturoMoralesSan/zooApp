@@ -1,13 +1,17 @@
 import {
 	ArrowRight01Icon,
 	Cards01Icon,
+	Location01Icon,
 	QrCodeScanIcon,
+	Refresh01Icon,
 	SwordsIcon,
+	Ticket01Icon,
 } from '@hugeicons/core-free-icons'
 import { CameraView, useCameraPermissions } from 'expo-camera'
-import { router } from 'expo-router'
+import * as Location from 'expo-location'
+import { router, useFocusEffect } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { ActivityIndicator, Linking, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -18,16 +22,25 @@ import { ScanFrame } from '@/components/duel/ScanFrame'
 import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
+import { VISIT_COPY } from '@/components/zoodeck/VisitNotice'
 import { useDuel } from '@/contexts/DuelContext'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
+import { useZooDeckMap } from '@/hooks/useZooDeckMap'
 import { isNetworkError } from '@/services/api'
-import { startDuel, type DuelStartResult } from '@/services/duels'
+import {
+	startDuel,
+	type Coordinates,
+	type DuelStartResult,
+} from '@/services/duels'
+import { getDuelCoordinates } from '@/services/location'
 import { notifyOffline } from '@/services/offline-notice'
 import colors from '@/theme/colors'
+import type { VisitReason } from '@/types/map'
 import { formatUnlockTime } from '@/utils/cards'
+import { ZOODECK_VISIT_CHECKS } from '@/utils/zoodeckDebug'
 
 type ScanState =
 	| { kind: 'scanning' }
@@ -37,6 +50,12 @@ type ScanState =
 // After a refusal or "Rechazar" the QR is usually still in view: ignore the
 // same code for a moment so the dialog doesn't open again right away.
 const SAME_CODE_COOLDOWN_MS = 3000
+
+const VISIT_TITLES: Record<VisitReason, string> = {
+	location_required: 'Activa tu ubicación',
+	outside_zoo: 'Estás fuera del zoológico',
+	no_ticket: 'Necesitas un boleto para hoy',
+}
 
 export default function ScanScreen() {
 	const insets = useSafeAreaInsets()
@@ -57,6 +76,46 @@ export default function ScanScreen() {
 	const lastScan = useRef<{ code: string; at: number } | null>(null)
 
 	useSessionRedirect()
+
+	// The visit (location, zone, ticket) is checked on arrival with the same
+	// rules as POST /duels, so nobody scans a plate only to be turned away.
+	// Asking here also keeps the permission prompt out of the middle of a scan.
+	const [position, setPosition] = useState<Coordinates | null>(null)
+	const [located, setLocated] = useState(false)
+	const visitCheck = useZooDeckMap(
+		position ? [position.longitude, position.latitude] : null,
+		position?.accuracy,
+		// The raw fix, as POST /duels gets it: a rounded one could turn away
+		// someone at the edge the server would accept.
+		{ enabled: ZOODECK_VISIT_CHECKS && located, exact: true },
+	)
+	const visit = visitCheck.data?.visit
+	// Without an answer (offline, error, still loading) scanning stays on:
+	// the server checks again on every scan.
+	const blockedBy =
+		ZOODECK_VISIT_CHECKS && visit?.enforced && visit.reason
+			? visit.reason
+			: null
+
+	const locate = useCallback(async (fresh = false) => {
+		setPosition(await getDuelCoordinates(true, fresh))
+		setLocated(true)
+	}, [])
+
+	// Back from buying a ticket or from the settings: check again. The fix may
+	// be the same (same key), so the answer is refreshed too.
+	const { refresh: refreshVisit } = visitCheck
+	const focusedBefore = useRef(false)
+
+	useFocusEffect(
+		useCallback(() => {
+			if (!ZOODECK_VISIT_CHECKS) return
+
+			void locate()
+			if (focusedBefore.current) void refreshVisit()
+			focusedBefore.current = true
+		}, [locate, refreshVisit]),
+	)
 
 	const resume = () => {
 		if (lastScan.current) lastScan.current.at = Date.now()
@@ -80,7 +139,10 @@ export default function ScanScreen() {
 		setState({ kind: 'loading' })
 
 		try {
-			const result = await startDuel(code)
+			const result = await startDuel(
+				code,
+				await getDuelCoordinates(ZOODECK_VISIT_CHECKS),
+			)
 
 			setState({ ...result, code })
 		} catch (error) {
@@ -115,7 +177,42 @@ export default function ScanScreen() {
 		router.replace(`/deck/${state.card.id}`)
 	}
 
-	const scanning = state.kind === 'scanning'
+	const allowLocation = async () => {
+		const permission = await Location.requestForegroundPermissionsAsync()
+
+		if (!permission.granted && !permission.canAskAgain) {
+			void Linking.openSettings()
+		}
+
+		resume()
+		if (permission.granted) void locate()
+	}
+
+	const retryLocation = async () => {
+		await locate(true)
+		void refreshVisit()
+	}
+
+	const scanning = state.kind === 'scanning' && !blockedBy
+
+	const visitAction =
+		blockedBy === 'location_required'
+			? {
+					title: 'Permitir ubicación',
+					icon: Location01Icon,
+					onPress: () => void allowLocation(),
+				}
+			: blockedBy === 'no_ticket'
+				? {
+						title: 'Comprar boleto',
+						icon: Ticket01Icon,
+						onPress: () => router.push('/tickets'),
+					}
+				: {
+						title: 'Reintentar ubicación',
+						icon: Refresh01Icon,
+						onPress: () => void retryLocation(),
+					}
 
 	return (
 		<View className='flex-1 bg-tinta'>
@@ -150,15 +247,32 @@ export default function ScanScreen() {
 						position='relative'
 					/>
 
-					<CameraNotice
-						icon={QrCodeScanIcon}
-						message='Apunta a la placa del recinto. El QR se escanea solo.'
-						className='mt-4'
-					/>
+					{/* Scanning hints, only while the camera reads QRs. */}
+					{!blockedBy && (
+						<CameraNotice
+							icon={QrCodeScanIcon}
+							message='Apunta a la placa del recinto. El QR se escanea solo.'
+							className='mt-4'
+						/>
+					)}
 				</View>
 
 				<View className='items-center'>
-					{permission && !permission.granted ? (
+					{blockedBy ? (
+						// The scanner is off until the visit allows a duel.
+						<CameraNotice
+							icon={blockedBy === 'no_ticket' ? Ticket01Icon : Location01Icon}
+							message={`${VISIT_TITLES[blockedBy]}. ${VISIT_COPY[blockedBy].message}`}
+							className='w-full'
+						>
+							<Button
+								title={visitAction.title}
+								icon={visitAction.icon}
+								iconPosition='leading'
+								onPress={visitAction.onPress}
+							/>
+						</CameraNotice>
+					) : permission && !permission.granted ? (
 						<CameraNotice
 							message='Necesitamos tu cámara para escanear el código QR del recinto.'
 							className='w-full'
@@ -189,9 +303,14 @@ export default function ScanScreen() {
 					)}
 				</View>
 
-				<Text className='text-center font-sans-semibold text-[14px] text-blanco'>
-					¿No lo detecta? Acércate a 30 cm
-				</Text>
+				{blockedBy ? (
+					// Keeps the panel centered (justify-between).
+					<View />
+				) : (
+					<Text className='text-center font-sans-semibold text-[14px] text-blanco'>
+						¿No lo detecta? Acércate a 30 cm
+					</Text>
+				)}
 			</View>
 
 			{/* A-19 RETO */}
@@ -267,6 +386,40 @@ export default function ScanScreen() {
 					icon: ArrowRight01Icon,
 					onPress: resume,
 				}}
+				onRequestClose={resume}
+			/>
+
+			{/* 403 / 422 with a reason: the visit checks (location, zone, ticket) */}
+			<DuelDialog
+				visible={state.kind === 'visit'}
+				align='center'
+				title={state.kind === 'visit' ? VISIT_TITLES[state.reason] : undefined}
+				message={state.kind === 'visit' ? state.message : undefined}
+				primary={
+					state.kind === 'visit' && state.reason === 'no_ticket'
+						? {
+								title: 'Comprar boleto',
+								icon: Ticket01Icon,
+								onPress: () => router.replace('/tickets'),
+							}
+						: state.kind === 'visit' && state.reason === 'location_required'
+							? {
+									title: 'Permitir ubicación',
+									icon: Location01Icon,
+									onPress: () => void allowLocation(),
+								}
+							: {
+									title: 'Seguir escaneando',
+									icon: ArrowRight01Icon,
+									onPress: resume,
+								}
+				}
+				// Outside the zoo there's nothing to do here but keep scanning.
+				secondary={
+					state.kind === 'visit' && state.reason !== 'outside_zoo'
+						? { title: 'Seguir escaneando', onPress: resume }
+						: undefined
+				}
 				onRequestClose={resume}
 			/>
 		</View>

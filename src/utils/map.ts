@@ -12,7 +12,8 @@ import type {
 	Zone,
 } from '@/types/map'
 
-export const ZOO_CENTER: Coordinate = [-104.6532, 24.0277]
+// Middle of the "Principal" zone polygon (Zoológico Sahuatoba, Durango).
+export const ZOO_CENTER: Coordinate = [-104.584, 24.0758]
 
 export const DEFAULT_ZOOM = 17
 export const USER_ZOOM = 18
