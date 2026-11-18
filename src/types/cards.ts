@@ -95,12 +95,24 @@ export type DuelReviewItem = {
 	correct_answer_id: number
 }
 
+// Points for a capture, set by the server from the card's rarity rule.
+export type DuelPoints = {
+	// 0 when the rarity's rule is disabled.
+	awarded: number
+	// User's total after this capture.
+	total: number
+	level: { id: number; name: string } | null
+	level_up: boolean
+}
+
 export type DuelResult = {
 	outcome: DuelOutcome
 	results: DuelQuestionResult[]
 	attempts: Attempts | null
 	review: DuelReviewItem[] | null
 	card: OwnedCard | null
+	// Only on a win; missing on servers older than capture points.
+	points?: DuelPoints | null
 }
 
 export type DuelSubmitResponse = {

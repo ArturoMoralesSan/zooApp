@@ -1,4 +1,8 @@
+import type { IconSvgElement } from '@hugeicons/react-native'
 import { Text, View } from 'react-native'
+
+import { Icon } from '@/components/ui/Icon'
+import colors from '@/theme/colors'
 
 export type BadgeTone = 'success' | 'pending' | 'error' | 'neutral'
 
@@ -8,6 +12,8 @@ type BadgeProps = {
 	tone?: BadgeTone
 	// Leading dot for statuses that sit next to similar badges.
 	dot?: boolean
+	// Leading icon (points, level…), in the tone's text color.
+	icon?: IconSvgElement
 	className?: string
 }
 
@@ -15,21 +21,25 @@ const tones = {
 	success: {
 		box: 'border-lima bg-lima',
 		text: 'text-bosque',
+		icon: colors.bosque,
 		dot: 'bg-bosque',
 	},
 	pending: {
 		box: 'border-aviso-text/25 bg-aviso',
 		text: 'text-aviso-text',
+		icon: colors.avisoText,
 		dot: 'bg-aviso-text',
 	},
 	error: {
 		box: 'border-error-border bg-error-bg',
 		text: 'text-error',
+		icon: colors.error,
 		dot: 'bg-error',
 	},
 	neutral: {
 		box: 'border-card-border bg-niebla',
 		text: 'text-tinta-2',
+		icon: colors.tinta2,
 		dot: 'bg-tinta-2',
 	},
 }
@@ -39,6 +49,7 @@ export function Badge({
 	label,
 	tone = 'neutral',
 	dot = false,
+	icon,
 	className = '',
 }: BadgeProps) {
 	const style = tones[tone]
@@ -48,6 +59,7 @@ export function Badge({
 			className={`h-6 shrink-0 flex-row items-center gap-1.5 self-start rounded-full border px-2.5 ${style.box} ${className}`}
 		>
 			{dot && <View className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />}
+			{icon && <Icon icon={icon} size={14} color={style.icon} strong />}
 			<Text className={`font-sans-bold text-[12px] ${style.text}`}>
 				{label}
 			</Text>

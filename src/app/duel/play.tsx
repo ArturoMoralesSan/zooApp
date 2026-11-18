@@ -22,16 +22,17 @@ import {
 import { DebugQuizBackground } from '@/components/duel/DebugQuizBackground'
 import { DuelAnswer, type DuelAnswerState } from '@/components/duel/DuelAnswer'
 import { DuelDialog } from '@/components/duel/DuelDialog'
+import { DuelPoints } from '@/components/duel/DuelPoints'
 import { Badge } from '@/components/ui/Badge'
 import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
-import Toast from '@/components/ui/Toast'
+import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useViroExit } from '@/hooks/useViroHandoff'
-import { isNetworkError } from '@/services/api'
+import { ApiError, isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
 import { clearDuelCache } from '@/services/packSync'
 import colors from '@/theme/colors'
@@ -41,12 +42,17 @@ import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 type Phase = 'placing' | 'ready' | 'quiz'
 type ModelStatus = 'waiting' | 'loading' | 'loaded' | 'error'
 
-type ToastState = { title: string; message: string } | null
+type ToastState = {
+	title: string
+	message: string
+	// Errors by default; a 409 isn't one.
+	type?: ToastType
+} | null
 
 export default function DuelPlayScreen() {
 	const insets = useSafeAreaInsets()
 	const { isOffline } = useNetworkStatus()
-	const { addOwnedCard } = useDataRefresh()
+	const { addOwnedCard, refreshCards, refreshProfile } = useDataRefresh()
 	const { code, duel, answers, result, submitting, choose, retry, submit } =
 		useDuel()
 
@@ -172,10 +178,27 @@ export default function DuelPlayScreen() {
 		}
 
 		try {
-			await submit()
+			const response = await submit()
+
+			// The header's points and level come from the profile: revalidate
+			// it instead of adding the points here.
+			if (response.data.outcome === 'won' && !debug) void refreshProfile()
 		} catch (error) {
 			if (isNetworkError(error)) {
 				notifyOffline()
+				return
+			}
+
+			// 409: the server already graded this attempt (its response was
+			// lost). Points are never guessed; the profile and deck show them.
+			if (error instanceof ApiError && error.status === 409) {
+				void refreshProfile()
+				void refreshCards()
+				setToast({
+					type: 'warning',
+					title: 'Ya recibimos tus respuestas',
+					message: 'Revisa tu colección y tus puntos.',
+				})
 				return
 			}
 
@@ -235,6 +258,7 @@ export default function DuelPlayScreen() {
 
 	const outcome = result?.data.outcome
 	const resultAttempts = result?.data.attempts
+	const points = result?.data.points ?? null
 
 	return (
 		<View className='flex-1 bg-tinta'>
@@ -412,7 +436,9 @@ export default function DuelPlayScreen() {
 					onPress: takeCard,
 				}}
 				onRequestClose={takeCard}
-			/>
+			>
+				{points && <DuelPoints points={points} />}
+			</DuelDialog>
 
 			{/* A-23 PERDISTE */}
 			<DuelDialog
@@ -475,7 +501,7 @@ export default function DuelPlayScreen() {
 
 			<Toast
 				visible={toast !== null}
-				type='error'
+				type={toast?.type ?? 'error'}
 				title={toast?.title}
 				message={toast?.message ?? ''}
 				onHide={hideToast}
