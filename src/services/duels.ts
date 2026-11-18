@@ -80,6 +80,9 @@ export async function startDuel(
 export type Coordinates = {
 	latitude: number
 	longitude: number
+	// GPS accuracy in meters: the server accepts a fix this close to the zoo's
+	// edge (up to its cap), so a bad reading at the fence doesn't lock anyone out.
+	accuracy?: number | null
 }
 
 // 201 = won, 200 = failed; `data.outcome` says which. Grading errors

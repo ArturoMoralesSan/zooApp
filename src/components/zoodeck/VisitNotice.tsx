@@ -8,9 +8,15 @@ type VisitNoticeProps = {
 	reason: VisitReason
 	onAllowLocation: () => void
 	onBuyTicket: () => void
+	// A fresh fix: GPS near the fence can read as outside for a moment.
+	onRetryLocation: () => void
 }
 
-const copy: Record<VisitReason, { title: string; message: string }> = {
+// Also used by the scanner, so both screens explain a refusal the same way.
+export const VISIT_COPY: Record<
+	VisitReason,
+	{ title: string; message: string }
+> = {
 	location_required: {
 		title: 'Activa tu ubicación',
 		message: 'La usamos para saber si estás en el zoológico.',
@@ -30,12 +36,13 @@ export function VisitNotice({
 	reason,
 	onAllowLocation,
 	onBuyTicket,
+	onRetryLocation,
 }: VisitNoticeProps) {
 	return (
 		<Notice
 			tone='warning'
-			title={copy[reason].title}
-			message={copy[reason].message}
+			title={VISIT_COPY[reason].title}
+			message={VISIT_COPY[reason].message}
 			icon={reason === 'outside_zoo' ? Location01Icon : undefined}
 		>
 			{reason === 'location_required' && (
@@ -43,6 +50,9 @@ export function VisitNotice({
 			)}
 			{reason === 'no_ticket' && (
 				<TextLink label='Comprar boleto' onPress={onBuyTicket} />
+			)}
+			{reason === 'outside_zoo' && (
+				<TextLink label='Reintentar ubicación' onPress={onRetryLocation} />
 			)}
 		</Notice>
 	)

@@ -38,8 +38,8 @@ const NO_ZONES: Zone[] = []
 // A-17 Duelos: the zoo map with only the animals that can be challenged
 // (active card, questions and a usable QR), each with its card's state.
 export default function ZooDeckMapScreen() {
-	const { userLocation, locating, retry } = useUserLocation()
-	const zoodeck = useZooDeckMap(userLocation)
+	const { userLocation, locationAccuracy, locating, retry } = useUserLocation()
+	const zoodeck = useZooDeckMap(userLocation, locationAccuracy)
 	const { isOffline } = useNetworkStatus()
 
 	const zones = zoodeck.data?.zones ?? NO_ZONES
@@ -143,7 +143,13 @@ export default function ZooDeckMapScreen() {
 			: null
 
 	// The server answers per card on scan; this only spares a useless trip.
-	const canScan = !ZOODECK_VISIT_CHECKS || !visit || visit.can_duel
+	// Not for outside_zoo: this key is rounded, so at the edge it can disagree
+	// with the server, and the scanner checks the raw fix itself.
+	const canScan =
+		!ZOODECK_VISIT_CHECKS ||
+		!visit ||
+		visit.can_duel ||
+		visit.reason === 'outside_zoo'
 
 	const selectItem = (item: SelectableItem) => {
 		setSelectedId(item.id)
@@ -249,6 +255,7 @@ export default function ZooDeckMapScreen() {
 								reason={visitReason}
 								onAllowLocation={() => void allowLocation()}
 								onBuyTicket={() => router.push('/tickets')}
+								onRetryLocation={retry}
 							/>
 						)}
 

@@ -7,10 +7,12 @@ const MAX_LAST_KNOWN_AGE_MS = 60_000
 
 // The user's position for the duel's visit checks. With `ask`, location
 // permission is requested; otherwise it's only read if already allowed.
+// `fresh` skips the last known fix (a retry must not get the same one back).
 // Null when there's no permission or no fix: the server answers
 // location_required if it needs one.
 export async function getDuelCoordinates(
 	ask: boolean,
+	fresh = false,
 ): Promise<Coordinates | null> {
 	try {
 		const permission = ask
@@ -19,10 +21,13 @@ export async function getDuelCoordinates(
 
 		if (!permission.granted) return null
 
+		const lastKnown = fresh
+			? null
+			: await Location.getLastKnownPositionAsync({
+					maxAge: MAX_LAST_KNOWN_AGE_MS,
+				})
 		const position =
-			(await Location.getLastKnownPositionAsync({
-				maxAge: MAX_LAST_KNOWN_AGE_MS,
-			})) ??
+			lastKnown ??
 			(await Location.getCurrentPositionAsync({
 				accuracy: Location.Accuracy.High,
 			}))
@@ -30,6 +35,7 @@ export async function getDuelCoordinates(
 		return {
 			latitude: position.coords.latitude,
 			longitude: position.coords.longitude,
+			accuracy: position.coords.accuracy,
 		}
 	} catch {
 		return null
