@@ -185,7 +185,7 @@ The server can run one **points mode** at a time (a season or event) that change
 
 - **Data**: [`services/points.ts`](../src/services/points.ts) + `usePointSeason()`; revalidated when the app returns to the foreground and on pull-to-refresh, never polled.
 - **Banner**: [`SeasonBanner`](../src/components/points/SeasonBanner.tsx) on Explore, MiZoo and ZooDeck, opening `points/season`. Closing it hides it on all three (`useSeasonDismissal`, stored with the hints in SecureStore) until a season with another title arrives. MiZoo's `LevelCard` keeps a `SeasonChip` so the details stay reachable.
-- **Duel win**: `data.points.season` adds the same chip and "normalmente N puntos" to `DuelPoints`.
+- **Duel win**: with `data.points.season`, `DuelPoints` adds a `SeasonCaptureNotice` that explains the capture ("30 puntos en lugar de 50", or no points when the season turns the card off) with the zoo's `message`.
 - **Icon and color**: the server sends a catalog key and four hex tones. [`utils/pointSeason.ts`](../src/utils/pointSeason.ts) maps the key to a Hugeicons icon (unknown keys → `SparklesIcon`) and falls back to the brand tones when `color` is `null`. The tones are runtime values, so they go in `style`: `text` on `soft`, `on_accent` on `accent`.
 
 ## Styling and design system

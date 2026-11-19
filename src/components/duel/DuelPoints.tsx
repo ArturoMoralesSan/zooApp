@@ -2,7 +2,7 @@ import { Coins02Icon, Crown02Icon } from '@hugeicons/core-free-icons'
 import { useEffect, useState } from 'react'
 import { AccessibilityInfo, Animated, Easing, Text, View } from 'react-native'
 
-import { SeasonChip } from '@/components/points/SeasonChip'
+import { SeasonCaptureNotice } from '@/components/points/SeasonCaptureNotice'
 import { Badge } from '@/components/ui/Badge'
 import type { DuelPoints as DuelPointsData } from '@/types/cards'
 
@@ -19,11 +19,6 @@ const formatPoints = (value: number) => value.toLocaleString('es-MX')
 export function DuelPoints({ points }: DuelPointsProps) {
 	const { awarded, total, level, level_up } = points
 	const season = points.season ?? null
-	// Only when the season changed this card's points.
-	const usual =
-		season && season.base_points !== null && season.base_points !== awarded
-			? season.base_points
-			: null
 	const [shown, setShown] = useState(0)
 	const [counted, setCounted] = useState(awarded === 0)
 	const [levelOpacity] = useState(() => new Animated.Value(0))
@@ -80,8 +75,6 @@ export function DuelPoints({ points }: DuelPointsProps) {
 
 	const summary = [
 		awarded > 0 ? `Ganaste ${formatPoints(awarded)} puntos.` : null,
-		season ? `Temporada ${season.title}.` : null,
-		usual !== null ? `Normalmente ${formatPoints(usual)}.` : null,
 		`Total: ${formatPoints(total)} puntos.`,
 		levelName ? `Subiste a nivel ${levelName}.` : null,
 	]
@@ -89,47 +82,37 @@ export function DuelPoints({ points }: DuelPointsProps) {
 		.join(' ')
 
 	return (
-		<View
-			accessible
-			accessibilityLabel={summary}
-			className='items-center gap-2'
-		>
-			{/* Wrapped: Badge is self-start, the wrapper centers it. */}
-			{awarded > 0 && (
-				<View>
-					<Badge icon={Coins02Icon} label={`+${formatPoints(shown)}`} />
-				</View>
-			)}
+		<View className='w-full items-center gap-3'>
+			<View
+				accessible
+				accessibilityLabel={summary}
+				className='items-center gap-2'
+			>
+				{/* Wrapped: Badge is self-start, the wrapper centers it. */}
+				{awarded > 0 && (
+					<View>
+						<Badge icon={Coins02Icon} label={`+${formatPoints(shown)}`} />
+					</View>
+				)}
 
-			{/* Shown even at 0 points: it explains why none were given. */}
-			{season && (
-				<View className='items-center gap-1'>
-					<SeasonChip
-						title={season.title}
-						icon={season.icon}
-						color={season.color}
-					/>
-					{usual !== null && (
-						<Text className='text-meta text-center text-tinta-2'>
-							Normalmente {formatPoints(usual)} puntos
-						</Text>
-					)}
-				</View>
-			)}
+				<Text className='text-meta text-center text-tinta-2'>
+					Total: {formatPoints(total)} puntos
+				</Text>
 
-			<Text className='text-meta text-center text-tinta-2'>
-				Total: {formatPoints(total)} puntos
-			</Text>
+				{levelName && counted && (
+					<Animated.View style={{ opacity: levelOpacity }}>
+						<Badge
+							tone='success'
+							icon={Crown02Icon}
+							label={`¡Subiste a nivel ${levelName}!`}
+						/>
+					</Animated.View>
+				)}
+			</View>
 
-			{levelName && counted && (
-				<Animated.View style={{ opacity: levelOpacity }}>
-					<Badge
-						tone='success'
-						icon={Crown02Icon}
-						label={`¡Subiste a nivel ${levelName}!`}
-					/>
-				</Animated.View>
-			)}
+			{/* Its own element, read after the points. Shown even at 0 points:
+			    it explains why none were given. */}
+			{season && <SeasonCaptureNotice season={season} awarded={awarded} />}
 		</View>
 	)
 }

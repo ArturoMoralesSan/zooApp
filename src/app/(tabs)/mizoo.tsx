@@ -170,7 +170,6 @@ export default function MiZoo() {
 						// always one tap away.
 						season.data && (
 							<SeasonChip
-								look='soft'
 								title={season.data.title}
 								icon={season.data.icon}
 								color={season.data.color}

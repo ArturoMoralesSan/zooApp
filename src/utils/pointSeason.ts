@@ -163,3 +163,20 @@ export function pointChange(basePoints: number, points: number): PointChange {
 export function formatSeasonPoints(points: number): string {
 	return points === 0 ? 'Sin puntos' : `${points.toLocaleString('es-MX')} pts`
 }
+
+// Why a won card gave what it gave, or null when the season didn't change
+// it (same points, or a rarity that never gives any).
+export function seasonCaptureText(
+	awarded: number,
+	basePoints: number | null,
+): string | null {
+	if (basePoints === null || basePoints === awarded) return null
+
+	const base = basePoints.toLocaleString('es-MX')
+
+	if (awarded === 0) {
+		return `Esta temporada, esta carta no da puntos. Normalmente da ${base}.`
+	}
+
+	return `Esta carta da ${awarded.toLocaleString('es-MX')} puntos en lugar de ${base}.`
+}
