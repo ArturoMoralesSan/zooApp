@@ -181,9 +181,25 @@ Key App measurements:
 - **No AI attribution anywhere:** no `Co-Authored-By` trailers, no "Generated with…", no mention of AI in commits or PRs.
 - Push, open, or merge PRs only when the user asks. PRs use `gh pr create --base main` and merge with `gh pr merge --merge --delete-branch`. The description says what changed, how to test, and whether a native rebuild or `expo start -c` is needed.
 
+## Keeping the docs current
+
+The docs must describe the code as it is. When a change makes any of them wrong or incomplete, update them in the same branch, as their own commit:
+
+| If the change…                                                                                        | Update                 |
+| ----------------------------------------------------------------------------------------------------- | ---------------------- |
+| adds or changes a convention, lint rule, command, folder, workflow step or a risk agents must know    | `AGENTS.md`            |
+| changes routing, the data layer, state, offline support, the design system, maps, AR or native config | `docs/ARCHITECTURE.md` |
+| changes how screens, data, modules or components are added, the PR workflow or code standards         | `CONTRIBUTING.md`      |
+| adds a feature, a package, an environment variable, a setup step or a roadmap item (or ships one)     | `README.md`            |
+
+- Keep `AGENTS.md` condensed: rules and pointers, not explanations. Detail belongs in the human docs.
+- Write the human docs as the description of a finished product. Planned work goes in the README's Roadmap section, not as caveats across the docs.
+- Don't rewrite a doc for style while doing an unrelated task. When unsure whether a rule should change, ask the user instead of editing it.
+
 ## Done means
 
 - `npm run lint` and `npx tsc --noEmit` both at 0.
 - UI changes checked on the device (or the reason they couldn't be).
 - No new hardcoded colors, sizes or duplicated markup that a `ui/` component already covers.
+- Docs updated if the change made them outdated (see "Keeping the docs current").
 - Nothing left in the repo from testing (screenshots, notes, credentials).
