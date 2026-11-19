@@ -360,7 +360,7 @@ export function EventCard({ event, onPress, className }: EventCardProps) {
 }
 ```
 
-A few older files (`Toast`, `FixedFooter`) use default exports; new components use named exports.
+`Toast` and `FixedFooter` are default exports, so import them without braces.
 
 ### Add a package or native module
 
@@ -389,7 +389,6 @@ The app is tested on a real Android phone with the development build.
 - **Run**: `npx expo start`, then open the installed app. Shake the phone or run `adb shell input keyevent 82` for the dev menu.
 - **States to check** for any screen with data: loading, error, empty, and offline.
 - **Offline**: turn off Wi-Fi and mobile data (or `adb shell svc wifi disable && adb shell svc data disable`, then `enable`). If Metro runs over USB, run `adb reverse tcp:8081 tcp:8081` first so the phone still reaches it. Always turn the network back on.
-- **Payments** are simulated: ticket purchases and donations only create test records, so test those flows freely.
 - **Duels away from the zoo**: set `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS=0`, or `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1` for a fake duel without QR or backend (see the [README](README.md#environment-variables)).
 - **AR** needs an ARCore phone; the emulator can't test it. Use `EXPO_PUBLIC_ZOODECK_FORCE_360=1` to test the 360° fallback.
 - **Measuring the UI**: `adb shell uiautomator dump` gives element bounds in px; dp = px ÷ (`adb shell wm density` ÷ 160). Compare with the design measurements.

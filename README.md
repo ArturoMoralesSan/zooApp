@@ -2,7 +2,7 @@
 
 Visitor app for **Zoológico Sahuatoba** (Durango, Mexico). It helps visitors plan and enjoy their visit, buy tickets, donate, learn about the species, and play **ZooDeck**, a collectible-card game with QR duels and an augmented-reality view of each animal.
 
-The app is Android-first and is built with Expo (development builds, not Expo Go).
+ZooApp is an Android app built with Expo development builds. Its interface is in Spanish.
 
 ## Documentation
 
@@ -25,8 +25,6 @@ The app is Android-first and is built with Expo (development builds, not Expo Go
 - **Duels**: scan a QR code at an enclosure and answer a quiz to win that animal's card.
 - **MiZoo**: the visitor's species, achievements and rewards.
 - **Panel / Profile**: account, QR and settings.
-
-Payments are **simulated**: buying tickets or donating only creates test records on the backend.
 
 ## Tech stack
 
@@ -151,10 +149,10 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 - **Styles don't update** after editing the Tailwind config or the palette: restart Metro with `-c`.
 - **Build fails with a Java error**: check `java -version` reports 17.
 
-## Project status
+## Roadmap
 
-- Android is the supported platform. **iOS has not been set up or tested yet.**
-- The app UI is in Spanish; developer documentation is in English.
+- **Payment provider integration**: connect ticket purchases and donations to a payment gateway.
+- **iOS release**: configure, test and publish the iOS build.
 
 ## License
 

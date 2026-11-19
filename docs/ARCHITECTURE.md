@@ -68,7 +68,7 @@ src/app/
     mizoo.tsx          MiZoo
     zoodeek.tsx        ZooDeck
     panel.tsx          Panel
-    ar.tsx             Hidden AR prototype with a test model (href: null)
+    ar.tsx             Standalone AR placement screen, not shown in the tab bar
   species/             index, [id]
   tickets/             index → summary → success, my-tickets
   donations/           index → summary → success, history
@@ -194,7 +194,7 @@ The zoo map uses MapLibre (`@maplibre/maplibre-react-native`). Screens: `src/app
 ## AR and 3D
 
 - **Library**: ViroReact (`@reactvision/react-viro`), configured through its config plugin in `app.json` (`xRMode: ["AR"]`). It needs a development build and a phone with ARCore.
-- **Where**: the card AR screen is `src/app/deck/ar/[id].tsx` (`src/app/(tabs)/ar.tsx` is a hidden prototype with a test model); scenes and camera UI live in `src/components/ar/` (`ModelPlacementScene`, `Viewer360Scene`, `ArCameraControls`…). The card 3D viewer is in `src/components/deck/CardViewerScene.tsx`.
+- **Where**: the card AR screen is `src/app/deck/ar/[id].tsx`; scenes and camera UI live in `src/components/ar/` (`ModelPlacementScene`, `Viewer360Scene`, `ArCameraControls`…). The card 3D viewer is in `src/components/deck/CardViewerScene.tsx`.
 - **Fallback**: [`useArAvailability`](../src/hooks/useArAvailability.ts) returns `'ar'`, `'unsupported'`, `'no-camera'` or `'forced'`; anything but `'ar'` shows the 360° view instead.
 - **Scene rules**: Viro components are not React Native views (no `className`, no layout props). Scene components are defined at module level and receive data through `viroAppProps`. UI over the camera is a normal React Native layer positioned above the navigator.
 - **Models**: `.glb` files in `assets/models/` (bundled) or from the offline pack (downloaded). `metro.config.js` registers the 3D extensions as assets and `src/assets.d.ts` types the imports.
