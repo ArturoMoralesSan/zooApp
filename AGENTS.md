@@ -1,3 +1,5 @@
+> Humans: start with [README.md](README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [CONTRIBUTING.md](CONTRIBUTING.md). This file is the condensed version for AI coding agents.
+
 # ZooApp: agent guide
 
 Visitor app for Zoológico Sahuatoba. Read this whole file before working; it is the source of truth for how code is written here.
@@ -8,7 +10,7 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before 
 
 ## Stack
 
-Expo SDK 57 · React Native 0.86 · expo-router (file routes in `src/app/`) · TypeScript strict · NativeWind v4 (Tailwind 3.4, `inlineRem: 16`) · SWR behind domain hooks · NetInfo · Hugeicons · MapLibre · Barlow + Noto Sans via `@expo-google-fonts`. Android-first, tested on a real phone with a dev build.
+Expo SDK 57 · React Native 0.86 · expo-router (file routes in `src/app/`) · TypeScript strict · NativeWind v4 (Tailwind 3.4, `inlineRem: 16`) · SWR behind domain hooks · NetInfo · Hugeicons · MapLibre · Barlow + Noto Sans via `@expo-google-fonts` · ViroReact (AR/3D). Android app, tested on a real phone with a dev build (never Expo Go).
 
 ## Commands
 
@@ -18,28 +20,46 @@ Expo SDK 57 · React Native 0.86 · expo-router (file routes in `src/app/`) · T
 | Types (must be 0) | `npx tsc --noEmit`                                                                                |
 | Format            | `npx prettier --write <files>` (tabs, single quotes, no semicolons; Tailwind classes auto-sorted) |
 | Dev server        | `npx expo start` (`-c` clears the cache)                                                          |
-| Native build      | `npx expo run:android`, only after adding a native module                                         |
+| Native build      | `npx expo run:android`, only after adding a native module or changing `app.json` plugins          |
 | Add a package     | `npx expo install <pkg>`, so the version matches SDK 57                                           |
 
-Restart Metro with `-c` after changing `tailwind.config.js`, `metro.config.js` or `src/theme/colors.js`. Everything else hot-reloads.
+Restart Metro with `-c` after changing `tailwind.config.js`, `metro.config.js`, `src/theme/colors.js` or `.env`. Everything else hot-reloads.
+
+## Environment
+
+`.env` (copied from `.env-example`, never committed) holds:
+
+- `EXPO_PUBLIC_API_URL`: backend base URL, without `/api`. Required: `api.ts` throws at startup without it.
+- `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1`: fake duel with no QR or backend quiz (`/duel/debug`).
+- `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS=0`: skips the in-zoo location/ticket checks so duels can be tested anywhere. The server has its own flag.
+- `EXPO_PUBLIC_ZOODECK_FORCE_360=1`: dev only, shows the 360° view instead of AR.
+
+The flags are read in `src/utils/zoodeckDebug.ts`. Don't change `.env` without telling the user; Metro must restart with `-c` afterwards.
 
 ## Project structure
 
 ```
 src/
   app/                 Routes only (expo-router). Every file here becomes a screen.
-    (tabs)/            Tab bar: index (Explore), mizoo, zoodeek, panel
+    _layout.tsx        Providers (SafeArea, Keyboard, DataProvider, Auth) + OfflinePackSync + OfflineBanner
+    index → splash     Session check, then (tabs) or login; login, register, forgot-password
+    (tabs)/            Tab bar: index (Explore), mizoo, zoodeek (ZooDeck), panel; ar is hidden
     tickets/ donations/ species/   Stack screens per module
+    deck/              Card collection: index, [id] (3D), ar/[id], map (duel map), offline (pack)
+    duel/              _layout (DuelProvider): scan → play → review, debug
+    map.tsx profile.tsx +not-found.tsx
   components/
     ui/                Generic design-system components (Button, Card, ListCard, TextField,
                        QueryView, LoadingState/ErrorState/EmptyState, Toast, BottomSheet, Modal…)
-    <domain>/          Pieces used by one module (map/, tickets/, species/, profile/…)
-  hooks/               Domain data hooks (useSpecies, useMyTickets…) + UI hooks (useScrolled…)
-  services/            api(), token, one module per API domain (functions + SWR keys), swr-config
+    <domain>/          Pieces used by one module (map/, tickets/, species/, deck/, duel/, zoodeck/,
+                       ar/, profile/…)
+  hooks/               Domain data hooks (useSpecies, useMyTickets, useCards…) + UI hooks (useScrolled…)
+  services/            api(), token, one module per API domain (functions + SWR keys), swr-config,
+                       offline pack (packSync, packStore, packCrypto)
   types/               API types, one file per domain
-  utils/               Pure helpers (format.ts, date.ts, map.ts…), no JSX
+  utils/               Pure helpers (format.ts, date.ts, map.ts, zoodeck.ts…), no JSX
   theme/               colors.js (palette, single source), layout.ts (safe-area/footer spacing)
-  contexts/            AuthContext (logged-in user)
+  contexts/            AuthContext (logged-in user), DuelContext (one duel, scoped to duel/)
   global.css           Tailwind + type role classes (text-h1, text-body…)
 assets/models/         3D models for AR (.glb), typed in src/assets.d.ts
 docs/design/           Design PDFs (design-system.pdf, mobile-app.pdf)
@@ -51,7 +71,7 @@ Never put non-route files under `src/app/`: expo-router turns them into routes.
 
 - **Style matches the surrounding code:** same naming, comment density and idioms. Comments explain _why_, briefly; don't narrate code.
 - **TypeScript:** no `any`. API shapes live in `src/types/<domain>.ts`. Import with the `@/` alias.
-- **Components:** one per file, named export, a props type in the same file. Keep screens thin: they compose components and hold screen state.
+- **Components:** one per file, named export (`Toast` and `FixedFooter` are default exports), a props type in the same file. Keep screens thin: they compose components and hold screen state.
 - **Styling:** NativeWind `className` only. `StyleSheet.create` is banned by lint. Inline `style` only for animated values, values computed at runtime (insets, sizes from props or API) and Android-only props.
 - **Colors:** only palette tokens (`bg-esmeralda`, `text-tinta-2`, `border-card-border`, or `colors.<token>` in TS). Hex/rgb literals are banned by lint. Opacity via modifiers (`bg-tinta/[0.78]`). Don't add colors without the user's OK. The few allowed exceptions carry `// eslint-disable-next-line no-restricted-syntax -- <reason>`.
 - **Typography:** use the role classes from `global.css` (`text-h1`, `text-subtitle`, `text-h2`, `text-h3`, `text-body`, `text-meta`, `text-overline`, `text-button`) or the family classes (`font-display`, `font-display-x`, `font-sans`, `font-sans-semibold`, `font-sans-bold`, `font-sans-x`). Never add `font-bold`/`font-semibold`… weight classes: on Android a custom font's weight comes from its family, and mixing them falls back to the system font. Minimum text is 12px.
@@ -81,9 +101,16 @@ Never put non-route files under `src/app/`: expo-router turns them into routes.
 **New write (POST/PUT)**
 
 1. Plain async function in the domain service.
-2. After success, refresh the affected reads with `useDataRefresh()` (`refreshMyTickets`, `refreshDonations`, `refreshProfile`…).
-3. Errors: show `Toast` with title + text. Offline: don't send; call `notifyOffline()`.
-4. Validation errors arrive as `ApiValidationError` (422) with per-field messages for `TextField`'s `error`.
+2. In the handler: `if (await checkOffline())` → `notifyOffline(message)` and stop. `redirectIfSignedOut()` when it needs a session. Model: `src/app/donations/summary.tsx`.
+3. After success, refresh the affected reads with `useDataRefresh()` (`refreshMyTickets`, `refreshDonations`, `refreshCards`, `addOwnedCard`, `refreshProfile`…); add a function there for new keys. Never import `mutate` from `swr`: the app's cache provider is separate.
+4. Errors: `isNetworkError` → `notifyOffline()`; otherwise show `Toast` with title + text.
+5. Validation errors arrive as `ApiValidationError` (422) with per-field messages for `TextField`'s `error`.
+
+**Offline card pack (ZooDeck)**
+
+- `services/packSync.ts` downloads the encrypted pack and decrypts the user's own cards; `packStore.ts` owns the on-device layout; screens read it through `usePackStatus()`.
+- Logout deletes the user's decrypted cards and clears the SWR cache (`AuthContext`). Keep both when touching auth or cards.
+- Changes here can delete downloaded files on the user's phone; ask before changing the storage layout.
 
 **New component**
 
@@ -169,7 +196,7 @@ Key App measurements:
   2. Network off with `adb shell svc wifi disable && adb shell svc data disable`, back on with `enable`. If not permitted, try `cmd connectivity airplane-mode enable|disable`.
   3. Always restore the network.
 - **Test account:** ask the user for credentials. Type them with `adb shell input text`. Never write credentials into code, commits, PRs or any repo file.
-- Payments are simulated (no real provider): ticket purchases and donations only create test records, so test those flows freely.
+- **Payments:** a real payment provider is being integrated, so never assume ticket purchases or donations are simulated. Before completing a purchase or donation (on the device, through the API, or in a script), ask the user whether the current backend charges real money, and only continue once they confirm it is a test environment.
 - Ask the user only for what ADB can't do: PIN unlock, system dialogs you can't tap, a native rebuild, a Metro restart they own.
 
 ## Git and PRs
@@ -179,9 +206,25 @@ Key App measurements:
 - **No AI attribution anywhere:** no `Co-Authored-By` trailers, no "Generated with…", no mention of AI in commits or PRs.
 - Push, open, or merge PRs only when the user asks. PRs use `gh pr create --base main` and merge with `gh pr merge --merge --delete-branch`. The description says what changed, how to test, and whether a native rebuild or `expo start -c` is needed.
 
+## Keeping the docs current
+
+The docs must describe the code as it is. When a change makes any of them wrong or incomplete, update them in the same branch, as their own commit:
+
+| If the change…                                                                                        | Update                 |
+| ----------------------------------------------------------------------------------------------------- | ---------------------- |
+| adds or changes a convention, lint rule, command, folder, workflow step or a risk agents must know    | `AGENTS.md`            |
+| changes routing, the data layer, state, offline support, the design system, maps, AR or native config | `docs/ARCHITECTURE.md` |
+| changes how screens, data, modules or components are added, the PR workflow or code standards         | `CONTRIBUTING.md`      |
+| adds a feature, a package, an environment variable, a setup step or a roadmap item (or ships one)     | `README.md`            |
+
+- Keep `AGENTS.md` condensed: rules and pointers, not explanations. Detail belongs in the human docs.
+- Write the human docs as the description of a finished product. Planned work goes in the README's Roadmap section, not as caveats across the docs.
+- Don't rewrite a doc for style while doing an unrelated task. When unsure whether a rule should change, ask the user instead of editing it.
+
 ## Done means
 
 - `npm run lint` and `npx tsc --noEmit` both at 0.
 - UI changes checked on the device (or the reason they couldn't be).
 - No new hardcoded colors, sizes or duplicated markup that a `ui/` component already covers.
+- Docs updated if the change made them outdated (see "Keeping the docs current").
 - Nothing left in the repo from testing (screenshots, notes, credentials).

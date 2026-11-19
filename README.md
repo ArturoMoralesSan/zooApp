@@ -1,71 +1,160 @@
-# DurangoZooApp
+# ZooApp
 
-Interactive institution AR educational platform for Durango Zoológico Sahuatoba.
+Visitor app for **Zoológico Sahuatoba** (Durango, Mexico). It helps visitors plan and enjoy their visit, buy tickets, donate, learn about the species, and play **ZooDeck**, a collectible-card game with QR duels and an augmented-reality view of each animal.
 
-## TODO
+ZooApp is an Android app built with Expo development builds. Its interface is in Spanish.
 
-- [x] Basic setup instructions
-- [ ] iOS setup and usage
-- [ ] Localized documentation
-- [ ] Improved writing and refined docs
+## Documentation
 
-## Development
+| Document                                     | Read it to…                                                                         |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **README.md** (this file)                    | set up the project and run it on a phone                                            |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | understand how the app is organized: routing, data, offline, design system, AR      |
+| [CONTRIBUTING.md](CONTRIBUTING.md)           | learn the workflow and code standards, and add screens, data, modules or components |
+| [docs/design/](docs/design/)                 | see the UI source of truth (`design-system.pdf`, `mobile-app.pdf`)                  |
+| [AGENTS.md](AGENTS.md)                       | (for AI coding agents) the condensed rules they follow in this repo                 |
 
-There are some prerequisites that need to be fulfilled before starting developing the project. The installation process may vary depending on your operating system and mobile device's operating system.
+## Features
 
-Copy and paste the following in your terminal to install Volta:
+- **Explore**: the home tab, with featured events and shortcuts to tickets, the map, species and donations.
+- **Map**: an interactive map of the zoo (MapLibre) with zones, points of interest, species and the visitor's location.
+- **Species**: a searchable catalog with a detail page for each animal.
+- **Tickets**: buy entry tickets and show them as QR codes.
+- **Donations**: donate to the zoo and see the donation history.
+- **ZooDeck**: collect animal cards, see them in 3D, in AR or in a 360° view, and download them for offline use.
+- **Duels**: scan a QR code at an enclosure and answer a quiz to win that animal's card.
+- **MiZoo**: the visitor's species, achievements and rewards.
+- **Panel / Profile**: the visitor's account, personal QR code, and ticket and donation history.
 
-bash
+## Tech stack
 
-# Linux
+| Area       | Choice                                                             |
+| ---------- | ------------------------------------------------------------------ |
+| Framework  | Expo SDK 57, React Native 0.86, React 19, TypeScript (strict)      |
+| Navigation | expo-router (file-based routes in `src/app/`)                      |
+| Styling    | NativeWind v4 (Tailwind CSS 3.4), Barlow + Noto Sans fonts         |
+| Data       | `fetch` wrapper + SWR, NetInfo for connectivity                    |
+| Maps       | MapLibre React Native                                              |
+| AR / 3D    | ViroReact (`@reactvision/react-viro`)                              |
+| Storage    | expo-secure-store (session token), expo-file-system (offline pack) |
+| Icons      | Hugeicons                                                          |
 
-curl "https://get.volta.sh" | bash
+## Prerequisites
+
+You need Node.js with npm 11, JDK 17, the Android SDK and an Android phone. The steps differ slightly between operating systems.
+
+### Node.js and npm
+
+We recommend [Volta](https://docs.volta.sh/guide/getting-started) to manage Node and npm versions. Use **npm 11**: the Expo CLI does not work properly with npm 12 yet.
+
+```bash
+# Linux / macOS
+curl https://get.volta.sh | bash
 
 # Windows
-
 winget install Volta.Volta
 
-This is used to manage multiple versions of both NodeJS and NPM. Since the expo CLI does not work properly yet on NPM 12, the 11th version is pinned for this project.
+# Then
+volta install node@24 npm@11
+```
 
-You can find further instructions [here][1].
+### JDK 17
 
-A JDK 17 installation is also needed for generating local development builds. On Linux you can use sdkman.
+Required to compile development builds.
 
-bash
-
-# Install sdkman
-
+```bash
+# Linux / macOS, with sdkman (https://sdkman.io)
 curl -s "https://get.sdkman.io" | bash
-
-# Install the required JDK
-
 sdk install java 17.0.20-tem
+```
 
-On windows go to the [Temurin JDK webpage][3] and download the corresponding JDK for your system.
+On Windows, download JDK 17 from [Adoptium Temurin](https://adoptium.net/temurin/releases/?version=17).
 
-### Android
+### Android SDK and phone
 
-Install Android Studio, the Android SDK Build-Tools, and the Android SDK Platform-Tools v36. Then add the the ANDROID_HOME environment variable and platform tools to the path.
+1. Install [Android Studio](https://developer.android.com/studio) and, from its SDK Manager, the Android SDK Platform 36, Build-Tools and Platform-Tools.
+2. Set `ANDROID_HOME` to the SDK folder and add `$ANDROID_HOME/platform-tools` to your `PATH`.
+3. On the phone, enable **Developer options** and **USB debugging**, connect it, and check that it appears in:
 
-Lastly, check if your device is being recognized by your computer with `adb devices`. Enable the developer options in your device before executing this command.
+   ```bash
+   adb devices
+   ```
 
-More information [here][4].
+AR features need a phone that supports ARCore (Google Play Services for AR). The emulator can run most of the app, but not AR.
 
-### Start the project
+The full official guide is Expo's [Set up your environment](https://docs.expo.dev/get-started/set-up-your-environment/?mode=development-build&buildEnv=local) (development build, local).
 
-To start the project execute the following commands.
+## Getting started
 
-bash
+```bash
+# 1. Clone and install
+git clone https://github.com/ArturoMoralesSan/zooApp.git
+cd zooApp
+npm install
 
-# Generate the prebuild
+# 2. Configure the environment
+cp .env-example .env
+# then edit .env (see below)
 
+# 3. Build and install the development build on the phone
 npx expo prebuild --clean
-
-# Run the project
-
 npx expo run:android
+```
 
-[1]: https://docs.volta.sh/guide/getting-started 'Getting started, Volta.'
-[2]: https://sdkman.io/ 'sdkman.'
-[3]: https://adoptium.net/temurin/releases/?version=11&os=windows&arch=any 'Temurin JDK'
-[4]: https://docs.expo.dev/get-started/set-up-your-environment/?mode=development-build&buildEnv=local 'Expo - Set up your environment'
+Step 3 compiles the native app and installs it on the connected phone. You only need to repeat it when native code changes (see [When to rebuild](#when-to-rebuild)). For day-to-day work, start the dev server and open the already-installed app:
+
+```bash
+npx expo start
+```
+
+### Environment variables
+
+`.env` is ignored by git. Copy `.env-example` and fill in:
+
+| Variable                           | Required | Description                                                                                             |
+| ---------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `EXPO_PUBLIC_API_URL`              | yes      | Backend base URL, e.g. `http://192.168.1.20:8000` (no trailing `/api`). The app won't start without it. |
+| `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG`   | no       | `1` enables a fake duel that needs no QR code or backend quiz.                                          |
+| `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS` | no       | `0` disables the "you must be at the zoo" checks, so duels can be tested anywhere.                      |
+| `EXPO_PUBLIC_ZOODECK_FORCE_360`    | no       | `1` (dev only) shows the 360° view instead of AR, to test it on any phone.                              |
+
+When the backend runs on your computer, use your computer's LAN IP (not `localhost`) so the phone can reach it. Restart Metro after changing `.env`.
+
+## Scripts and commands
+
+| Command                        | What it does                                                               |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `npx expo start`               | Start the Metro dev server (`-c` clears its cache)                         |
+| `npm run android`              | Build and install the Android development build (`expo run:android`)       |
+| `npm run lint`                 | ESLint (must report 0 problems)                                            |
+| `npx tsc --noEmit`             | Type-check (must report 0 errors)                                          |
+| `npx prettier --write <files>` | Format files (tabs, single quotes, no semicolons, sorted Tailwind classes) |
+| `npx expo install <package>`   | Add a dependency with the version that matches SDK 57                      |
+
+## Troubleshooting
+
+### When to rebuild
+
+| You changed…                                                           | Do this                            |
+| ---------------------------------------------------------------------- | ---------------------------------- |
+| JS/TS code, components, screens                                        | Nothing, it hot-reloads            |
+| `tailwind.config.js`, `metro.config.js`, `src/theme/colors.js`, `.env` | Restart Metro: `npx expo start -c` |
+| Added/upgraded a native package, or changed `app.json` plugins         | Rebuild: `npx expo run:android`    |
+
+### Common problems
+
+- **"EXPO_PUBLIC_API_URL no está definida"**: `.env` is missing or Metro was started before you created it. Create it and run `npx expo start -c`.
+- **The app opens in Expo Go and crashes**: this project uses native modules (AR, maps) that Expo Go doesn't include. Use the development build installed by `npx expo run:android`.
+- **The phone can't reach the API**: check that phone and computer are on the same network and that `EXPO_PUBLIC_API_URL` uses the computer's LAN IP.
+- **Styles don't update** after editing the Tailwind config or the palette: restart Metro with `-c`.
+- **Build fails with a Java error**: check `java -version` reports 17.
+
+## Roadmap
+
+- **Payment provider integration**: connect ticket purchases and donations to a payment gateway.
+- **Settings and Help**: complete the Panel's settings and help sections.
+- **iOS release**: configure, test and publish the iOS build.
+
+## License
+
+See [LICENSE](LICENSE).
