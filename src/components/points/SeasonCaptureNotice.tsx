@@ -26,7 +26,11 @@ export function SeasonCaptureNotice({
 	return (
 		<View
 			accessible
-			accessibilityLabel={[`Temporada ${season.title}.`, change, season.message]
+			accessibilityLabel={[
+				`Temporada de puntos: ${season.title}.`,
+				change,
+				season.message,
+			]
 				.filter(Boolean)
 				.join(' ')}
 			className='w-full flex-row items-start gap-3 rounded-xl border-1.5 px-4 py-3'
@@ -48,11 +52,16 @@ export function SeasonCaptureNotice({
 			</View>
 
 			<View style={{ flex: 1, minWidth: 0 }}>
+				{/* Overline + title, as in the banner: the zoo's title may
+				    already start with "Temporada". */}
+				<Text className='text-overline' style={{ color: tones.text }}>
+					Temporada de puntos
+				</Text>
 				<Text
 					className='font-sans-bold text-[14px]'
 					style={{ color: tones.text }}
 				>
-					Temporada {season.title}
+					{season.title}
 				</Text>
 				{change && (
 					<Text className='text-meta mt-0.5' style={{ color: tones.text }}>
