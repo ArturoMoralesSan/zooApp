@@ -3,17 +3,16 @@ import type { Rarity } from '@/types/cards'
 // Tones of a season, picked in the panel. Each pair has ≥ 4.5:1 contrast:
 // `text` on `soft` (the notice) and `on_accent` on `accent` (icon, chips).
 export type SeasonColor = {
-	key: string
 	accent: string
 	on_accent: string
 	soft: string
 	text: string
 }
 
-// A capture rule the season changes, one entry per rarity.
+// A capture rule the season changes, one entry per rarity (named with the
+// app's own rarity labels).
 export type PointSeasonCardChange = {
 	rarity: Rarity
-	rarity_label: string
 	base_points: number
 	// 0: the card is still captured, it just gives no points.
 	points: number

@@ -111,7 +111,6 @@ const DEBUG_POINTS: (DuelPoints | null)[] = [
 			base_points: 50,
 			icon: 'snowflake',
 			color: {
-				key: 'bosque',
 				accent: colors.bosque,
 				on_accent: colors.blanco,
 				soft: colors.niebla,

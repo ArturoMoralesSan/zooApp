@@ -160,7 +160,7 @@ export default function PointSeasonScreen() {
 
 						const cards: Change[] = data.cards.map((card) => ({
 							key: card.rarity,
-							label: `Carta ${rarityLabel(card.rarity).toLowerCase() || card.rarity_label}`,
+							label: `Carta ${rarityLabel(card.rarity).toLowerCase()}`,
 							base: card.base_points,
 							points: card.points,
 						}))
