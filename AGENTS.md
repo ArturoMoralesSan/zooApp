@@ -171,7 +171,7 @@ Key App measurements:
   2. Network off with `adb shell svc wifi disable && adb shell svc data disable`, back on with `enable`. If not permitted, try `cmd connectivity airplane-mode enable|disable`.
   3. Always restore the network.
 - **Test account:** ask the user for credentials. Type them with `adb shell input text`. Never write credentials into code, commits, PRs or any repo file.
-- Payments are simulated (no real provider): ticket purchases and donations only create test records, so test those flows freely.
+- **Payments:** a real payment provider is being integrated, so never assume ticket purchases or donations are simulated. Before completing a purchase or donation (on the device, through the API, or in a script), ask the user whether the current backend charges real money, and only continue once they confirm it is a test environment.
 - Ask the user only for what ADB can't do: PIN unlock, system dialogs you can't tap, a native rebuild, a Metro restart they own.
 
 ## Git and PRs
