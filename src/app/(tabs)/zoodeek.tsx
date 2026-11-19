@@ -5,7 +5,7 @@ import {
 	SwordsIcon,
 } from '@hugeicons/core-free-icons'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { RefreshControl, ScrollView, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -14,6 +14,8 @@ import { CollectionTile } from '@/components/deck/CollectionTile'
 import { MapPreviewCard } from '@/components/deck/MapPreviewCard'
 import { OfflinePackCard } from '@/components/deck/OfflinePackCard'
 import { OfflinePackIntroModal } from '@/components/deck/OfflinePackIntroModal'
+import { SeasonBanner } from '@/components/points/SeasonBanner'
+import { SeasonDismissedToast } from '@/components/points/SeasonDismissedToast'
 import { ListCard } from '@/components/ui/ListCard'
 import { Notice } from '@/components/ui/Notice'
 import { QueryView } from '@/components/ui/QueryView'
@@ -24,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useCards } from '@/hooks/useCards'
 import { useOfflinePackPrompts } from '@/hooks/useOfflinePackPrompts'
 import { usePackStatus } from '@/hooks/usePackStatus'
+import { usePointSeason } from '@/hooks/usePointSeason'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useZooDeckMap } from '@/hooks/useZooDeckMap'
@@ -43,11 +46,14 @@ export default function ZooDeck() {
 
 	const cards = useCards()
 	const pack = usePackStatus()
+	const season = usePointSeason()
 	// No location here: the preview only frames the zones and animals, and
 	// the tab shouldn't ask for it. Same key as the duels map before its fix.
 	const zoodeckMap = useZooDeckMap(null)
 	const prompts = useOfflinePackPrompts()
 	const [refreshing, setRefreshing] = useState(false)
+	const [seasonToast, setSeasonToast] = useState(false)
+	const hideSeasonToast = useCallback(() => setSeasonToast(false), [])
 
 	useSessionRedirect()
 
@@ -60,6 +66,7 @@ export default function ZooDeck() {
 				refreshUser(),
 				syncPack(),
 				zoodeckMap.refresh(),
+				season.refresh(),
 			])
 		} finally {
 			setRefreshing(false)
@@ -90,6 +97,9 @@ export default function ZooDeck() {
 					/>
 				}
 			>
+				{/* TEMPORADA DE PUNTOS: only while the zoo shows one */}
+				<SeasonBanner className='mb-6' onDismiss={() => setSeasonToast(true)} />
+
 				{/* MAPA: opens the A-17 map of the animals to challenge */}
 				<MapPreviewCard
 					zones={zoodeckMap.data?.zones}
@@ -192,6 +202,8 @@ export default function ZooDeck() {
 				onDownload={prompts.download}
 				onLater={prompts.later}
 			/>
+
+			<SeasonDismissedToast visible={seasonToast} onHide={hideSeasonToast} />
 		</SafeAreaView>
 	)
 }

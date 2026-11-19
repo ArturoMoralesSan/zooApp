@@ -21,11 +21,14 @@ import { ListCard } from '@/components/ui/ListCard'
 import { QueryView } from '@/components/ui/QueryView'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { EventCard } from '@/components/explore/EventCard'
+import { SeasonBanner } from '@/components/points/SeasonBanner'
+import { SeasonDismissedToast } from '@/components/points/SeasonDismissedToast'
 import { EventCarouselDots } from '@/components/explore/EventCarouselDots'
 import { TabHeader } from '@/components/ui/TabHeader'
 import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useExplore } from '@/hooks/useExplore'
+import { usePointSeason } from '@/hooks/usePointSeason'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 
 import colors from '@/theme/colors'
@@ -43,6 +46,7 @@ export default function Explorar() {
 	const { refreshUser } = useAuth()
 
 	const explore = useExplore()
+	const season = usePointSeason()
 	const { refresh } = explore
 	const events = explore.data?.featured_events ?? []
 	const firstLoad = explore.isLoading && !explore.data
@@ -51,6 +55,8 @@ export default function Explorar() {
 	const [activeEventIndex, setActiveEventIndex] = useState(0)
 	const [comingSoon, setComingSoon] = useState<string | null>(null)
 	const hideComingSoon = useCallback(() => setComingSoon(null), [])
+	const [seasonToast, setSeasonToast] = useState(false)
+	const hideSeasonToast = useCallback(() => setSeasonToast(false), [])
 
 	useSessionRedirect()
 
@@ -58,7 +64,7 @@ export default function Explorar() {
 		setRefreshing(true)
 
 		try {
-			await Promise.all([refresh(), refreshUser()])
+			await Promise.all([refresh(), refreshUser(), season.refresh()])
 		} finally {
 			setRefreshing(false)
 		}
@@ -100,6 +106,9 @@ export default function Explorar() {
 					/>
 				}
 			>
+				{/* TEMPORADA DE PUNTOS: only while the zoo shows one */}
+				<SeasonBanner className='mb-6' onDismiss={() => setSeasonToast(true)} />
+
 				{/* EVENTOS DESTACADOS */}
 				<View>
 					<SectionTitle title='Eventos destacados' />
@@ -218,6 +227,8 @@ export default function Explorar() {
 				message={comingSoon ?? ''}
 				onHide={hideComingSoon}
 			/>
+
+			<SeasonDismissedToast visible={seasonToast} onHide={hideSeasonToast} />
 		</SafeAreaView>
 	)
 }
