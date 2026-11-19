@@ -1,3 +1,5 @@
+> Humans: start with [README.md](README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [CONTRIBUTING.md](CONTRIBUTING.md). This file is the condensed version for AI coding agents.
+
 # ZooApp: agent guide
 
 Visitor app for Zoológico Sahuatoba. Read this whole file before working; it is the source of truth for how code is written here.
