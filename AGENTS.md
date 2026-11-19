@@ -47,6 +47,7 @@ src/
     tickets/ donations/ species/   Stack screens per module
     deck/              Card collection: index, [id] (3D), ar/[id], map (duel map), offline (pack)
     duel/              _layout (DuelProvider): scan → play → review, debug
+    points/            season: what the active points season changes
     map.tsx profile.tsx +not-found.tsx
   components/
     ui/                Generic design-system components (Button, Card, ListCard, TextField,

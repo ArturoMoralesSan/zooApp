@@ -74,6 +74,7 @@ src/app/
   donations/           index → summary → success, history
   deck/                index, [id], map, offline, ar/[id]
   duel/                _layout (DuelProvider), scan → play → review, debug
+  points/              season (what the active points season changes)
   map.tsx profile.tsx +not-found.tsx
 ```
 
@@ -177,6 +178,15 @@ On logout, `useDataRefresh().clearCache()` drops every cached response so nothin
   - [`packStore.ts`](../src/services/packStore.ts) defines the on-device layout in the documents directory: shared encrypted `packs/{id}.bin` files and per-user decrypted copies in `cards/{userId}/`.
   - [`packCrypto.ts`](../src/services/packCrypto.ts) verifies and decrypts AES-GCM `.bin` files.
   - Screens read progress through `usePackStatus()`; `OfflinePackSync` in the root layout runs the sync, and `deck/offline.tsx` shows its state.
+
+## Points seasons
+
+The server can run one **points mode** at a time (a season or event) that changes what each point rule gives. When the zoo makes it visible, `GET /api/points/season` returns its notice; otherwise `null`. The app only explains it: points are always the ones the server returns with each action.
+
+- **Data**: [`services/points.ts`](../src/services/points.ts) + `usePointSeason()`; revalidated when the app returns to the foreground and on pull-to-refresh, never polled.
+- **Banner**: [`SeasonBanner`](../src/components/points/SeasonBanner.tsx) on Explore, MiZoo and ZooDeck, opening `points/season`. Closing it hides it on all three (`useSeasonDismissal`, stored with the hints in SecureStore) until a season with another title arrives. MiZoo's `LevelCard` keeps a `SeasonChip` so the details stay reachable.
+- **Duel win**: `data.points.season` adds the same chip and "normalmente N puntos" to `DuelPoints`.
+- **Icon and color**: the server sends a catalog key and four hex tones. [`utils/pointSeason.ts`](../src/utils/pointSeason.ts) maps the key to a Hugeicons icon (unknown keys → `SparklesIcon`) and falls back to the brand tones when `color` is `null`. The tones are runtime values, so they go in `style`: `text` on `soft`, `on_accent` on `accent`.
 
 ## Styling and design system
 
