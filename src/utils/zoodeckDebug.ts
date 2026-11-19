@@ -2,6 +2,7 @@ import { Image } from 'react-native'
 
 import cardTestImage from '@/assets/models/card_test.png'
 import modelTest from '@/assets/models/model_test.glb'
+import colors from '@/theme/colors'
 import type {
 	DuelAnswer,
 	DuelPoints,
@@ -98,6 +99,40 @@ const DEBUG_POINTS: (DuelPoints | null)[] = [
 	{ awarded: 100, total: 500, level: { id: 2, name: 'Plata' }, level_up: true },
 	{ awarded: 0, total: 500, level: { id: 2, name: 'Plata' }, level_up: false },
 	null,
+	// Points seasons: fewer points than usual, in the server's Bosque tones…
+	{
+		awarded: 30,
+		total: 530,
+		level: { id: 2, name: 'Plata' },
+		level_up: false,
+		season: {
+			title: 'Temporada difícil',
+			message: 'Las capturas dan menos puntos.',
+			base_points: 50,
+			icon: 'snowflake',
+			color: {
+				key: 'bosque',
+				accent: colors.bosque,
+				on_accent: colors.blanco,
+				soft: colors.niebla,
+				text: colors.bosque,
+			},
+		},
+	},
+	// …and a card the season turns off, with the default icon and colors.
+	{
+		awarded: 0,
+		total: 530,
+		level: { id: 2, name: 'Plata' },
+		level_up: false,
+		season: {
+			title: 'Fin de semana especial',
+			message: null,
+			base_points: 25,
+			icon: 'unknown-key',
+			color: null,
+		},
+	},
 ]
 let debugWins = 0
 

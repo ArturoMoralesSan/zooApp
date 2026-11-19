@@ -1,3 +1,5 @@
+import type { SeasonColor } from '@/types/points'
+
 import type { CardPack } from './pack'
 
 export type Rarity = 'comun' | 'rara' | 'epica' | 'edicion_especial'
@@ -103,6 +105,18 @@ export type DuelPoints = {
 	total: number
 	level: { id: number; name: string } | null
 	level_up: boolean
+	// Visible points season, if any; missing on older servers.
+	season?: DuelPointsSeason | null
+}
+
+// The season's notice for this capture: same icon and color as the banner.
+export type DuelPointsSeason = {
+	title: string
+	message: string | null
+	// What this card gives without the season; null if its rarity gives none.
+	base_points: number | null
+	icon: string | null
+	color: SeasonColor | null
 }
 
 export type DuelResult = {
