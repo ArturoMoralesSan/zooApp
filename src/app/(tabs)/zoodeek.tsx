@@ -14,6 +14,7 @@ import { CollectionTile } from '@/components/deck/CollectionTile'
 import { MapPreviewCard } from '@/components/deck/MapPreviewCard'
 import { OfflinePackCard } from '@/components/deck/OfflinePackCard'
 import { OfflinePackIntroModal } from '@/components/deck/OfflinePackIntroModal'
+import { SeasonBanner } from '@/components/points/SeasonBanner'
 import { ListCard } from '@/components/ui/ListCard'
 import { Notice } from '@/components/ui/Notice'
 import { QueryView } from '@/components/ui/QueryView'
@@ -24,6 +25,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useCards } from '@/hooks/useCards'
 import { useOfflinePackPrompts } from '@/hooks/useOfflinePackPrompts'
 import { usePackStatus } from '@/hooks/usePackStatus'
+import { usePointSeason } from '@/hooks/usePointSeason'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useZooDeckMap } from '@/hooks/useZooDeckMap'
@@ -43,6 +45,7 @@ export default function ZooDeck() {
 
 	const cards = useCards()
 	const pack = usePackStatus()
+	const season = usePointSeason()
 	// No location here: the preview only frames the zones and animals, and
 	// the tab shouldn't ask for it. Same key as the duels map before its fix.
 	const zoodeckMap = useZooDeckMap(null)
@@ -60,6 +63,7 @@ export default function ZooDeck() {
 				refreshUser(),
 				syncPack(),
 				zoodeckMap.refresh(),
+				season.refresh(),
 			])
 		} finally {
 			setRefreshing(false)
@@ -90,6 +94,9 @@ export default function ZooDeck() {
 					/>
 				}
 			>
+				{/* TEMPORADA DE PUNTOS: only while the zoo shows one */}
+				<SeasonBanner className='mb-6' />
+
 				{/* MAPA: opens the A-17 map of the animals to challenge */}
 				<MapPreviewCard
 					zones={zoodeckMap.data?.zones}

@@ -14,6 +14,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LevelCard } from '@/components/mizoo/LevelCard'
 import { SeeMoreTile } from '@/components/mizoo/SeeMoreTile'
 import { SpeciesTile } from '@/components/mizoo/SpeciesTile'
+import { SeasonBanner } from '@/components/points/SeasonBanner'
+import { SeasonChip } from '@/components/points/SeasonChip'
 import { Badge } from '@/components/ui/Badge'
 import { ListCard } from '@/components/ui/ListCard'
 import { QueryView } from '@/components/ui/QueryView'
@@ -22,6 +24,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle'
 import { TabHeader } from '@/components/ui/TabHeader'
 import { TextLink } from '@/components/ui/TextLink'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePointSeason } from '@/hooks/usePointSeason'
 import { useProfile } from '@/hooks/useProfile'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -100,6 +103,7 @@ export default function MiZoo() {
 	const { user, refreshUser } = useAuth()
 	const profile = useProfile()
 	const speciesQuery = useSpecies()
+	const season = usePointSeason()
 
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -113,6 +117,7 @@ export default function MiZoo() {
 				speciesQuery.refresh(),
 				profile.refresh(),
 				refreshUser(),
+				season.refresh(),
 			])
 		} finally {
 			setRefreshing(false)
@@ -160,7 +165,22 @@ export default function MiZoo() {
 					progress={topLevel ? 1 : progress / 100}
 					pointsToNextLevel={gamification?.points_to_next_level ?? 0}
 					nextLevel={gamification?.next_level?.name || undefined}
+					footer={
+						// Stays after the banner is closed, so the details are
+						// always one tap away.
+						season.data && (
+							<SeasonChip
+								look='soft'
+								title={season.data.title}
+								icon={season.data.icon}
+								color={season.data.color}
+								onPress={() => router.push('/points/season')}
+							/>
+						)
+					}
 				/>
+
+				<SeasonBanner className='mt-3' />
 
 				{/* ESPECIES: replaces A-06's card collection */}
 				<View className='mt-6'>
