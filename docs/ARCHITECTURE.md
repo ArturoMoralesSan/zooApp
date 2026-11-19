@@ -149,7 +149,7 @@ Only `src/hooks/**` and `src/services/swr-config.tsx` may import `swr` (enforced
 
 Writes are plain async service functions (e.g. `createDonation` in `services/donations.ts`) called from a screen handler. The pattern, as in `src/app/donations/summary.tsx`:
 
-1. `if (await checkOffline())` → `notifyOffline(message)` and stop.
+1. `if (await checkOffline())` → `notifyOffline(message)` and stop. If the write needs a session, `if (await redirectIfSignedOut()) return`.
 2. Call the service function.
 3. On success, refresh affected reads with [`useDataRefresh()`](../src/hooks/useDataRefresh.ts) (`refreshMyTickets`, `refreshDonations`, `refreshCards`, `refreshProfile`…).
 4. On error: `isNetworkError` → `notifyOffline`; `ApiValidationError` → field errors; anything else → `Toast` with a title and message.

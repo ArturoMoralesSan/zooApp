@@ -287,6 +287,9 @@ const register = async () => {
 		return
 	}
 
+	// Needs a session: sends the user to /login when signed out.
+	if (await redirectIfSignedOut()) return
+
 	setLoading(true)
 
 	try {
