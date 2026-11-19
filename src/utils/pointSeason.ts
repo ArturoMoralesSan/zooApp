@@ -180,3 +180,11 @@ export function seasonCaptureText(
 
 	return `Esta carta da ${awarded.toLocaleString('es-MX')} puntos en lugar de ${base}.`
 }
+
+// Ends zoo-written text with a period for screen readers, unless it already
+// ends in punctuation ("¡Feliz Navidad!" shouldn't read "¡Feliz Navidad!.").
+export function asSentence(text: string): string {
+	const trimmed = text.trim()
+
+	return /[.!?…]$/.test(trimmed) ? trimmed : `${trimmed}.`
+}

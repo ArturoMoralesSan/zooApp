@@ -13,9 +13,16 @@ import { FocusRing, useFocusRing } from '@/components/ui/FocusRing'
 import { Icon } from '@/components/ui/Icon'
 import { usePointSeason } from '@/hooks/usePointSeason'
 import { useSeasonDismissal } from '@/hooks/useSeasonDismissal'
-import { seasonIcon, seasonTones, withAlpha } from '@/utils/pointSeason'
+import {
+	asSentence,
+	seasonIcon,
+	seasonTones,
+	withAlpha,
+} from '@/utils/pointSeason'
 
 type SeasonBannerProps = {
+	// After the user closes it (e.g. to say where the details are now).
+	onDismiss?: () => void
 	className?: string
 }
 
@@ -23,7 +30,7 @@ type SeasonBannerProps = {
 // colors by default). List card anatomy: padding 16, radius 16, icon 40.
 // Opens the detail screen; closing it hides it on every tab until the
 // season's title changes. Renders nothing without a visible season.
-export function SeasonBanner({ className = '' }: SeasonBannerProps) {
+export function SeasonBanner({ onDismiss, className = '' }: SeasonBannerProps) {
 	const { data: season } = usePointSeason()
 	const { dismissed, dismiss } = useSeasonDismissal(season?.title)
 	const visible = Boolean(season) && !dismissed
@@ -78,7 +85,13 @@ export function SeasonBanner({ className = '' }: SeasonBannerProps) {
 			<Pressable
 				onPress={() => router.push('/points/season')}
 				accessibilityRole='button'
-				accessibilityLabel={`Temporada de puntos: ${season.title}. ${season.message ?? ''} Ver cambios`}
+				accessibilityLabel={[
+					`Temporada de puntos: ${asSentence(season.title)}`,
+					season.message && asSentence(season.message),
+					'Ver cambios',
+				]
+					.filter(Boolean)
+					.join(' ')}
 				{...focusProps}
 				className={`flex-row items-start gap-3 rounded-2xl p-4 pr-14 active:opacity-90 ${focused ? 'border-2 border-bosque' : 'border-1.5'}`}
 				style={{
@@ -131,7 +144,10 @@ export function SeasonBanner({ className = '' }: SeasonBannerProps) {
 			{/* Sibling, not nested: an accessible card would swallow it. */}
 			<View className='absolute right-2 top-2'>
 				<Pressable
-					onPress={dismiss}
+					onPress={() => {
+						dismiss()
+						onDismiss?.()
+					}}
 					hitSlop={4}
 					accessibilityRole='button'
 					accessibilityLabel='Cerrar aviso de temporada'

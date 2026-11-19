@@ -4,7 +4,7 @@ import { Pressable, Text, View } from 'react-native'
 import { FocusRing, useFocusRing } from '@/components/ui/FocusRing'
 import { Icon } from '@/components/ui/Icon'
 import type { SeasonColor } from '@/types/points'
-import { seasonIcon, seasonTones } from '@/utils/pointSeason'
+import { asSentence, seasonIcon, seasonTones } from '@/utils/pointSeason'
 
 type SeasonChipProps = {
 	title: string
@@ -34,7 +34,7 @@ export function SeasonChip({
 				// 32px chip, 40px touch target.
 				hitSlop={4}
 				accessibilityRole='button'
-				accessibilityLabel={`Temporada de puntos: ${title}. Ver cambios`}
+				accessibilityLabel={`Temporada de puntos: ${asSentence(title)} Ver cambios`}
 				{...focusProps}
 				className={`h-8 max-w-full flex-row items-center gap-1.5 rounded-full px-3 active:opacity-80 ${focused ? 'border-2 border-bosque' : ''}`}
 				style={{ backgroundColor: tones.soft }}

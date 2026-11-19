@@ -3,6 +3,7 @@ import { Text, View } from 'react-native'
 import { Icon } from '@/components/ui/Icon'
 import type { DuelPointsSeason } from '@/types/cards'
 import {
+	asSentence,
 	seasonCaptureText,
 	seasonIcon,
 	seasonTones,
@@ -27,9 +28,9 @@ export function SeasonCaptureNotice({
 		<View
 			accessible
 			accessibilityLabel={[
-				`Temporada de puntos: ${season.title}.`,
+				`Temporada de puntos: ${asSentence(season.title)}`,
 				change,
-				season.message,
+				season.message && asSentence(season.message),
 			]
 				.filter(Boolean)
 				.join(' ')}
