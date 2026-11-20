@@ -397,6 +397,8 @@ npm test -- __tests__/services/duels      # one file or folder
 npm run test:ci                           # with coverage, as CI runs it
 ```
 
+`npm run test:ci` fails when coverage drops below the thresholds in `jest.config.js`. The critical ZooDeck files have their own (the pack's encryption, storage and sync, duels, cards); `global` covers the rest. When your tests raise coverage, raise `global` too; never lower a threshold to make CI pass.
+
 **Where things are**
 
 - `__tests__/`: the tests, mirroring `src/` (`src/services/duels.ts` → `__tests__/services/duels.test.ts`). Never under `src/app/`, which expo-router would turn into routes.

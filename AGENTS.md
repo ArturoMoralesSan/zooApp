@@ -133,6 +133,7 @@ Jest (`jest-expo`) + React Native Testing Library + MSW 2. Details and examples 
 - `packSync`, `packStore`, `cards` and `useArAvailability` keep state in the module: one stateful scenario per test file.
 - RNTL 14 is async: `await render`, `await renderHook`, `await fireEvent.press`. Modals open a frame later: `findBy*`.
 - A known bug gets a `test.failing` that names the issue. No snapshots.
+- `npm run test:ci` enforces the coverage thresholds in `jest.config.js`: raise `global` when coverage grows, never lower a threshold to make CI pass.
 - Never upgrade MSW to 3 (ESM only, doesn't load in Jest 29).
 
 ## Design references

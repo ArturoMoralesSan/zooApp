@@ -1,0 +1,108 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	jest,
+	test,
+} from '@jest/globals'
+import { act, renderHook } from '@testing-library/react-native'
+
+import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
+
+// Viro shares one native platform between views: mounting one while the
+// previous is still being released crashes natively, and releasing one that
+// is still loading leaves the next one black.
+beforeEach(() => {
+	jest.useFakeTimers()
+})
+
+afterEach(() => {
+	jest.useRealTimers()
+})
+
+const advance = (ms: number) =>
+	act(async () => {
+		jest.advanceTimersByTime(ms)
+	})
+
+describe('useViroHandoff', () => {
+	test('a new Viro view waits half a second before mounting', async () => {
+		const { result } = await renderHook(() => useViroHandoff())
+
+		expect(result.current).toBe(false)
+		await advance(499)
+		expect(result.current).toBe(false)
+		await advance(1)
+		expect(result.current).toBe(true)
+	})
+})
+
+describe('useViroExit', () => {
+	test('unmounts the view at once and navigates after its release', async () => {
+		const then = jest.fn()
+		const { result } = await renderHook(() => useViroExit('scene3d'))
+
+		await act(async () => result.current.exit(then))
+		expect(result.current.exiting).toBe(true)
+
+		await advance(499)
+		expect(then).not.toHaveBeenCalled()
+		await advance(1)
+		expect(then).toHaveBeenCalledTimes(1)
+	})
+
+	test('closing an AR session takes longer', async () => {
+		const then = jest.fn()
+		const { result } = await renderHook(() => useViroExit('ar'))
+
+		await act(async () => result.current.exit(then))
+		await advance(1499)
+		expect(then).not.toHaveBeenCalled()
+		await advance(1)
+		expect(then).toHaveBeenCalledTimes(1)
+	})
+
+	test('waits for a model that is still loading', async () => {
+		const then = jest.fn()
+		const { result, rerender } = await renderHook(
+			({ busy }: { busy: boolean }) => useViroExit('scene3d', busy),
+			{ initialProps: { busy: true } },
+		)
+
+		await act(async () => result.current.exit(then))
+		await advance(3000)
+		expect(result.current.exiting).toBe(false)
+
+		await rerender({ busy: false })
+		expect(result.current.exiting).toBe(true)
+		await advance(500)
+		expect(then).toHaveBeenCalledTimes(1)
+	})
+
+	test('but never more than 6 s', async () => {
+		const then = jest.fn()
+		const { result } = await renderHook(() => useViroExit('scene3d', true))
+
+		await act(async () => result.current.exit(then))
+		await advance(5999)
+		expect(result.current.exiting).toBe(false)
+		await advance(1)
+		expect(result.current.exiting).toBe(true)
+		await advance(500)
+		expect(then).toHaveBeenCalledTimes(1)
+	})
+
+	test('a second exit keeps the first destination', async () => {
+		const first = jest.fn()
+		const second = jest.fn()
+		const { result } = await renderHook(() => useViroExit('scene3d'))
+
+		await act(async () => result.current.exit(first))
+		await act(async () => result.current.exit(second))
+		await advance(500)
+
+		expect(first).toHaveBeenCalledTimes(1)
+		expect(second).not.toHaveBeenCalled()
+	})
+})

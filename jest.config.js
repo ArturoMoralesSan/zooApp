@@ -71,7 +71,7 @@ module.exports = {
 		'/node_modules/react-native-reanimated/plugin/',
 		'/node_modules/@react-native/babel-preset/',
 	],
-	// ZooDeck only, the module these tests cover (docs/TESTING_PLAN.md §0).
+	// ZooDeck only: the module these tests cover so far.
 	collectCoverageFrom: [
 		'src/services/{cards,duels,location,pack,packCrypto,packStore,packSync}.ts',
 		'src/contexts/DuelContext.tsx',
@@ -81,4 +81,26 @@ module.exports = {
 		'src/app/{deck,duel}/**/*.tsx',
 		'src/components/{deck,duel,zoodeck,ar}/*.tsx',
 	],
+	// Checked by `npm run test:ci`. Files whose logic is fully reachable keep
+	// their full coverage; packSync's remaining branches are file-system
+	// failures. Jest leaves the files listed here out of `global`, which
+	// covers the rest (mostly screens and components; the AR, 3D and map
+	// ones aren't unit-tested). It's the value measured when the thresholds
+	// were set: raise it as coverage grows, never lower it.
+	coverageThreshold: {
+		global: { lines: 25, statements: 25, functions: 25, branches: 24 },
+		'./src/services/packCrypto.ts': { lines: 100, branches: 100 },
+		// visitReason's ApiError guard (duels.ts:32) can't be reached from
+		// startDuel, which rethrows anything else first.
+		'./src/services/duels.ts': { lines: 100, branches: 90 },
+		'./src/services/cards.ts': { lines: 100, branches: 100 },
+		'./src/services/pack.ts': { lines: 100, branches: 100 },
+		'./src/services/packStore.ts': { lines: 90 },
+		'./src/services/packSync.ts': { lines: 85 },
+		'./src/contexts/DuelContext.tsx': { lines: 90 },
+		'./src/utils/offlinePack.ts': { lines: 100, branches: 100 },
+		'./src/utils/zoodeck.ts': { lines: 100, branches: 100 },
+		'./src/hooks/useArAvailability.ts': { lines: 100 },
+		'./src/hooks/usePackSync.ts': { lines: 100 },
+	},
 }
