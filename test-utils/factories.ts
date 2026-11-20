@@ -6,6 +6,18 @@ import type {
 	UnownedCard,
 } from '@/types/cards'
 import type { PackFile, PackManifest } from '@/types/pack'
+import type { User } from '@/types/user'
+
+export function makeUser(overrides: Partial<User> = {}): User {
+	return {
+		id: 7,
+		name: 'Ana Pérez',
+		email: 'ana@example.com',
+		points: 0,
+		level_id: null,
+		...overrides,
+	}
+}
 
 export function makeOwnedCard(overrides: Partial<OwnedCard> = {}): OwnedCard {
 	return {
