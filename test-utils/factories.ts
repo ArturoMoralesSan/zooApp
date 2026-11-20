@@ -5,8 +5,26 @@ import type {
 	OwnedCard,
 	UnownedCard,
 } from '@/types/cards'
+import type { ZooDeckCard } from '@/types/map'
 import type { PackFile, PackManifest } from '@/types/pack'
 import type { User } from '@/types/user'
+
+export function makeZooDeckCard(
+	overrides: Partial<ZooDeckCard> = {},
+): ZooDeckCard {
+	return {
+		id: 1,
+		name: 'Lobo gris',
+		rarity: 'rara',
+		thumbnail_image: null,
+		status: 'available',
+		attempts: { max: 3, left: 3, locked_until: null },
+		can_duel: true,
+		reason: null,
+		qr_codes: [],
+		...overrides,
+	}
+}
 
 export function makeUser(overrides: Partial<User> = {}): User {
 	return {
