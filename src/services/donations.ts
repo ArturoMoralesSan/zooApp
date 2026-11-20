@@ -1,6 +1,7 @@
 import type {
 	CreateDonationResponse,
 	Donation,
+	DonationResult,
 	DonationsResponse,
 } from '@/types/donations'
 
@@ -35,7 +36,7 @@ export async function getDonations(): Promise<Donation[]> {
 
 export async function createDonation(body: {
 	amount: number
-}): Promise<Donation> {
+}): Promise<DonationResult> {
 	const response = await api<CreateDonationResponse>(donationsKeys.list, {
 		method: 'POST',
 		body: JSON.stringify(body),
@@ -49,5 +50,5 @@ export async function createDonation(body: {
 		)
 	}
 
-	return donation
+	return { donation, points: response?.data?.points ?? null }
 }

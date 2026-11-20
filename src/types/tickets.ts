@@ -1,3 +1,5 @@
+import type { PointsAward } from '@/types/points'
+
 export type TicketType = {
 	id: number
 	name: string
@@ -16,6 +18,8 @@ export type Order = {
 	paid_at?: string | null
 	created_at?: string | null
 	tickets?: Ticket[]
+	// Only in the purchase response, once per order; missing on older servers.
+	points?: PointsAward | null
 }
 
 export type Ticket = {

@@ -1,3 +1,5 @@
+import type { PointsAward } from '@/types/points'
+
 export type PaymentMethod = {
 	id?: number
 	name?: string | null
@@ -29,6 +31,14 @@ export type CreateDonationResponse = {
 	message?: string
 	data?: {
 		donation?: Donation
+		// Missing on older servers.
+		points?: PointsAward | null
 	}
 	donation?: Donation
+}
+
+// What createDonation returns: the donation and the points it gave.
+export type DonationResult = {
+	donation: Donation
+	points: PointsAward | null
 }
