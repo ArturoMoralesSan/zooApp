@@ -1,28 +1,34 @@
 import { Text, View } from 'react-native'
 
 import { Icon } from '@/components/ui/Icon'
-import type { DuelPointsSeason } from '@/types/cards'
+import type { PointsAwardSeason } from '@/types/points'
 import {
 	asSentence,
-	seasonCaptureText,
+	type PointsSubject,
+	seasonPointsText,
 	seasonIcon,
 	seasonTones,
 	withAlpha,
 } from '@/utils/pointSeason'
 
-type SeasonCaptureNoticeProps = {
-	season: DuelPointsSeason
+type SeasonPointsNoticeProps = {
+	season: PointsAwardSeason
 	awarded: number
+	// What earned the points: "Esta carta…", "Esta compra…".
+	subject: PointsSubject
+	className?: string
 }
 
-// Victory notice: why this capture gave more, fewer or no points. Compact
-// Notice layout (it shares the dialog with the card), in the season's tones.
-export function SeasonCaptureNotice({
+// Why an action (a won card, a ticket order, a donation) gave more, fewer or
+// no points. Compact Notice layout, in the season's tones.
+export function SeasonPointsNotice({
 	season,
 	awarded,
-}: SeasonCaptureNoticeProps) {
+	subject,
+	className = '',
+}: SeasonPointsNoticeProps) {
 	const tones = seasonTones(season.color)
-	const change = seasonCaptureText(awarded, season.base_points)
+	const change = seasonPointsText(subject, awarded, season.base_points)
 
 	return (
 		<View
@@ -34,7 +40,7 @@ export function SeasonCaptureNotice({
 			]
 				.filter(Boolean)
 				.join(' ')}
-			className='w-full flex-row items-start gap-3 rounded-xl border-1.5 px-4 py-3'
+			className={`w-full flex-row items-start gap-3 rounded-xl border-1.5 px-4 py-3 ${className}`}
 			style={{
 				backgroundColor: tones.soft,
 				borderColor: withAlpha(tones.accent, 0.35),

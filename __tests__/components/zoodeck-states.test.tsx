@@ -13,7 +13,7 @@ import { OfflinePackCard } from '@/components/deck/OfflinePackCard'
 import { DuelAnswer } from '@/components/duel/DuelAnswer'
 import { DuelPoints } from '@/components/duel/DuelPoints'
 import { VisitNotice } from '@/components/zoodeck/VisitNotice'
-import type { DuelPoints as DuelPointsData } from '@/types/cards'
+import type { PointsAward } from '@/types/points'
 import type { VisitReason } from '@/types/map'
 
 import { routerSpies } from '../../test-utils/router'
@@ -26,7 +26,7 @@ jest.mock(
 		).expoRouterMock,
 )
 
-const points = (overrides: Partial<DuelPointsData> = {}): DuelPointsData => ({
+const points = (overrides: Partial<PointsAward> = {}): PointsAward => ({
 	awarded: 50,
 	total: 1320,
 	level: { id: 2, name: 'Plata' },

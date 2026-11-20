@@ -1,16 +1,14 @@
 import { Coins02Icon, Crown02Icon } from '@hugeicons/core-free-icons'
-import { useEffect, useState } from 'react'
-import { AccessibilityInfo, Animated, Easing, Text, View } from 'react-native'
+import { Animated, Text, View } from 'react-native'
 
-import { SeasonCaptureNotice } from '@/components/points/SeasonCaptureNotice'
+import { SeasonPointsNotice } from '@/components/points/SeasonPointsNotice'
 import { Badge } from '@/components/ui/Badge'
-import type { DuelPoints as DuelPointsData } from '@/types/cards'
+import { usePointsReveal } from '@/hooks/usePointsReveal'
+import type { PointsAward } from '@/types/points'
 
 type DuelPointsProps = {
-	points: DuelPointsData
+	points: PointsAward
 }
-
-const COUNT_MS = 700
 
 const formatPoints = (value: number) => value.toLocaleString('es-MX')
 
@@ -19,59 +17,8 @@ const formatPoints = (value: number) => value.toLocaleString('es-MX')
 export function DuelPoints({ points }: DuelPointsProps) {
 	const { awarded, total, level, level_up } = points
 	const season = points.season ?? null
-	const [shown, setShown] = useState(0)
-	const [counted, setCounted] = useState(awarded === 0)
-	const [levelOpacity] = useState(() => new Animated.Value(0))
-
-	useEffect(() => {
-		if (awarded === 0) return
-
-		const value = new Animated.Value(0)
-		const listener = value.addListener(({ value: current }) =>
-			setShown(Math.round(current)),
-		)
-		let animation: Animated.CompositeAnimation | null = null
-		let cancelled = false
-
-		void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
-			if (cancelled) return
-
-			if (reduce) {
-				setShown(awarded)
-				setCounted(true)
-				return
-			}
-
-			animation = Animated.timing(value, {
-				toValue: awarded,
-				duration: COUNT_MS,
-				easing: Easing.out(Easing.cubic),
-				// The listener reads the value on JS, so no native driver.
-				useNativeDriver: false,
-			})
-			animation.start(({ finished }) => {
-				if (finished) setCounted(true)
-			})
-		})
-
-		return () => {
-			cancelled = true
-			animation?.stop()
-			value.removeListener(listener)
-		}
-	}, [awarded])
-
 	const levelName = level_up ? level?.name : undefined
-
-	useEffect(() => {
-		if (!counted || !levelName) return
-
-		Animated.timing(levelOpacity, {
-			toValue: 1,
-			duration: 250,
-			useNativeDriver: true,
-		}).start()
-	}, [counted, levelName, levelOpacity])
+	const { shown, counted, levelOpacity } = usePointsReveal(awarded, levelName)
 
 	const summary = [
 		awarded > 0 ? `Ganaste ${formatPoints(awarded)} puntos.` : null,
@@ -112,7 +59,9 @@ export function DuelPoints({ points }: DuelPointsProps) {
 
 			{/* Its own element, read after the points. Shown even at 0 points:
 			    it explains why none were given. */}
-			{season && <SeasonCaptureNotice season={season} awarded={awarded} />}
+			{season && (
+				<SeasonPointsNotice season={season} awarded={awarded} subject='carta' />
+			)}
 		</View>
 	)
 }

@@ -5,11 +5,11 @@ import modelTest from '@/assets/models/model_test.glb'
 import colors from '@/theme/colors'
 import type {
 	DuelAnswer,
-	DuelPoints,
 	DuelStart,
 	DuelSubmitResponse,
 	OwnedCard,
 } from '@/types/cards'
+import type { PointsAward } from '@/types/points'
 
 // Debug duel (EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1): a fake quiz, without QR or
 // AR, that ends in the real 3D view with a fake card. Graded here, never
@@ -89,7 +89,7 @@ export function createDebugDuel(attemptsLeft = MAX_ATTEMPTS): DuelStart {
 
 // Fake capture points, one case per debug win in turn, so every A-22 state
 // can be checked: points, level up, disabled rule (0) and an older server.
-const DEBUG_POINTS: (DuelPoints | null)[] = [
+const DEBUG_POINTS: (PointsAward | null)[] = [
 	{
 		awarded: 50,
 		total: 320,
