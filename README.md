@@ -46,7 +46,7 @@ You need Node.js with npm 11, JDK 17, the Android SDK and an Android phone. The 
 
 ### Node.js and npm
 
-We recommend [Volta](https://docs.volta.sh/guide/getting-started) to manage Node and npm versions. Use **npm 11**: the Expo CLI does not work properly with npm 12 yet.
+The project is pinned to **Node 24.22.3 and npm 11.21.3** (`volta` and `engines` in `package.json`). Use npm 11: the Expo CLI does not work properly with npm 12 yet. We recommend [Volta](https://docs.volta.sh/guide/getting-started), which switches to the pinned versions by itself inside the project.
 
 ```bash
 # Linux / macOS
@@ -56,7 +56,7 @@ curl https://get.volta.sh | bash
 winget install Volta.Volta
 
 # Then
-volta install node@24 npm@11
+volta install node@24.22.3 npm@11.21.3
 ```
 
 ### JDK 17
@@ -128,7 +128,9 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 | `npx expo start`               | Start the Metro dev server (`-c` clears its cache)                         |
 | `npm run android`              | Build and install the Android development build (`expo run:android`)       |
 | `npm run lint`                 | ESLint (must report 0 problems)                                            |
-| `npx tsc --noEmit`             | Type-check (must report 0 errors)                                          |
+| `npm run typecheck`            | Type-check, app and tests (must report 0 errors)                           |
+| `npm test`                     | Unit and integration tests (Jest); `npm test -- <path>` runs one file      |
+| `npm run test:ci`              | Tests with coverage, as CI runs them (report in `coverage/`)               |
 | `npx prettier --write <files>` | Format files (tabs, single quotes, no semicolons, sorted Tailwind classes) |
 | `npx expo install <package>`   | Add a dependency with the version that matches SDK 57                      |
 
