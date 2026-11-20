@@ -19,8 +19,8 @@ ZooApp is an Android app built with Expo development builds. Its interface is in
 - **Explore**: the home tab, with featured events and shortcuts to tickets, the map, species and donations.
 - **Map**: an interactive map of the zoo (MapLibre) with zones, points of interest, species and the visitor's location.
 - **Species**: a searchable catalog with a detail page for each animal.
-- **Tickets**: buy entry tickets and show them as QR codes.
-- **Donations**: donate to the zoo and see the donation history.
+- **Tickets**: buy entry tickets and show them as QR codes, with the points the purchase earned.
+- **Donations**: donate to the zoo, see the points earned and the donation history.
 - **ZooDeck**: collect animal cards, see them in 3D, in AR or in a 360° view, and download them for offline use.
 - **Duels**: scan a QR code at an enclosure and answer a quiz to win that animal's card.
 - **MiZoo**: the visitor's species, achievements and rewards.

@@ -179,13 +179,21 @@ On logout, `useDataRefresh().clearCache()` drops every cached response so nothin
   - [`packCrypto.ts`](../src/services/packCrypto.ts) verifies and decrypts AES-GCM `.bin` files.
   - Screens read progress through `usePackStatus()`; `OfflinePackSync` in the root layout runs the sync, and `deck/offline.tsx` shows its state.
 
-## Points seasons
+## Points
+
+Points are authoritative on the server. Each action that gives points (a duel win, a ticket order, a donation) awards them in its own request and returns the same `data.points` block (`PointsAward` in [`types/points.ts`](../src/types/points.ts)): `awarded`, `total`, `level`, `level_up` and the visible `season`. The app never adds points itself; after the action it revalidates the profile (`refreshProfile()`), so the header and MiZoo show the new total.
+
+- **Duel win**: `DuelPoints` in the victory dialog.
+- **Ticket order and donation**: [`PointsEarnedCard`](../src/components/points/PointsEarnedCard.tsx) under the success banner: the points counted up (`usePointsReveal`, shared with the duel), the total, the progress to the next level once the refreshed profile reports the new total, and a level-up badge. At 0 points there's no card, never "+0".
+- **Season notice**: `SeasonPointsNotice` explains what the season changed for that action ("Esta compra da 20 puntos en lugar de 10"). When `base_points` is `null` (rule off, donation under the server's minimum) it doesn't compare, so the season isn't blamed.
+
+### Points seasons
 
 The server can run one **points mode** at a time (a season or event) that changes what each point rule gives. When the zoo makes it visible, `GET /api/points/season` returns its notice; otherwise `null`. The app only explains it: points are always the ones the server returns with each action.
 
 - **Data**: [`services/points.ts`](../src/services/points.ts) + `usePointSeason()`; revalidated when the app returns to the foreground and on pull-to-refresh, never polled.
 - **Banner**: [`SeasonBanner`](../src/components/points/SeasonBanner.tsx) on Explore, MiZoo and ZooDeck, opening `points/season`. Closing it hides it on all three (`useSeasonDismissal`, stored with the hints in SecureStore) until a season with another title arrives. MiZoo's `LevelCard` keeps a `SeasonChip` so the details stay reachable, and closing it on Explore or ZooDeck shows `SeasonDismissedToast` to point there.
-- **Duel win**: with `data.points.season`, `DuelPoints` adds a `SeasonCaptureNotice` that explains the capture ("30 puntos en lugar de 50", or no points when the season turns the card off) with the zoo's `message`.
+- **Actions**: with `data.points.season`, the duel win and the ticket and donation success screens show `SeasonPointsNotice` (see above).
 - **Icon and color**: the server sends a catalog key and four hex tones. [`utils/pointSeason.ts`](../src/utils/pointSeason.ts) maps the key to a Hugeicons icon (unknown keys → `SparklesIcon`) and falls back to the brand tones when `color` is `null`. The tones are runtime values, so they go in `style`: `text` on `soft`, `on_accent` on `accent`.
 
 ## Styling and design system
