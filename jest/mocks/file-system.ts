@@ -213,16 +213,20 @@ export class DownloadTask {
 	}
 }
 
+const DEFAULT_DISK_SPACE = 10 * 1024 ** 3
+
 export const Paths = {
 	document: new Directory('document'),
 	cache: new Directory('cache'),
-	// Tests lower it to reach the "no space" path.
-	availableDiskSpace: 10 * 1024 ** 3,
+	availableDiskSpace: DEFAULT_DISK_SPACE,
 }
 
-const DEFAULT_DISK_SPACE = Paths.availableDiskSpace
-
 export const __fs = { files, dirs }
+
+// Read-only in expo-file-system's types; tests lower it to reach "no space".
+export function __setAvailableDiskSpace(bytes: number) {
+	Paths.availableDiskSpace = bytes
+}
 
 export function __reset() {
 	files.clear()

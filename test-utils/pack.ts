@@ -5,7 +5,12 @@ import { http, HttpResponse } from 'msw'
 import type { DeckCard } from '@/types/cards'
 import type { PackFile } from '@/types/pack'
 
-import { makeManifest } from './factories'
+import {
+	makeManifest,
+	makeOwnedCard,
+	makePackFile,
+	makeUnownedCard,
+} from './factories'
 import { API } from './server'
 
 const toHex = (bytes: Uint8Array) =>
@@ -42,6 +47,49 @@ export async function makeBin(plain: string | Uint8Array) {
 		bin,
 		keyBase64: toBase64(raw),
 		sha256: toHex(new Uint8Array(await crypto.subtle.digest('SHA-256', bin))),
+	}
+}
+
+// A card's 3D model as the pack has it: the catalog entry, its encrypted
+// .bin, and the card as /api/cards lists it (owned cards carry the key).
+export async function makePackedCard(
+	cardId: number,
+	{ owned = true, version = 'v1', plain = `model ${cardId}` } = {},
+) {
+	const { bin, keyBase64, sha256 } = await makeBin(plain)
+	const id = `${cardId}-${version}`
+	const file = makePackFile({
+		id,
+		card_id: cardId,
+		kind: 'model',
+		bytes: bin.length,
+		sha256,
+	})
+	const card: DeckCard = owned
+		? makeOwnedCard({
+				id: cardId,
+				pack: { model: { id, key: keyBase64 } },
+			})
+		: makeUnownedCard({ id: cardId })
+
+	return { file, bin, card, plain }
+}
+
+export type PackedCard = Awaited<ReturnType<typeof makePackedCard>>
+
+// Serves the catalog, the card list and the files of these cards.
+export function servePack(cards: PackedCard[]) {
+	const files = serveFiles(
+		Object.fromEntries(cards.map(({ file, bin }) => [file.url, bin])),
+	)
+
+	return {
+		handlers: [
+			serveManifest(cards.map(({ file }) => file)),
+			serveCards(cards.map(({ card }) => card)),
+			files.handler,
+		],
+		downloaded: files.downloaded,
 	}
 }
 

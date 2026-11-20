@@ -47,6 +47,9 @@ module.exports = {
 	testMatch: ['<rootDir>/__tests__/**/*.test.{ts,tsx}'],
 	// Spy calls never leak into the next test; implementations stay.
 	clearMocks: true,
+	// A screen's first render transforms its whole component tree, which
+	// takes longer than Jest's default 5 s on a cold cache (always in CI).
+	testTimeout: 30_000,
 	moduleNameMapper: {
 		// 3D assets registered in metro.config.js; Metro turns them into numbers.
 		'\\.(glb|gltf|obj|mtl|bin|vrx|hdr|arobject)$': '<rootDir>/jest/fileStub.js',
