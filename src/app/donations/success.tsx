@@ -4,12 +4,14 @@ import { useMemo } from 'react'
 import { ScrollView, Text } from 'react-native'
 
 import FixedFooter from '@/components/FixedFooter'
+import { PointsEarnedCard } from '@/components/points/PointsEarnedCard'
 import { Card } from '@/components/ui/Card'
 import { DetailRow } from '@/components/ui/DetailRow'
 import { Divider } from '@/components/ui/Divider'
 import { ListCard } from '@/components/ui/ListCard'
 import { SuccessBanner } from '@/components/ui/SuccessBanner'
 import type { Donation, PaymentMethod } from '@/types/donations'
+import type { PointsAward } from '@/types/points'
 import { formatCurrency } from '@/utils/format'
 import { useFixedFooterSpace } from '@/theme/layout'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
@@ -28,6 +30,7 @@ export default function DonationSuccessScreen() {
 	const params = useLocalSearchParams<{
 		donation?: string
 		amount?: string
+		points?: string
 	}>()
 
 	const donation = useMemo<Partial<Donation>>(() => {
@@ -45,6 +48,15 @@ export default function DonationSuccessScreen() {
 
 		return { amount: params.amount }
 	}, [params.donation, params.amount])
+
+	// Missing on older servers, or when it can't be read: no points shown.
+	const points = useMemo<PointsAward | null>(() => {
+		try {
+			return params.points ? (JSON.parse(params.points) as PointsAward) : null
+		} catch {
+			return null
+		}
+	}, [params.points])
 
 	const amount = donation.amount ?? params.amount ?? 0
 
@@ -77,6 +89,15 @@ export default function DonationSuccessScreen() {
 					title='¡Donación realizada!'
 					message='Gracias por apoyar al Zoológico Sahuatoba.'
 				/>
+
+				{/* PUNTOS: none under the server's minimum; then it just thanks */}
+				{points && (
+					<PointsEarnedCard
+						points={points}
+						subject='donación'
+						className='mb-3'
+					/>
+				)}
 
 				{/* MONTO DONADO Y DETALLE */}
 				<Card className='mb-3'>
