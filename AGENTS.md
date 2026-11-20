@@ -17,7 +17,8 @@ Expo SDK 57 · React Native 0.86 · expo-router (file routes in `src/app/`) · T
 | Task              | Command                                                                                           |
 | ----------------- | ------------------------------------------------------------------------------------------------- |
 | Lint (must be 0)  | `npm run lint`, or `npx eslint <files>` while working                                             |
-| Types (must be 0) | `npx tsc --noEmit`                                                                                |
+| Types (must be 0) | `npm run typecheck` (`tsc --noEmit`, app and tests)                                               |
+| Tests (must pass) | `npm test`, or `npm test -- <path>` while working; see "Tests" below                              |
 | Format            | `npx prettier --write <files>` (tabs, single quotes, no semicolons; Tailwind classes auto-sorted) |
 | Dev server        | `npx expo start` (`-c` clears the cache)                                                          |
 | Native build      | `npx expo run:android`, only after adding a native module or changing `app.json` plugins          |
@@ -64,9 +65,12 @@ src/
   global.css           Tailwind + type role classes (text-h1, text-body…)
 assets/models/         3D models for AR (.glb), typed in src/assets.d.ts
 docs/design/           Design PDFs (design-system.pdf, mobile-app.pdf)
+__tests__/             Jest tests, mirroring src/ paths (smoke/, services/, contexts/…)
+jest/                  Jest setup and in-memory mocks of native modules (mocks/)
+test-utils/            Test helpers: MSW server, render with providers, router mock, pack, factories
 ```
 
-Never put non-route files under `src/app/`: expo-router turns them into routes.
+Never put non-route files under `src/app/`: expo-router turns them into routes. That includes tests: they go in `__tests__/`.
 
 ## Code standards
 
@@ -118,6 +122,19 @@ Never put non-route files under `src/app/`: expo-router turns them into routes.
 - Is it in the design system, or used by more than one module? Then `src/components/ui/`, built to the spec.
 - Otherwise `src/components/<domain>/`.
 - Before writing markup, check whether `ui/` already has it (Button, Card, ListCard, IconBox, Chip, Badge, StatCard, DetailRow, Divider, SectionTitle, Notice, Modal, BottomSheet…). Extend with a variant or prop rather than copying.
+
+## Tests
+
+Jest (`jest-expo`) + React Native Testing Library + MSW 2. Details and examples in [CONTRIBUTING](CONTRIBUTING.md#automated-tests).
+
+- Files in `__tests__/<same path as src>/<name>.test.ts(x)`. Import test globals from `@jest/globals` (TypeScript 6 doesn't load `@types/jest` on its own).
+- Mock only native modules. SecureStore, NetInfo and `expo-file-system` are already in-memory fakes and expo-crypto runs on WebCrypto (`jest/setup.ts`); the network goes through MSW (`test-utils/server.ts`), and an unhandled request fails the test.
+- Per file when needed: `expo-router` (`test-utils/router.ts`), `react-native-safe-area-context/jest/mock`, `react-native-keyboard-controller/jest`, ViroReact, expo-camera, expo-location.
+- `packSync`, `packStore`, `cards` and `useArAvailability` keep state in the module: one stateful scenario per test file.
+- RNTL 14 is async: `await render`, `await renderHook`, `await fireEvent.press`. Modals open a frame later: `findBy*`.
+- A known bug gets a `test.failing` that names the issue. No snapshots.
+- `npm run test:ci` enforces the coverage thresholds in `jest.config.js`: raise `global` when coverage grows, never lower a threshold to make CI pass.
+- Never upgrade MSW to 3 (ESM only, doesn't load in Jest 29).
 
 ## Design references
 
@@ -176,7 +193,7 @@ Key App measurements:
 
 - Don't explore broadly. Find things with `grep -rn` / `git grep`, then read only the line ranges you need (Read with offset/limit, or `sed -n 'X,Yp'`). Large files: get an outline first with `grep -nE "^(export|function|const|type)|return \(" <file>`.
 - Prefer targeted edits over rewriting files. Move code as-is when refactoring.
-- Lint and type-check only touched files while working; run the full `npm run lint` and `npx tsc --noEmit` once before committing.
+- Lint and type-check only touched files while working; run the full `npm run lint`, `npm run typecheck` and `npm test` once before committing.
 - Don't re-read files you just edited, or PDF pages you already read; keep notes of the values you need.
 - Batch independent commands in one call. Keep replies short: what changed, what was verified, what's left.
 - Don't install packages or change native config without asking; both force a rebuild for the whole team.
@@ -224,7 +241,7 @@ The docs must describe the code as it is. When a change makes any of them wrong 
 
 ## Done means
 
-- `npm run lint` and `npx tsc --noEmit` both at 0.
+- `npm run lint` and `npm run typecheck` both at 0, and `npm test` passing.
 - UI changes checked on the device (or the reason they couldn't be).
 - No new hardcoded colors, sizes or duplicated markup that a `ui/` component already covers.
 - Docs updated if the change made them outdated (see "Keeping the docs current").

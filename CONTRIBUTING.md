@@ -15,8 +15,9 @@ This guide covers the workflow, the code standards and step-by-step recipes for 
    - [Add a component](#add-a-component)
    - [Add a package or native module](#add-a-package-or-native-module)
    - [Add a 3D model or AR scene](#add-a-3d-model-or-ar-scene)
-5. [Testing on a device](#testing-on-a-device)
-6. [Definition of done](#definition-of-done)
+5. [Automated tests](#automated-tests)
+6. [Testing on a device](#testing-on-a-device)
+7. [Definition of done](#definition-of-done)
 
 ## Setup
 
@@ -121,7 +122,8 @@ Key measurements: buttons and inputs 52dp (primary button with a 3px Bosque bott
 npx prettier --write <files>   # tabs, single quotes, no semicolons, sorted classes
 npx eslint <files>             # while working
 npm run lint                   # whole project, before committing
-npx tsc --noEmit               # whole project, before committing
+npm run typecheck              # whole project (app and tests), before committing
+npm test                       # all tests, before committing
 ```
 
 ## Recipes
@@ -385,6 +387,58 @@ Before writing Expo code, read the docs for the exact SDK version: <https://docs
 - **Lighting colors** in a scene aren't UI colors: mark them `// eslint-disable-next-line no-restricted-syntax -- AR light color`.
 - References: the [ViroReact docs](https://viro-community.readme.io/docs) and the types in `node_modules/@reactvision/react-viro`.
 
+## Automated tests
+
+Unit and integration tests run on Jest with the `jest-expo` preset, [React Native Testing Library](https://callstack.github.io/react-native-testing-library/) for components and hooks, and [MSW](https://mswjs.io/) 2 for the API. There are no end-to-end tests: AR, 3D and the maps are tested through the hooks and services around them.
+
+```bash
+npm test                                  # all tests
+npm test -- __tests__/services/duels      # one file or folder
+npm run test:ci                           # with coverage, as CI runs it
+```
+
+`npm run test:ci` fails when coverage drops below the thresholds in `jest.config.js`. The critical ZooDeck files have their own (the pack's encryption, storage and sync, duels, cards); `global` covers the rest. When your tests raise coverage, raise `global` too; never lower a threshold to make CI pass.
+
+**Where things are**
+
+- `__tests__/`: the tests, mirroring `src/` (`src/services/duels.ts` → `__tests__/services/duels.test.ts`). Never under `src/app/`, which expo-router would turn into routes.
+- `jest/setup.ts`: in-memory fakes of the native modules (`jest/mocks/`) and the MSW server lifecycle. Every test starts with an empty SecureStore, an empty file system, NetInfo online on Wi-Fi and no request handlers.
+- `test-utils/`: `server.ts` (MSW server and the `API` base URL), `render.tsx` (`renderWithProviders`, `renderHookWithProviders`, with an empty SWR cache per render), `router.ts` (expo-router mock with shared spies), `pack.ts` (encrypted `.bin` files and pack handlers) and `factories.ts` (cards, pack files, duels).
+
+**Writing a test**
+
+```tsx
+import { expect, test } from '@jest/globals'
+import { http, HttpResponse } from 'msw'
+
+import { startDuel } from '@/services/duels'
+
+import { API, server } from '../../test-utils/server'
+
+test('an owned card is a result, not an error', async () => {
+	server.use(
+		http.post(`${API}/duels`, () =>
+			HttpResponse.json(
+				{ message: 'Ya la tienes', data: { card: { id: 1 } } },
+				{ status: 409 },
+			),
+		),
+	)
+
+	await expect(startDuel('qr')).resolves.toMatchObject({ kind: 'owned' })
+})
+```
+
+- Import `describe`, `test`, `expect`, `jest`… from `@jest/globals`: TypeScript 6 doesn't load the Jest globals by itself, and `npm run typecheck` checks the tests too.
+- Mock only native modules. Screens that use expo-router mock it per file with `test-utils/router.ts`; screens with a keyboard-aware scroll also need `react-native-keyboard-controller/jest`, and anything using insets needs `react-native-safe-area-context/jest/mock`.
+- Network: `server.use(http.get(...))` in each test. A request without a handler fails the test, so nothing reaches a real server.
+- Simulate connectivity with `__setNetState(OFFLINE)` or `__setNetState(CELLULAR)` from `jest/mocks/netinfo.ts`.
+- `packSync`, `packStore`, `cards` and `useArAvailability` keep state in the module between tests in the same file, so each stateful scenario gets its own test file.
+- RNTL 14 is async: `await render(...)`, `await renderHook(...)`, `await fireEvent.press(...)`. Our `Modal` opens one frame later, so look for its content with `findBy*`.
+- Assert rejections with `await expect(promise).rejects…`, never a `.catch` without an assertion.
+- A known bug gets a `test.failing` that names its issue, so CI flags it as soon as it's fixed. No snapshots.
+- Don't upgrade MSW to 3: it's ESM-only and doesn't load in Jest 29.
+
 ## Testing on a device
 
 The app is tested on a real Android phone with the development build.
@@ -400,7 +454,7 @@ Keep screenshots and notes out of the repo.
 
 ## Definition of done
 
-- [ ] `npm run lint` reports 0 problems and `npx tsc --noEmit` reports 0 errors.
+- [ ] `npm run lint` reports 0 problems, `npm run typecheck` reports 0 errors and `npm test` passes.
 - [ ] The change matches the design PDFs and was checked on a phone (or the PR says why it couldn't be).
 - [ ] Loading, error, empty and offline states are handled for new data.
 - [ ] No hardcoded colors, sizes, or markup that a `ui/` component already covers.
