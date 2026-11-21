@@ -93,14 +93,14 @@ SafeAreaProvider → KeyboardProvider → DataProvider (SWR) → AuthProvider
 
 ### `api()` and errors
 
-[src/services/api.ts](../src/services/api.ts) is the only place that calls `fetch`.
+[src/services/api.ts](../src/services/api.ts) is the only place that calls `fetch`, except the avatar upload in `services/profile.ts` (multipart), which throws the same `NetworkError`.
 
 - `request(endpoint, options)` prefixes `EXPO_PUBLIC_API_URL + '/api'`, sets the JSON headers and adds `Authorization: Bearer <token>` from SecureStore.
-- `api<T>(endpoint, options)` calls `request` and parses the JSON body.
+- `api<T>(endpoint, options)` calls `request` and parses the JSON body. A success with no body (204) resolves to `undefined`.
 - Errors are typed:
-  - `NetworkError`: the request never reached the server (`isNetworkError(e)` tells them apart).
+  - `NetworkError`: the request never reached the server (`isNetworkError(e)` tells them apart). Nothing else counts as offline: a `TypeError` from the app's own code is a bug, not a lost connection.
   - `ApiValidationError` (422): `errors` holds per-field messages, ready for `TextField`'s `error` prop.
-  - `ApiError`: any other failed response, with `status` and optional `data`.
+  - `ApiError`: any other failed response, with `status` and optional `data`. A body that isn't JSON (an HTML error page, a truncated response) is an `ApiError` with the response's status.
 
 The token lives in [src/services/token.ts](../src/services/token.ts), separate from `auth.ts` to avoid a circular import.
 
