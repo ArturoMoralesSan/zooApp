@@ -4,7 +4,7 @@ import {
 	ShieldCheckIcon,
 } from '@hugeicons/core-free-icons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
 import FixedFooter from '@/components/FixedFooter'
@@ -60,9 +60,23 @@ export default function DonationsSummaryScreen() {
 
 	const { refreshDonations, refreshProfile } = useDataRefresh()
 
-	const confirmDonation = async () => {
-		if (loading) return
+	// Set synchronously: two taps in the same frame both see the state from
+	// the last render, and each would send a payment.
+	const submitting = useRef(false)
 
+	const confirmDonation = async () => {
+		if (submitting.current) return
+
+		submitting.current = true
+
+		try {
+			await sendDonation()
+		} finally {
+			submitting.current = false
+		}
+	}
+
+	const sendDonation = async () => {
 		if (amount < 10) {
 			setError('El monto mínimo de donación es de $10.00.')
 			return
