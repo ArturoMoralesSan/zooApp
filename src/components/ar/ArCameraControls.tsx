@@ -1,39 +1,34 @@
-import { CameraSmile01Icon, Refresh01Icon } from '@hugeicons/core-free-icons'
+import type { IconSvgElement } from '@hugeicons/react-native'
 import { Pressable, View } from 'react-native'
 
 import { RoundCameraButton } from '@/components/ar/RoundCameraButton'
 import { FocusRing, useFocusRing } from '@/components/ui/FocusRing'
 
-type ArCameraControlsProps = {
-	onReset: () => void
-	onShutter: () => void
-	onSelfie: () => void
+export type CameraAction = {
+	icon: IconSvgElement
+	label: string
+	onPress: () => void
+	tone: 'white' | 'lima'
 }
 
-// Controls over the camera (DS p.7, A-29): white reset, 76dp shutter and a
-// Lima selfie button.
+type ArCameraControlsProps = {
+	left: CameraAction
+	right: CameraAction
+	onShutter: () => void
+}
+
+// Controls over the camera (DS p.7): a round button on each side of the
+// 76dp shutter. A-29: reset · shutter · selfie; A-30: grid · shutter · AR.
 export function ArCameraControls({
-	onReset,
+	left,
+	right,
 	onShutter,
-	onSelfie,
 }: ArCameraControlsProps) {
 	return (
 		<View className='flex-row items-center justify-center gap-8'>
-			<RoundCameraButton
-				icon={Refresh01Icon}
-				label='Colocar de nuevo'
-				onPress={onReset}
-				tone='white'
-			/>
-
+			<RoundCameraButton {...left} />
 			<Shutter onPress={onShutter} />
-
-			<RoundCameraButton
-				icon={CameraSmile01Icon}
-				label='Selfie'
-				onPress={onSelfie}
-				tone='lima'
-			/>
+			<RoundCameraButton {...right} />
 		</View>
 	)
 }

@@ -1,13 +1,15 @@
 import {
+	CameraSmile01Icon,
 	CenterFocusIcon,
 	CubeIcon,
+	Refresh01Icon,
 	Rotate360Icon,
 	Touch01Icon,
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, BackHandler, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -18,11 +20,13 @@ import {
 } from '@/components/ar/ModelPlacementScene'
 import { RoundCameraButton } from '@/components/ar/RoundCameraButton'
 import { SurfaceDetectedPill } from '@/components/ar/SurfaceDetectedPill'
+import { PhotoReview } from '@/components/ar/PhotoReview'
 import { SurfaceOffer } from '@/components/ar/SurfaceOffer'
 import { Viewer360, type Viewer360Handle } from '@/components/ar/Viewer360'
 import { CardStats } from '@/components/deck/CardStats'
 import BackButton from '@/components/ui/BackButton'
 import { CameraNotice } from '@/components/ui/CameraNotice'
+import Toast from '@/components/ui/Toast'
 import {
 	type ArAvailability,
 	useArAvailability,
@@ -32,13 +36,12 @@ import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSurfaceOffer } from '@/hooks/useSurfaceOffer'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
+import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
 
 type Phase = 'placing' | 'loading' | 'placed' | 'error'
 type View360Status = 'loading' | 'loaded' | 'error'
-
-const noop = () => {}
 
 // Why the 360° view opened on its own, before its instructions.
 const REASONS: Partial<Record<ArAvailability, string>> = {
@@ -47,8 +50,8 @@ const REASONS: Partial<Record<ArAvailability, string>> = {
 }
 
 // AR view of an owned card's animal (A-28 → A-29): find a surface, tap to
-// place it at life size, and reset to place it again. The shutter and the
-// selfie button are placeholders for now. Without AR (unsupported phone,
+// place it at life size, and reset to place it again, take a photo (A-31 →
+// A-32) or switch to the selfie. Without AR (unsupported phone,
 // camera denied, or no surface found) the animal shows in the Vista 360°.
 export default function CardArScreen() {
 	// `mode` is the card view's mode, restored when going back.
@@ -84,6 +87,10 @@ export default function CardArScreen() {
 	// is read by the pending switch, the state by the overlay.
 	const leavingRef = useRef(false)
 	const [leaving, setLeaving] = useState(false)
+	const navigatorRef = useRef<ViroARSceneNavigator>(null)
+	// The shot under review (A-31), and whether taking one failed.
+	const [shot, setShot] = useState<string | null>(null)
+	const [shotFailed, setShotFailed] = useState(false)
 	const backHref =
 		`/deck/${id}?mode=${mode === 'model' ? 'model' : 'card'}` as const
 
@@ -122,6 +129,52 @@ export default function CardArScreen() {
 			arExit.exit(back)
 		}
 	}, [arExit, view360Exit, view, backHref])
+
+	// Selfie (A-30) runs its own AR session: this one closes first.
+	const openSelfie = () => {
+		leavingRef.current = true
+		setLeaving(true)
+		arExit.exit(() =>
+			router.replace(`/deck/selfie/${id}?mode=${mode ?? 'card'}&from=ar`),
+		)
+	}
+
+	// Shots left by a flow that didn't finish (the app closed midway).
+	useEffect(() => clearPhotos(), [])
+
+	const takePhoto = async () => {
+		if (!navigatorRef.current) return
+
+		try {
+			setShot(await takeArPhoto(navigatorRef.current))
+		} catch {
+			setShotFailed(true)
+		}
+	}
+
+	const retake = () => {
+		if (shot) deletePhoto(shot)
+		setShot(null)
+	}
+
+	// The framed photo goes to the share screen (A-32), once the AR session
+	// has been released.
+	const keepPhoto = (framed: string) => {
+		if (shot) deletePhoto(shot)
+		leavingRef.current = true
+		setLeaving(true)
+		arExit.exit(() =>
+			router.replace({
+				pathname: '/deck/photo',
+				params: {
+					uri: framed,
+					id,
+					mode: mode === 'model' ? 'model' : 'card',
+					camera: 'ar',
+				},
+			}),
+		)
+	}
 
 	const switchTo360 = () =>
 		arExit.exit(() => {
@@ -174,6 +227,7 @@ export default function CardArScreen() {
 
 			{showAr && (
 				<ViroARSceneNavigator
+					ref={navigatorRef}
 					autofocus
 					initialScene={{ scene: ModelPlacementScene }}
 					viroAppProps={sceneProps}
@@ -300,15 +354,41 @@ export default function CardArScreen() {
 					(phase === 'placing' ? (
 						planeFound && <SurfaceDetectedPill />
 					) : (
-						// Shutter and selfie aren't built yet.
 						<ArCameraControls
-							onReset={placeAgain}
-							onShutter={noop}
-							onSelfie={noop}
+							left={{
+								icon: Refresh01Icon,
+								label: 'Colocar de nuevo',
+								onPress: placeAgain,
+								tone: 'white',
+							}}
+							onShutter={() => void takePhoto()}
+							right={{
+								icon: CameraSmile01Icon,
+								label: 'Selfie',
+								onPress: openSelfie,
+								tone: 'lima',
+							}}
 						/>
 					))
 				)}
 			</View>
+
+			<PhotoReview
+				uri={shot}
+				name={name}
+				area={card?.category_name ?? null}
+				onRetake={retake}
+				onUse={keepPhoto}
+				onError={() => setShotFailed(true)}
+			/>
+
+			<Toast
+				visible={shotFailed}
+				type='error'
+				title='No se pudo tomar la foto'
+				message='Inténtalo de nuevo. Si sigue fallando, vuelve a abrir la cámara.'
+				onHide={() => setShotFailed(false)}
+			/>
 		</View>
 	)
 }

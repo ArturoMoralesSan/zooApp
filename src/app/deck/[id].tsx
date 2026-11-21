@@ -31,8 +31,6 @@ import type { OwnedCard } from '@/types/cards'
 import { rarityLabel } from '@/utils/cards'
 import { DEBUG_CARD, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
-const noop = () => {}
-
 // A-26 (card) and A-27 (model): one screen with a view switch and a
 // carousel of the user's other cards.
 export default function CardViewScreen() {
@@ -244,11 +242,17 @@ export default function CardViewScreen() {
 											onChange={setMode}
 											className='mt-1'
 										/>
-										{/* Selfie isn't built yet. */}
 										<RoundAction
 											icon={CameraSmile01Icon}
 											label='Selfie'
-											onPress={noop}
+											// Replace, like AR: one Viro view at a time.
+											onPress={() =>
+												exit(() =>
+													router.replace(
+														`/deck/selfie/${card.id}?mode=${mode}&from=card`,
+													),
+												)
+											}
 										/>
 									</View>
 

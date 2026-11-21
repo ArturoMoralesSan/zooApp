@@ -384,6 +384,8 @@ Before writing Expo code, read the docs for the exact SDK version: <https://docs
 - **Plane placement**: forward the scene's anchor events to `ViroARPlaneSelector` through its ref (`handleAnchorFound/Updated/Removed`).
 - **UI over the camera** is regular React Native in an absolutely positioned layer: dark panel at 82%, white 48–56dp buttons, 76dp shutter (design system p.7).
 - **Fallback**: use `useArAvailability()` and show the 360° view when AR isn't available.
+- **Gestures** on a Viro view outside plane AR go through a `PanResponder` layer above it (see `useModelGestures`). Copy `gestureState.dx/dy` and the touches when the event arrives: PanResponder reuses that object, so a state updater that reads it later gets wrong values.
+- **Photos**: take them with the AR navigator's `_takeScreenshot` and hand them to `services/photo.ts` (`takeArPhoto`, `PhotoReview`), so they stay in the cache folder that the flow clears.
 - **Lighting colors** in a scene aren't UI colors: mark them `// eslint-disable-next-line no-restricted-syntax -- AR light color`.
 - References: the [ViroReact docs](https://viro-community.readme.io/docs) and the types in `node_modules/@reactvision/react-viro`.
 
