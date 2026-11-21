@@ -73,7 +73,7 @@ module.exports = {
 	],
 	// ZooDeck, plus the points pieces it shares with tickets and donations.
 	collectCoverageFrom: [
-		'src/services/{cards,duels,location,pack,packCrypto,packStore,packSync}.ts',
+		'src/services/{cards,duels,location,pack,packCrypto,packStore,packSync,photo}.ts',
 		'src/contexts/DuelContext.tsx',
 		'src/hooks/{useCards,useCardAsset,usePackStatus,usePackSync,useOfflinePackPrompts,useZooDeckMap,useArAvailability,useViroHandoff,useSurfaceOffer}.ts',
 		'src/utils/{cards,zoodeck,zoodeckDebug,offlinePack}.ts',
