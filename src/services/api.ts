@@ -33,7 +33,7 @@ export class ApiValidationError extends ApiError {
 }
 
 // fetch() rejects with a TypeError when the request never reaches the
-// server (no network, DNS, timeout); api() rethrows it as NetworkError.
+// server (no network, DNS, timeout); request() rethrows it as NetworkError.
 export class NetworkError extends Error {
 	constructor() {
 		super('Sin conexión')
@@ -42,8 +42,9 @@ export class NetworkError extends Error {
 }
 
 // Tells a failed connection apart from an error the server answered with.
+// Only NetworkError: any other TypeError is a bug, not a lost connection.
 export function isNetworkError(error: unknown) {
-	return error instanceof NetworkError || error instanceof TypeError
+	return error instanceof NetworkError
 }
 
 // Sends a request with the JSON headers and the session token, and returns
