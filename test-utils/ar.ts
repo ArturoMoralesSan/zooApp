@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals'
+import { Component } from 'react'
 
 // ViroReact and expo-camera for useArAvailability. Mock them per file,
 // lazily (without a factory, importing ViroReact fails: it ships JSX):
@@ -9,6 +10,9 @@ import { jest } from '@jest/globals'
 //     ).viroMock,
 //   )
 //   jest.mock('expo-camera', () => ... .expoCameraMock)
+//
+// Screens with an AR view also take ViroARSceneNavigatorStub (spread it in
+// with viroMock as ViroARSceneNavigator).
 type Support = { isARSupported: boolean }
 
 export const viroMock = {
@@ -32,3 +36,27 @@ export const expoCameraMock = {
 }
 
 export const arcoreState = (state: string) => new Error(state)
+
+type ScreenshotResult = { success: boolean; url?: string; errorCode?: number }
+
+// What the stub's _takeScreenshot answers: where Viro left the shot.
+export const arScreenshot = jest.fn(async (): Promise<ScreenshotResult> => ({
+	success: true,
+	url: '/mock/cache/viro.jpg',
+}))
+
+type StubProps = { viroAppProps?: { onModelReady?: () => void } }
+
+// ViroARSceneNavigator without a native view: renders nothing, reports the
+// scene's model as loaded and takes "screenshots" (arScreenshot).
+export class ViroARSceneNavigatorStub extends Component<StubProps> {
+	componentDidMount() {
+		this.props.viroAppProps?.onModelReady?.()
+	}
+
+	_takeScreenshot = () => arScreenshot()
+
+	render() {
+		return null
+	}
+}

@@ -100,6 +100,7 @@ module.exports = {
 		'./src/services/pack.ts': { lines: 100, branches: 100 },
 		'./src/services/packStore.ts': { lines: 90 },
 		'./src/services/packSync.ts': { lines: 85 },
+		'./src/services/photo.ts': { lines: 100, branches: 90 },
 		'./src/contexts/DuelContext.tsx': { lines: 90 },
 		'./src/utils/offlinePack.ts': { lines: 100, branches: 100 },
 		'./src/utils/zoodeck.ts': { lines: 100, branches: 100 },

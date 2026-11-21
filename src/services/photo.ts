@@ -25,6 +25,10 @@ export type ScreenshotSource = {
 
 type ScreenshotResult = { success?: boolean; url?: string; errorCode?: number }
 
+// Unique within a run, even for two shots in the same millisecond.
+let shots = 0
+const shotName = (kind: string) => `${kind}-${Date.now()}-${++shots}`
+
 const asFileUri = (path: string) =>
 	path.startsWith('file://') ? path : `file://${path}`
 
@@ -42,7 +46,7 @@ function keep(path: string, name: string) {
 
 // The AR view as it looks now: camera and animal, without the controls.
 export async function takeArPhoto(source: ScreenshotSource) {
-	const name = `ar-${Date.now()}`
+	const name = shotName('ar')
 	const result = (await source._takeScreenshot(name, false)) as
 		ScreenshotResult | undefined
 
@@ -61,7 +65,7 @@ export async function captureFrame(view: RefObject<View | null>) {
 		result: 'tmpfile',
 	})
 
-	return keep(path, `zoo-${Date.now()}`)
+	return keep(path, shotName('zoo'))
 }
 
 // Write-only access: the app adds photos but never reads the gallery.
