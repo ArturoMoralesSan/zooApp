@@ -7,23 +7,26 @@ import {
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ActivityIndicator, BackHandler, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { ArCameraControls } from '@/components/ar/ArCameraControls'
 import { CameraGrid } from '@/components/ar/CameraGrid'
 import { CameraLabel } from '@/components/ar/CameraLabel'
+import { PhotoReview } from '@/components/ar/PhotoReview'
 import { SelfieScene, type SelfieSceneProps } from '@/components/ar/SelfieScene'
 import BackButton from '@/components/ui/BackButton'
 import { CameraNotice } from '@/components/ui/CameraNotice'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
+import Toast from '@/components/ui/Toast'
 import { useArAvailability } from '@/hooks/useArAvailability'
 import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
 import { type ModelTransform, useModelGestures } from '@/hooks/useModelGestures'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
+import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
 
@@ -73,7 +76,9 @@ export default function SelfieScreen() {
 	// better than the animation. A tap plays it.
 	const [playing, setPlaying] = useState(false)
 	const [grid, setGrid] = useState(false)
-	const [capture, setCapture] = useState<string | null>(null)
+	// The shot under review (A-31), and whether taking one failed.
+	const [shot, setShot] = useState<string | null>(null)
+	const [failed, setFailed] = useState(false)
 	const navigatorRef = useRef<ViroARSceneNavigator>(null)
 
 	// The gesture hint shows until the animal is moved or tapped.
@@ -141,19 +146,41 @@ export default function SelfieScreen() {
 		[modelUrl, playing, transform],
 	)
 
-	// TEMP: replaced by the photo review in the next step.
+	// Shots left by a flow that didn't finish (the app closed midway).
+	useEffect(() => clearPhotos(), [])
+
 	const takePhoto = async () => {
+		if (!navigatorRef.current) return
+
 		try {
-			const result = (await navigatorRef.current?._takeScreenshot(
-				`selfie-${Date.now()}`,
-				false,
-			)) as { success?: boolean; url?: string; errorCode?: number } | undefined
-			setCapture(
-				result?.success ? `${result.url}` : `error ${result?.errorCode}`,
-			)
-		} catch (error) {
-			setCapture(`error: ${String(error)}`)
+			setShot(await takeArPhoto(navigatorRef.current))
+		} catch {
+			setFailed(true)
 		}
+	}
+
+	const retake = () => {
+		if (shot) deletePhoto(shot)
+		setShot(null)
+	}
+
+	// The framed photo goes to the share screen (A-32), once the AR session
+	// has been released.
+	const keepPhoto = (framed: string) => {
+		if (shot) deletePhoto(shot)
+
+		exit(() =>
+			router.replace({
+				pathname: '/deck/photo',
+				params: {
+					uri: framed,
+					id,
+					mode: modeParam,
+					camera: 'selfie',
+					from: from ?? 'card',
+				},
+			}),
+		)
 	}
 
 	const name = card?.name ?? 'el animal'
@@ -248,12 +275,6 @@ export default function SelfieScreen() {
 					<View pointerEvents='none' className='mt-4'>
 						{notice}
 					</View>
-
-					{capture && (
-						<Text className='text-meta mt-2 bg-blanco' selectable>
-							{capture}
-						</Text>
-					)}
 				</View>
 
 				{ready && (
@@ -274,6 +295,23 @@ export default function SelfieScreen() {
 					/>
 				)}
 			</View>
+
+			<PhotoReview
+				uri={shot}
+				name={name}
+				area={card?.category_name ?? null}
+				onRetake={retake}
+				onUse={keepPhoto}
+				onError={() => setFailed(true)}
+			/>
+
+			<Toast
+				visible={failed}
+				type='error'
+				title='No se pudo tomar la foto'
+				message='Inténtalo de nuevo. Si sigue fallando, vuelve a abrir la cámara.'
+				onHide={() => setFailed(false)}
+			/>
 		</View>
 	)
 }
