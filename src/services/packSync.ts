@@ -25,6 +25,7 @@ import {
 	type UserIndex,
 	userDir,
 	wipePacks,
+	wipeOtherUsers,
 	wipeUser,
 	writePackIndex,
 	writeUserIndex,
@@ -907,6 +908,8 @@ export async function setPackUser(id: number) {
 		wipeUser(previous)
 		clearDuelCache()
 	}
+
+	wipeOtherUsers(id)
 
 	userId = id
 	await setLastUserId(id)

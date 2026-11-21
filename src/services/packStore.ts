@@ -171,7 +171,29 @@ export function wipeUser(userId: number) {
 
 		if (dir.exists) dir.delete()
 	} catch {
-		// Leftovers are overwritten on the next login of the same user.
+		// Left for wipeOtherUsers on the next login.
+	}
+}
+
+// Every other account's copies, on login: a wipe that failed at logout
+// (a file still open, a full disk) must not hand them to the next account.
+export function wipeOtherUsers(userId: number) {
+	try {
+		if (!cardsRoot.exists) return
+
+		for (const entry of cardsRoot.list()) {
+			if (entry.name !== String(userId)) wipeEntry(entry)
+		}
+	} catch {
+		// Tried again on the next login.
+	}
+}
+
+function wipeEntry(entry: File | Directory) {
+	try {
+		entry.delete()
+	} catch {
+		// One locked folder doesn't keep the others.
 	}
 }
 

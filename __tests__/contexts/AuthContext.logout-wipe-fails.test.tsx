@@ -10,36 +10,31 @@ import { renderHookWithProviders } from '../../test-utils/render'
 import { API, server } from '../../test-utils/server'
 import { seedSignedInUser, serveCurrentUser } from '../../test-utils/session'
 
-// Known bug Z-R2: packStore.wipeUser ignores a failed
-// delete ("leftovers are overwritten on the next login of the same user"),
-// so if another account signs in next, the previous user's decrypted cards
-// stay on the phone. Remove `.failing` once they're removed or retried.
-test.failing(
-	"a failed wipe on logout doesn't leave the cards for the next account",
-	async () => {
-		const { user, cards } = await seedSignedInUser()
+// Z-R2: a wipe that fails at logout (a file still open) must not leave the
+// user's decrypted cards for the next account on this phone.
+test("a failed wipe on logout doesn't leave the cards for the next account", async () => {
+	const { user, cards } = await seedSignedInUser()
 
-		server.use(
-			serveCurrentUser(user),
-			http.post(`${API}/logout`, () => HttpResponse.json({ success: true })),
-		)
+	server.use(
+		serveCurrentUser(user),
+		http.post(`${API}/logout`, () => HttpResponse.json({ success: true })),
+	)
 
-		const { result } = await renderHookWithProviders(() => useAuth(), {
-			auth: true,
-		})
+	const { result } = await renderHookWithProviders(() => useAuth(), {
+		auth: true,
+	})
 
-		await waitFor(() => expect(result.current.user?.id).toBe(user.id))
+	await waitFor(() => expect(result.current.user?.id).toBe(user.id))
 
-		// The user's folder is locked once, e.g. a file still open.
-		jest.spyOn(Directory.prototype, 'delete').mockImplementationOnce(() => {
-			throw new Error('Directory is in use')
-		})
+	// The user's folder is locked once, e.g. a file still open.
+	jest.spyOn(Directory.prototype, 'delete').mockImplementationOnce(() => {
+		throw new Error('Directory is in use')
+	})
 
-		await act(() => result.current.logout())
+	await act(() => result.current.logout())
 
-		// Another account signs in on the same phone.
-		await setPackUser(user.id + 1)
+	// Another account signs in on the same phone.
+	await setPackUser(user.id + 1)
 
-		expect(cards.exists).toBe(false)
-	},
-)
+	expect(cards.exists).toBe(false)
+})

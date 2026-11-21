@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect, jest, test } from '@jest/globals'
 import { Directory, File, Paths } from 'expo-file-system'
 
 import {
@@ -9,6 +9,7 @@ import {
 	readPackIndex,
 	readStoredCards,
 	readUserIndex,
+	wipeOtherUsers,
 	wipePacks,
 	wipeUser,
 	writePackIndex,
@@ -116,6 +117,32 @@ describe('wiping', () => {
 
 	test('wipeUser of a user without copies does nothing', () => {
 		expect(() => wipeUser(9)).not.toThrow()
+	})
+
+	test('wipeOtherUsers keeps the account signing in and deletes the rest', () => {
+		write(new File(userDir(7), '1-model-v1.glb'), 'plain model')
+		write(new File(userDir(8), '2-model-v1.glb'), 'plain model')
+		write(new File(userDir(9), '3-model-v1.glb'), 'plain model')
+		write(new File(packs(), 'v1.bin'), 'encrypted')
+		// One account's folder is locked: the others still go.
+		jest.spyOn(Directory.prototype, 'delete').mockImplementationOnce(() => {
+			throw new Error('Directory is in use')
+		})
+
+		wipeOtherUsers(8)
+
+		expect([userDir(7), userDir(9)].filter((dir) => dir.exists)).toHaveLength(1)
+		expect(new File(userDir(8), '2-model-v1.glb').exists).toBe(true)
+		expect(new File(packs(), 'v1.bin').exists).toBe(true)
+
+		wipeOtherUsers(8)
+
+		expect(userDir(7).exists).toBe(false)
+		expect(userDir(9).exists).toBe(false)
+	})
+
+	test('wipeOtherUsers without any copies does nothing', () => {
+		expect(() => wipeOtherUsers(8)).not.toThrow()
 	})
 
 	test('wipePacks deletes the encrypted files and keeps the copies', () => {
