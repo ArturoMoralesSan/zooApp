@@ -6,7 +6,7 @@ import type {
 	User,
 } from '@/types/user'
 
-import { API_URL, api } from './api'
+import { API_URL, api, NetworkError } from './api'
 import { getToken } from './token'
 
 export const profileKeys = {
@@ -37,14 +37,21 @@ export async function updateAvatar(file: Blob): Promise<AvatarResponse> {
 	const formData = new FormData()
 	formData.append('avatar', file)
 
-	const response = await fetch(`${API_URL}${profileKeys.avatar}`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			...(token ? { Authorization: `Bearer ${token}` } : {}),
-		},
-		body: formData,
-	})
+	let response: Response
+
+	try {
+		response = await fetch(`${API_URL}${profileKeys.avatar}`, {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				...(token ? { Authorization: `Bearer ${token}` } : {}),
+			},
+			body: formData,
+		})
+	} catch {
+		// Never reached the server, as in request().
+		throw new NetworkError()
+	}
 
 	const responseText = await response.text()
 
