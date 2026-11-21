@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 
 import FixedFooter from '@/components/FixedFooter'
@@ -89,9 +89,23 @@ export default function TicketSummaryScreen() {
 
 	const totalTickets = summary.reduce((sum, item) => sum + item.quantity, 0)
 
-	const confirmPurchase = async () => {
-		if (purchasing) return
+	// Set synchronously: two taps in the same frame both see the state from
+	// the last render, and each would send a payment.
+	const submitting = useRef(false)
 
+	const confirmPurchase = async () => {
+		if (submitting.current) return
+
+		submitting.current = true
+
+		try {
+			await sendPurchase()
+		} finally {
+			submitting.current = false
+		}
+	}
+
+	const sendPurchase = async () => {
 		// The footer button is disabled while there are no tickets.
 		if (summary.length === 0) return
 
