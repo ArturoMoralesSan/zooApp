@@ -75,11 +75,16 @@ export function Viewer360({
 				onPanResponderTerminationRequest: () => false,
 				onPanResponderGrant: () =>
 					setDrag((previous) => ({ ...previous, from: previous.yaw })),
-				onPanResponderMove: (_event, gesture) =>
+				onPanResponderMove: (_event, gesture) => {
+					// Copied now: PanResponder reuses and resets this object, and
+					// the updater may run after the release zeroes it.
+					const { dx } = gesture
+
 					setDrag((previous) => ({
 						...previous,
-						yaw: (previous.from ?? previous.yaw) + gesture.dx * YAW_PER_PX,
-					})),
+						yaw: (previous.from ?? previous.yaw) + dx * YAW_PER_PX,
+					}))
+				},
 				onPanResponderRelease: () =>
 					setDrag((previous) => ({ ...previous, from: null })),
 				onPanResponderTerminate: () =>

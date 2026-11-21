@@ -104,23 +104,28 @@ export function CardViewerFrame({
 						...previous,
 						dragFrom: previous.rotations[viewKey] ?? start,
 					})),
-				onPanResponderMove: (_event, gesture) =>
+				onPanResponderMove: (_event, gesture) => {
+					// Copied now: PanResponder reuses and resets this object, and
+					// the updater may run after the release zeroes it.
+					const { dx, dy } = gesture
+
 					setTurns((previous) => {
 						const [pitch, yaw] =
 							previous.dragFrom ?? previous.rotations[viewKey] ?? start
 						const nextPitch = Math.max(
 							-MAX_PITCH,
-							Math.min(MAX_PITCH, pitch + gesture.dy * PITCH_PER_PX),
+							Math.min(MAX_PITCH, pitch + dy * PITCH_PER_PX),
 						)
 
 						return {
 							...previous,
 							rotations: {
 								...previous.rotations,
-								[viewKey]: [nextPitch, yaw + gesture.dx * YAW_PER_PX],
+								[viewKey]: [nextPitch, yaw + dx * YAW_PER_PX],
 							},
 						}
-					}),
+					})
+				},
 				onPanResponderRelease: (_event, gesture) => {
 					setTurns((previous) => ({ ...previous, dragFrom: null }))
 
