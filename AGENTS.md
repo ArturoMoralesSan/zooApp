@@ -46,7 +46,8 @@ src/
     index → splash     Session check, then (tabs) or login; login, register, forgot-password
     (tabs)/            Tab bar: index (Explore), mizoo, zoodeek (ZooDeck), panel; ar is hidden
     tickets/ donations/ species/   Stack screens per module
-    deck/              Card collection: index, [id] (3D), ar/[id], map (duel map), offline (pack)
+    deck/              Card collection: index, [id] (3D), ar/[id], selfie/[id], photo (share),
+                       map (duel map), offline (pack)
     duel/              _layout (DuelProvider): scan → play → review, debug
     points/            season: what the active points season changes
     map.tsx profile.tsx +not-found.tsx
@@ -129,7 +130,7 @@ Jest (`jest-expo`) + React Native Testing Library + MSW 2. Details and examples 
 
 - Files in `__tests__/<same path as src>/<name>.test.ts(x)`. Import test globals from `@jest/globals` (TypeScript 6 doesn't load `@types/jest` on its own).
 - Mock only native modules. SecureStore, NetInfo and `expo-file-system` are already in-memory fakes and expo-crypto runs on WebCrypto (`jest/setup.ts`); the network goes through MSW (`test-utils/server.ts`), and an unhandled request fails the test.
-- Per file when needed: `expo-router` (`test-utils/router.ts`), `react-native-safe-area-context/jest/mock`, `react-native-keyboard-controller/jest`, ViroReact, expo-camera, expo-location.
+- Per file when needed: `expo-router` (`test-utils/router.ts`), `react-native-safe-area-context/jest/mock`, `react-native-keyboard-controller/jest`, ViroReact (`test-utils/ar.ts`, with `ViroARSceneNavigatorStub` for AR screens), expo-camera, expo-location. Anything importing `services/photo` also mocks `react-native-view-shot`, `expo-media-library` and `expo-sharing`.
 - `packSync`, `packStore`, `cards` and `useArAvailability` keep state in the module: one stateful scenario per test file.
 - RNTL 14 is async: `await render`, `await renderHook`, `await fireEvent.press`. Modals open a frame later: `findBy*`.
 - A known bug gets a `test.failing` that names the issue. No snapshots.
@@ -185,6 +186,8 @@ Key App measurements:
   - define scene components at module level, never inline in render, and pass them to `ViroARSceneNavigator`'s `initialScene`
   - pass data in with `viroAppProps`, not closures
   - UI over the camera (instructions, shutter, buttons) is regular React Native in an absolutely positioned layer above the navigator, styled per design system p.7: dark panel at 82%, white 48–56dp buttons, 76dp shutter
+- **Selfie and photos:** the selfie is ARCore on the front camera (`frontCameraEnabled`): no planes, the animal stands at a fixed spot. Don't use `ViroCameraTexture` (no Android native code, it crashes). Photos come from the AR navigator's `_takeScreenshot` and stay in `cache/photos/` through `services/photo.ts`, never uploaded.
+- **Gestures:** outside rear-camera plane AR, drags go through a `PanResponder` layer above the view. Copy `gestureState.dx/dy` and the touches when the event arrives: PanResponder reuses the object, and a state updater that reads it later gets wrong values.
 - **Placement:** with `ViroARPlaneSelector`, forward the scene's anchor events to it through its ref (`handleAnchorFound/Updated/Removed`), and place the model at the selected plane.
 - **Models:** keep them small (a few MB, few draw calls), set `scale` explicitly, show a loading state while they load, and handle `onError`. Remove debug `console.log`s before committing.
 - **Lint:** light colors in a scene are 3D lighting, not UI. Mark them with `// eslint-disable-next-line no-restricted-syntax -- AR light color` instead of using palette tokens.
