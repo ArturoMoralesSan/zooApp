@@ -71,7 +71,7 @@ module.exports = {
 		'/node_modules/react-native-reanimated/plugin/',
 		'/node_modules/@react-native/babel-preset/',
 	],
-	// ZooDeck only: the module these tests cover so far.
+	// ZooDeck, plus the points pieces it shares with tickets and donations.
 	collectCoverageFrom: [
 		'src/services/{cards,duels,location,pack,packCrypto,packStore,packSync}.ts',
 		'src/contexts/DuelContext.tsx',
@@ -80,6 +80,9 @@ module.exports = {
 		'src/app/(tabs)/zoodeek.tsx',
 		'src/app/{deck,duel}/**/*.tsx',
 		'src/components/{deck,duel,zoodeck,ar}/*.tsx',
+		'src/hooks/usePointsReveal.ts',
+		'src/utils/pointSeason.ts',
+		'src/components/points/{PointsEarnedCard,SeasonPointsNotice}.tsx',
 	],
 	// Checked by `npm run test:ci`. Files whose logic is fully reachable keep
 	// their full coverage; packSync's remaining branches are file-system
@@ -88,7 +91,7 @@ module.exports = {
 	// ones aren't unit-tested). It's the value measured when the thresholds
 	// were set: raise it as coverage grows, never lower it.
 	coverageThreshold: {
-		global: { lines: 25, statements: 25, functions: 25, branches: 24 },
+		global: { lines: 27, statements: 27, functions: 27, branches: 27 },
 		'./src/services/packCrypto.ts': { lines: 100, branches: 100 },
 		// visitReason's ApiError guard (duels.ts:32) can't be reached from
 		// startDuel, which rethrows anything else first.

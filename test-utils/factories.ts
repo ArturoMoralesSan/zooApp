@@ -7,6 +7,7 @@ import type {
 } from '@/types/cards'
 import type { ZooDeckCard } from '@/types/map'
 import type { PackFile, PackManifest } from '@/types/pack'
+import type { PointsAward } from '@/types/points'
 import type { User } from '@/types/user'
 
 export function makeZooDeckCard(
@@ -22,6 +23,20 @@ export function makeZooDeckCard(
 		can_duel: true,
 		reason: null,
 		qr_codes: [],
+		...overrides,
+	}
+}
+
+// Points a ticket order, donation or duel win gave, as the server sends them.
+export function makePointsAward(
+	overrides: Partial<PointsAward> = {},
+): PointsAward {
+	return {
+		awarded: 10,
+		total: 310,
+		level: { id: 2, name: 'Plata' },
+		level_up: false,
+		season: null,
 		...overrides,
 	}
 }

@@ -164,9 +164,14 @@ export function formatSeasonPoints(points: number): string {
 	return points === 0 ? 'Sin puntos' : `${points.toLocaleString('es-MX')} pts`
 }
 
-// Why a won card gave what it gave, or null when the season didn't change
-// it (same points, or a rarity that never gives any).
-export function seasonCaptureText(
+// What the season changed in an action's points.
+export type PointsSubject = 'carta' | 'compra' | 'donación'
+
+// Why an action gave what it gave ("Esta compra da 20 puntos en lugar de
+// 10."), or null when the season didn't change it: same points, or a base
+// of null (rule off, donation under the minimum: not the season's doing).
+export function seasonPointsText(
+	subject: PointsSubject,
 	awarded: number,
 	basePoints: number | null,
 ): string | null {
@@ -175,10 +180,10 @@ export function seasonCaptureText(
 	const base = basePoints.toLocaleString('es-MX')
 
 	if (awarded === 0) {
-		return `Esta temporada, esta carta no da puntos. Normalmente da ${base}.`
+		return `Esta temporada, esta ${subject} no da puntos. Normalmente da ${base}.`
 	}
 
-	return `Esta carta da ${awarded.toLocaleString('es-MX')} puntos en lugar de ${base}.`
+	return `Esta ${subject} da ${awarded.toLocaleString('es-MX')} puntos en lugar de ${base}.`
 }
 
 // Ends zoo-written text with a period for screen readers, unless it already

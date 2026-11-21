@@ -1,4 +1,4 @@
-import type { SeasonColor } from '@/types/points'
+import type { PointsAward } from '@/types/points'
 
 import type { CardPack } from './pack'
 
@@ -97,30 +97,6 @@ export type DuelReviewItem = {
 	correct_answer_id: number
 }
 
-// Points for a capture, set by the server from the card's rarity rule.
-export type DuelPoints = {
-	// 0 when the rarity's rule is disabled.
-	awarded: number
-	// User's total after this capture.
-	total: number
-	level: { id: number; name: string } | null
-	level_up: boolean
-	// Visible points season, if any; missing on older servers.
-	season?: DuelPointsSeason | null
-}
-
-// The season's notice for this capture: same icon and color as the banner.
-export type DuelPointsSeason = {
-	title: string
-	// The zoo's explanation, shown in the victory notice.
-	message: string | null
-	// What this card gives without the season; null if its rarity gives none.
-	// With awarded 0 and a number here, the season turned the card off.
-	base_points: number | null
-	icon: string | null
-	color: SeasonColor | null
-}
-
 export type DuelResult = {
 	outcome: DuelOutcome
 	results: DuelQuestionResult[]
@@ -128,7 +104,7 @@ export type DuelResult = {
 	review: DuelReviewItem[] | null
 	card: OwnedCard | null
 	// Only on a win; missing on servers older than capture points.
-	points?: DuelPoints | null
+	points?: PointsAward | null
 }
 
 export type DuelSubmitResponse = {

@@ -58,7 +58,7 @@ export default function DonationsSummaryScreen() {
 		return value
 	}, [params.amount])
 
-	const { refreshDonations } = useDataRefresh()
+	const { refreshDonations, refreshProfile } = useDataRefresh()
 
 	const confirmDonation = async () => {
 		if (loading) return
@@ -80,17 +80,20 @@ export default function DonationsSummaryScreen() {
 		try {
 			if (await redirectIfSignedOut()) return
 
-			const donation = await createDonation({
+			const { donation, points } = await createDonation({
 				amount: Number(amount.toFixed(2)),
 			})
 
 			void refreshDonations()
+			// Header and MiZoo show the new total; the points come from the server.
+			void refreshProfile()
 
 			router.replace({
 				pathname: '/donations/success',
 				params: {
 					amount: String(donation.amount ?? amount),
 					donation: JSON.stringify(donation),
+					...(points ? { points: JSON.stringify(points) } : {}),
 				},
 			})
 		} catch (err: unknown) {

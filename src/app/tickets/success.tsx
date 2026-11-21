@@ -10,6 +10,7 @@ import QRCode from 'react-native-qrcode-svg'
 import { QrFrame } from '@/components/ui/QrFrame'
 
 import FixedFooter from '@/components/FixedFooter'
+import { PointsEarnedCard } from '@/components/points/PointsEarnedCard'
 import { Chip } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
 import { Divider } from '@/components/ui/Divider'
@@ -71,6 +72,15 @@ export default function TicketSuccessScreen() {
 					title='¡Compra realizada!'
 					message='Tu compra se realizó correctamente. Guarda tus códigos QR para ingresar al zoológico.'
 				/>
+
+				{/* PUNTOS: once per order, from the server */}
+				{order?.points && (
+					<PointsEarnedCard
+						points={order.points}
+						subject='compra'
+						className='mb-3'
+					/>
+				)}
 
 				{/* BOLETOS Y CÓDIGOS QR */}
 				<Card className='mb-3'>

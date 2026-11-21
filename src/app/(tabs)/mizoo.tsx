@@ -31,6 +31,7 @@ import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSpecies } from '@/hooks/useSpecies'
 import colors from '@/theme/colors'
 import { getTabBarExtraSpace } from '@/theme/layout'
+import { levelProgress } from '@/utils/profile'
 
 // Species shown before the "Ver más" tile.
 const CAROUSEL_LIMIT = 8
@@ -130,10 +131,7 @@ export default function MiZoo() {
 	const points = gamification?.points ?? user?.points ?? 0
 	const level =
 		gamification?.current_level?.name || user?.level?.name || 'Bronce'
-	const progress = Math.min(100, Math.max(0, gamification?.progress ?? 0))
-	// Full bar only when the profile says there's no next level; unknown
-	// (profile not loaded) stays empty.
-	const topLevel = Boolean(gamification) && !gamification?.next_level
+	const { progress, pointsToNextLevel, nextLevel } = levelProgress(gamification)
 
 	return (
 		<ScreenBackground>
@@ -162,9 +160,9 @@ export default function MiZoo() {
 				<LevelCard
 					level={level}
 					points={points}
-					progress={topLevel ? 1 : progress / 100}
-					pointsToNextLevel={gamification?.points_to_next_level ?? 0}
-					nextLevel={gamification?.next_level?.name || undefined}
+					progress={progress}
+					pointsToNextLevel={pointsToNextLevel}
+					nextLevel={nextLevel}
 					footer={
 						// Stays after the banner is closed, so the details are
 						// always one tap away.

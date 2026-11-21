@@ -45,3 +45,30 @@ export type PointSeasonResponse = {
 	// null: no active mode, or it's hidden from visitors.
 	data: PointSeason | null
 }
+
+// Points an action gave (a duel win, a ticket order, a donation), set by
+// the server from the action's rule and the active points mode.
+export type PointsAward = {
+	// 0 when the rule is off, the season sets it to 0, or (donations) the
+	// amount is under the server's minimum.
+	awarded: number
+	// User's total after this action.
+	total: number
+	level: { id: number; name: string } | null
+	level_up: boolean
+	// Visible points season, if any; missing on older servers.
+	season?: PointsAwardSeason | null
+}
+
+// The season's notice for this action: same icon and color as the banner.
+export type PointsAwardSeason = {
+	title: string
+	// The zoo's explanation, shown under the points.
+	message: string | null
+	// What the action gives without the season. null when it gives nothing
+	// anyway (rule off, donation under the minimum), so the season isn't
+	// blamed. With awarded 0 and a number here, the season turned it off.
+	base_points: number | null
+	icon: string | null
+	color: SeasonColor | null
+}

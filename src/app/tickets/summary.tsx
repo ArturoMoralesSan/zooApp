@@ -49,7 +49,7 @@ export default function TicketSummaryScreen() {
 
 	const ticketTypesQuery = useTicketTypes()
 	const ticketTypes = ticketTypesQuery.data ?? NO_TICKET_TYPES
-	const { refreshMyTickets } = useDataRefresh()
+	const { refreshMyTickets, refreshProfile } = useDataRefresh()
 	const [purchasing, setPurchasing] = useState(false)
 	const [paymentError, setPaymentError] = useState<string | null>(null)
 	const hidePaymentError = useCallback(() => setPaymentError(null), [])
@@ -113,6 +113,8 @@ export default function TicketSummaryScreen() {
 			})
 
 			void refreshMyTickets()
+			// Header and MiZoo show the new total; the points come from the server.
+			void refreshProfile()
 
 			router.replace({
 				pathname: '/tickets/success',
