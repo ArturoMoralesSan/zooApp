@@ -1,18 +1,27 @@
-import { Camera01Icon } from '@hugeicons/core-free-icons'
+import {
+	Camera01Icon,
+	CameraSmile01Icon,
+	CubeIcon,
+	GridIcon,
+	Touch01Icon,
+} from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
-import { useCameraPermissions } from 'expo-camera'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, BackHandler, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { RoundCameraButton } from '@/components/ar/RoundCameraButton'
+import { ArCameraControls } from '@/components/ar/ArCameraControls'
+import { CameraGrid } from '@/components/ar/CameraGrid'
+import { CameraLabel } from '@/components/ar/CameraLabel'
 import { SelfieScene, type SelfieSceneProps } from '@/components/ar/SelfieScene'
 import BackButton from '@/components/ui/BackButton'
 import { CameraNotice } from '@/components/ui/CameraNotice'
 import { ScreenStatusBar } from '@/components/ui/ScreenStatusBar'
+import { useArAvailability } from '@/hooks/useArAvailability'
 import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
+import { type ModelTransform, useModelGestures } from '@/hooks/useModelGestures'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
 import colors from '@/theme/colors'
@@ -20,8 +29,21 @@ import type { OwnedCard } from '@/types/cards'
 
 type ModelStatus = 'loading' | 'ready' | 'error'
 
+// The animal starts by the visitor's shoulder, turned slightly to them.
+const START: ModelTransform = { x: 0.3, y: -0.25, scale: 1, yaw: -20 }
+// Largest side at scale 1, in meters.
+const MODEL_SIZE = 0.7
+// About how far a dp of drag moves the animal at its distance.
+const METERS_PER_DP = 0.0024
+const LIMITS = {
+	x: [-0.9, 0.9],
+	y: [-0.9, 0.6],
+	scale: [0.4, 2.5],
+} satisfies Record<string, [number, number]>
+
 // Selfie with the card's animal (A-30): AR on the front camera with its 3D
-// model. Opened from the card view or from AR (`from`), and goes back there.
+// model, which the visitor drags, pinches and twists into place. Opened
+// from the card view or from AR (`from`), and goes back there.
 export default function SelfieScreen() {
 	const { id, mode, from } = useLocalSearchParams<{
 		id: string
@@ -30,7 +52,10 @@ export default function SelfieScreen() {
 	}>()
 	const insets = useSafeAreaInsets()
 	const { data } = useCards()
-	const [permission, requestPermission] = useCameraPermissions()
+	// The front camera needs ARCore too. The 360° dev flag is about the
+	// rear-camera AR view, so it doesn't apply here.
+	const availability = useArAvailability()
+	const canSelfie = availability === 'ar' || availability === 'forced'
 
 	const card = data?.find(
 		(item): item is OwnedCard => item.encountered && String(item.id) === id,
@@ -44,21 +69,34 @@ export default function SelfieScreen() {
 	const modelUrl = model.loading ? null : model.uri
 
 	const [status, setStatus] = useState<ModelStatus>('loading')
+	// Still at first: the front camera runs at ~20 fps, where a pose looks
+	// better than the animation. A tap plays it.
+	const [playing, setPlaying] = useState(false)
+	const [grid, setGrid] = useState(false)
 	const [capture, setCapture] = useState<string | null>(null)
 	const navigatorRef = useRef<ViroARSceneNavigator>(null)
 
+	// The gesture hint shows until the animal is moved or tapped.
+	const [tapped, setTapped] = useState(false)
+	const togglePlaying = useCallback(() => {
+		setTapped(true)
+		setPlaying((value) => !value)
+	}, [])
+	const { transform, panHandlers } = useModelGestures(START, {
+		metersPerDp: METERS_PER_DP,
+		limits: LIMITS,
+		onTap: togglePlaying,
+	})
+
 	const viroReady = useViroHandoff()
-	const { exiting, exit } = useViroExit('ar', status === 'loading')
-	const granted = permission?.granted === true
-	const showScene = granted && Boolean(modelUrl) && viroReady && !exiting
+	const { exiting, exit } = useViroExit(
+		'ar',
+		Boolean(modelUrl) && status === 'loading',
+	)
+	const showScene = canSelfie && Boolean(modelUrl) && viroReady && !exiting
+	const ready = showScene && status === 'ready'
 
 	useSessionRedirect()
-
-	useEffect(() => {
-		if (permission && !permission.granted && permission.canAskAgain) {
-			void requestPermission()
-		}
-	}, [permission, requestPermission])
 
 	const modeParam = mode === 'card' ? 'card' : 'model'
 	const backHref =
@@ -66,12 +104,15 @@ export default function SelfieScreen() {
 			? (`/deck/ar/${id}?mode=${modeParam}` as const)
 			: (`/deck/${id}?mode=${modeParam}` as const)
 
-	// Back with replace (this screen replaced the one before), once the 3D
-	// view has been released (see useViroHandoff).
+	// Back with replace (this screen replaced the one before), once the AR
+	// session has been released (see useViroHandoff).
 	const goBack = useCallback(
 		() => exit(() => router.replace(backHref)),
 		[exit, backHref],
 	)
+
+	const openAr = () =>
+		exit(() => router.replace(`/deck/ar/${id}?mode=${modeParam}`))
 
 	useFocusEffect(
 		useCallback(() => {
@@ -90,17 +131,17 @@ export default function SelfieScreen() {
 	const sceneProps = useMemo<SelfieSceneProps>(
 		() => ({
 			modelUrl,
-			playing: false,
-			position: [0.3, -0.25],
-			modelSize: 0.7,
-			yaw: -20,
+			playing,
+			position: [transform.x, transform.y],
+			modelSize: MODEL_SIZE * transform.scale,
+			yaw: transform.yaw,
 			onModelReady: () => setStatus('ready'),
 			onModelError: () => setStatus('error'),
 		}),
-		[modelUrl],
+		[modelUrl, playing, transform],
 	)
 
-	// TEMP: proves the front-camera AR view can be captured with the animal.
+	// TEMP: replaced by the photo review in the next step.
 	const takePhoto = async () => {
 		try {
 			const result = (await navigatorRef.current?._takeScreenshot(
@@ -117,6 +158,43 @@ export default function SelfieScreen() {
 
 	const name = card?.name ?? 'el animal'
 
+	const notice =
+		availability === 'checking' || (canSelfie && model.loading) ? (
+			<CameraNotice
+				message={
+					model.downloading ? 'Descargando el animal…' : `Cargando a ${name}…`
+				}
+			>
+				<ActivityIndicator color={colors.lima} />
+			</CameraNotice>
+		) : availability === 'unsupported' ? (
+			<CameraNotice message='Tu teléfono no es compatible con la selfie en AR.' />
+		) : availability === 'no-camera' ? (
+			<CameraNotice message='Sin permiso de cámara. Actívalo en los ajustes del teléfono para tomarte una selfie.' />
+		) : !modelUrl ? (
+			<CameraNotice
+				icon={CubeIcon}
+				message='Esta tarjeta aún no tiene modelo 3D.'
+			/>
+		) : exiting ? (
+			<CameraNotice message='Cerrando la cámara…'>
+				<ActivityIndicator color={colors.lima} />
+			</CameraNotice>
+		) : status === 'loading' ? (
+			<CameraNotice message={`Cargando a ${name}…`}>
+				<ActivityIndicator color={colors.lima} />
+			</CameraNotice>
+		) : status === 'error' ? (
+			<CameraNotice
+				message={`No pudimos cargar a ${name}. Vuelve e inténtalo de nuevo.`}
+			/>
+		) : transform === START && !tapped ? (
+			<CameraNotice
+				icon={Touch01Icon}
+				message={`Arrastra a ${name} para moverlo, pellizca para cambiar su tamaño y gira con dos dedos. Tócalo para animarlo.`}
+			/>
+		) : null
+
 	return (
 		<View className='flex-1 bg-tinta'>
 			<ScreenStatusBar style='light' />
@@ -132,6 +210,18 @@ export default function SelfieScreen() {
 				/>
 			)}
 
+			{/* Gestures for the animal: Viro's view doesn't handle them here. */}
+			{ready && (
+				<View
+					className='absolute inset-0'
+					accessibilityHint='Arrastra para mover al animal, pellizca para cambiar su tamaño y tócalo para animarlo'
+					{...panHandlers}
+				/>
+			)}
+
+			{ready && grid && <CameraGrid />}
+
+			{/* Empty areas let touches through to the gesture layer. */}
 			<View
 				pointerEvents='box-none'
 				className='absolute inset-0 justify-between px-5'
@@ -141,25 +231,23 @@ export default function SelfieScreen() {
 				}}
 			>
 				<View pointerEvents='box-none'>
-					<BackButton onPress={goBack} variant='outline' position='relative' />
+					<View pointerEvents='box-none' className='justify-center'>
+						<BackButton
+							onPress={goBack}
+							variant='outline'
+							position='relative'
+						/>
+						<View pointerEvents='none' className='absolute inset-x-12'>
+							<CameraLabel
+								icon={CameraSmile01Icon}
+								label={`Selfie con ${name}`}
+							/>
+						</View>
+					</View>
 
-					{permission && !granted ? (
-						<CameraNotice message='Sin permiso de cámara.' className='mt-4' />
-					) : model.loading || status === 'loading' ? (
-						<CameraNotice message={`Cargando a ${name}…`} className='mt-4'>
-							<ActivityIndicator color={colors.lima} />
-						</CameraNotice>
-					) : !modelUrl ? (
-						<CameraNotice
-							message='Esta tarjeta aún no tiene modelo 3D.'
-							className='mt-4'
-						/>
-					) : status === 'error' ? (
-						<CameraNotice
-							message={`No pudimos cargar a ${name}.`}
-							className='mt-4'
-						/>
-					) : null}
+					<View pointerEvents='none' className='mt-4'>
+						{notice}
+					</View>
 
 					{capture && (
 						<Text className='text-meta mt-2 bg-blanco' selectable>
@@ -168,14 +256,23 @@ export default function SelfieScreen() {
 					)}
 				</View>
 
-				<View className='items-center'>
-					<RoundCameraButton
-						icon={Camera01Icon}
-						label='Capturar'
-						onPress={() => void takePhoto()}
-						tone='white'
+				{ready && (
+					<ArCameraControls
+						left={{
+							icon: GridIcon,
+							label: grid ? 'Ocultar cuadrícula' : 'Mostrar cuadrícula',
+							onPress: () => setGrid((value) => !value),
+							tone: grid ? 'lima' : 'white',
+						}}
+						onShutter={() => void takePhoto()}
+						right={{
+							icon: Camera01Icon,
+							label: 'Ver en AR',
+							onPress: openAr,
+							tone: 'white',
+						}}
 					/>
-				</View>
+				)}
 			</View>
 		</View>
 	)

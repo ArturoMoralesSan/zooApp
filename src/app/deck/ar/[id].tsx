@@ -1,6 +1,8 @@
 import {
+	CameraSmile01Icon,
 	CenterFocusIcon,
 	CubeIcon,
+	Refresh01Icon,
 	Rotate360Icon,
 	Touch01Icon,
 } from '@hugeicons/core-free-icons'
@@ -47,8 +49,8 @@ const REASONS: Partial<Record<ArAvailability, string>> = {
 }
 
 // AR view of an owned card's animal (A-28 → A-29): find a surface, tap to
-// place it at life size, and reset to place it again. The shutter and the
-// selfie button are placeholders for now. Without AR (unsupported phone,
+// place it at life size, and reset to place it again, or switch to the
+// selfie. The shutter is a placeholder for now. Without AR (unsupported phone,
 // camera denied, or no surface found) the animal shows in the Vista 360°.
 export default function CardArScreen() {
 	// `mode` is the card view's mode, restored when going back.
@@ -122,6 +124,15 @@ export default function CardArScreen() {
 			arExit.exit(back)
 		}
 	}, [arExit, view360Exit, view, backHref])
+
+	// Selfie (A-30) runs its own AR session: this one closes first.
+	const openSelfie = () => {
+		leavingRef.current = true
+		setLeaving(true)
+		arExit.exit(() =>
+			router.replace(`/deck/selfie/${id}?mode=${mode ?? 'card'}&from=ar`),
+		)
+	}
 
 	const switchTo360 = () =>
 		arExit.exit(() => {
@@ -300,11 +311,21 @@ export default function CardArScreen() {
 					(phase === 'placing' ? (
 						planeFound && <SurfaceDetectedPill />
 					) : (
-						// Shutter and selfie aren't built yet.
+						// The shutter isn't built yet.
 						<ArCameraControls
-							onReset={placeAgain}
+							left={{
+								icon: Refresh01Icon,
+								label: 'Colocar de nuevo',
+								onPress: placeAgain,
+								tone: 'white',
+							}}
 							onShutter={noop}
-							onSelfie={noop}
+							right={{
+								icon: CameraSmile01Icon,
+								label: 'Selfie',
+								onPress: openSelfie,
+								tone: 'lima',
+							}}
 						/>
 					))
 				)}
