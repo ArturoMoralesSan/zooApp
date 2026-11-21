@@ -166,7 +166,7 @@ There is no global store. State lives in three places:
 | A multi-screen flow | A context scoped to that flow's layout, e.g. `DuelContext`, provided by `src/app/duel/_layout.tsx` for scan → play → review                                                                                   |
 | Screen UI           | `useState` in the screen                                                                                                                                                                                      |
 
-On logout, `useDataRefresh().clearCache()` drops every cached response so nothing leaks into the next account, and the user's decrypted cards are deleted.
+On logout, `useDataRefresh().clearCache()` drops every cached response so nothing leaks into the next account, even if deleting the cards fails, and the user's decrypted cards are deleted. When an account signs in, any other account's decrypted cards still on the phone (a delete that failed at logout) are deleted too.
 
 ## Offline support
 
