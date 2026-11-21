@@ -77,9 +77,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		try {
 			await authLogout()
 		} finally {
-			// The user's decrypted cards go; the shared encrypted pack stays.
-			await resetPackUser()
-			await clearCache()
+			try {
+				// The user's decrypted cards go; the shared encrypted pack stays.
+				await resetPackUser()
+			} finally {
+				// Even if that failed: the next account must not see this one's data.
+				await clearCache()
+			}
 		}
 	}
 
