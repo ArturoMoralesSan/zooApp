@@ -150,17 +150,22 @@ export function CardViewerScene(props?: CardViewerSceneNavigatorProps) {
 
 type Dimensions = { size: number; height: number }
 
+export type AnimalModelProps = Pick<
+	CardViewerSceneProps,
+	'modelUrl' | 'playing' | 'modelSize' | 'onModelReady' | 'onModelError'
+>
+
 // The animal GLB is real scale (1 unit = 1 m, origin at the bottom center),
 // so it loads hidden at scale 1 and gets measured. Its largest side is then
 // scaled to `modelSize` and it's centered on the point the drag turns
 // around.
-function AnimalModel({
+export function AnimalModel({
 	modelUrl,
 	playing,
 	modelSize,
 	onModelReady,
 	onModelError,
-}: CardViewerSceneProps) {
+}: AnimalModelProps) {
 	const ref = useRef<Viro3DObject>(null)
 	const [dimensions, setDimensions] = useState<Dimensions | null>(null)
 	// Stable across drag re-renders, so the GLB isn't reloaded (see cardSource).
