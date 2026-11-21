@@ -88,14 +88,22 @@ export async function api<T>(
 }
 
 // Parses a JSON response, throwing ApiError/ApiValidationError when it failed.
+// A success with no body (204) resolves to undefined.
 export async function readResponse<T>(response: Response): Promise<T> {
+	const text = await response.text()
+
+	if (response.ok && text.trim() === '') return undefined as T
+
 	let data: T
 
 	try {
-		data = await response.json()
+		data = JSON.parse(text)
 	} catch {
-		throw new Error(
-			`La API respondió con un formato inválido. Código HTTP: ${response.status}`,
+		// An HTML error page (a proxy, a crashed server) or a truncated body:
+		// a server error that keeps its status.
+		throw new ApiError(
+			`El servidor no respondió como esperábamos (${response.status}). Inténtalo más tarde.`,
+			response.status,
 		)
 	}
 
