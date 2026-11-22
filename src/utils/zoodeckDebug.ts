@@ -29,6 +29,12 @@ export const ZOODECK_VISIT_CHECKS =
 export const ZOODECK_FORCE_360 =
 	__DEV__ && process.env.EXPO_PUBLIC_ZOODECK_FORCE_360 === '1'
 
+// Dev only (EXPO_PUBLIC_ZOODECK_NOAR_SUPPORT=1): the app behaves as on a phone
+// without ARCore (360° view, no AR selfie), without asking ARCore. Ignored in
+// production; EXPO_PUBLIC_ZOODECK_FORCE_360 wins over it.
+export const ZOODECK_NO_AR =
+	__DEV__ && process.env.EXPO_PUBLIC_ZOODECK_NOAR_SUPPORT === '1'
+
 // Stands in for the scanned QR; the duel session uses it to spot the debug
 // duel.
 export const DEBUG_DUEL_CODE = 'zoodeck-debug'
