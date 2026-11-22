@@ -76,6 +76,15 @@ const SKY_YAW_OFFSET = -90
 // Where the sunlight travels at heading 0: from behind the user, on the
 // right, 24° above the horizon.
 const SUN_DIRECTION: Vec3 = [-0.604, -0.409, -0.684]
+// Only the animal casts a live shadow (the scenario's are baked). The
+// sun's shadow camera sits this far up-sun from the animal, and its box
+// grows with the animal: a low sun casts long shadows.
+const SHADOW_CAMERA_DISTANCE = 15
+const SHADOW_MAP_SIZE = 2048
+const SHADOW_PER_SIZE = 5
+const MIN_SHADOW_BOX = 8
+const MAX_SHADOW_BOX = 30
+const NO_SHADOW = 0
 
 ViroMaterials.createMaterials({
 	view360Ground: {
@@ -174,6 +183,21 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		: MIN_DISTANCE
 	const ground = useMemo(() => circle(distance + GROUND_MARGIN), [distance])
 	const shadowSize = (dimensions?.footprint ?? 1) * SHADOW_SPREAD
+	const sunShadow = useMemo(() => {
+		const [x, y, z] = rotateAroundY([0, -EYE_HEIGHT, -distance], heading)
+		const [dx, dy, dz] = sunDirection
+		const from: Vec3 = [
+			x - dx * SHADOW_CAMERA_DISTANCE,
+			y - dy * SHADOW_CAMERA_DISTANCE,
+			z - dz * SHADOW_CAMERA_DISTANCE,
+		]
+		const box = Math.min(
+			MAX_SHADOW_BOX,
+			Math.max(MIN_SHADOW_BOX, (dimensions?.size ?? 0) * SHADOW_PER_SIZE),
+		)
+
+		return { from, box }
+	}, [distance, heading, sunDirection, dimensions])
 
 	const faceCamera = async () => {
 		try {
@@ -240,14 +264,21 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 				rotation={[0, heading + SKY_YAW_OFFSET, 0]}
 			/>
 
-			{/* Measured from the scenario's sky: bluish sky light and a warm sun. */}
+			{/* An evening sun, warm like the scenario's painted light. */}
 			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
-			<ViroAmbientLight color='#b7daff' intensity={290} />
+			<ViroAmbientLight color='#e3cdb4' intensity={230} />
 			<ViroDirectionalLight
 				// eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color
-				color='#ffeed8'
+				color='#ffc985'
 				direction={sunDirection}
-				intensity={1250}
+				intensity={1000}
+				castsShadow
+				shadowOpacity={0.55}
+				shadowMapSize={SHADOW_MAP_SIZE}
+				shadowOrthographicPosition={sunShadow.from}
+				shadowOrthographicSize={sunShadow.box}
+				shadowNearZ={1}
+				shadowFarZ={SHADOW_CAMERA_DISTANCE * 2}
 			/>
 
 			{!(scenarioLoaded && placed) && (
@@ -257,6 +288,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 					position={[0, -EYE_HEIGHT, 0]}
 					rotation={FLAT}
 					materials={['view360Ground']}
+					shadowCastingBitMask={NO_SHADOW}
 				/>
 			)}
 
@@ -267,6 +299,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 					position={SCENARIO_POSITION}
 					scale={[1, 1, 1]}
 					visible={placed && scenarioLoaded}
+					shadowCastingBitMask={NO_SHADOW}
 					onLoadEnd={() => setScenarioLoaded(true)}
 					onError={() => setScenarioLoaded(false)}
 				/>
@@ -280,6 +313,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 							rotation={FLAT}
 							materials={['view360Shadow']}
 							visible={placed}
+							shadowCastingBitMask={NO_SHADOW}
 						/>
 
 						{/* Its front (+Z) already faces the camera; the drag turns it. */}

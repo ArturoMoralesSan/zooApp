@@ -117,7 +117,7 @@ export function Viewer360({
 				hdrEnabled
 				multisamplingEnabled
 				bloomEnabled={false}
-				shadowsEnabled={false}
+				shadowsEnabled
 				debug={false}
 				style={{ flex: 1 }}
 			/>
