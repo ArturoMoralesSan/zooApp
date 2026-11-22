@@ -200,9 +200,7 @@ export default function Panel() {
 						icon={Settings01Icon}
 						title='Configuración'
 						description='Preferencias de la aplicación'
-						onPress={() =>
-							setComingSoon('Configuración estará disponible pronto.')
-						}
+						onPress={() => router.push('/settings')}
 					/>
 
 					<ListCard
