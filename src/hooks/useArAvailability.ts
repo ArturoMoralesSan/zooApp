@@ -2,7 +2,7 @@ import { isARSupportedOnDevice } from '@reactvision/react-viro'
 import { useCameraPermissions } from 'expo-camera'
 import { useEffect, useRef, useState } from 'react'
 
-import { ZOODECK_FORCE_360 } from '@/utils/zoodeckDebug'
+import { ZOODECK_FORCE_360, ZOODECK_NO_AR } from '@/utils/zoodeckDebug'
 
 // Why a card's animal shows in AR or in the 360° view:
 // - 'ar': supported and the camera is allowed
@@ -57,7 +57,8 @@ export function useArAvailability({ camera = true }: Options = {}) {
 
 		let active = true
 
-		support ??= checkSupport()
+		// The dev flag answers like a phone without ARCore, still asynchronously.
+		support ??= ZOODECK_NO_AR ? Promise.resolve(false) : checkSupport()
 		void support.then((value) => {
 			if (active) setSupported(value)
 		})

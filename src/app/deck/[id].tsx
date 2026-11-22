@@ -65,6 +65,10 @@ export default function CardViewScreen() {
 	// The camera isn't needed (or asked for) just to name it.
 	const availability = useArAvailability({ camera: false })
 	const only360 = availability === 'unsupported' || availability === 'forced'
+	// The selfie needs ARCore too: the button stays, dimmed, and says why
+	// instead of opening a screen with nothing in it.
+	const selfieUnavailable = availability === 'unsupported'
+	const [selfieNotice, setSelfieNotice] = useState(false)
 	// Heights of the controls over the viewer, to fit the subject between.
 	const [overlayTop, setOverlayTop] = useState(0)
 	const [overlayBottom, setOverlayBottom] = useState(0)
@@ -126,6 +130,7 @@ export default function CardViewScreen() {
 	}, [mode, card?.model_url])
 
 	const hideHint = useCallback(() => setHintVisible(false), [])
+	const hideSelfieNotice = useCallback(() => setSelfieNotice(false), [])
 
 	return (
 		<ScreenBackground tone='niebla'>
@@ -251,13 +256,21 @@ export default function CardViewScreen() {
 										<RoundAction
 											icon={CameraSmile01Icon}
 											label='Selfie'
+											unavailable={selfieUnavailable}
+											accessibilityHint={
+												selfieUnavailable
+													? 'No disponible: tu teléfono no es compatible con AR.'
+													: undefined
+											}
 											// Replace, like AR: one Viro view at a time.
 											onPress={() =>
-												exit(() =>
-													router.replace(
-														`/deck/selfie/${card.id}?mode=${mode}&from=card`,
-													),
-												)
+												selfieUnavailable
+													? setSelfieNotice(true)
+													: exit(() =>
+															router.replace(
+																`/deck/selfie/${card.id}?mode=${mode}&from=card`,
+															),
+														)
 											}
 										/>
 									</View>
@@ -286,6 +299,14 @@ export default function CardViewScreen() {
 				title='Toca el modelo'
 				message={`Toca a ${card?.name ?? 'el animal'} para verlo en movimiento y vuelve a tocarlo para pausarlo.`}
 				onHide={hideHint}
+			/>
+
+			<Toast
+				visible={selfieNotice}
+				icon={CameraSmile01Icon}
+				title='Selfie no disponible'
+				message='La selfie usa realidad aumentada (AR) y tu teléfono no es compatible. Puedes ver al animal en la vista 360°.'
+				onHide={hideSelfieNotice}
 			/>
 		</ScreenBackground>
 	)
