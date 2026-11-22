@@ -75,6 +75,7 @@ src/app/
   deck/                index, [id], map, offline, ar/[id]
   duel/                _layout (DuelProvider), scan → play → review, debug
   points/              season (what the active points season changes)
+  settings/            index (preferences, draft), storage (what the app keeps on the phone)
   map.tsx profile.tsx +not-found.tsx
 ```
 
