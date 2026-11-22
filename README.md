@@ -161,6 +161,7 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 - **AR lighting from the room**: match the animal's light to ARCore's estimate. Viro runs ARCore in HDR mode and doesn't pass the estimate to JS, so it needs a change in Viro's native code.
 - **Duel timer**: a time limit per question, starting once the animal is placed in AR (or the 360° view has loaded), so looking for a surface never counts.
 - **Help**: complete the Panel's help section.
+- **About and credits**: the screens (Panel → Acerca de ZooApp) are a draft. They need the real team names, the connection to `GET /api/v1/credits` (they show the API doc's example for now) and the open-source software licences.
 - **iOS release**: configure, test and publish the iOS build.
 
 ## License

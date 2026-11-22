@@ -52,6 +52,7 @@ src/
     duel/              _layout (DuelProvider): scan → play → review, debug
     points/            season: what the active points season changes
     settings/          index (preferences), graphics (Calidad gráfica), storage (what the app keeps, links to each download)
+    about/             index (team), credits (content credits per card), licenses (grouped by licence)
     map.tsx profile.tsx +not-found.tsx
   components/
     ui/                Generic design-system components (Button, Card, ListCard, TextField,

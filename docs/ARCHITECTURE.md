@@ -76,6 +76,7 @@ src/app/
   duel/                _layout (DuelProvider), scan → play → review, debug
   points/              season (what the active points season changes)
   settings/            index (preferences: AR placement and graphics are saved, the rest a draft), graphics (Calidad gráfica), storage (what the app keeps on the phone)
+  about/               index (team), credits (content credits per card), licenses (by licence); draft data
   map.tsx profile.tsx +not-found.tsx
 ```
 
