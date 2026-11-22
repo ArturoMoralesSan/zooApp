@@ -2,6 +2,7 @@ import {
 	CameraSmile01Icon,
 	Cards01Icon,
 	Move01Icon,
+	Rotate360Icon,
 	Touch01Icon,
 	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
@@ -22,6 +23,7 @@ import { Icon } from '@/components/ui/Icon'
 import { QueryView } from '@/components/ui/QueryView'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import Toast from '@/components/ui/Toast'
+import { useArAvailability } from '@/hooks/useArAvailability'
 import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useViroExit } from '@/hooks/useViroHandoff'
@@ -59,6 +61,10 @@ export default function CardViewScreen() {
 	)
 	const [playing, setPlaying] = useState(false)
 	const [hintVisible, setHintVisible] = useState(false)
+	// Without ARCore the AR screen shows the 360° view: the button says so.
+	// The camera isn't needed (or asked for) just to name it.
+	const availability = useArAvailability({ camera: false })
+	const only360 = availability === 'unsupported' || availability === 'forced'
 	// Heights of the controls over the viewer, to fit the subject between.
 	const [overlayTop, setOverlayTop] = useState(0)
 	const [overlayBottom, setOverlayBottom] = useState(0)
@@ -227,8 +233,8 @@ export default function CardViewScreen() {
 										className='mt-4 flex-row items-start justify-between px-5'
 									>
 										<RoundAction
-											icon={VrGlassesIcon}
-											label='Ver en AR'
+											icon={only360 ? Rotate360Icon : VrGlassesIcon}
+											label={only360 ? 'Ver en 360°' : 'Ver en AR'}
 											// Replace, not push: this screen's 3D view must be
 											// released before the AR one starts (see useViroHandoff).
 											onPress={() =>

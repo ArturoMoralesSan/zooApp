@@ -7,6 +7,8 @@ export type HintKey =
 	// ZooDeck's offline pack: the first-visit modal and the mobile-data notice.
 	| 'deck_offline_intro'
 	| 'deck_offline_mobile'
+	// How to look around and turn the animal in the 360° view.
+	| 'deck_360_controls'
 
 const prefix = 'zooapp_hint_'
 

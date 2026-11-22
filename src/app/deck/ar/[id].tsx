@@ -36,6 +36,7 @@ import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSurfaceOffer } from '@/hooks/useSurfaceOffer'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
+import { markHintShown, wasHintShown } from '@/services/hints'
 import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
@@ -82,6 +83,9 @@ export default function CardArScreen() {
 	// The user chose the 360° view from AR ("¿No encuentras una superficie?").
 	const [chose360, setChose360] = useState(false)
 	const [view360, setView360] = useState<View360Status>('loading')
+	// The 360° view's controls are explained once per device; null while the
+	// flag is read, so a user who has seen them never gets a flash of it.
+	const [show360Hint, setShow360Hint] = useState<boolean | null>(null)
 	const viewer360Ref = useRef<Viewer360Handle>(null)
 	// Back pressed while AR closes for the 360° view: leave instead. The ref
 	// is read by the pending switch, the state by the overlay.
@@ -141,6 +145,27 @@ export default function CardArScreen() {
 
 	// Shots left by a flow that didn't finish (the app closed midway).
 	useEffect(() => clearPhotos(), [])
+
+	// Decided once the 360° view shows: the first time on this device it
+	// explains the controls, and it's remembered as seen.
+	const view360Ready = view === '360' && view360 === 'loaded'
+
+	useEffect(() => {
+		if (!view360Ready || show360Hint !== null) return
+
+		let cancelled = false
+
+		void wasHintShown('deck_360_controls').then((shown) => {
+			if (cancelled) return
+
+			setShow360Hint(!shown)
+			if (!shown) void markHintShown('deck_360_controls')
+		})
+
+		return () => {
+			cancelled = true
+		}
+	}, [view360Ready, show360Hint])
 
 	const takePhoto = async () => {
 		if (!navigatorRef.current) return
@@ -306,13 +331,14 @@ export default function CardArScreen() {
 								message={`No pudimos cargar a ${name}. Vuelve e inténtalo de nuevo.`}
 								className='mt-4'
 							/>
-						) : (
+						) : show360Hint ? (
 							<CameraNotice
 								icon={Rotate360Icon}
 								message={`${REASONS[availability] ?? ''}Vista 360°: mueve el teléfono para mirar alrededor y arrastra para girar a ${name}.`}
 								className='mt-4'
+								onDismiss={() => setShow360Hint(false)}
 							/>
-						)
+						) : null
 					) : phase === 'placing' ? (
 						offer360 ? (
 							<SurfaceOffer onAccept={switchTo360} className='mt-4' />
