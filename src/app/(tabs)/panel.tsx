@@ -1,6 +1,7 @@
 import {
 	HeartIcon,
 	HelpCircleIcon,
+	InformationCircleIcon,
 	QrCodeIcon,
 	Settings01Icon,
 	Ticket01Icon,
@@ -201,6 +202,14 @@ export default function Panel() {
 						title='Configuración'
 						description='Preferencias de la aplicación'
 						onPress={() => router.push('/settings')}
+					/>
+
+					<ListCard
+						className='mb-3'
+						icon={InformationCircleIcon}
+						title='Acerca de ZooApp'
+						description='Equipo, créditos y licencias'
+						onPress={() => router.push('/about')}
 					/>
 
 					<ListCard
