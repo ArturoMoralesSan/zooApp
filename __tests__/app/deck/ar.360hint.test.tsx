@@ -1,5 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
-import { screen } from '@testing-library/react-native'
+import { fireEvent, screen } from '@testing-library/react-native'
 import * as SecureStore from 'expo-secure-store'
 
 import CardArScreen from '@/app/deck/ar/[id]'
@@ -60,7 +60,7 @@ const HINT =
 	/Vista 360°: mueve el teléfono para mirar alrededor y arrastra para girar a Mapache\./
 
 // One scenario: services/cards and useArAvailability keep state in the module.
-test('the 360° controls are explained the first time only', async () => {
+test('the 360° controls are explained the first time only, and a tap hides them', async () => {
 	await SecureStore.setItemAsync('zooapp_token', 'token-de-prueba')
 	viroMock.isARSupportedOnDevice.mockRejectedValue(arcoreState('UNSUPPORTED'))
 	server.use(
@@ -80,6 +80,10 @@ test('the 360° controls are explained the first time only', async () => {
 	expect(await SecureStore.getItemAsync('zooapp_hint_deck_360_controls')).toBe(
 		'1',
 	)
+
+	// A tap hides it right away.
+	await fireEvent.press(screen.getByRole('button', { name: HINT }))
+	expect(screen.queryByText(HINT)).toBeNull()
 	await first.unmount()
 
 	// Seen: the next time the view opens without it.

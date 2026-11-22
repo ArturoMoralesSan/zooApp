@@ -336,6 +336,7 @@ export default function CardArScreen() {
 								icon={Rotate360Icon}
 								message={`${REASONS[availability] ?? ''}Vista 360°: mueve el teléfono para mirar alrededor y arrastra para girar a ${name}.`}
 								className='mt-4'
+								onDismiss={() => setShow360Hint(false)}
 							/>
 						) : null
 					) : phase === 'placing' ? (
