@@ -14,20 +14,40 @@ jest.mock('expo-router', () => ({
 	useNavigation: () => ({ setOptions: () => {} }),
 }))
 
-type SceneProps = { yaw: number }
+type SceneProps = { yaw: number; onTrackingStuck: () => void }
 
 // The yaw each render hands the scene.
 const mockSceneYaws: number[] = []
+// The navigator's mounts, whether one is mounted, and its latest props.
+const mockNavigator = {
+	mounts: 0,
+	mounted: false,
+	props: null as SceneProps | null,
+}
 
-jest.mock('@reactvision/react-viro', () => ({
-	// Viewer360Scene registers its materials on import.
-	ViroMaterials: { createMaterials: () => {} },
-	ViroVRSceneNavigator: ({ viroAppProps }: { viroAppProps: SceneProps }) => {
-		mockSceneYaws.push(viroAppProps.yaw)
+jest.mock('@reactvision/react-viro', () => {
+	const { useEffect } = jest.requireActual<typeof import('react')>('react')
 
-		return null
-	},
-}))
+	return {
+		// Viewer360Scene registers its materials on import.
+		ViroMaterials: { createMaterials: () => {} },
+		ViroVRSceneNavigator: ({ viroAppProps }: { viroAppProps: SceneProps }) => {
+			mockSceneYaws.push(viroAppProps.yaw)
+			mockNavigator.props = viroAppProps
+
+			useEffect(() => {
+				mockNavigator.mounts += 1
+				mockNavigator.mounted = true
+
+				return () => {
+					mockNavigator.mounted = false
+				}
+			}, [])
+
+			return null
+		},
+	}
+})
 
 test('a drag keeps its turn when the release resets the gesture', async () => {
 	const create = jest.spyOn(PanResponder, 'create')
@@ -55,4 +75,35 @@ test('a drag keeps its turn when the release resets the gesture', async () => {
 	})
 
 	expect(mockSceneYaws.at(-1)).toBe(120 * YAW_PER_PX)
+})
+
+test('stuck head tracking creates the view again, at most twice', async () => {
+	jest.useFakeTimers()
+	mockNavigator.mounts = 0
+	await render(
+		<Viewer360
+			modelUrl='https://example.test/mapache.glb'
+			onModelLoaded={jest.fn()}
+			onModelError={jest.fn()}
+		/>,
+	)
+	expect(mockNavigator.mounts).toBe(1)
+
+	for (const mounts of [2, 3]) {
+		await act(async () => mockNavigator.props?.onTrackingStuck())
+		// Released first: a new Viro view can't start while one closes.
+		expect(mockNavigator.mounted).toBe(false)
+
+		await act(async () => jest.advanceTimersByTime(1000))
+		expect(mockNavigator.mounted).toBe(true)
+		expect(mockNavigator.mounts).toBe(mounts)
+	}
+
+	// A third report leaves the view as it is: no restart loop.
+	await act(async () => mockNavigator.props?.onTrackingStuck())
+	await act(async () => jest.advanceTimersByTime(1000))
+	expect(mockNavigator.mounted).toBe(true)
+	expect(mockNavigator.mounts).toBe(3)
+
+	jest.useRealTimers()
 })

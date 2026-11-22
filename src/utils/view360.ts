@@ -10,3 +10,17 @@ export function rotateAroundY([x, y, z]: Vec3, degrees: number): Vec3 {
 
 	return [x * cos + z * sin, y, z * cos - x * sin]
 }
+
+// The pose GVR reports before its head tracking starts: looking straight
+// down with the phone's top to -X, exactly. Real sensor readings never land
+// on these round numbers, even with the phone lying flat.
+export function isUntrackedPose(forward: number[], up: number[]) {
+	return (
+		forward[0] === 0 &&
+		forward[1] === -1 &&
+		forward[2] === 0 &&
+		up[0] === -1 &&
+		up[1] === 0 &&
+		up[2] === 0
+	)
+}

@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useImperativeHandle,
 	useMemo,
+	useRef,
 	useState,
 } from 'react'
 import { PanResponder, View } from 'react-native'
@@ -35,6 +36,12 @@ type Drag = { yaw: number; from: number | null }
 // screen's orientation is set again: it has to change for the native side
 // to apply it, hence 'portrait' first.
 const RELOCK_DELAY_MS = 500
+// When the scene reports head tracking that hasn't started, the view is
+// created again: unmounted, released, then mounted after the usual handoff
+// (see useViroHandoff: a Viro view created while another is still being
+// released crashes natively). A couple of tries, never a loop.
+const RESTART_DELAY_MS = 1000
+const MAX_RESTARTS = 2
 
 // Vista 360° (the fallback when AR isn't possible): a single view, not
 // split for a headset, where the gyroscope drives the camera. Dragging
@@ -48,6 +55,28 @@ export function Viewer360({
 	const navigation = useNavigation()
 	const [drag, setDrag] = useState<Drag>({ yaw: 0, from: null })
 	const [centerKey, setCenterKey] = useState(0)
+	// Each restart mounts a new navigator (its key); none while restarting.
+	const [session, setSession] = useState(0)
+	const [restarting, setRestarting] = useState(false)
+	const restarts = useRef(0)
+
+	const restart = useCallback(() => {
+		if (restarts.current >= MAX_RESTARTS) return
+
+		restarts.current += 1
+		setRestarting(true)
+	}, [])
+
+	useEffect(() => {
+		if (!restarting) return
+
+		const timeout = setTimeout(() => {
+			setSession((current) => current + 1)
+			setRestarting(false)
+		}, RESTART_DELAY_MS)
+
+		return () => clearTimeout(timeout)
+	}, [restarting])
 
 	const lockPortrait = useCallback(() => {
 		navigation.setOptions({ orientation: 'portrait' })
@@ -103,24 +132,38 @@ export function Viewer360({
 				onModelLoaded()
 			},
 			onModelError,
+			onTrackingStuck: restart,
 		}),
-		[modelUrl, drag.yaw, centerKey, onModelLoaded, onModelError, lockPortrait],
+		[
+			modelUrl,
+			drag.yaw,
+			centerKey,
+			onModelLoaded,
+			onModelError,
+			lockPortrait,
+			restart,
+		],
 	)
 
 	return (
 		<View style={{ flex: 1 }}>
-			<ViroVRSceneNavigator
-				vrModeEnabled={false}
-				initialScene={{ scene: Viewer360Scene }}
-				viroAppProps={sceneProps}
-				pbrEnabled
-				hdrEnabled
-				multisamplingEnabled
-				bloomEnabled={false}
-				shadowsEnabled
-				debug={false}
-				style={{ flex: 1 }}
-			/>
+			{!restarting && (
+				<ViroVRSceneNavigator
+					key={session}
+					vrModeEnabled={false}
+					initialScene={{ scene: Viewer360Scene }}
+					viroAppProps={sceneProps}
+					pbrEnabled
+					hdrEnabled
+					multisamplingEnabled
+					bloomEnabled={false}
+					// Viro shadows add about a second of a blank view to every start;
+					// the scene lays the animal's shadow as a texture instead.
+					shadowsEnabled={false}
+					debug={false}
+					style={{ flex: 1 }}
+				/>
+			)}
 
 			{/* Viro's view has no touch handling outside AR: drags land here. */}
 			<View className='absolute inset-0' {...panResponder.panHandlers} />
