@@ -79,7 +79,7 @@ export default function StorageSettingsScreen() {
 				<SectionTitle
 					title='Sin conexión'
 					subtitle='Descárgalo en casa y úsalo en el zoológico sin gastar datos.'
-					className='mt-6'
+					className='mb-3 mt-6'
 				/>
 				<View className='gap-3'>
 					<ListCard
@@ -92,7 +92,11 @@ export default function StorageSettingsScreen() {
 						icon={CloudDownloadIcon}
 						title='Especies y mapa'
 						description='Consúltalos en el zoológico sin internet'
-						trailing={<Badge tone='neutral' label='Próximamente' />}
+						trailing={
+							<View>
+								<Badge tone='neutral' label='Próximamente' />
+							</View>
+						}
 					/>
 					<Toggle
 						label='Usar datos móviles para descargar'
@@ -103,7 +107,7 @@ export default function StorageSettingsScreen() {
 				</View>
 
 				{/* EN ESTE TELÉFONO */}
-				<SectionTitle title='En este teléfono' className='mt-6' />
+				<SectionTitle title='En este teléfono' className='mb-3 mt-6' />
 				<View className='gap-3'>
 					<ListCard
 						icon={Image01Icon}

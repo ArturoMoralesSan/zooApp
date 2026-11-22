@@ -55,7 +55,12 @@ export default function SettingsScreen() {
 
 	const used = DRAFT_STORAGE.reduce((sum, item) => sum + item.bytes, 0)
 	const closeSheet = () => setSheet(null)
-	const soon = <Badge tone='neutral' label='Próximamente' />
+	// Badge is self-start; the wrapper centres it with the chevron.
+	const soon = (
+		<View>
+			<Badge tone='neutral' label='Próximamente' />
+		</View>
+	)
 
 	return (
 		<ScreenBackground>
@@ -100,7 +105,7 @@ export default function SettingsScreen() {
 				</View>
 
 				{/* AR Y 3D */}
-				<SectionTitle title='Realidad aumentada y 3D' className='mt-6' />
+				<SectionTitle title='Realidad aumentada y 3D' className='mb-3 mt-6' />
 				{noAr && (
 					<Notice
 						tone='warning'
@@ -129,7 +134,7 @@ export default function SettingsScreen() {
 				</View>
 
 				{/* ALMACENAMIENTO */}
-				<SectionTitle title='Almacenamiento' className='mt-6' />
+				<SectionTitle title='Almacenamiento' className='mb-3 mt-6' />
 				<ListCard
 					icon={HardDriveIcon}
 					title='Espacio y descargas'
