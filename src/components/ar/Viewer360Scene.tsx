@@ -14,7 +14,6 @@ import type { ImageSourcePropType } from 'react-native'
 
 import contactShadow from '@/assets/images/view360/contact-shadow.png'
 import savannaSky from '@/assets/images/view360/savanna-sky.jpg'
-import sunShadow from '@/assets/images/view360/sun-shadow.png'
 import savannaScenario from '@/assets/models/scenario/savanna.glb'
 import colors from '@/theme/colors'
 import { isUntrackedPose, rotateAroundY, type Vec3 } from '@/utils/view360'
@@ -80,18 +79,15 @@ const SKY_YAW_OFFSET = -90
 // Where the sunlight travels at heading 0: from behind the user, on the
 // right, 24° above the horizon.
 const SUN_DIRECTION: Vec3 = [-0.604, -0.409, -0.684]
-// The animal's sun shadow is a soft texture laid on the ground away from
-// the sun, not a Viro shadow (with shadowsEnabled every start of this GVR
-// view shows only the ground for about a second). A low sun makes it
-// longer than the animal is tall, by 1 / tan(elevation).
-const SUN_SHADOW_PER_HEIGHT =
-	Math.hypot(SUN_DIRECTION[0], SUN_DIRECTION[2]) / -SUN_DIRECTION[1]
-// Turns -Z, where the shadow is laid, to where the sunlight travels.
-const SUN_SHADOW_YAW =
-	(Math.atan2(-SUN_DIRECTION[0], -SUN_DIRECTION[2]) * 180) / Math.PI
-// Width per metre of the animal's footprint, and overall darkness.
-const SUN_SHADOW_WIDTH = 1
-const SUN_SHADOW_OPACITY = 1
+// Only the animal casts a live shadow (the scenario's are baked). The
+// sun's shadow camera sits this far up-sun from the animal, and its box
+// grows with the animal: a low sun casts long shadows.
+const SHADOW_CAMERA_DISTANCE = 15
+const SHADOW_MAP_SIZE = 2048
+const SHADOW_PER_SIZE = 5
+const MIN_SHADOW_BOX = 8
+const MAX_SHADOW_BOX = 30
+const NO_SHADOW = 0
 
 ViroMaterials.createMaterials({
 	view360Ground: {
@@ -101,12 +97,6 @@ ViroMaterials.createMaterials({
 	},
 	view360Shadow: {
 		diffuseTexture: contactShadow,
-		lightingModel: 'Constant',
-		blendMode: 'Alpha',
-		writesToDepthBuffer: false,
-	},
-	view360SunShadow: {
-		diffuseTexture: sunShadow,
 		lightingModel: 'Constant',
 		blendMode: 'Alpha',
 		writesToDepthBuffer: false,
@@ -132,7 +122,7 @@ function circle(radius: number): [number, number][] {
 	})
 }
 
-type Dimensions = { size: number; footprint: number; height: number }
+type Dimensions = { size: number; footprint: number }
 
 // Below this horizontal length the phone points almost straight up or down
 // and its forward has no useful heading.
@@ -206,14 +196,22 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 			)
 		: MIN_DISTANCE
 	const ground = useMemo(() => circle(distance + GROUND_MARGIN), [distance])
-	const footprint = dimensions?.footprint ?? 1
-	const shadowSize = footprint * SHADOW_SPREAD
-	// From just behind the animal's feet to where its top's shadow falls.
-	const sunShadowReach = Math.max(
-		footprint,
-		(dimensions?.height ?? 0) * SUN_SHADOW_PER_HEIGHT,
-	)
-	const sunShadowLength = sunShadowReach + footprint / 2
+	const shadowSize = (dimensions?.footprint ?? 1) * SHADOW_SPREAD
+	const sunShadow = useMemo(() => {
+		const [x, y, z] = rotateAroundY([0, -EYE_HEIGHT, -distance], heading)
+		const [dx, dy, dz] = sunDirection
+		const from: Vec3 = [
+			x - dx * SHADOW_CAMERA_DISTANCE,
+			y - dy * SHADOW_CAMERA_DISTANCE,
+			z - dz * SHADOW_CAMERA_DISTANCE,
+		]
+		const box = Math.min(
+			MAX_SHADOW_BOX,
+			Math.max(MIN_SHADOW_BOX, (dimensions?.size ?? 0) * SHADOW_PER_SIZE),
+		)
+
+		return { from, box }
+	}, [distance, heading, sunDirection, dimensions])
 
 	const faceCamera = async () => {
 		try {
@@ -282,13 +280,12 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 			const width = box.maxX - box.minX
 			const depth = box.maxZ - box.minZ
-			const height = box.maxY - box.minY
-			const size = Math.max(width, height, depth)
+			const size = Math.max(width, box.maxY - box.minY, depth)
 
-			setDimensions({ size, footprint: Math.max(width, depth), height })
+			setDimensions({ size, footprint: Math.max(width, depth) })
 		} catch {
 			// Unmeasurable: the nearest distance and a 1 m shadow still work.
-			setDimensions({ size: 0, footprint: 1, height: 0 })
+			setDimensions({ size: 0, footprint: 1 })
 		}
 
 		onModelLoaded()
@@ -309,6 +306,13 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 				color='#ffc985'
 				direction={sunDirection}
 				intensity={1000}
+				castsShadow
+				shadowOpacity={0.55}
+				shadowMapSize={SHADOW_MAP_SIZE}
+				shadowOrthographicPosition={sunShadow.from}
+				shadowOrthographicSize={sunShadow.box}
+				shadowNearZ={1}
+				shadowFarZ={SHADOW_CAMERA_DISTANCE * 2}
 			/>
 
 			{!(scenarioLoaded && placed) && (
@@ -318,6 +322,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 					position={[0, -EYE_HEIGHT, 0]}
 					rotation={FLAT}
 					materials={['view360Ground']}
+					shadowCastingBitMask={NO_SHADOW}
 				/>
 			)}
 
@@ -328,6 +333,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 					position={SCENARIO_POSITION}
 					scale={[1, 1, 1]}
 					visible={placed && scenarioLoaded}
+					shadowCastingBitMask={NO_SHADOW}
 					onLoadEnd={() => setScenario('loaded')}
 					onError={() => setScenario('failed')}
 				/>
@@ -341,19 +347,8 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 							rotation={FLAT}
 							materials={['view360Shadow']}
 							visible={placed}
+							shadowCastingBitMask={NO_SHADOW}
 						/>
-
-						<ViroNode rotation={[0, SUN_SHADOW_YAW, 0]}>
-							<ViroQuad
-								width={footprint * SUN_SHADOW_WIDTH}
-								height={sunShadowLength}
-								position={[0, SHADOW_LIFT, -sunShadowReach / 2]}
-								rotation={FLAT}
-								materials={['view360SunShadow']}
-								opacity={SUN_SHADOW_OPACITY}
-								visible={placed}
-							/>
-						</ViroNode>
 
 						{/* Its front (+Z) already faces the camera; the drag turns it. */}
 						<Viro3DObject

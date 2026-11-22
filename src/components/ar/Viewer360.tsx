@@ -157,9 +157,9 @@ export function Viewer360({
 					hdrEnabled
 					multisamplingEnabled
 					bloomEnabled={false}
-					// Viro shadows add about a second of a blank view to every start;
-					// the scene lays the animal's shadow as a texture instead.
-					shadowsEnabled={false}
+					// For the animal's live shadow. It costs every start about a
+					// second looking at the ground before head tracking begins.
+					shadowsEnabled
 					debug={false}
 					style={{ flex: 1 }}
 				/>
