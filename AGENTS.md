@@ -51,6 +51,7 @@ src/
                        map (duel map), offline (pack)
     duel/              _layout (DuelProvider): scan → play → review, debug
     points/            season: what the active points season changes
+    settings/          index (preferences), storage (what the app keeps, links to each download)
     map.tsx profile.tsx +not-found.tsx
   components/
     ui/                Generic design-system components (Button, Card, ListCard, TextField,

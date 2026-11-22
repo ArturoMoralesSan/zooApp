@@ -157,7 +157,8 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 ## Roadmap
 
 - **Payment provider integration**: connect ticket purchases and donations to a payment gateway.
-- **Settings and Help**: complete the Panel's settings and help sections.
+- **Settings**: the screen (Panel → Configuración) is a visual draft whose choices aren't saved yet: language, dark mode, AR placement (automatic or on a chosen surface), graphics quality and storage (a summary that links to each download, such as the ZooDeck pack).
+- **Help**: complete the Panel's help section.
 - **iOS release**: configure, test and publish the iOS build.
 
 ## License
