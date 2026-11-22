@@ -74,8 +74,6 @@ const IDLE_ANIMATION = { name: 'idle', run: true, loop: true }
 // in, so the scenario, the sky and the sun all turn with the animal's
 // heading and keep their places relative to it.
 const SCENARIO_POSITION: Vec3 = [0, -EYE_HEIGHT, 0]
-// The sky image has its centre at +X; Viro's 360° image starts at -Z.
-const SKY_YAW_OFFSET = -90
 // Where the sunlight travels at heading 0: from behind the user, on the
 // right, 32° above the horizon (the sky image's own sun).
 const SUN_DIRECTION: Vec3 = [-0.543, -0.528, -0.653]
@@ -293,10 +291,9 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 	return (
 		<ViroScene ref={sceneRef}>
-			<Viro360Image
-				source={background}
-				rotation={[0, heading + SKY_YAW_OFFSET, 0]}
-			/>
+			{/* The sky image has the HDRI's rotation built in and lines up with
+			    the scenario as it is (checked on a phone against a marked sky). */}
+			<Viro360Image source={background} rotation={[0, heading, 0]} />
 
 			{/* Colours measured from the noon sky; intensities set so the ground is as
 			    bright on a phone as in the Blender render. */}
