@@ -119,6 +119,7 @@ npx expo start
 | `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG`   | no       | `1` enables a fake duel that needs no QR code or backend quiz.                                          |
 | `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS` | no       | `0` disables the "you must be at the zoo" checks, so duels can be tested anywhere.                      |
 | `EXPO_PUBLIC_ZOODECK_FORCE_360`    | no       | `1` (dev only) shows the 360° view instead of AR, to test it on any phone.                              |
+| `EXPO_PUBLIC_ZOODECK_NOAR_SUPPORT` | no       | `1` (dev only) makes any phone behave as one without ARCore (360° view, no AR selfie).                  |
 
 When the backend runs on your computer, use your computer's LAN IP (not `localhost`) so the phone can reach it. Restart Metro after changing `.env`.
 

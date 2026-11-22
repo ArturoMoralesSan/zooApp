@@ -34,6 +34,7 @@ Restart Metro with `-c` after changing `tailwind.config.js`, `metro.config.js`, 
 - `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1`: fake duel with no QR or backend quiz (`/duel/debug`).
 - `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS=0`: skips the in-zoo location/ticket checks so duels can be tested anywhere. The server has its own flag.
 - `EXPO_PUBLIC_ZOODECK_FORCE_360=1`: dev only, shows the 360° view instead of AR.
+- `EXPO_PUBLIC_ZOODECK_NOAR_SUPPORT=1`: dev only, the phone behaves as one without ARCore. `FORCE_360` wins over it.
 
 The flags are read in `src/utils/zoodeckDebug.ts`. Don't change `.env` without telling the user; Metro must restart with `-c` afterwards.
 

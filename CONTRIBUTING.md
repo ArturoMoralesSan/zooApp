@@ -449,7 +449,7 @@ The app is tested on a real Android phone with the development build.
 - **States to check** for any screen with data: loading, error, empty, and offline.
 - **Offline**: turn off Wi-Fi and mobile data (or `adb shell svc wifi disable && adb shell svc data disable`, then `enable`). If Metro runs over USB, run `adb reverse tcp:8081 tcp:8081` first so the phone still reaches it. Always turn the network back on.
 - **Duels away from the zoo**: set `EXPO_PUBLIC_ZOODECK_VISIT_CHECKS=0`, or `EXPO_PUBLIC_ZOODECK_QUIZ_DEBUG=1` for a fake duel without QR or backend (see the [README](README.md#environment-variables)).
-- **AR** needs an ARCore phone; the emulator can't test it. Use `EXPO_PUBLIC_ZOODECK_FORCE_360=1` to test the 360° fallback.
+- **AR** needs an ARCore phone; the emulator can't test it. Use `EXPO_PUBLIC_ZOODECK_FORCE_360=1` to test the 360° fallback, or `EXPO_PUBLIC_ZOODECK_NOAR_SUPPORT=1` to test the whole app as on a phone without ARCore (set `FORCE_360` to `0`, it wins).
 - **Measuring the UI**: `adb shell uiautomator dump` gives element bounds in px; dp = px ÷ (`adb shell wm density` ÷ 160). Compare with the design measurements.
 
 Keep screenshots and notes out of the repo.
