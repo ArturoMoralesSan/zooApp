@@ -190,7 +190,7 @@ Key App measurements:
 - **Gestures:** outside rear-camera plane AR, drags go through a `PanResponder` layer above the view. Copy `gestureState.dx/dy` and the touches when the event arrives: PanResponder reuses the object, and a state updater that reads it later gets wrong values.
 - **Placement:** with `ViroARPlaneSelector`, forward the scene's anchor events to it through its ref (`handleAnchorFound/Updated/Removed`), and place the model at the selected plane.
 - **Models:** keep them small (a few MB, few draw calls), set `scale` explicitly, show a loading state while they load, and handle `onError`. Remove debug `console.log`s before committing.
-- **360° scenario:** `assets/models/scenario/savanna.glb` has baked ground shadows, so it, the sky rotation and the sun direction must always turn together with the animal's heading in `Viewer360Scene`. It's exported from a Blender file outside the repo: don't edit the GLB, ask the user. Details in [ARCHITECTURE](docs/ARCHITECTURE.md#ar-and-3d).
+- **360° scenario:** `assets/models/scenario/savanna.glb` has baked ground shadows, so it, the sky rotation and the sun direction must always turn together with the animal's heading in `Viewer360Scene`, and only the animal casts a live shadow (anything else gets `shadowCastingBitMask={0}`). It's exported from a Blender file outside the repo: don't edit the GLB, ask the user. Details in [ARCHITECTURE](docs/ARCHITECTURE.md#ar-and-3d).
 - **Lint:** light colors in a scene are 3D lighting, not UI. Mark them with `// eslint-disable-next-line no-restricted-syntax -- AR light color` instead of using palette tokens.
 
 ## Working efficiently (low token use)
