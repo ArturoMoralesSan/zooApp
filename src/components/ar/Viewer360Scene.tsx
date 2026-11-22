@@ -74,11 +74,9 @@ const IDLE_ANIMATION = { name: 'idle', run: true, loop: true }
 // in, so the scenario, the sky and the sun all turn with the animal's
 // heading and keep their places relative to it.
 const SCENARIO_POSITION: Vec3 = [0, -EYE_HEIGHT, 0]
-// The sky image has its centre at +X; Viro's 360° image starts at -Z.
-const SKY_YAW_OFFSET = -90
 // Where the sunlight travels at heading 0: from behind the user, on the
-// right, 24° above the horizon.
-const SUN_DIRECTION: Vec3 = [-0.604, -0.409, -0.684]
+// right, 32° above the horizon (the sky image's own sun).
+const SUN_DIRECTION: Vec3 = [-0.543, -0.528, -0.653]
 // Only the animal casts a live shadow (the scenario's are baked). The
 // sun's shadow camera sits this far up-sun from the animal, and its box
 // grows with the animal: a low sun casts long shadows.
@@ -293,19 +291,19 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 	return (
 		<ViroScene ref={sceneRef}>
-			<Viro360Image
-				source={background}
-				rotation={[0, heading + SKY_YAW_OFFSET, 0]}
-			/>
+			{/* The sky image has the HDRI's rotation built in and lines up with
+			    the scenario as it is (checked on a phone against a marked sky). */}
+			<Viro360Image source={background} rotation={[0, heading, 0]} />
 
-			{/* An evening sun, warm like the scenario's painted light. */}
+			{/* Colours measured from the noon sky; intensities set so the ground is as
+			    bright on a phone as in the Blender render. */}
 			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
-			<ViroAmbientLight color='#e3cdb4' intensity={230} />
+			<ViroAmbientLight color='#c5e3ff' intensity={362} />
 			<ViroDirectionalLight
 				// eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color
-				color='#ffc985'
+				color='#fff2cc'
 				direction={sunDirection}
-				intensity={1000}
+				intensity={728}
 				castsShadow
 				shadowOpacity={0.55}
 				shadowMapSize={SHADOW_MAP_SIZE}
