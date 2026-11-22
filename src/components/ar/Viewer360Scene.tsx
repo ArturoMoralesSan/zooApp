@@ -13,8 +13,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ImageSourcePropType } from 'react-native'
 
 import contactShadow from '@/assets/images/view360/contact-shadow.png'
-import neutralSky from '@/assets/images/view360/sky.png'
+import savannaSky from '@/assets/images/view360/savanna-sky.jpg'
+import savannaScenario from '@/assets/models/scenario/savanna.glb'
 import colors from '@/theme/colors'
+import { rotateAroundY, type Vec3 } from '@/utils/view360'
 
 export type Viewer360SceneProps = {
 	// GLB at real scale (1 unit = 1 m, origin at the bottom center).
@@ -23,8 +25,7 @@ export type Viewer360SceneProps = {
 	yaw: number
 	// Each new value moves the animal in front of where the phone points.
 	centerKey: number
-	// Equirectangular image around the user. The neutral sky for now; a
-	// habitat's own 360° photo can replace it later.
+	// Equirectangular image around the user; the savanna's sky by default.
 	background?: ImageSourcePropType
 	onModelLoaded: () => void
 	onModelError: () => void
@@ -33,8 +34,6 @@ export type Viewer360SceneProps = {
 type Viewer360SceneNavigatorProps = {
 	sceneNavigator: { viroAppProps: Viewer360SceneProps }
 }
-
-type Vec3 = [number, number, number]
 
 type BoundingBox = {
 	minX: number
@@ -65,6 +64,18 @@ const NO_HOLES: [number, number][][] = []
 
 // Every card model embeds an "idle" clip.
 const IDLE_ANIMATION = { name: 'idle', run: true, loop: true }
+
+// The savanna (built in Blender, outside the repo) is laid out around -Z,
+// where the animal stands: a clear area 6 m wide from 1.5 to 8.5 m, plants
+// and rocks around it. Its ground has the shadows of SUN_DIRECTION baked
+// in, so the scenario, the sky and the sun all turn with the animal's
+// heading and keep their places relative to it.
+const SCENARIO_POSITION: Vec3 = [0, -EYE_HEIGHT, 0]
+// The sky image has its centre at +X; Viro's 360° image starts at -Z.
+const SKY_YAW_OFFSET = -90
+// Where the sunlight travels at heading 0: from behind the user, on the
+// right, 24° above the horizon.
+const SUN_DIRECTION: Vec3 = [-0.604, -0.409, -0.684]
 
 ViroMaterials.createMaterials({
 	view360Ground: {
@@ -132,7 +143,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		modelUrl,
 		yaw,
 		centerKey,
-		background = neutralSky,
+		background = savannaSky,
 		onModelLoaded,
 		onModelError,
 	} = props?.sceneNavigator.viroAppProps ?? NO_SCENE_PROPS
@@ -144,6 +155,13 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 	const [heading, setHeading] = useState(0)
 	// Shown only once placed in front of the user (see below).
 	const [placed, setPlaced] = useState(false)
+	// Until the scenario shows (or if it can't load) the plain ground disc
+	// stands in for it; the animal never waits for it.
+	const [scenarioLoaded, setScenarioLoaded] = useState(false)
+	const sunDirection = useMemo(
+		() => rotateAroundY(SUN_DIRECTION, heading),
+		[heading],
+	)
 	// Same object between renders: the scene re-renders on every drag frame,
 	// and a new source would load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
@@ -217,27 +235,43 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 	return (
 		<ViroScene ref={sceneRef}>
-			<Viro360Image source={background} />
+			<Viro360Image
+				source={background}
+				rotation={[0, heading + SKY_YAW_OFFSET, 0]}
+			/>
 
+			{/* Measured from the scenario's sky: bluish sky light and a warm sun. */}
 			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
-			<ViroAmbientLight color='#fff' intensity={300} />
+			<ViroAmbientLight color='#b7daff' intensity={290} />
 			<ViroDirectionalLight
 				// eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color
-				color='#fff'
-				direction={[0.3, -1, -0.6]}
-				intensity={600}
+				color='#ffeed8'
+				direction={sunDirection}
+				intensity={1250}
 			/>
 
-			<ViroPolygon
-				vertices={ground}
-				holes={NO_HOLES}
-				position={[0, -EYE_HEIGHT, 0]}
-				rotation={FLAT}
-				materials={['view360Ground']}
-			/>
+			{!(scenarioLoaded && placed) && (
+				<ViroPolygon
+					vertices={ground}
+					holes={NO_HOLES}
+					position={[0, -EYE_HEIGHT, 0]}
+					rotation={FLAT}
+					materials={['view360Ground']}
+				/>
+			)}
 
-			{modelUrl && (
-				<ViroNode rotation={[0, heading, 0]}>
+			<ViroNode rotation={[0, heading, 0]}>
+				<Viro3DObject
+					source={savannaScenario}
+					type='GLB'
+					position={SCENARIO_POSITION}
+					scale={[1, 1, 1]}
+					visible={placed && scenarioLoaded}
+					onLoadEnd={() => setScenarioLoaded(true)}
+					onError={() => setScenarioLoaded(false)}
+				/>
+
+				{modelUrl && (
 					<ViroNode position={[0, -EYE_HEIGHT, -distance]}>
 						<ViroQuad
 							width={shadowSize}
@@ -261,8 +295,8 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 							onError={onModelError}
 						/>
 					</ViroNode>
-				</ViroNode>
-			)}
+				)}
+			</ViroNode>
 		</ViroScene>
 	)
 }
