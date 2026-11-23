@@ -1,5 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
-import { act, render } from '@testing-library/react-native'
+import { act, render, screen } from '@testing-library/react-native'
 import {
 	PanResponder,
 	type PanResponderCallbacks,
@@ -19,6 +19,7 @@ type SceneProps = {
 	yaw: number
 	scenario: boolean
 	liveShadow: boolean
+	onReady: () => void
 	onTrackingStuck: () => void
 }
 
@@ -155,4 +156,41 @@ test('the graphics level reaches the scene and the navigator', async () => {
 		liveShadow: false,
 	})
 	expect(mockNavigator.shadowsEnabled).toBe(false)
+})
+
+test('a cover hides the view until the scene is ready, then fades out', async () => {
+	jest.useFakeTimers()
+	const onCoverChange = jest.fn()
+	await render(
+		<Viewer360
+			modelUrl='https://example.test/mapache.glb'
+			graphics={GRAPHICS_PRESETS.high}
+			onModelLoaded={jest.fn()}
+			onModelError={jest.fn()}
+			onCoverChange={onCoverChange}
+		/>,
+	)
+	const cover = 'Cargando la vista 360°'
+
+	await act(async () => jest.advanceTimersByTime(5000))
+	expect(screen.getByLabelText(cover)).toBeOnTheScreen()
+
+	await act(async () => mockNavigator.props?.onReady())
+	// Still covered while it waits and fades.
+	expect(onCoverChange).toHaveBeenLastCalledWith(true)
+	await act(async () => jest.advanceTimersByTime(1000))
+	expect(screen.queryByLabelText(cover)).toBeNull()
+	expect(onCoverChange).toHaveBeenLastCalledWith(false)
+
+	// A restart covers the new view again until it's ready.
+	await act(async () => mockNavigator.props?.onTrackingStuck())
+	expect(screen.getByLabelText(cover)).toBeOnTheScreen()
+	expect(onCoverChange).toHaveBeenLastCalledWith(true)
+
+	// Never for good: a phone lying flat never places the animal.
+	await act(async () => jest.advanceTimersByTime(20000))
+	await act(async () => jest.advanceTimersByTime(1000))
+	expect(screen.queryByLabelText(cover)).toBeNull()
+
+	jest.useRealTimers()
 })

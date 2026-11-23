@@ -131,6 +131,8 @@ export default function CardArScreen() {
 	// The view being opened by the switch or the surface offer.
 	const [switchingTo, setSwitchingTo] = useState<AnimalView | null>(null)
 	const [view360, setView360] = useState<View360Status>('loading')
+	// Viewer360's loading cover: recentering waits until it has faded out.
+	const [view360Covered, setView360Covered] = useState(true)
 	// The 360° view's controls are explained once per device; null while the
 	// flag is read, so a user who has seen them never gets a flash of it.
 	const [show360Hint, setShow360Hint] = useState<boolean | null>(null)
@@ -355,6 +357,7 @@ export default function CardArScreen() {
 					graphics={graphics}
 					onModelLoaded={on360Loaded}
 					onModelError={on360Error}
+					onCoverChange={setView360Covered}
 				/>
 			)}
 
@@ -486,7 +489,7 @@ export default function CardArScreen() {
 						pointerEvents='box-none'
 						className={showSwitch ? 'h-[76px] justify-center' : ''}
 					>
-						{show360 && view360 === 'loaded' ? (
+						{show360 && view360 === 'loaded' && !view360Covered ? (
 							<View className='items-center'>
 								<RoundCameraButton
 									icon={CenterFocusIcon}

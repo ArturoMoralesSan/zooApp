@@ -44,8 +44,18 @@ jest.mock('@/components/ar/Viewer360', () => {
 	const { useEffect } = jest.requireActual<typeof import('react')>('react')
 
 	return {
-		Viewer360: ({ onModelLoaded }: { onModelLoaded: () => void }) => {
-			useEffect(() => onModelLoaded(), [onModelLoaded])
+		// Loaded, and its loading cover already faded out.
+		Viewer360: ({
+			onModelLoaded,
+			onCoverChange,
+		}: {
+			onModelLoaded: () => void
+			onCoverChange?: (covered: boolean) => void
+		}) => {
+			useEffect(() => {
+				onModelLoaded()
+				onCoverChange?.(false)
+			}, [onModelLoaded, onCoverChange])
 
 			return null
 		},

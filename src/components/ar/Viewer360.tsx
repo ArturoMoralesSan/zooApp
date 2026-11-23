@@ -36,6 +36,9 @@ type Viewer360Props = {
 	graphics: GraphicsEffects
 	onModelLoaded: () => void
 	onModelError: () => void
+	// The loading cover going up (also on a restart) or, after its fade,
+	// down: controls that need the scene wait for it.
+	onCoverChange?: (covered: boolean) => void
 	ref?: Ref<Viewer360Handle>
 }
 
@@ -67,6 +70,7 @@ export function Viewer360({
 	graphics,
 	onModelLoaded,
 	onModelError,
+	onCoverChange,
 	ref,
 }: Viewer360Props) {
 	const navigation = useNavigation()
@@ -82,6 +86,8 @@ export function Viewer360({
 	const [covered, setCovered] = useState(true)
 	const [coverOpacity] = useState(() => new Animated.Value(1))
 	const markReady = useCallback(() => setReady(true), [])
+
+	useEffect(() => onCoverChange?.(covered), [covered, onCoverChange])
 
 	const restart = useCallback(() => {
 		if (restarts.current >= MAX_RESTARTS) return
