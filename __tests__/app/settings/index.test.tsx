@@ -71,6 +71,22 @@ test('the placement choice is saved and read back next time', async () => {
 	).toBeTruthy()
 })
 
+test('animals open in AR until 360° is chosen, which is saved', async () => {
+	await renderWithProviders(<SettingsScreen />)
+
+	await fireEvent.press(
+		await screen.findByLabelText(
+			'Vista de los animales, Realidad aumentada (AR)',
+		),
+	)
+	await fireEvent.press(await screen.findByLabelText(/^Vista 360°\./))
+
+	expect(
+		await screen.findByLabelText('Vista de los animales, Vista 360°'),
+	).toBeTruthy()
+	expect(await SecureStore.getItemAsync('zooapp_pref_animal_view')).toBe('360')
+})
+
 test('the graphics row shows the saved level and opens its screen', async () => {
 	await SecureStore.setItemAsync('zooapp_pref_graphics', 'saver')
 	await renderWithProviders(<SettingsScreen />)
