@@ -13,7 +13,8 @@ export type ArAvailability =
 	'checking' | 'ar' | 'unsupported' | 'no-camera' | 'forced'
 
 type Options = {
-	// The duel already has the camera (the QR scan needed it).
+	// False when the camera isn't needed: the duel already has it (the QR
+	// scan asked), or the 360° view was chosen. Asked again when it turns true.
 	camera?: boolean
 }
 
@@ -70,9 +71,17 @@ export function useArAvailability({ camera = true }: Options = {}) {
 
 	const needsCamera = camera && supported === true
 
+	// Not needed any more (the 360° view was chosen): the next time AR is
+	// chosen on this screen, the camera is asked for again.
+	if (!needsCamera && answered) setAnswered(false)
+
 	// Asked only on a phone that can do AR.
 	useEffect(() => {
-		if (!needsCamera || !permission || permission.granted) return
+		if (!needsCamera) {
+			asked.current = false
+			return
+		}
+		if (!permission || permission.granted) return
 		if (!permission.canAskAgain || asked.current) return
 
 		asked.current = true

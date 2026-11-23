@@ -141,4 +141,23 @@ describe('useViroExit', () => {
 		expect(first).toHaveBeenCalledTimes(1)
 		expect(second).not.toHaveBeenCalled()
 	})
+
+	test('reset lets the view mount again for another exit', async () => {
+		const first = jest.fn()
+		const second = jest.fn()
+		const { result } = await renderHook(() => useViroExit('scene3d'))
+
+		await act(async () => result.current.exit(first))
+		await advance(500)
+		expect(first).toHaveBeenCalledTimes(1)
+
+		await act(async () => result.current.reset())
+		expect(result.current.exiting).toBe(false)
+		expect(result.current.closing).toBe(false)
+
+		await act(async () => result.current.exit(second))
+		expect(result.current.exiting).toBe(true)
+		await advance(500)
+		expect(second).toHaveBeenCalledTimes(1)
+	})
 })

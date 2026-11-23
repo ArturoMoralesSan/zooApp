@@ -49,3 +49,24 @@ test('a surface found in time never shows the offer', async () => {
 
 	expect(result.current).toBe(false)
 })
+
+test('AR opened again after the 360° view waits the full 10 s again', async () => {
+	const { result, rerender } = await renderHook(
+		({ searching }: { searching: boolean }) => useSurfaceOffer(searching),
+		{ initialProps: { searching: true } },
+	)
+
+	await act(async () => {
+		jest.advanceTimersByTime(10_000)
+	})
+	expect(result.current).toBe(true)
+
+	await rerender({ searching: false })
+	await rerender({ searching: true })
+	expect(result.current).toBe(false)
+
+	await act(async () => {
+		jest.advanceTimersByTime(10_000)
+	})
+	expect(result.current).toBe(true)
+})
