@@ -9,13 +9,20 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { PanResponder, View } from 'react-native'
+import {
+	ActivityIndicator,
+	Animated,
+	Easing,
+	PanResponder,
+	View,
+} from 'react-native'
 
 import {
 	Viewer360Scene,
 	type Viewer360SceneProps,
 } from '@/components/ar/Viewer360Scene'
 import { YAW_PER_PX } from '@/components/deck/CardViewerFrame'
+import colors from '@/theme/colors'
 import type { GraphicsEffects } from '@/types/settings'
 
 export type Viewer360Handle = {
@@ -45,6 +52,12 @@ const RELOCK_DELAY_MS = 500
 // released crashes natively). A couple of tries, never a loop.
 const RESTART_DELAY_MS = 1000
 const MAX_RESTARTS = 2
+// The loading cover: Viro reports a model loaded a moment before it draws
+// it, so the fade waits a little, and never waits for good (a phone kept
+// lying flat never places the animal).
+const COVER_SETTLE_MS = 300
+const COVER_FADE_MS = 450
+const COVER_MAX_MS = 20000
 
 // Vista 360° (the fallback when AR isn't possible): a single view, not
 // split for a headset, where the gyroscope drives the camera. Dragging
@@ -63,13 +76,46 @@ export function Viewer360({
 	const [session, setSession] = useState(0)
 	const [restarting, setRestarting] = useState(false)
 	const restarts = useRef(0)
+	// Hides the half-loaded scene (plain disc, savanna popping in) until it's
+	// ready; shown again for each restart.
+	const [ready, setReady] = useState(false)
+	const [covered, setCovered] = useState(true)
+	const [coverOpacity] = useState(() => new Animated.Value(1))
+	const markReady = useCallback(() => setReady(true), [])
 
 	const restart = useCallback(() => {
 		if (restarts.current >= MAX_RESTARTS) return
 
 		restarts.current += 1
 		setRestarting(true)
-	}, [])
+		setReady(false)
+		setCovered(true)
+		coverOpacity.setValue(1)
+	}, [coverOpacity])
+
+	useEffect(() => {
+		if (!covered) return
+
+		if (!ready) {
+			const timeout = setTimeout(markReady, COVER_MAX_MS)
+
+			return () => clearTimeout(timeout)
+		}
+
+		const fade = Animated.timing(coverOpacity, {
+			toValue: 0,
+			delay: COVER_SETTLE_MS,
+			duration: COVER_FADE_MS,
+			easing: Easing.out(Easing.quad),
+			useNativeDriver: true,
+		})
+
+		fade.start(({ finished }) => {
+			if (finished) setCovered(false)
+		})
+
+		return () => fade.stop()
+	}, [ready, covered, coverOpacity, markReady])
 
 	useEffect(() => {
 		if (!restarting) return
@@ -137,7 +183,11 @@ export function Viewer360({
 				lockPortrait()
 				onModelLoaded()
 			},
-			onModelError,
+			onModelError: () => {
+				markReady()
+				onModelError()
+			},
+			onReady: markReady,
 			onTrackingStuck: restart,
 		}),
 		[
@@ -148,6 +198,7 @@ export function Viewer360({
 			onModelLoaded,
 			onModelError,
 			lockPortrait,
+			markReady,
 			restart,
 		],
 	)
@@ -170,6 +221,19 @@ export function Viewer360({
 					debug={false}
 					style={{ flex: 1 }}
 				/>
+			)}
+
+			{covered && (
+				<Animated.View
+					pointerEvents='none'
+					accessible
+					accessibilityRole='progressbar'
+					accessibilityLabel='Cargando la vista 360°'
+					className='absolute inset-0 items-center justify-center bg-niebla'
+					style={{ opacity: coverOpacity }}
+				>
+					<ActivityIndicator size='large' color={colors.esmeralda} />
+				</Animated.View>
 			)}
 
 			{/* Viro's view has no touch handling outside AR: drags land here. */}

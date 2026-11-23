@@ -46,6 +46,9 @@ export type Viewer360SceneProps = {
 	liveShadow: boolean
 	onModelLoaded: () => void
 	onModelError: () => void
+	// Once the animal is placed and the scenario has loaded (or failed): what
+	// a loading cover waits for. Called once per scene.
+	onReady: () => void
 	// Head tracking hasn't started (see TRACKING_STUCK_MS): the view needs
 	// to be created again.
 	onTrackingStuck: () => void
@@ -112,6 +115,7 @@ const NO_SCENE_PROPS: Viewer360SceneProps = {
 	liveShadow: true,
 	onModelLoaded: noop,
 	onModelError: noop,
+	onReady: noop,
 	onTrackingStuck: noop,
 }
 
@@ -164,6 +168,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		liveShadow,
 		onModelLoaded,
 		onModelError,
+		onReady,
 		onTrackingStuck,
 	} = props?.sceneNavigator.viroAppProps ?? NO_SCENE_PROPS
 	const sceneRef = useRef<ViroScene>(null)
@@ -262,6 +267,10 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 		return () => clearInterval(interval)
 	}, [dimensions, placed, scenario, onTrackingStuck])
+
+	useEffect(() => {
+		if (placed && scenario !== 'loading') onReady()
+	}, [placed, scenario, onReady])
 
 	// Measured hidden first: its size decides how far away it stands.
 	const measure = async () => {
