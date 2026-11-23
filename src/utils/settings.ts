@@ -123,14 +123,16 @@ export const GRAPHICS_PRESETS: Record<'high' | 'saver', GraphicsEffects> = {
 	},
 }
 
-// Rough weight of each effect on the phone: the savanna is by far the
-// heaviest (about 110 MB of graphics memory), the blob almost free.
+// Weight of each effect, from a moto g 5G (2024): the savanna costs about
+// 119 MB of graphics memory; the live shadows no measurable fps (AR stays
+// at 30, the 360° view at 60), only a little work per frame; the light and
+// the blob next to nothing.
 const EFFECT_COST: Record<keyof GraphicsEffects, number> = {
-	arDaylight: 1,
-	arLiveShadow: 2,
+	arDaylight: 0.5,
+	arLiveShadow: 1,
 	arBlob: 0.5,
 	view360Scenario: 5,
-	view360LiveShadow: 2,
+	view360LiveShadow: 1,
 }
 const TOTAL_COST = Object.values(EFFECT_COST).reduce((sum, n) => sum + n, 0)
 

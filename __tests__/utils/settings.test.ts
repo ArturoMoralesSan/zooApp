@@ -26,8 +26,12 @@ test('the load grows with the effects, the savanna weighing most', () => {
 		level: 'high',
 	})
 	expect(graphicsLoad(GRAPHICS_PRESETS.saver).level).toBe('low')
+	// The savanna alone makes it high; the rest of Alta without it, medium.
 	expect(
 		graphicsLoad({ ...GRAPHICS_PRESETS.saver, view360Scenario: true }).level,
+	).toBe('high')
+	expect(
+		graphicsLoad({ ...GRAPHICS_PRESETS.high, view360Scenario: false }).level,
 	).toBe('medium')
 })
 
