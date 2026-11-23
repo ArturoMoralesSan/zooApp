@@ -191,13 +191,20 @@ export type DeviceClass = {
 	totalMemory: number | null
 }
 
-// The effects a level turns on; 'custom' uses the user's own mix.
+// The effects a level turns on; 'custom' uses the user's own mix. The 360°
+// live shadow needs the savanna: the plain ground is unlit and takes no
+// shadow (an arShadowReceiver quad doesn't work outside AR).
 export function resolveGraphics(
 	quality: GraphicsQuality,
 	custom: GraphicsEffects,
 	device: DeviceClass,
 ): GraphicsEffects {
-	if (quality === 'custom') return custom
+	if (quality === 'custom') {
+		return {
+			...custom,
+			view360LiveShadow: custom.view360Scenario && custom.view360LiveShadow,
+		}
+	}
 
 	return GRAPHICS_PRESETS[
 		quality === 'auto' ? autoGraphicsLevel(device) : quality

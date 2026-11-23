@@ -40,5 +40,13 @@ test('a level resolves to its effects; Personalizada to the user’s mix', () =>
 	expect(resolveGraphics('saver', mix, recent)).toEqual(GRAPHICS_PRESETS.saver)
 	expect(resolveGraphics('auto', mix, recent)).toEqual(GRAPHICS_PRESETS.high)
 	expect(resolveGraphics('auto', mix, old)).toEqual(GRAPHICS_PRESETS.saver)
-	expect(resolveGraphics('custom', mix, recent)).toBe(mix)
+	expect(resolveGraphics('custom', mix, recent)).toEqual(mix)
+	// The 360° shadow needs the savanna.
+	expect(
+		resolveGraphics(
+			'custom',
+			{ ...GRAPHICS_PRESETS.high, view360Scenario: false },
+			recent,
+		).view360LiveShadow,
+	).toBe(false)
 })

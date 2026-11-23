@@ -110,9 +110,14 @@ export default function GraphicsSettingsScreen() {
 							/>
 							<Toggle
 								label='Sombra en el suelo'
-								description='La sombra del animal en tiempo real.'
+								description={
+									effects.view360Scenario
+										? 'La sombra del animal en tiempo real.'
+										: 'Necesita el escenario de la sabana.'
+								}
 								value={effects.view360LiveShadow}
 								onValueChange={set('view360LiveShadow')}
+								disabled={!effects.view360Scenario}
 							/>
 						</View>
 

@@ -73,3 +73,18 @@ test('the level and the mix are saved and read back', async () => {
 		screen.getAllByRole('switch', { name: 'Sombra en el suelo' })[0],
 	).not.toBeChecked()
 })
+
+test('without the savanna the 360° shadow is off and says why', async () => {
+	await renderWithProviders(<GraphicsSettingsScreen />)
+
+	await fireEvent.press(await screen.findByRole('radio', { name: /^Alta\./ }))
+	await fireEvent.press(scenario())
+
+	const shadow360 = screen.getAllByRole('switch', {
+		name: 'Sombra en el suelo',
+	})[1]
+
+	expect(shadow360).toBeDisabled()
+	expect(shadow360).not.toBeChecked()
+	expect(screen.getByText('Necesita el escenario de la sabana.')).toBeTruthy()
+})
