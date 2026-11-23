@@ -1,6 +1,5 @@
 import {
 	Viro3DObject,
-	ViroAmbientLight,
 	ViroARPlaneSelector,
 	ViroARScene,
 	type ViroCameraARHitTest,
@@ -10,6 +9,8 @@ import {
 } from '@reactvision/react-viro'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { ArLights, DEFAULT_LIGHT_DIRECTION } from '@/components/ar/ArLights'
+import { ArShadow } from '@/components/ar/ArShadow'
 import colors from '@/theme/colors'
 import type { ArPlacement } from '@/types/settings'
 import {
@@ -29,6 +30,12 @@ import {
 	steadyTolerance,
 	yawToward,
 } from '@/utils/arPlacement'
+import {
+	type Dimensions,
+	dimensionsOf,
+	FALLBACK_DIMENSIONS,
+	lightFromCamera,
+} from '@/utils/shadow'
 
 export type ModelPlacementSceneProps = {
 	// GLB already at real scale (1 unit = 1 m, origin at the bottom center).
@@ -56,10 +63,23 @@ type ModelPlacementSceneNavigatorProps = {
 type Vec3 = [number, number, number]
 
 // Where the model stands: the tapped point in world space, turned to face
-// the camera at that moment.
-type Placement = { position: Vec3; yaw: number }
+// the camera at that moment, and where the light comes from (fixed then,
+// so the shadow doesn't swing as the user walks around).
+type Placement = { position: Vec3; yaw: number; light: Vec3 }
 
 const noop = () => {}
+
+// The model's size, or the fallback when it can't be measured.
+async function measureModel(model: Viro3DObject | null) {
+	try {
+		const result = (await model?.getBoundingBoxAsync()) as
+			{ boundingBox?: BoundingBox } | undefined
+
+		return result?.boundingBox ?? null
+	} catch {
+		return null
+	}
+}
 
 // Every card model embeds an "idle" clip; it loops from the moment the
 // animal is placed.
@@ -102,6 +122,7 @@ function PlanePlacement({
 }: ModelPlacementSceneProps) {
 	const sceneRef = useRef<ViroARScene>(null)
 	const selectorRef = useRef<ViroARPlaneSelector>(null)
+	const modelRef = useRef<Viro3DObject>(null)
 	// The plane the user picked. ARCore drops and re-creates anchors when the
 	// app is paused (Gemini, a system dialog); forwarding that removal would
 	// clear the selection and show the planes again.
@@ -109,6 +130,8 @@ function PlanePlacement({
 	// Same object between renders, so Viro doesn't load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
 	const [placement, setPlacement] = useState<Placement | null>(null)
+	// Measured once loaded: the shadow shows with the model.
+	const [dimensions, setDimensions] = useState<Dimensions | null>(null)
 	const [placedFor, setPlacedFor] = useState(resetKey)
 
 	// A new reset key clears the selection: the planes show again and the
@@ -116,6 +139,7 @@ function PlanePlacement({
 	if (placedFor !== resetKey) {
 		setPlacedFor(resetKey)
 		setPlacement(null)
+		setDimensions(null)
 	}
 
 	useEffect(() => {
@@ -127,17 +151,28 @@ function PlanePlacement({
 		selectedAnchorRef.current = anchorId
 
 		let yaw = 0
+		let light = DEFAULT_LIGHT_DIRECTION
 
 		try {
 			const camera = await sceneRef.current?.getCameraOrientationAsync()
 
-			if (camera) yaw = yawToward(position, camera.position)
+			if (camera) {
+				yaw = yawToward(position, camera.position)
+				light = lightFromCamera(position, camera.position)
+			}
 		} catch {
 			// Facing the default direction is fine.
 		}
 
-		setPlacement({ position, yaw })
+		setPlacement({ position, yaw, light })
 		onPlaced()
+	}
+
+	const measure = async () => {
+		const box = await measureModel(modelRef.current)
+
+		setDimensions(box ? dimensionsOf(box) : FALLBACK_DIMENSIONS)
+		onModelLoaded()
 	}
 
 	return (
@@ -155,8 +190,14 @@ function PlanePlacement({
 				}
 			}}
 		>
-			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
-			<ViroAmbientLight color='#fff' intensity={250} />
+			<ArLights
+				direction={placement?.light ?? DEFAULT_LIGHT_DIRECTION}
+				shadow={
+					placement && dimensions
+						? { target: placement.position, size: dimensions.size }
+						: null
+				}
+			/>
 
 			{modelUrl && (
 				<ViroARPlaneSelector
@@ -176,12 +217,14 @@ function PlanePlacement({
 					position={placement.position}
 					rotation={[0, placement.yaw, 0]}
 				>
+					{dimensions && <ArShadow dimensions={dimensions} receiver />}
 					<Viro3DObject
+						ref={modelRef}
 						source={source}
 						type='GLB'
 						scale={[1, 1, 1]}
 						animation={IDLE_ANIMATION}
-						onLoadEnd={onModelLoaded}
+						onLoadEnd={() => void measure()}
 						onError={onModelError}
 					/>
 				</ViroNode>
@@ -208,6 +251,11 @@ const FLOOR_HALF_LIFE = 50
 const MIN_YAW_STEP = 1
 // Used when the model can't be measured.
 const FALLBACK_SIZE = { distance: 2.5, height: 1, radius: 0.6 }
+const FALLBACK_AUTO_DIMENSIONS: Dimensions = {
+	size: FALLBACK_SIZE.height,
+	footprint: FALLBACK_SIZE.radius * 2,
+	height: FALLBACK_SIZE.height,
+}
 
 // Unit ring, flat on the floor: a 64-sided circle with a hole. Its node is
 // scaled to the animal's footprint.
@@ -287,13 +335,18 @@ function AutoPlacement({
 }: ModelPlacementSceneProps) {
 	const nodeRef = useRef<ViroNode>(null)
 	const ringRef = useRef<ViroNode>(null)
+	// The contact blob follows the ring; it stays under the animal once landed.
+	const shadowRef = useRef<ViroNode>(null)
 	const modelRef = useRef<Viro3DObject>(null)
 	const live = useRef(createLive())
 	// Same object between renders, so Viro doesn't load the GLB again.
 	const source = useMemo(() => ({ uri: modelUrl ?? '' }), [modelUrl])
 	// Hidden until measured; idle animation once placed.
 	const [visible, setVisible] = useState(false)
-	const [placed, setPlaced] = useState(false)
+	const [dimensions, setDimensions] = useState<Dimensions | null>(null)
+	// Where it landed and the light fixed then; null while floating.
+	const [landed, setLanded] = useState<Omit<Placement, 'yaw'> | null>(null)
+	const placed = landed !== null
 	// A model that failed to load is mounted again (a new key) on reset.
 	const [failed, setFailed] = useState(false)
 	const [attempt, setAttempt] = useState(0)
@@ -301,7 +354,7 @@ function AutoPlacement({
 
 	if (placedFor !== resetKey) {
 		setPlacedFor(resetKey)
-		setPlaced(false)
+		setLanded(null)
 
 		if (failed) {
 			setFailed(false)
@@ -336,8 +389,10 @@ function AutoPlacement({
 				position: [position[0], position[1] + RING_LIFT, position[2]],
 				visible: shown,
 			})
+			shadowRef.current?.setNativeProps({ position, visible: shown })
 		} else if (state.ringShown !== shown) {
 			ringRef.current?.setNativeProps({ visible: shown })
+			shadowRef.current?.setNativeProps({ visible: shown })
 		}
 		state.ringShown = shown
 	}
@@ -367,7 +422,10 @@ function AutoPlacement({
 		state.shown = state.hit
 		showRing(false)
 		moveModel(state.hit, yawToward(state.hit, state.camera))
-		setPlaced(true)
+		setLanded({
+			position: state.hit,
+			light: lightFromCamera(state.hit, state.camera),
+		})
 		onPlaced()
 	}
 
@@ -461,25 +519,19 @@ function AutoPlacement({
 	// Measured before it ever turns (rotation 0): X is its width, Z its depth.
 	const measure = async () => {
 		const state = live.current
-		let size = FALLBACK_SIZE
-
-		try {
-			const result = (await modelRef.current?.getBoundingBoxAsync()) as
-				{ boundingBox?: BoundingBox } | undefined
-			const box = result?.boundingBox
-
-			if (box) {
-				size = {
+		const box = await measureModel(modelRef.current)
+		// Fallback size: it may not fit the screen exactly.
+		const measured = box ? dimensionsOf(box) : FALLBACK_AUTO_DIMENSIONS
+		const size = box
+			? {
 					distance: fitDistance(box),
-					height: box.maxY - box.minY,
-					radius: Math.max(box.maxX - box.minX, box.maxZ - box.minZ) / 2,
+					height: measured.height,
+					radius: measured.footprint / 2,
 				}
-			}
-		} catch {
-			// Fallback size: it may not fit the screen exactly.
-		}
+			: FALLBACK_SIZE
 
 		state.size = size
+		setDimensions(measured)
 		ringRef.current?.setNativeProps({
 			scale: [size.radius, size.radius, size.radius],
 		})
@@ -496,8 +548,26 @@ function AutoPlacement({
 			// closing, Viro stops emitting them.
 			onCameraARHitTest={placed || closing ? undefined : onHitTest}
 		>
-			{/* eslint-disable-next-line no-restricted-syntax -- AR light color, not a UI color */}
-			<ViroAmbientLight color='#fff' intensity={250} />
+			<ArLights
+				direction={landed?.light ?? DEFAULT_LIGHT_DIRECTION}
+				shadow={
+					landed && dimensions
+						? { target: landed.position, size: dimensions.size }
+						: null
+				}
+			/>
+
+			{/* Hidden while floating; moved with the ring, then left under the
+			    animal with the live shadow on. */}
+			{dimensions && (
+				<ArShadow
+					ref={shadowRef}
+					dimensions={dimensions}
+					receiver={placed}
+					position={landed?.position}
+					visible={placed}
+				/>
+			)}
 
 			<ViroNode ref={ringRef} visible={false}>
 				<ViroPolygon

@@ -354,6 +354,8 @@ export default function DuelPlayScreen() {
 			) : placement === null ? null : (
 				<ViroARSceneNavigator
 					autofocus
+					// The animal's live shadow (ArLights, ArShadow).
+					shadowsEnabled
 					initialScene={{ scene: ModelPlacementScene }}
 					viroAppProps={sceneProps}
 					style={{ flex: 1 }}

@@ -283,6 +283,8 @@ export default function CardArScreen() {
 				<ViroARSceneNavigator
 					ref={navigatorRef}
 					autofocus
+					// The animal's live shadow (ArLights, ArShadow).
+					shadowsEnabled
 					initialScene={{ scene: ModelPlacementScene }}
 					viroAppProps={sceneProps}
 					style={{ flex: 1 }}
