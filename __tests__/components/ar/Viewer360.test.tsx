@@ -8,13 +8,19 @@ import {
 
 import { Viewer360 } from '@/components/ar/Viewer360'
 import { YAW_PER_PX } from '@/components/deck/CardViewerFrame'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 // The view relocks the screen's orientation through the navigation.
 jest.mock('expo-router', () => ({
 	useNavigation: () => ({ setOptions: () => {} }),
 }))
 
-type SceneProps = { yaw: number; onTrackingStuck: () => void }
+type SceneProps = {
+	yaw: number
+	scenario: boolean
+	liveShadow: boolean
+	onTrackingStuck: () => void
+}
 
 // The yaw each render hands the scene.
 const mockSceneYaws: number[] = []
@@ -23,6 +29,7 @@ const mockNavigator = {
 	mounts: 0,
 	mounted: false,
 	props: null as SceneProps | null,
+	shadowsEnabled: undefined as boolean | undefined,
 }
 
 jest.mock('@reactvision/react-viro', () => {
@@ -31,9 +38,16 @@ jest.mock('@reactvision/react-viro', () => {
 	return {
 		// Viewer360Scene registers its materials on import.
 		ViroMaterials: { createMaterials: () => {} },
-		ViroVRSceneNavigator: ({ viroAppProps }: { viroAppProps: SceneProps }) => {
+		ViroVRSceneNavigator: ({
+			viroAppProps,
+			shadowsEnabled,
+		}: {
+			viroAppProps: SceneProps
+			shadowsEnabled?: boolean
+		}) => {
 			mockSceneYaws.push(viroAppProps.yaw)
 			mockNavigator.props = viroAppProps
+			mockNavigator.shadowsEnabled = shadowsEnabled
 
 			useEffect(() => {
 				mockNavigator.mounts += 1
@@ -54,6 +68,7 @@ test('a drag keeps its turn when the release resets the gesture', async () => {
 	await render(
 		<Viewer360
 			modelUrl='https://example.test/mapache.glb'
+			graphics={GRAPHICS_PRESETS.high}
 			onModelLoaded={jest.fn()}
 			onModelError={jest.fn()}
 		/>,
@@ -83,6 +98,7 @@ test('stuck head tracking creates the view again, at most twice', async () => {
 	await render(
 		<Viewer360
 			modelUrl='https://example.test/mapache.glb'
+			graphics={GRAPHICS_PRESETS.high}
 			onModelLoaded={jest.fn()}
 			onModelError={jest.fn()}
 		/>,
@@ -106,4 +122,37 @@ test('stuck head tracking creates the view again, at most twice', async () => {
 	expect(mockNavigator.mounts).toBe(3)
 
 	jest.useRealTimers()
+})
+
+test('the graphics level reaches the scene and the navigator', async () => {
+	const { rerender } = await render(
+		<Viewer360
+			modelUrl='https://example.test/mapache.glb'
+			graphics={GRAPHICS_PRESETS.high}
+			onModelLoaded={jest.fn()}
+			onModelError={jest.fn()}
+		/>,
+	)
+
+	expect(mockNavigator.props).toMatchObject({
+		scenario: true,
+		liveShadow: true,
+	})
+	expect(mockNavigator.shadowsEnabled).toBe(true)
+
+	// Ahorro: no savanna, no live shadow, no shadow pass.
+	await rerender(
+		<Viewer360
+			modelUrl='https://example.test/mapache.glb'
+			graphics={GRAPHICS_PRESETS.saver}
+			onModelLoaded={jest.fn()}
+			onModelError={jest.fn()}
+		/>,
+	)
+
+	expect(mockNavigator.props).toMatchObject({
+		scenario: false,
+		liveShadow: false,
+	})
+	expect(mockNavigator.shadowsEnabled).toBe(false)
 })

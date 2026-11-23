@@ -10,6 +10,8 @@ import type { Vec3 } from '@/utils/view360'
 type ArShadowProps = {
 	ref?: Ref<ViroNode>
 	dimensions: Dimensions
+	// The soft contact blob ("Sombra bajo las patas").
+	blob: boolean
 	// The invisible floor that shows the live shadow on the real one.
 	receiver: boolean
 	position?: Vec3
@@ -31,28 +33,31 @@ ViroMaterials.createMaterials({
 })
 
 // What grounds the animal on the real floor, centred on its feet: the
-// soft contact blob, always, and the shadow receiver once the live shadow
-// is on. Neither casts.
+// soft contact blob and the shadow receiver, each when its effect is on.
+// Neither casts.
 export function ArShadow({
 	ref,
 	dimensions,
+	blob,
 	receiver,
 	position,
 	visible,
 }: ArShadowProps) {
-	const blob = blobSize(dimensions.footprint)
+	const blobSide = blobSize(dimensions.footprint)
 	const floor = receiverSize(dimensions)
 
 	return (
 		<ViroNode ref={ref} position={position} visible={visible}>
-			<ViroQuad
-				width={blob}
-				height={blob}
-				position={[0, BLOB_LIFT, 0]}
-				rotation={FLAT}
-				materials={['arContactShadow']}
-				shadowCastingBitMask={NO_SHADOW}
-			/>
+			{blob && (
+				<ViroQuad
+					width={blobSide}
+					height={blobSide}
+					position={[0, BLOB_LIFT, 0]}
+					rotation={FLAT}
+					materials={['arContactShadow']}
+					shadowCastingBitMask={NO_SHADOW}
+				/>
+			)}
 			{receiver && (
 				<ViroQuad
 					width={floor}

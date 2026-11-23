@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store'
 
 import CardArScreen from '@/app/deck/ar/[id]'
 import type { ModelPlacementSceneProps } from '@/components/ar/ModelPlacementScene'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 import { arSceneProps, viroMock } from '../../../test-utils/ar'
 import { makeOwnedCard } from '../../../test-utils/factories'
@@ -52,6 +53,7 @@ const scene = () =>
 test('chosen automatic, AR places it: load, search, land', async () => {
 	await SecureStore.setItemAsync('zooapp_token', 'token-de-prueba')
 	await SecureStore.setItemAsync('zooapp_pref_ar_placement', 'auto')
+	await SecureStore.setItemAsync('zooapp_pref_graphics', 'saver')
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
 	server.use(
 		serveCards([
@@ -68,6 +70,8 @@ test('chosen automatic, AR places it: load, search, land', async () => {
 
 	// The model loads before anything is placed.
 	await waitFor(() => expect(scene()?.placement).toBe('auto'))
+	// The saved graphics level reaches the scene.
+	expect(scene()?.graphics).toEqual(GRAPHICS_PRESETS.saver)
 	expect(screen.getByText('Cargando a Mapache…')).toBeTruthy()
 
 	await act(async () => scene()?.onModelLoaded())

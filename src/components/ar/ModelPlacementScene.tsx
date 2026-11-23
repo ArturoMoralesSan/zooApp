@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArLights, DEFAULT_LIGHT_DIRECTION } from '@/components/ar/ArLights'
 import { ArShadow } from '@/components/ar/ArShadow'
 import colors from '@/theme/colors'
-import type { ArPlacement } from '@/types/settings'
+import type { ArPlacement, GraphicsEffects } from '@/types/settings'
 import {
 	type BoundingBox,
 	createSteadyTimer,
@@ -36,6 +36,7 @@ import {
 	FALLBACK_DIMENSIONS,
 	lightFromCamera,
 } from '@/utils/shadow'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 export type ModelPlacementSceneProps = {
 	// GLB already at real scale (1 unit = 1 m, origin at the bottom center).
@@ -44,6 +45,9 @@ export type ModelPlacementSceneProps = {
 	// (experimental): the animal floats ahead and lands on the floor at the
 	// screen centre.
 	placement: ArPlacement
+	// What "Calidad gráfica" lets the scene draw: the daylight, the live
+	// shadow (its navigator needs shadowsEnabled too) and the blob.
+	graphics: GraphicsEffects
 	// Changing it clears the placement so the user can place it again.
 	resetKey?: number
 	// The view is about to close (useViroExit's `closing`): stop per-frame
@@ -89,6 +93,7 @@ const NO_ANIMATION = { name: 'idle', run: false, loop: true }
 const NO_SCENE_PROPS: ModelPlacementSceneProps = {
 	modelUrl: null,
 	placement: 'plane',
+	graphics: GRAPHICS_PRESETS.high,
 	onPlaced: noop,
 	onModelLoaded: noop,
 	onModelError: noop,
@@ -114,6 +119,7 @@ export function ModelPlacementScene(props?: ModelPlacementSceneNavigatorProps) {
 // drifted with it). `resetKey` re-shows the planes to place it again.
 function PlanePlacement({
 	modelUrl,
+	graphics,
 	resetKey = 0,
 	onPlaneFound = noop,
 	onPlaced,
@@ -191,9 +197,10 @@ function PlanePlacement({
 			}}
 		>
 			<ArLights
+				daylight={graphics.arDaylight}
 				direction={placement?.light ?? DEFAULT_LIGHT_DIRECTION}
 				shadow={
-					placement && dimensions
+					graphics.arLiveShadow && placement && dimensions
 						? { target: placement.position, size: dimensions.size }
 						: null
 				}
@@ -217,7 +224,13 @@ function PlanePlacement({
 					position={placement.position}
 					rotation={[0, placement.yaw, 0]}
 				>
-					{dimensions && <ArShadow dimensions={dimensions} receiver />}
+					{dimensions && (
+						<ArShadow
+							dimensions={dimensions}
+							blob={graphics.arBlob}
+							receiver={graphics.arLiveShadow}
+						/>
+					)}
 					<Viro3DObject
 						ref={modelRef}
 						source={source}
@@ -326,6 +339,7 @@ const createLive = (): Live => ({
 // whole time: moving it under another parent would reload the GLB.
 function AutoPlacement({
 	modelUrl,
+	graphics,
 	resetKey = 0,
 	closing = false,
 	onPlaneFound = noop,
@@ -549,9 +563,10 @@ function AutoPlacement({
 			onCameraARHitTest={placed || closing ? undefined : onHitTest}
 		>
 			<ArLights
+				daylight={graphics.arDaylight}
 				direction={landed?.light ?? DEFAULT_LIGHT_DIRECTION}
 				shadow={
-					landed && dimensions
+					graphics.arLiveShadow && landed && dimensions
 						? { target: landed.position, size: dimensions.size }
 						: null
 				}
@@ -563,7 +578,8 @@ function AutoPlacement({
 				<ArShadow
 					ref={shadowRef}
 					dimensions={dimensions}
-					receiver={placed}
+					blob={graphics.arBlob}
+					receiver={graphics.arLiveShadow && placed}
 					position={landed?.position}
 					visible={placed}
 				/>

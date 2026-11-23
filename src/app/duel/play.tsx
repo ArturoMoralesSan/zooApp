@@ -35,6 +35,7 @@ import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import { useSessionGraphics } from '@/hooks/useSessionGraphics'
 import { useSurfaceOffer } from '@/hooks/useSurfaceOffer'
 import { useViroExit } from '@/hooks/useViroHandoff'
 import { ApiError, isNetworkError } from '@/services/api'
@@ -43,6 +44,7 @@ import { clearDuelCache } from '@/services/packSync'
 import colors from '@/theme/colors'
 import type { ArPlacement } from '@/types/settings'
 import { formatUnlockTime, rarityLabel } from '@/utils/cards'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
 type Phase = 'placing' | 'ready' | 'quiz'
@@ -114,9 +116,13 @@ export default function DuelPlayScreen() {
 
 	if (placement === null && saved) setPlacement(saved)
 
+	// The graphics level, also fixed for the duel.
+	const graphics = useSessionGraphics()
+
 	const auto = placement === 'auto'
 	// AR not decided yet, or waiting for the saved mode.
-	const startingAr = view === null || (view === 'ar' && placement === null)
+	const startingAr =
+		view === null || graphics === null || (view === 'ar' && placement === null)
 	// The model loads as auto AR opens: 'waiting' is already loading.
 	const modelLoading =
 		modelStatus === 'loading' ||
@@ -135,6 +141,7 @@ export default function DuelPlayScreen() {
 		() => ({
 			modelUrl,
 			placement: placement ?? 'plane',
+			graphics: graphics ?? GRAPHICS_PRESETS.high,
 			closing: arExit.closing,
 			onPlaneFound: () => setPlaneFound(true),
 			// Auto places a model that's already loaded.
@@ -154,7 +161,7 @@ export default function DuelPlayScreen() {
 				setPhase((current) => (current === 'placing' ? 'ready' : current))
 			},
 		}),
-		[modelUrl, placement, arExit.closing],
+		[modelUrl, placement, graphics, arExit.closing],
 	)
 
 	const view360Exit = useViroExit(
@@ -345,9 +352,10 @@ export default function DuelPlayScreen() {
 		<View className='flex-1 bg-tinta'>
 			<ScreenStatusBar style='light' />
 
-			{exiting || view === null ? null : view === '360' ? (
+			{exiting || view === null || graphics === null ? null : view === '360' ? (
 				<Viewer360
 					modelUrl={modelUrl}
+					graphics={graphics}
 					onModelLoaded={sceneProps.onModelLoaded}
 					onModelError={sceneProps.onModelError}
 				/>
@@ -355,7 +363,7 @@ export default function DuelPlayScreen() {
 				<ViroARSceneNavigator
 					autofocus
 					// The animal's live shadow (ArLights, ArShadow).
-					shadowsEnabled
+					shadowsEnabled={graphics.arLiveShadow}
 					initialScene={{ scene: ModelPlacementScene }}
 					viroAppProps={sceneProps}
 					style={{ flex: 1 }}

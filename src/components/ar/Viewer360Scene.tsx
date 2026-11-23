@@ -8,6 +8,7 @@ import {
 	ViroPolygon,
 	ViroQuad,
 	ViroScene,
+	ViroSkyBox,
 } from '@reactvision/react-viro'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ImageSourcePropType } from 'react-native'
@@ -38,6 +39,11 @@ export type Viewer360SceneProps = {
 	centerKey: number
 	// Equirectangular image around the user; the savanna's sky by default.
 	background?: ImageSourcePropType
+	// "Calidad gráfica": the savanna and its sky (off: the plain ground disc
+	// under a plain sky, and savanna.glb is never loaded) and the live
+	// shadow (its navigator needs shadowsEnabled too).
+	scenario: boolean
+	liveShadow: boolean
 	onModelLoaded: () => void
 	onModelError: () => void
 	// Head tracking hasn't started (see TRACKING_STUCK_MS): the view needs
@@ -102,6 +108,8 @@ const NO_SCENE_PROPS: Viewer360SceneProps = {
 	modelUrl: null,
 	yaw: 0,
 	centerKey: 0,
+	scenario: true,
+	liveShadow: true,
 	onModelLoaded: noop,
 	onModelError: noop,
 	onTrackingStuck: noop,
@@ -152,6 +160,8 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		yaw,
 		centerKey,
 		background = savannaSky,
+		scenario: withScenario,
+		liveShadow,
 		onModelLoaded,
 		onModelError,
 		onTrackingStuck,
@@ -164,11 +174,11 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 	const [heading, setHeading] = useState(0)
 	// Shown only once placed in front of the user (see below).
 	const [placed, setPlaced] = useState(false)
-	// Until the scenario shows (or if it can't load) the plain ground disc
-	// stands in for it; the animal never waits for it.
-	const [scenario, setScenario] = useState<'loading' | 'loaded' | 'failed'>(
-		'loading',
-	)
+	// Until the scenario shows (or if it can't load, or it's off) the plain
+	// ground disc stands in for it; the animal never waits for it.
+	const [scenario, setScenario] = useState<
+		'loading' | 'loaded' | 'failed' | 'off'
+	>(withScenario ? 'loading' : 'off')
 	const scenarioLoaded = scenario === 'loaded'
 	// Since when the camera has been at GVR's untracked pose.
 	const untrackedSince = useRef<number | null>(null)
@@ -275,7 +285,11 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 		<ViroScene ref={sceneRef}>
 			{/* The sky image has the HDRI's rotation built in and lines up with
 			    the scenario as it is (checked on a phone against a marked sky). */}
-			<Viro360Image source={background} rotation={[0, heading, 0]} />
+			{withScenario ? (
+				<Viro360Image source={background} rotation={[0, heading, 0]} />
+			) : (
+				<ViroSkyBox color={colors.niebla} />
+			)}
 
 			{/* Colours measured from the noon sky; intensities set so the ground is as
 			    bright on a phone as in the Blender render. */}
@@ -286,7 +300,7 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 				color='#fff2cc'
 				direction={sunDirection}
 				intensity={728}
-				castsShadow
+				castsShadow={liveShadow}
 				shadowOpacity={0.55}
 				shadowMapSize={SHADOW_MAP_SIZE}
 				shadowOrthographicPosition={sunShadow.from}
@@ -307,16 +321,18 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 			)}
 
 			<ViroNode rotation={[0, heading, 0]}>
-				<Viro3DObject
-					source={savannaScenario}
-					type='GLB'
-					position={SCENARIO_POSITION}
-					scale={[1, 1, 1]}
-					visible={placed && scenarioLoaded}
-					shadowCastingBitMask={NO_SHADOW}
-					onLoadEnd={() => setScenario('loaded')}
-					onError={() => setScenario('failed')}
-				/>
+				{withScenario && (
+					<Viro3DObject
+						source={savannaScenario}
+						type='GLB'
+						position={SCENARIO_POSITION}
+						scale={[1, 1, 1]}
+						visible={placed && scenarioLoaded}
+						shadowCastingBitMask={NO_SHADOW}
+						onLoadEnd={() => setScenario('loaded')}
+						onError={() => setScenario('failed')}
+					/>
+				)}
 
 				{modelUrl && (
 					<ViroNode position={[0, -EYE_HEIGHT, -distance]}>

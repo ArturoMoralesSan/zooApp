@@ -35,6 +35,7 @@ import {
 import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
+import { useSessionGraphics } from '@/hooks/useSessionGraphics'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
 import { useSurfaceOffer } from '@/hooks/useSurfaceOffer'
 import { useViroExit, useViroHandoff } from '@/hooks/useViroHandoff'
@@ -43,6 +44,7 @@ import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
 import type { ArPlacement } from '@/types/settings'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 // 'plane': placing (tap) → loading → placed. 'auto': the model loads first,
 // then floats while searching for the floor → placed.
@@ -88,6 +90,8 @@ export default function CardArScreen() {
 	const [placement, setPlacement] = useState<ArPlacement | null>(null)
 
 	if (placement === null && saved) setPlacement(saved)
+	// The graphics level, also fixed for the session.
+	const graphics = useSessionGraphics()
 
 	const auto = placement === 'auto'
 	// null until a scene event: the first phase depends on the mode.
@@ -137,9 +141,15 @@ export default function CardArScreen() {
 		view === 'ar' &&
 		Boolean(modelUrl) &&
 		placement !== null &&
+		graphics !== null &&
 		viroReady &&
 		!exiting
-	const show360 = view === '360' && Boolean(modelUrl) && viroReady && !exiting
+	const show360 =
+		view === '360' &&
+		Boolean(modelUrl) &&
+		graphics !== null &&
+		viroReady &&
+		!exiting
 
 	useSessionRedirect()
 
@@ -251,6 +261,7 @@ export default function CardArScreen() {
 		() => ({
 			modelUrl,
 			placement: placement ?? 'plane',
+			graphics: graphics ?? GRAPHICS_PRESETS.high,
 			resetKey,
 			closing: arExit.closing,
 			onPlaneFound: () => setPlaneFound(true),
@@ -259,7 +270,7 @@ export default function CardArScreen() {
 				setPhase(placement === 'auto' ? 'searching' : 'placed'),
 			onModelError: () => setPhase('error'),
 		}),
-		[modelUrl, placement, resetKey, arExit.closing],
+		[modelUrl, placement, graphics, resetKey, arExit.closing],
 	)
 
 	const on360Loaded = useCallback(() => setView360('loaded'), [])
@@ -284,17 +295,18 @@ export default function CardArScreen() {
 					ref={navigatorRef}
 					autofocus
 					// The animal's live shadow (ArLights, ArShadow).
-					shadowsEnabled
+					shadowsEnabled={graphics?.arLiveShadow}
 					initialScene={{ scene: ModelPlacementScene }}
 					viroAppProps={sceneProps}
 					style={{ flex: 1 }}
 				/>
 			)}
 
-			{show360 && (
+			{show360 && graphics && (
 				<Viewer360
 					ref={viewer360Ref}
 					modelUrl={modelUrl}
+					graphics={graphics}
 					onModelLoaded={on360Loaded}
 					onModelError={on360Error}
 				/>
@@ -337,8 +349,9 @@ export default function CardArScreen() {
 						</CameraNotice>
 					) : model.loading ||
 					  view === null ||
-					  // Waiting for the saved placement mode.
-					  (view === 'ar' && placement === null) ? (
+					  // Waiting for the saved placement mode and graphics.
+					  (view === 'ar' && placement === null) ||
+					  graphics === null ? (
 						<CameraNotice
 							message={
 								model.downloading
