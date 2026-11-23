@@ -46,3 +46,14 @@ test('a level and a switch show at once and are saved for next time', async () =
 	await waitFor(() => expect(next.result.current.quality).toBe('custom'))
 	expect(next.result.current.custom).toEqual(mix)
 })
+
+test('reload picks up a level saved elsewhere', async () => {
+	const { result } = await renderHook(() => useGraphicsQuality())
+
+	await waitFor(() => expect(result.current.quality).toBe('auto'))
+
+	await SecureStore.setItemAsync('zooapp_pref_graphics', 'high')
+	await act(async () => result.current.reload())
+
+	await waitFor(() => expect(result.current.quality).toBe('high'))
+})

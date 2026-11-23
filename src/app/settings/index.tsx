@@ -5,8 +5,8 @@ import {
 	PaintBoardIcon,
 	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
-import { router } from 'expo-router'
-import { useState } from 'react'
+import { router, useFocusEffect } from 'expo-router'
+import { useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 
 import { SettingChoiceSheet } from '@/components/settings/SettingChoiceSheet'
@@ -51,7 +51,14 @@ export default function SettingsScreen() {
 	const [theme, setTheme] = useState<ThemeMode>('light')
 	// null while it's read: the row shows no value yet.
 	const { placement, setPlacement } = useArPlacement()
-	const { quality: graphics } = useGraphicsQuality()
+	// Chosen on its own screen: read again when coming back from it.
+	const { quality: graphics, reload: reloadGraphics } = useGraphicsQuality()
+
+	useFocusEffect(
+		useCallback(() => {
+			reloadGraphics()
+		}, [reloadGraphics]),
+	)
 
 	const used = DRAFT_STORAGE.reduce((sum, item) => sum + item.bytes, 0)
 	const closeSheet = () => setSheet(null)
