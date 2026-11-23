@@ -46,6 +46,9 @@ test('without ARCore placement is off; graphics opens its own screen', async () 
 		await screen.findByText('Tu teléfono no es compatible con AR'),
 	).toBeTruthy()
 	expect(screen.getByText('No disponible en este teléfono')).toBeTruthy()
+	expect(
+		screen.getByText('Vista 360° (este teléfono no tiene AR)'),
+	).toBeTruthy()
 
 	await fireEvent.press(screen.getByLabelText('Calidad gráfica, Automática'))
 

@@ -47,7 +47,8 @@ export function useViroExit(
 	const [exiting, setExiting] = useState(false)
 	const quiet = !perFrameEvents || quietDone
 
-	// Latched: once the view is unmounted it isn't mounted again.
+	// Latched: once the view is unmounted it isn't mounted again (until
+	// `reset`).
 	if (pending && !exiting && quiet && (!busy || gaveUp)) {
 		setExiting(true)
 	}
@@ -80,5 +81,14 @@ export function useViroExit(
 		setPending((current) => current ?? { then })
 	}, [])
 
-	return { closing: pending !== null, exiting, exit }
+	// After an exit that didn't leave the screen (switching between AR and
+	// the 360° view): the view may be mounted again.
+	const reset = useCallback(() => {
+		setPending(null)
+		setGaveUp(false)
+		setQuietDone(false)
+		setExiting(false)
+	}, [])
+
+	return { closing: pending !== null, exiting, exit, reset }
 }

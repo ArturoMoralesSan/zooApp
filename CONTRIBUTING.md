@@ -335,7 +335,7 @@ A module is a feature with its own screens, like tickets or donations.
 
 ### Add a component
 
-1. **Check `src/components/ui/` first.** It already has Button, IconButton, Card, ListCard, IconBox, Chip, Badge, StatCard, DetailRow, Divider, SectionTitle, Notice, Toast, Modal, BottomSheet, TextField, PasswordField, SearchField, Toggle, SegmentedTabs, QuantityStepper, ProgressBar, QueryView and the loading/error/empty states. If something is close, add a variant or prop rather than copying it.
+1. **Check `src/components/ui/` first.** It already has Button, IconButton, Card, ListCard, IconBox, Chip, Badge, StatCard, DetailRow, Divider, SectionTitle, Notice, Toast, Modal, BottomSheet, TextField, PasswordField, SearchField, Toggle, SegmentedTabs, ModeSwitch, QuantityStepper, ProgressBar, QueryView and the loading/error/empty states. If something is close, add a variant or prop rather than copying it.
 2. **Decide where it goes**:
    - in the design system (`design-system.pdf`) or used by more than one module → `src/components/ui/`, built to the spec measurements;
    - used by one module → `src/components/<domain>/`.
@@ -383,7 +383,7 @@ Before writing Expo code, read the docs for the exact SDK version: <https://docs
 - **Scenes**: in `src/components/ar/`. Viro components (`ViroARScene`, `Viro3DObject`…) are not React Native views: no `className` or layout props. Define scene components at module level, never inline, and pass data with `viroAppProps`.
 - **Plane placement**: forward the scene's anchor events to `ViroARPlaneSelector` through its ref (`handleAnchorFound/Updated/Removed`).
 - **UI over the camera** is regular React Native in an absolutely positioned layer: dark panel at 82%, white 48–56dp buttons, 76dp shutter (design system p.7).
-- **Fallback**: use `useArAvailability()` and show the 360° view when AR isn't available.
+- **Fallback**: use `useArAvailability()` and show the 360° view when AR isn't available. Screens that show the animal in AR also offer the 360° view through `AnimalViewSwitch` and `useAnimalView` (see the card AR screen).
 - **Gestures** on a Viro view outside plane AR go through a `PanResponder` layer above it (see `useModelGestures`). Copy `gestureState.dx/dy` and the touches when the event arrives: PanResponder reuses that object, so a state updater that reads it later gets wrong values.
 - **Photos**: take them with the AR navigator's `_takeScreenshot` and hand them to `services/photo.ts` (`takeArPhoto`, `PhotoReview`), so they stay in the cache folder that the flow clears.
 - **Lighting colors** in a scene aren't UI colors: mark them `// eslint-disable-next-line no-restricted-syntax -- AR light color`.

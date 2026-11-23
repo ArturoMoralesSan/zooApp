@@ -23,6 +23,7 @@ import { Icon } from '@/components/ui/Icon'
 import { QueryView } from '@/components/ui/QueryView'
 import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import Toast from '@/components/ui/Toast'
+import { useAnimalView } from '@/hooks/useAnimalView'
 import { useArAvailability } from '@/hooks/useArAvailability'
 import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -61,10 +62,14 @@ export default function CardViewScreen() {
 	)
 	const [playing, setPlaying] = useState(false)
 	const [hintVisible, setHintVisible] = useState(false)
-	// Without ARCore the AR screen shows the 360° view: the button says so.
-	// The camera isn't needed (or asked for) just to name it.
+	// The button names the view it opens: the saved one, or 360° without
+	// ARCore. The camera isn't needed (or asked for) just to name it.
 	const availability = useArAvailability({ camera: false })
-	const only360 = availability === 'unsupported' || availability === 'forced'
+	const savedView = useAnimalView().view
+	const opens360 =
+		availability === 'unsupported' ||
+		availability === 'forced' ||
+		savedView === '360'
 	// The selfie needs ARCore too: the button stays, dimmed, and says why
 	// instead of opening a screen with nothing in it.
 	const selfieUnavailable = availability === 'unsupported'
@@ -238,8 +243,8 @@ export default function CardViewScreen() {
 										className='mt-4 flex-row items-start justify-between px-5'
 									>
 										<RoundAction
-											icon={only360 ? Rotate360Icon : VrGlassesIcon}
-											label={only360 ? 'Ver en 360°' : 'Ver en AR'}
+											icon={opens360 ? Rotate360Icon : VrGlassesIcon}
+											label={opens360 ? 'Ver en 360°' : 'Ver en AR'}
 											// Replace, not push: this screen's 3D view must be
 											// released before the AR one starts (see useViroHandoff).
 											onPress={() =>

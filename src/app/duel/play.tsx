@@ -20,6 +20,7 @@ import {
 	ModelPlacementScene,
 	type ModelPlacementSceneProps,
 } from '@/components/ar/ModelPlacementScene'
+import { AnimalViewSwitch } from '@/components/ar/AnimalViewSwitch'
 import { SurfaceOffer } from '@/components/ar/SurfaceOffer'
 import { Viewer360 } from '@/components/ar/Viewer360'
 import { DuelAnswer, type DuelAnswerState } from '@/components/duel/DuelAnswer'
@@ -30,6 +31,7 @@ import BackButton from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
+import { useAnimalView } from '@/hooks/useAnimalView'
 import { useArAvailability } from '@/hooks/useArAvailability'
 import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
@@ -42,7 +44,7 @@ import { ApiError, isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
 import { clearDuelCache } from '@/services/packSync'
 import colors from '@/theme/colors'
-import type { ArPlacement } from '@/types/settings'
+import type { AnimalView, ArPlacement } from '@/types/settings'
 import { formatUnlockTime, rarityLabel } from '@/utils/cards'
 import { GRAPHICS_PRESETS } from '@/utils/settings'
 import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
@@ -68,15 +70,21 @@ export default function DuelPlayScreen() {
 	const debug = ZOODECK_QUIZ_DEBUG && code === DEBUG_DUEL_CODE
 	// The camera was already allowed to scan the QR.
 	const availability = useArAvailability({ camera: false })
-	// The user chose the 360° view from AR ("¿No encuentras una superficie?").
-	const [chose360, setChose360] = useState(false)
+	// The view for this duel: the saved one, then what the switch picks.
+	const savedView = useAnimalView()
+	const [target, setTarget] = useState<AnimalView | null>(null)
+
+	if (target === null && savedView.view) setTarget(savedView.view)
+	// The view being opened by the switch or the surface offer.
+	const [switchingTo, setSwitchingTo] = useState<AnimalView | null>(null)
 	// Without AR the animal shows in the 360° view, with nothing to place.
-	const view =
-		debug || chose360 || (availability !== 'ar' && availability !== 'checking')
-			? '360'
-			: availability === 'checking'
-				? null
-				: 'ar'
+	const view = debug
+		? '360'
+		: target === null || availability === 'checking'
+			? null
+			: target === 'ar' && availability === 'ar'
+				? 'ar'
+				: '360'
 	// From the offline pack when it's on the phone, else its URL (a rare
 	// download at the zoo, announced in the placing notice).
 	const model = useCardAsset(
@@ -168,33 +176,53 @@ export default function DuelPlayScreen() {
 		'scene3d',
 		view === '360' && Boolean(modelUrl) && modelStatus === 'waiting',
 	)
-	// Leaving while AR closes for the 360° view: the switch leaves instead.
-	// The ref is read by the pending switch, the state by the overlay.
+	// Leaving while a view closes for the other one: the switch leaves
+	// instead. The ref is read by the pending switch, the state by the overlay.
 	const afterSwitchRef = useRef<(() => void) | null>(null)
 	const [leaving, setLeaving] = useState(false)
 	const exiting = view === '360' ? view360Exit.exiting : arExit.exiting
-	const switching = arExit.exiting && !leaving && view === 'ar'
+	const switching = switchingTo !== null && !leaving
+	// Only with ARCore and an animal to show; the debug duel has no AR.
+	const showSwitch =
+		!debug && availability === 'ar' && Boolean(modelUrl) && view !== null
 
 	const exit = useCallback(
 		(then: () => void) => {
-			if (view === '360') {
-				view360Exit.exit(then)
-				return
-			}
-
 			afterSwitchRef.current = then
 			setLeaving(true)
-			arExit.exit(then)
+			if (view === '360') view360Exit.exit(then)
+			else arExit.exit(then)
 		},
 		[view, arExit, view360Exit],
 	)
 	const leave = useCallback(() => exit(() => router.back()), [exit])
 
-	const switchTo360 = () =>
-		arExit.exit(() => {
-			if (afterSwitchRef.current) afterSwitchRef.current()
-			else setChose360(true)
+	// Closes the open view, then opens the other one. `save`: chosen with the
+	// switch, so it's remembered; the surface offer only changes this duel.
+	const switchView = (next: AnimalView, save: boolean) => {
+		if (view === null || view === next || switchingTo) return
+
+		const current = view === 'ar' ? arExit : view360Exit
+
+		if (save) savedView.setView(next)
+		setSwitchingTo(next)
+		current.exit(() => {
+			if (afterSwitchRef.current) {
+				afterSwitchRef.current()
+				return
+			}
+
+			current.reset()
+			setSwitchingTo(null)
+			// The animal loads again, and AR places it first.
+			setModelStatus('waiting')
+			setPlaneFound(false)
+			if (next === 'ar') {
+				setPhase((value) => (value === 'ready' ? 'placing' : value))
+			}
+			setTarget(next)
 		})
+	}
 
 	const offer360 = useSurfaceOffer(
 		view === 'ar' &&
@@ -345,6 +373,17 @@ export default function DuelPlayScreen() {
 	}
 
 	const outcome = result?.data.outcome
+	// Only before the quiz (placing and A-20), on the bottom edge like a
+	// camera's modes. Once it starts, the duel keeps its view: a switch would
+	// blank the screen and ask for the animal's place mid-question.
+	const viewSwitch = showSwitch && view && phase !== 'quiz' && !result && (
+		<AnimalViewSwitch
+			value={switchingTo ?? view}
+			onChange={(next) => switchView(next, true)}
+			disabled={switchingTo !== null || exiting || leaving}
+			className='mt-3 self-center'
+		/>
+	)
 	const resultAttempts = result?.data.attempts
 	const points = result?.data.points ?? null
 
@@ -392,13 +431,23 @@ export default function DuelPlayScreen() {
 				</View>
 
 				{phase === 'placing' && switching && (
-					<CameraNotice message='Abriendo la Vista 360°…' className='mt-4'>
+					<CameraNotice
+						message={
+							switchingTo === '360'
+								? 'Abriendo la Vista 360°…'
+								: 'Abriendo la cámara…'
+						}
+						className='mt-4'
+					>
 						<ActivityIndicator color={colors.lima} />
 					</CameraNotice>
 				)}
 
 				{phase === 'placing' && !switching && offer360 && (
-					<SurfaceOffer onAccept={switchTo360} className='mt-4' />
+					<SurfaceOffer
+						onAccept={() => switchView('360', false)}
+						className='mt-4'
+					/>
 				)}
 
 				{phase === 'placing' && !switching && !offer360 && (
@@ -455,6 +504,8 @@ export default function DuelPlayScreen() {
 							icon={ArrowRight01Icon}
 							iconPosition='leading'
 							onPress={() => setPhase('quiz')}
+							// The quiz waits for a switch to end.
+							disabled={switching}
 							className='mt-3'
 						/>
 					</>
@@ -525,6 +576,12 @@ export default function DuelPlayScreen() {
 						</View>
 					</>
 				)}
+
+				{/* Placing has no bottom controls: the switch still goes to the edge. */}
+				{phase === 'placing' && viewSwitch && (
+					<View pointerEvents='box-none' style={{ flex: 1 }} />
+				)}
+				{viewSwitch}
 			</View>
 
 			{/* A-22 GANASTE */}

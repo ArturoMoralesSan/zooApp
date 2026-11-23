@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, BackHandler, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { AnimalViewSwitch } from '@/components/ar/AnimalViewSwitch'
 import { ArCameraControls } from '@/components/ar/ArCameraControls'
 import {
 	ModelPlacementScene,
@@ -32,6 +33,7 @@ import {
 	type ArAvailability,
 	useArAvailability,
 } from '@/hooks/useArAvailability'
+import { useAnimalView } from '@/hooks/useAnimalView'
 import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
@@ -43,7 +45,7 @@ import { markHintShown, wasHintShown } from '@/services/hints'
 import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
-import type { ArPlacement } from '@/types/settings'
+import type { AnimalView, ArPlacement } from '@/types/settings'
 import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 // 'plane': placing (tap) → loading → placed. 'auto': the model loads first,
@@ -51,23 +53,46 @@ import { GRAPHICS_PRESETS } from '@/utils/settings'
 type Phase = 'placing' | 'loading' | 'searching' | 'placed' | 'error'
 type View360Status = 'loading' | 'loaded' | 'error'
 
-// Why the 360° view opened on its own, before its instructions.
+// Why the 360° view opened on its own, before its instructions. A denied
+// camera gets a toast instead: it can happen again on every switch.
 const REASONS: Partial<Record<ArAvailability, string>> = {
 	unsupported: 'Tu teléfono no es compatible con AR. ',
-	'no-camera': 'Sin permiso de cámara. ',
 }
 
 // AR view of an owned card's animal (A-28 → A-29): find a surface and place
 // it at life size, automatically or with a tap (the "Colocación del animal"
 // setting), and reset to place it again, take a photo (A-31 →
-// A-32) or switch to the selfie. Without AR (unsupported phone,
-// camera denied, or no surface found) the animal shows in the Vista 360°.
+// A-32) or switch to the selfie. It opens in the saved "Vista de los
+// animales", and the switch above the controls changes between AR and the
+// Vista 360° (and saves it). Without ARCore, or with the camera denied, the
+// animal shows in the 360° view.
 export default function CardArScreen() {
 	// `mode` is the card view's mode, restored when going back.
 	const { id, mode } = useLocalSearchParams<{ id: string; mode?: string }>()
 	const insets = useSafeAreaInsets()
 	const { data } = useCards()
-	const availability = useArAvailability()
+	// The view for this visit: the saved one, then what the switch picks.
+	const savedView = useAnimalView()
+	const [target, setTarget] = useState<AnimalView | null>(null)
+
+	if (target === null && savedView.view) setTarget(savedView.view)
+	// The camera is asked for only when AR is wanted.
+	const availability = useArAvailability({ camera: target === 'ar' })
+	// The phone has ARCore, so the switch can offer AR. Latched: asking for
+	// the camera reads as 'checking' for a moment.
+	const [arExists, setArExists] = useState(false)
+
+	if (!arExists && (availability === 'ar' || availability === 'no-camera')) {
+		setArExists(true)
+	}
+	// Camera denied: this visit goes on in the 360° view, the saved choice
+	// stays, and a toast says why.
+	const [cameraDenied, setCameraDenied] = useState(false)
+
+	if (target === 'ar' && availability === 'no-camera') {
+		setTarget('360')
+		setCameraDenied(true)
+	}
 
 	const card = data?.find(
 		(item): item is OwnedCard => item.encountered && String(item.id) === id,
@@ -103,15 +128,15 @@ export default function CardArScreen() {
 		: phase === 'placing'
 	const [planeFound, setPlaneFound] = useState(false)
 	const [resetKey, setResetKey] = useState(0)
-	// The user chose the 360° view from AR ("¿No encuentras una superficie?").
-	const [chose360, setChose360] = useState(false)
+	// The view being opened by the switch or the surface offer.
+	const [switchingTo, setSwitchingTo] = useState<AnimalView | null>(null)
 	const [view360, setView360] = useState<View360Status>('loading')
 	// The 360° view's controls are explained once per device; null while the
 	// flag is read, so a user who has seen them never gets a flash of it.
 	const [show360Hint, setShow360Hint] = useState<boolean | null>(null)
 	const viewer360Ref = useRef<Viewer360Handle>(null)
-	// Back pressed while AR closes for the 360° view: leave instead. The ref
-	// is read by the pending switch, the state by the overlay.
+	// Back pressed while a view closes for the other one: leave instead. The
+	// ref is read by the pending switch, the state by the overlay.
 	const leavingRef = useRef(false)
 	const [leaving, setLeaving] = useState(false)
 	const navigatorRef = useRef<ViroARSceneNavigator>(null)
@@ -122,9 +147,9 @@ export default function CardArScreen() {
 		`/deck/${id}?mode=${mode === 'model' ? 'model' : 'card'}` as const
 
 	const view =
-		availability === 'checking'
+		target === null || availability === 'checking'
 			? null
-			: availability === 'ar' && !chose360
+			: target === 'ar' && availability === 'ar'
 				? 'ar'
 				: '360'
 
@@ -160,13 +185,10 @@ export default function CardArScreen() {
 	const goBack = useCallback(() => {
 		const back = () => router.replace(backHref)
 
-		if (view === '360') {
-			view360Exit.exit(back)
-		} else {
-			leavingRef.current = true
-			setLeaving(true)
-			arExit.exit(back)
-		}
+		leavingRef.current = true
+		setLeaving(true)
+		if (view === '360') view360Exit.exit(back)
+		else arExit.exit(back)
 	}, [arExit, view360Exit, view, backHref])
 
 	// Selfie (A-30) runs its own AR session: this one closes first.
@@ -236,11 +258,33 @@ export default function CardArScreen() {
 		)
 	}
 
-	const switchTo360 = () =>
-		arExit.exit(() => {
-			if (leavingRef.current) router.replace(backHref)
-			else setChose360(true)
+	// Closes the open view, then opens the other one. `save`: chosen with the
+	// switch, so it's remembered; the surface offer only changes this visit.
+	const switchView = (next: AnimalView, save: boolean) => {
+		if (view === null || view === next || switchingTo) return
+
+		const current = view === 'ar' ? arExit : view360Exit
+
+		if (save) savedView.setView(next)
+		setSwitchingTo(next)
+		current.exit(() => {
+			if (leavingRef.current) {
+				router.replace(backHref)
+				return
+			}
+
+			current.reset()
+			setSwitchingTo(null)
+			// Each view starts over.
+			if (next === 'ar') {
+				setPhase(null)
+				setPlaneFound(false)
+			} else {
+				setView360('loading')
+			}
+			setTarget(next)
 		})
+	}
 
 	useFocusEffect(
 		useCallback(() => {
@@ -283,8 +327,10 @@ export default function CardArScreen() {
 	}
 
 	const name = card?.name ?? 'el animal'
-	// Closing AR for the 360° view, not leaving.
-	const switching = arExit.exiting && !leaving && view === 'ar'
+	// Only with ARCore and something to show.
+	const showSwitch = arExists && Boolean(modelUrl)
+	// Closing a view for the other one, not leaving.
+	const switching = switchingTo !== null && !leaving
 
 	return (
 		<View className='flex-1 bg-tinta'>
@@ -335,7 +381,14 @@ export default function CardArScreen() {
 					</View>
 
 					{switching ? (
-						<CameraNotice message='Abriendo la Vista 360°…' className='mt-4'>
+						<CameraNotice
+							message={
+								switchingTo === '360'
+									? 'Abriendo la Vista 360°…'
+									: 'Abriendo la cámara…'
+							}
+							className='mt-4'
+						>
 							<ActivityIndicator color={colors.lima} />
 						</CameraNotice>
 					) : exiting ? (
@@ -387,7 +440,10 @@ export default function CardArScreen() {
 							/>
 						) : null
 					) : offer360 ? (
-						<SurfaceOffer onAccept={switchTo360} className='mt-4' />
+						<SurfaceOffer
+							onAccept={() => switchView('360', false)}
+							className='mt-4'
+						/>
 					) : phase === 'searching' ? (
 						<CameraNotice
 							icon={Target02Icon}
@@ -421,37 +477,57 @@ export default function CardArScreen() {
 					)}
 				</View>
 
-				{show360 && view360 === 'loaded' ? (
-					<View className='items-center'>
-						<RoundCameraButton
-							icon={CenterFocusIcon}
-							label='Centrar vista'
-							onPress={() => viewer360Ref.current?.recenter()}
-							tone='white'
-						/>
+				{/* Controls, then the view switch on the bottom edge (like a
+				    camera's modes), the same spot in both views. */}
+				<View pointerEvents='box-none' className='gap-4'>
+					{/* Fixed height (the shutter's), so the controls don't jump
+					    between views or as the animal is placed. */}
+					<View
+						pointerEvents='box-none'
+						className={showSwitch ? 'h-[76px] justify-center' : ''}
+					>
+						{show360 && view360 === 'loaded' ? (
+							<View className='items-center'>
+								<RoundCameraButton
+									icon={CenterFocusIcon}
+									label='Centrar vista'
+									onPress={() => viewer360Ref.current?.recenter()}
+									tone='white'
+								/>
+							</View>
+						) : (
+							showAr &&
+							(searching ? (
+								planeFound && <SurfaceDetectedPill />
+							) : (
+								<ArCameraControls
+									left={{
+										icon: Refresh01Icon,
+										label: 'Colocar de nuevo',
+										onPress: placeAgain,
+										tone: 'white',
+									}}
+									onShutter={() => void takePhoto()}
+									right={{
+										icon: CameraSmile01Icon,
+										label: 'Selfie',
+										onPress: openSelfie,
+										tone: 'lima',
+									}}
+								/>
+							))
+						)}
 					</View>
-				) : (
-					showAr &&
-					(searching ? (
-						planeFound && <SurfaceDetectedPill />
-					) : (
-						<ArCameraControls
-							left={{
-								icon: Refresh01Icon,
-								label: 'Colocar de nuevo',
-								onPress: placeAgain,
-								tone: 'white',
-							}}
-							onShutter={() => void takePhoto()}
-							right={{
-								icon: CameraSmile01Icon,
-								label: 'Selfie',
-								onPress: openSelfie,
-								tone: 'lima',
-							}}
+
+					{showSwitch && view && (
+						<AnimalViewSwitch
+							value={switchingTo ?? view}
+							onChange={(next) => switchView(next, true)}
+							disabled={switchingTo !== null || exiting || leaving}
+							className='self-center'
 						/>
-					))
-				)}
+					)}
+				</View>
 			</View>
 
 			<PhotoReview
@@ -469,6 +545,14 @@ export default function CardArScreen() {
 				title='No se pudo tomar la foto'
 				message='Inténtalo de nuevo. Si sigue fallando, vuelve a abrir la cámara.'
 				onHide={() => setShotFailed(false)}
+			/>
+
+			<Toast
+				visible={cameraDenied}
+				type='warning'
+				title='Sin permiso de cámara'
+				message={`Para ver a ${name} en AR, permite la cámara. Si no te lo pregunta, actívala en los ajustes de Android.`}
+				onHide={() => setCameraDenied(false)}
 			/>
 		</View>
 	)

@@ -3,6 +3,7 @@ import {
 	HardDriveIcon,
 	LanguageSquareIcon,
 	PaintBoardIcon,
+	Rotate360Icon,
 	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
 import { router, useFocusEffect } from 'expo-router'
@@ -17,6 +18,7 @@ import { ScreenBackground } from '@/components/ui/ScreenBackground'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { TopBar } from '@/components/ui/TopBar'
+import { useAnimalView } from '@/hooks/useAnimalView'
 import { useArAvailability } from '@/hooks/useArAvailability'
 import { useArPlacement } from '@/hooks/useArPlacement'
 import { useGraphicsQuality } from '@/hooks/useGraphicsQuality'
@@ -25,6 +27,7 @@ import { useScrollBottomSpace } from '@/theme/layout'
 import type { AppLanguage, ThemeMode } from '@/types/settings'
 import { formatBytes } from '@/utils/format'
 import {
+	ANIMAL_VIEW_OPTIONS,
 	AR_PLACEMENT_OPTIONS,
 	DRAFT_STORAGE,
 	GRAPHICS_OPTIONS,
@@ -33,9 +36,9 @@ import {
 	THEME_OPTIONS,
 } from '@/utils/settings'
 
-type Sheet = 'language' | 'theme' | 'placement' | null
+type Sheet = 'language' | 'theme' | 'view' | 'placement' | null
 
-// App preferences. "Colocación del animal" and "Calidad gráfica" (its own
+// App preferences. "Vista de los animales", "Colocación del animal" and "Calidad gráfica" (its own
 // screen) are saved and used by AR and the 360° view; language and theme
 // are still a draft: those choices live only while the screen is open and
 // don't change the app yet.
@@ -49,7 +52,8 @@ export default function SettingsScreen() {
 	const [sheet, setSheet] = useState<Sheet>(null)
 	const [language, setLanguage] = useState<AppLanguage>('es')
 	const [theme, setTheme] = useState<ThemeMode>('light')
-	// null while it's read: the row shows no value yet.
+	// null while they're read: the rows show no value yet.
+	const { view, setView, reload: reloadView } = useAnimalView()
 	const { placement, setPlacement } = useArPlacement()
 	// Chosen on its own screen: read again when coming back from it.
 	const { quality: graphics, reload: reloadGraphics } = useGraphicsQuality()
@@ -57,7 +61,9 @@ export default function SettingsScreen() {
 	useFocusEffect(
 		useCallback(() => {
 			reloadGraphics()
-		}, [reloadGraphics]),
+			// A viewer's switch changes it too.
+			reloadView()
+		}, [reloadGraphics, reloadView]),
 	)
 
 	const used = DRAFT_STORAGE.reduce((sum, item) => sum + item.bytes, 0)
@@ -123,6 +129,18 @@ export default function SettingsScreen() {
 				)}
 				<View className='gap-3'>
 					<ListCard
+						icon={view === '360' || noAr ? Rotate360Icon : VrGlassesIcon}
+						title='Vista de los animales'
+						description={
+							noAr
+								? 'Vista 360° (este teléfono no tiene AR)'
+								: view
+									? optionLabel(ANIMAL_VIEW_OPTIONS, view)
+									: undefined
+						}
+						onPress={noAr || !view ? undefined : () => setSheet('view')}
+					/>
+					<ListCard
 						icon={VrGlassesIcon}
 						title='Colocación del animal'
 						description={
@@ -174,6 +192,17 @@ export default function SettingsScreen() {
 				onChange={setTheme}
 				onClose={closeSheet}
 			/>
+			{view && (
+				<SettingChoiceSheet
+					visible={sheet === 'view'}
+					title='Vista de los animales'
+					description='Cómo se abre el animal desde una tarjeta o un duelo. También puedes cambiarla en la propia vista.'
+					options={ANIMAL_VIEW_OPTIONS}
+					value={view}
+					onChange={setView}
+					onClose={closeSheet}
+				/>
+			)}
 			{placement && (
 				<SettingChoiceSheet
 					visible={sheet === 'placement'}

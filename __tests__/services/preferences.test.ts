@@ -2,9 +2,11 @@ import { expect, jest, test } from '@jest/globals'
 import * as SecureStore from 'expo-secure-store'
 
 import {
+	getAnimalView,
 	getArPlacement,
 	getGraphicsCustom,
 	getGraphicsQuality,
+	setAnimalView,
 	setArPlacement,
 	setGraphicsCustom,
 	setGraphicsQuality,
@@ -40,6 +42,22 @@ test('a failed save is not an error', async () => {
 		.mockRejectedValueOnce(new Error('keystore'))
 
 	await expect(setArPlacement('plane')).resolves.toBeUndefined()
+})
+
+test('animals open in AR until the user switches to the 360° view', async () => {
+	expect(await getAnimalView()).toBe('ar')
+
+	await setAnimalView('360')
+	expect(await SecureStore.getItemAsync('zooapp_pref_animal_view')).toBe('360')
+	expect(await getAnimalView()).toBe('360')
+
+	await SecureStore.setItemAsync('zooapp_pref_animal_view', 'vr')
+	expect(await getAnimalView()).toBe('ar')
+
+	jest
+		.mocked(SecureStore.getItemAsync)
+		.mockRejectedValueOnce(new Error('keystore'))
+	expect(await getAnimalView()).toBe('ar')
 })
 
 test('graphics are automatic until the user picks a level', async () => {

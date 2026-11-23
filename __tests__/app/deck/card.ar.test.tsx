@@ -49,7 +49,7 @@ jest.mock('@/components/deck/CardCarousel', () => ({
 }))
 
 // One scenario: useArAvailability keeps ARCore's answer in the module.
-test('with ARCore the card offers AR', async () => {
+test('with ARCore the card offers AR, or 360° when it was chosen last', async () => {
 	await SecureStore.setItemAsync('zooapp_token', 'token-de-prueba')
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
 	server.use(
@@ -63,8 +63,16 @@ test('with ARCore the card offers AR', async () => {
 	)
 	searchParams.mockReturnValue({ id: '5', mode: 'card' })
 
-	await renderWithProviders(<CardScreen />)
+	const first = await renderWithProviders(<CardScreen />)
 
 	expect(await screen.findByText('Ver en AR')).toBeTruthy()
 	expect(screen.queryByText('Ver en 360°')).toBeNull()
+	await first.unmount()
+
+	// The 360° view was chosen last: the button names it.
+	await SecureStore.setItemAsync('zooapp_pref_animal_view', '360')
+	await renderWithProviders(<CardScreen />)
+
+	expect(await screen.findByText('Ver en 360°')).toBeTruthy()
+	expect(screen.queryByText('Ver en AR')).toBeNull()
 })
