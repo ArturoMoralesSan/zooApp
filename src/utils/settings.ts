@@ -124,7 +124,7 @@ export const GRAPHICS_PRESETS: Record<'high' | 'saver', GraphicsEffects> = {
 }
 
 // Weight of each effect, from a moto g 5G (2024): the savanna costs about
-// 119 MB of graphics memory; the live shadows no measurable fps (AR stays
+// 80 MB of graphics memory; the live shadows no measurable fps (AR stays
 // at 30, the 360° view at 60), only a little work per frame; the light and
 // the blob next to nothing.
 const EFFECT_COST: Record<keyof GraphicsEffects, number> = {
