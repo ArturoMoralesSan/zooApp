@@ -112,6 +112,7 @@ export default function DuelPlayScreen() {
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
+			placement: 'plane',
 			onPlaneFound: () => setPlaneFound(true),
 			onPlaced: () => setModelStatus('loading'),
 			onModelLoaded: () => {

@@ -225,6 +225,7 @@ export default function CardArScreen() {
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
+			placement: 'plane',
 			resetKey,
 			onPlaneFound: () => setPlaneFound(true),
 			onPlaced: () => setPhase('loading'),
