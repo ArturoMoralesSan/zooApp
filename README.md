@@ -21,7 +21,7 @@ ZooApp is an Android app built with Expo development builds. Its interface is in
 - **Species**: a searchable catalog with a detail page for each animal.
 - **Tickets**: buy entry tickets and show them as QR codes, with the points the purchase earned.
 - **Donations**: donate to the zoo, see the points earned and the donation history.
-- **ZooDeck**: collect animal cards, see them in 3D, in AR or in a 360° view of a savanna, take photos and selfies with the animal in the zoo's frame to save or share, and download the cards for offline use.
+- **ZooDeck**: collect animal cards, see them in 3D, in AR (placed automatically on the floor, or on a surface you tap, as chosen in Configuración) or in a 360° view of a savanna, take photos and selfies with the animal in the zoo's frame to save or share, and download the cards for offline use.
 - **Duels**: scan a QR code at an enclosure and answer a quiz to win that animal's card.
 - **MiZoo**: the visitor's species, achievements and rewards.
 - **Point seasons**: when the zoo runs a points season, a banner on Explore, MiZoo and ZooDeck announces it, and a screen lists which actions give more or fewer points.
@@ -157,7 +157,7 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 ## Roadmap
 
 - **Payment provider integration**: connect ticket purchases and donations to a payment gateway.
-- **Settings**: the screen (Panel → Configuración) is a visual draft whose choices aren't saved yet: language, dark mode, AR placement (automatic or on a chosen surface), graphics quality and storage (a summary that links to each download, such as the ZooDeck pack).
+- **Settings**: on the screen (Panel → Configuración) only the AR placement is saved and used so far; the other choices are a visual draft: language, dark mode, graphics quality and storage (a summary that links to each download, such as the ZooDeck pack).
 - **Help**: complete the Panel's help section.
 - **iOS release**: configure, test and publish the iOS build.
 
