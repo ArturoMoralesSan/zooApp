@@ -128,7 +128,7 @@ export default function DuelPlayScreen() {
 
 	// Every way out releases the AR (or 360°) view first: the card view
 	// started while it was still alive came up blank (see useViroHandoff).
-	const arExit = useViroExit('ar', modelLoading)
+	const arExit = useViroExit('ar', modelLoading, auto)
 
 	// Stable props: the scene keeps its placement across overlay re-renders.
 	const sceneProps = useMemo<ModelPlacementSceneProps>(

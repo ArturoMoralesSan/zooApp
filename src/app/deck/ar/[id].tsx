@@ -126,7 +126,8 @@ export default function CardArScreen() {
 
 	const viroReady = useViroHandoff()
 	// Leaving mid-load would break the next Viro view: wait for the model.
-	const arExit = useViroExit('ar', phase === 'loading')
+	// Auto placement's hit tests stop before the view goes.
+	const arExit = useViroExit('ar', phase === 'loading', auto)
 	const view360Exit = useViroExit(
 		'scene3d',
 		view === '360' && view360 === 'loading',
