@@ -425,11 +425,8 @@ export default function CardArScreen() {
 							className='mt-4'
 						/>
 					) : view === '360' ? (
-						view360 === 'loading' ? (
-							<CameraNotice message={`Cargando a ${name}…`} className='mt-4'>
-								<ActivityIndicator color={colors.lima} />
-							</CameraNotice>
-						) : view360 === 'error' ? (
+						// Viewer360's own cover shows the loading.
+						view360 === 'loading' ? null : view360 === 'error' ? (
 							<CameraNotice
 								message={`No pudimos cargar a ${name}. Vuelve e inténtalo de nuevo.`}
 								className='mt-4'
