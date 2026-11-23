@@ -6,6 +6,7 @@ import {
 	MagicWand01Icon,
 	Moon02Icon,
 	SmartPhone01Icon,
+	SlidersHorizontalIcon,
 	SparklesIcon,
 	Sun03Icon,
 	Touch01Icon,
@@ -14,6 +15,7 @@ import {
 import type {
 	AppLanguage,
 	ArPlacement,
+	GraphicsEffects,
 	GraphicsQuality,
 	SettingOption,
 	StorageCategory,
@@ -96,7 +98,73 @@ export const GRAPHICS_OPTIONS: SettingOption<GraphicsQuality>[] = [
 			'Sin sombras en tiempo real y un suelo simple: carga más rápido y gasta menos batería.',
 		icon: Leaf01Icon,
 	},
+	{
+		value: 'custom',
+		label: 'Personalizada',
+		description: 'Elige tú cada efecto, abajo.',
+		icon: SlidersHorizontalIcon,
+	},
 ]
+
+export const GRAPHICS_PRESETS: Record<'high' | 'saver', GraphicsEffects> = {
+	high: {
+		arDaylight: true,
+		arLiveShadow: true,
+		arBlob: true,
+		view360Scenario: true,
+		view360LiveShadow: true,
+	},
+	saver: {
+		arDaylight: true,
+		arLiveShadow: false,
+		arBlob: true,
+		view360Scenario: false,
+		view360LiveShadow: false,
+	},
+}
+
+// Rough weight of each effect on the phone: the savanna is by far the
+// heaviest (about 110 MB of graphics memory), the blob almost free.
+const EFFECT_COST: Record<keyof GraphicsEffects, number> = {
+	arDaylight: 1,
+	arLiveShadow: 2,
+	arBlob: 0.5,
+	view360Scenario: 5,
+	view360LiveShadow: 2,
+}
+const TOTAL_COST = Object.values(EFFECT_COST).reduce((sum, n) => sum + n, 0)
+
+export type GraphicsLoad = { share: number; level: 'low' | 'medium' | 'high' }
+
+// How much the chosen effects ask of the phone, 0–1, and its level.
+export function graphicsLoad(effects: GraphicsEffects): GraphicsLoad {
+	const used = (Object.keys(EFFECT_COST) as (keyof GraphicsEffects)[])
+		.filter((key) => effects[key])
+		.reduce((sum, key) => sum + EFFECT_COST[key], 0)
+	const share = used / TOTAL_COST
+
+	return {
+		share,
+		level: share < 0.35 ? 'low' : share < 0.7 ? 'medium' : 'high',
+	}
+}
+
+const GB = 1024 ** 3
+// 'auto' saves on phones under 3 GB of memory or from before 2019, and on
+// any the system can't describe. Not 4 GB: a phone sold with 4 reports
+// about 3.4 (the system keeps the rest), and runs Alta at full speed.
+const AUTO_MIN_MEMORY = 3 * GB
+const AUTO_MIN_YEAR = 2019
+
+export function autoGraphicsLevel(device: DeviceClass): 'high' | 'saver' {
+	const { totalMemory, yearClass } = device
+
+	if (totalMemory === null || yearClass === null) return 'saver'
+
+	return totalMemory < AUTO_MIN_MEMORY || yearClass < AUTO_MIN_YEAR
+		? 'saver'
+		: 'high'
+}
 
 export function optionLabel<T extends string>(
 	options: SettingOption<T>[],
@@ -119,3 +187,21 @@ export const DRAFT_STORAGE: StorageCategory[] = [
 ]
 
 export const DRAFT_FREE_BYTES = 12_400_000_000
+
+export type DeviceClass = {
+	totalMemory: number | null
+	yearClass: number | null
+}
+
+// The effects a level turns on; 'custom' uses the user's own mix.
+export function resolveGraphics(
+	quality: GraphicsQuality,
+	custom: GraphicsEffects,
+	device: DeviceClass,
+): GraphicsEffects {
+	if (quality === 'custom') return custom
+
+	return GRAPHICS_PRESETS[
+		quality === 'auto' ? autoGraphicsLevel(device) : quality
+	]
+}

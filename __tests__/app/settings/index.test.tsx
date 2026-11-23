@@ -6,6 +6,7 @@ import SettingsScreen from '@/app/settings'
 
 import { viroMock } from '../../../test-utils/ar'
 import { renderWithProviders } from '../../../test-utils/render'
+import { routerSpies } from '../../../test-utils/router'
 
 jest.mock(
 	'expo-router',
@@ -68,4 +69,13 @@ test('the placement choice is saved and read back next time', async () => {
 			'Colocación del animal, Automática · Experimental',
 		),
 	).toBeTruthy()
+})
+
+test('the graphics row shows the saved level and opens its screen', async () => {
+	await SecureStore.setItemAsync('zooapp_pref_graphics', 'saver')
+	await renderWithProviders(<SettingsScreen />)
+
+	await fireEvent.press(await screen.findByLabelText('Calidad gráfica, Ahorro'))
+
+	expect(routerSpies.push).toHaveBeenCalledWith('/settings/graphics')
 })
