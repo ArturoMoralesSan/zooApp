@@ -150,20 +150,19 @@ export function graphicsLoad(effects: GraphicsEffects): GraphicsLoad {
 }
 
 const GB = 1024 ** 3
-// 'auto' saves on phones under 3 GB of memory or from before 2019, and on
-// any the system can't describe. Not 4 GB: a phone sold with 4 reports
-// about 3.4 (the system keeps the rest), and runs Alta at full speed.
+// 'auto' saves on phones under 3 GB of memory, or when the system doesn't
+// say. Not 4 GB: a phone sold with 4 reports about 3.4 (the system keeps
+// the rest) and runs Alta at full speed. expo-device's year class isn't
+// used: on Android it's guessed from an old RAM/CPU table, and a 2024 moto
+// g with 4 GB reads as 2015.
 const AUTO_MIN_MEMORY = 3 * GB
-const AUTO_MIN_YEAR = 2019
 
 export function autoGraphicsLevel(device: DeviceClass): 'high' | 'saver' {
-	const { totalMemory, yearClass } = device
+	const { totalMemory } = device
 
-	if (totalMemory === null || yearClass === null) return 'saver'
-
-	return totalMemory < AUTO_MIN_MEMORY || yearClass < AUTO_MIN_YEAR
-		? 'saver'
-		: 'high'
+	return totalMemory !== null && totalMemory >= AUTO_MIN_MEMORY
+		? 'high'
+		: 'saver'
 }
 
 export function optionLabel<T extends string>(
@@ -190,7 +189,6 @@ export const DRAFT_FREE_BYTES = 12_400_000_000
 
 export type DeviceClass = {
 	totalMemory: number | null
-	yearClass: number | null
 }
 
 // The effects a level turns on; 'custom' uses the user's own mix.

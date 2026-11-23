@@ -9,29 +9,15 @@ import {
 
 const GB = 1024 ** 3
 
-test('auto picks Alta on a recent phone with 3 GB or more', () => {
+test('auto picks Alta with 3 GB or more', () => {
 	// A phone sold with 4 GB reports about 3.4.
-	expect(autoGraphicsLevel({ totalMemory: 3.4 * GB, yearClass: 2019 })).toBe(
-		'high',
-	)
+	expect(autoGraphicsLevel({ totalMemory: 3.4 * GB })).toBe('high')
+	expect(autoGraphicsLevel({ totalMemory: 8 * GB })).toBe('high')
 })
 
-test('auto saves on little memory or an older phone', () => {
-	expect(autoGraphicsLevel({ totalMemory: 2.8 * GB, yearClass: 2023 })).toBe(
-		'saver',
-	)
-	expect(autoGraphicsLevel({ totalMemory: 8 * GB, yearClass: 2018 })).toBe(
-		'saver',
-	)
-})
-
-test('auto saves when the phone can’t be described', () => {
-	expect(autoGraphicsLevel({ totalMemory: null, yearClass: 2023 })).toBe(
-		'saver',
-	)
-	expect(autoGraphicsLevel({ totalMemory: 8 * GB, yearClass: null })).toBe(
-		'saver',
-	)
+test('auto saves on little memory, or when the phone doesn’t say', () => {
+	expect(autoGraphicsLevel({ totalMemory: 2.8 * GB })).toBe('saver')
+	expect(autoGraphicsLevel({ totalMemory: null })).toBe('saver')
 })
 
 test('the load grows with the effects, the savanna weighing most', () => {
@@ -46,8 +32,8 @@ test('the load grows with the effects, the savanna weighing most', () => {
 })
 
 test('a level resolves to its effects; Personalizada to the user’s mix', () => {
-	const recent = { totalMemory: 8 * GB, yearClass: 2023 }
-	const old = { totalMemory: 2 * GB, yearClass: 2016 }
+	const recent = { totalMemory: 8 * GB }
+	const old = { totalMemory: 2 * GB }
 	const mix = { ...GRAPHICS_PRESETS.saver, view360Scenario: true }
 
 	expect(resolveGraphics('high', mix, old)).toEqual(GRAPHICS_PRESETS.high)

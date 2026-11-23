@@ -19,10 +19,9 @@ jest.mock(
 			'react-native-safe-area-context/jest/mock',
 		).default,
 )
-// A recent phone with 8 GB: 'auto' means Alta.
+// A phone with 8 GB: 'auto' means Alta.
 jest.mock('expo-device', () => ({
 	totalMemory: 8 * 1024 ** 3,
-	deviceYearClass: 2023,
 }))
 
 const option = (label: string) =>

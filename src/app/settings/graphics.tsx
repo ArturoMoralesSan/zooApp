@@ -21,7 +21,6 @@ import {
 
 const DEVICE = {
 	totalMemory: Device.totalMemory,
-	yearClass: Device.deviceYearClass,
 }
 
 // "Calidad gráfica": the level on top, and below it every effect it turns

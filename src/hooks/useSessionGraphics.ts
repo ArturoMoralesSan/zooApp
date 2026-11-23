@@ -16,7 +16,6 @@ export function useSessionGraphics(): GraphicsEffects | null {
 		setEffects(
 			resolveGraphics(quality, custom, {
 				totalMemory: Device.totalMemory,
-				yearClass: Device.deviceYearClass,
 			}),
 		)
 	}

@@ -9,7 +9,6 @@ import { GRAPHICS_PRESETS } from '@/utils/settings'
 // A phone that reports 3.4 GB (sold as 4): 'auto' is Alta.
 jest.mock('expo-device', () => ({
 	totalMemory: 3.4 * 1024 ** 3,
-	deviceYearClass: 2023,
 }))
 
 test('resolves the level once and keeps it for the session', async () => {
