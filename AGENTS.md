@@ -51,7 +51,7 @@ src/
                        map (duel map), offline (pack)
     duel/              _layout (DuelProvider): scan → play → review, debug
     points/            season: what the active points season changes
-    settings/          index (preferences), storage (what the app keeps, links to each download)
+    settings/          index (preferences), graphics (Calidad gráfica), storage (what the app keeps, links to each download)
     map.tsx profile.tsx +not-found.tsx
   components/
     ui/                Generic design-system components (Button, Card, ListCard, TextField,
@@ -195,6 +195,7 @@ Key App measurements:
 - **Models:** keep them small (a few MB, few draw calls), set `scale` explicitly, show a loading state while they load, and handle `onError`. Remove debug `console.log`s before committing.
 - **360° scenario:** `assets/models/scenario/savanna.glb` has baked ground shadows, so it, the sky rotation and the sun direction must always turn together with the animal's heading in `Viewer360Scene`. Only the animal casts a live shadow (anything else in the scene gets `shadowCastingBitMask={0}`). GVR head tracking that never starts is handled by recreating the view (`onTrackingStuck`). Editing `Viewer360` while its view is open can crash the dev app natively (fast refresh remounts Viro without the release delay): leave the view first. It's exported from a Blender file outside the repo: don't edit the GLB, ask the user. Details in [ARCHITECTURE](docs/ARCHITECTURE.md#ar-and-3d).
 - **Shadows:** a live shadow needs `shadowsEnabled` on the navigator. Bitmasks stay at 1 on the light, the animal and the `arShadowReceiver` quad; anything that must not cast gets `shadowCastingBitMask={0}`. Shadow math lives in `utils/shadow.ts`, shared with the 360° view. `onAmbientLightUpdate` always reports 0 (Viro forces ARCore's HDR mode): don't build on it.
+- **Graphics level:** "Calidad gráfica" (`useGraphicsQuality`, keys `zooapp_pref_graphics` and `zooapp_pref_graphics_custom`) decides the live shadows, the AR daylight and blob, and whether the 360° view loads the savanna. AR and 360° screens read it with `useSessionGraphics()` once per session and wait for it; pass its effects to the scene and to the navigator's `shadowsEnabled`. The selfie ignores it.
 - **Lint:** light colors in a scene are 3D lighting, not UI. Mark them with `// eslint-disable-next-line no-restricted-syntax -- AR light color` instead of using palette tokens.
 
 ## Working efficiently (low token use)
