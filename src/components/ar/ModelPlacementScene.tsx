@@ -33,8 +33,9 @@ import {
 export type ModelPlacementSceneProps = {
 	// GLB already at real scale (1 unit = 1 m, origin at the bottom center).
 	modelUrl: string | null
-	// 'auto': the animal floats ahead and lands on the floor at the screen
-	// centre; 'plane': the user taps a detected plane.
+	// 'plane' (default): the user taps a detected plane; 'auto'
+	// (experimental): the animal floats ahead and lands on the floor at the
+	// screen centre.
 	placement: ArPlacement
 	// Changing it clears the placement so the user can place it again.
 	resetKey?: number
@@ -67,7 +68,7 @@ const NO_ANIMATION = { name: 'idle', run: false, loop: true }
 
 const NO_SCENE_PROPS: ModelPlacementSceneProps = {
 	modelUrl: null,
-	placement: 'auto',
+	placement: 'plane',
 	onPlaced: noop,
 	onModelLoaded: noop,
 	onModelError: noop,
@@ -265,7 +266,7 @@ const createLive = (): Live => ({
 	timeout: null,
 })
 
-// 'auto' (Model Viewer style): the GLB loads as AR opens and the animal
+// 'auto' (experimental, Model Viewer style): the GLB loads as AR opens and the animal
 // floats ahead, a little below eye level, far enough to fit on screen. The
 // hit test at the screen centre finds upward planes: the lowest is the
 // floor. A ring marks the floor hit, or between hits (they blink at the

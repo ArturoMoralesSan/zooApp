@@ -134,7 +134,7 @@ export default function DuelPlayScreen() {
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
-			placement: placement ?? 'auto',
+			placement: placement ?? 'plane',
 			closing: arExit.closing,
 			onPlaneFound: () => setPlaneFound(true),
 			// Auto places a model that's already loaded.

@@ -49,9 +49,8 @@ const scene = () =>
 	arSceneProps.mock.lastCall?.[0] as ModelPlacementSceneProps | undefined
 
 // One scenario: services/cards and useArAvailability keep state in the module.
-test('AR waits for the saved placement and starts in plane mode', async () => {
+test('AR waits for the placement and, with nothing saved, starts in plane mode', async () => {
 	await SecureStore.setItemAsync('zooapp_token', 'token-de-prueba')
-	await SecureStore.setItemAsync('zooapp_pref_ar_placement', 'plane')
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
 	server.use(
 		serveCards([

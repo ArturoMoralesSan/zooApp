@@ -7,13 +7,13 @@ import { useArPlacement } from '@/hooks/useArPlacement'
 const KEY = 'zooapp_pref_ar_placement'
 
 test('is null while reading, then the saved placement', async () => {
-	await SecureStore.setItemAsync(KEY, 'plane')
+	await SecureStore.setItemAsync(KEY, 'auto')
 
 	let release = () => {}
 	jest.mocked(SecureStore.getItemAsync).mockImplementationOnce(
 		() =>
 			new Promise((resolve) => {
-				release = () => resolve('plane')
+				release = () => resolve('auto')
 			}),
 	)
 
@@ -22,21 +22,21 @@ test('is null while reading, then the saved placement', async () => {
 	expect(result.current.placement).toBeNull()
 
 	await act(async () => release())
-	expect(result.current.placement).toBe('plane')
+	expect(result.current.placement).toBe('auto')
 })
 
 test('setting it shows at once and is saved for next time', async () => {
 	const { result } = await renderHook(() => useArPlacement())
 
-	await waitFor(() => expect(result.current.placement).toBe('auto'))
+	await waitFor(() => expect(result.current.placement).toBe('plane'))
 
-	await act(async () => result.current.setPlacement('plane'))
-	expect(result.current.placement).toBe('plane')
-	expect(await SecureStore.getItemAsync(KEY)).toBe('plane')
+	await act(async () => result.current.setPlacement('auto'))
+	expect(result.current.placement).toBe('auto')
+	expect(await SecureStore.getItemAsync(KEY)).toBe('auto')
 
 	const next = await renderHook(() => useArPlacement())
 
-	await waitFor(() => expect(next.result.current.placement).toBe('plane'))
+	await waitFor(() => expect(next.result.current.placement).toBe('auto'))
 })
 
 test('a choice made while reading wins over the stored one', async () => {

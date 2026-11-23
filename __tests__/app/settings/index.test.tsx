@@ -42,16 +42,21 @@ test('the placement choice is saved and read back next time', async () => {
 
 	const first = await renderWithProviders(<SettingsScreen />)
 
+	// On a surface by default; automatic is marked experimental.
 	await fireEvent.press(
-		await screen.findByLabelText('Colocación del animal, Automática'),
+		await screen.findByLabelText('Colocación del animal, En una superficie'),
 	)
-	await fireEvent.press(await screen.findByText('En una superficie'))
+	expect(await screen.findByText('Experimental')).toBeTruthy()
+	// The badge is read out with the option, not only shown.
+	await fireEvent.press(screen.getByLabelText(/^Automática, Experimental\./))
 
 	expect(
-		await screen.findByLabelText('Colocación del animal, En una superficie'),
+		await screen.findByLabelText(
+			'Colocación del animal, Automática · Experimental',
+		),
 	).toBeTruthy()
 	expect(await SecureStore.getItemAsync('zooapp_pref_ar_placement')).toBe(
-		'plane',
+		'auto',
 	)
 	await first.unmount()
 
@@ -59,6 +64,8 @@ test('the placement choice is saved and read back next time', async () => {
 	await renderWithProviders(<SettingsScreen />)
 
 	expect(
-		await screen.findByLabelText('Colocación del animal, En una superficie'),
+		await screen.findByLabelText(
+			'Colocación del animal, Automática · Experimental',
+		),
 	).toBeTruthy()
 })

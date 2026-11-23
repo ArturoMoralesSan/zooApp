@@ -1,5 +1,6 @@
 import { expect, jest, test } from '@jest/globals'
 import { act, renderHook, screen, waitFor } from '@testing-library/react-native'
+import * as SecureStore from 'expo-secure-store'
 import type { ReactNode } from 'react'
 
 import DuelPlayScreen from '@/app/duel/play'
@@ -61,6 +62,7 @@ const duel = makeDuelStart({
 // One scenario: useArAvailability keeps ARCore's answer in the module.
 test('auto placement: A-20 waits for the animal to land, and the 360° offer still comes', async () => {
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
+	await SecureStore.setItemAsync('zooapp_pref_ar_placement', 'auto')
 	// For the 10 s before the 360° offer.
 	jest.useFakeTimers()
 

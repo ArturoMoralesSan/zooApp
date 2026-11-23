@@ -4,8 +4,8 @@ export type AppLanguage = 'es' | 'en'
 
 export type ThemeMode = 'system' | 'light' | 'dark'
 
-// 'auto': the animal appears on the first floor found; 'plane': the user
-// picks the surface.
+// 'plane' (default): the user picks the surface; 'auto' (experimental): the
+// animal appears on the first floor found.
 export type ArPlacement = 'auto' | 'plane'
 
 // What the 3D views may spend: live shadow, the 360° scenario…
@@ -16,6 +16,8 @@ export type SettingOption<T extends string> = {
 	label: string
 	description: string
 	icon: IconSvgElement
+	// Shown as a badge next to the label, e.g. "Experimental".
+	badge?: string
 }
 
 export type StorageCategory = {
