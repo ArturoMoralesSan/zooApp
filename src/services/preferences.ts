@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store'
 
 import type {
+	AnimalView,
 	ArPlacement,
 	GraphicsEffects,
 	GraphicsQuality,
@@ -10,11 +11,13 @@ import { GRAPHICS_PRESETS } from '@/utils/settings'
 // App preferences, remembered per device. SecureStore is the only key-value
 // store the app ships with (see hints.ts).
 const AR_PLACEMENT_KEY = 'zooapp_pref_ar_placement'
+const ANIMAL_VIEW_KEY = 'zooapp_pref_animal_view'
 const GRAPHICS_KEY = 'zooapp_pref_graphics'
 // The switches of "Personalizada", kept even while another level is on.
 const GRAPHICS_CUSTOM_KEY = 'zooapp_pref_graphics_custom'
 
 const AR_PLACEMENTS: readonly ArPlacement[] = ['plane', 'auto']
+const ANIMAL_VIEWS: readonly AnimalView[] = ['ar', '360']
 const GRAPHICS_LEVELS: readonly GraphicsQuality[] = [
 	'auto',
 	'high',
@@ -39,6 +42,26 @@ export async function setArPlacement(value: ArPlacement): Promise<void> {
 		await SecureStore.setItemAsync(AR_PLACEMENT_KEY, value)
 	} catch {
 		// Not critical: AR uses the default until it's chosen again.
+	}
+}
+
+// AR or the 360° view, the last one the user switched to. Unset, unknown or
+// unreadable: 'ar'.
+export async function getAnimalView(): Promise<AnimalView> {
+	try {
+		const value = await SecureStore.getItemAsync(ANIMAL_VIEW_KEY)
+
+		return ANIMAL_VIEWS.find((item) => item === value) ?? 'ar'
+	} catch {
+		return 'ar'
+	}
+}
+
+export async function setAnimalView(value: AnimalView): Promise<void> {
+	try {
+		await SecureStore.setItemAsync(ANIMAL_VIEW_KEY, value)
+	} catch {
+		// Not critical: the animal opens in AR until it's chosen again.
 	}
 }
 

@@ -5,14 +5,17 @@ import {
 	Leaf01Icon,
 	MagicWand01Icon,
 	Moon02Icon,
+	Rotate360Icon,
 	SmartPhone01Icon,
 	SlidersHorizontalIcon,
 	SparklesIcon,
 	Sun03Icon,
 	Touch01Icon,
+	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
 
 import type {
+	AnimalView,
 	AppLanguage,
 	ArPlacement,
 	GraphicsEffects,
@@ -74,6 +77,22 @@ export const AR_PLACEMENT_OPTIONS: SettingOption<ArPlacement>[] = [
 			'El animal aparece en el primer suelo que encuentre la cámara.',
 		icon: MagicWand01Icon,
 		badge: 'Experimental',
+	},
+]
+
+export const ANIMAL_VIEW_OPTIONS: SettingOption<AnimalView>[] = [
+	{
+		value: 'ar',
+		label: 'Realidad aumentada (AR)',
+		description: 'El animal aparece en la cámara, junto a ti.',
+		icon: VrGlassesIcon,
+	},
+	{
+		value: '360',
+		label: 'Vista 360°',
+		description:
+			'El animal aparece en una sabana virtual. No necesita cámara ni espacio libre.',
+		icon: Rotate360Icon,
 	},
 ]
 

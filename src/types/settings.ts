@@ -8,6 +8,10 @@ export type ThemeMode = 'system' | 'light' | 'dark'
 // animal appears on the first floor found.
 export type ArPlacement = 'auto' | 'plane'
 
+// How the animal opens from a card or a duel: 'ar' (default) on the camera,
+// '360' in the savanna. Phones without ARCore always get '360'.
+export type AnimalView = 'ar' | '360'
+
 // What the 3D views may spend: live shadow, the 360° scenario… 'custom'
 // picks each effect (GraphicsEffects).
 export type GraphicsQuality = 'auto' | 'high' | 'saver' | 'custom'
