@@ -4,6 +4,7 @@ import {
 	Flag02Icon,
 	Refresh01Icon,
 	SwordsIcon,
+	Target02Icon,
 	Touch01Icon,
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
@@ -30,6 +31,7 @@ import { Button } from '@/components/ui/Button'
 import Toast, { type ToastType } from '@/components/ui/Toast'
 import { useDuel } from '@/contexts/DuelContext'
 import { useArAvailability } from '@/hooks/useArAvailability'
+import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset, useCardFace } from '@/hooks/useCardAsset'
 import { useDataRefresh } from '@/hooks/useDataRefresh'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
@@ -39,6 +41,7 @@ import { ApiError, isNetworkError } from '@/services/api'
 import { notifyOffline } from '@/services/offline-notice'
 import { clearDuelCache } from '@/services/packSync'
 import colors from '@/theme/colors'
+import type { ArPlacement } from '@/types/settings'
 import { formatUnlockTime, rarityLabel } from '@/utils/cards'
 import { DEBUG_DUEL_CODE, ZOODECK_QUIZ_DEBUG } from '@/utils/zoodeckDebug'
 
@@ -102,22 +105,48 @@ export default function DuelPlayScreen() {
 	const phase =
 		view === '360' && placingPhase === 'placing' ? 'ready' : placingPhase
 	const [planeFound, setPlaneFound] = useState(false)
+	// 'plane': waiting for the tap, then loading. 'auto': loading from the
+	// start, and A-20 waits for the animal to land.
 	const [modelStatus, setModelStatus] = useState<ModelStatus>('waiting')
+	// Read once per AR session, so the mode never changes mid-duel.
+	const saved = useArPlacement().placement
+	const [placement, setPlacement] = useState<ArPlacement | null>(null)
+
+	if (placement === null && saved) setPlacement(saved)
+
+	const auto = placement === 'auto'
+	// AR not decided yet, or waiting for the saved mode.
+	const startingAr = view === null || (view === 'ar' && placement === null)
+	// The model loads as auto AR opens: 'waiting' is already loading.
+	const modelLoading =
+		modelStatus === 'loading' ||
+		(auto && view === 'ar' && Boolean(modelUrl) && modelStatus === 'waiting')
 	const [index, setIndex] = useState(0)
 	const [retrying, setRetrying] = useState(false)
 	const [toast, setToast] = useState<ToastState>(null)
 	const hideToast = useCallback(() => setToast(null), [])
 
+	// Every way out releases the AR (or 360°) view first: the card view
+	// started while it was still alive came up blank (see useViroHandoff).
+	const arExit = useViroExit('ar', modelLoading)
+
 	// Stable props: the scene keeps its placement across overlay re-renders.
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
-			placement: 'plane',
+			placement: placement ?? 'auto',
+			closing: arExit.closing,
 			onPlaneFound: () => setPlaneFound(true),
-			onPlaced: () => setModelStatus('loading'),
+			// Auto places a model that's already loaded.
+			onPlaced: () =>
+				placement === 'auto'
+					? setPhase((current) => (current === 'placing' ? 'ready' : current))
+					: setModelStatus('loading'),
 			onModelLoaded: () => {
 				setModelStatus('loaded')
-				setPhase((current) => (current === 'placing' ? 'ready' : current))
+				if (placement !== 'auto') {
+					setPhase((current) => (current === 'placing' ? 'ready' : current))
+				}
 			},
 			// The quiz doesn't need the model: let the duel go on without it.
 			onModelError: () => {
@@ -125,12 +154,9 @@ export default function DuelPlayScreen() {
 				setPhase((current) => (current === 'placing' ? 'ready' : current))
 			},
 		}),
-		[modelUrl],
+		[modelUrl, placement, arExit.closing],
 	)
 
-	// Every way out releases the AR (or 360°) view first: the card view
-	// started while it was still alive came up blank (see useViroHandoff).
-	const arExit = useViroExit('ar', modelStatus === 'loading')
 	const view360Exit = useViroExit(
 		'scene3d',
 		view === '360' && Boolean(modelUrl) && modelStatus === 'waiting',
@@ -168,7 +194,7 @@ export default function DuelPlayScreen() {
 			!exiting &&
 			phase === 'placing' &&
 			!planeFound &&
-			modelStatus === 'waiting',
+			(auto || modelStatus === 'waiting'),
 	)
 
 	// The card isn't owned (or is now copied as owned): its decrypted files
@@ -325,7 +351,7 @@ export default function DuelPlayScreen() {
 					onModelLoaded={sceneProps.onModelLoaded}
 					onModelError={sceneProps.onModelError}
 				/>
-			) : (
+			) : placement === null ? null : (
 				<ViroARSceneNavigator
 					autofocus
 					initialScene={{ scene: ModelPlacementScene }}
@@ -367,17 +393,21 @@ export default function DuelPlayScreen() {
 
 				{phase === 'placing' && !switching && !offer360 && (
 					<CameraNotice
-						icon={Touch01Icon}
+						icon={auto ? Target02Icon : Touch01Icon}
 						message={
 							model.downloading
 								? 'Descargando el animal…'
-								: modelStatus === 'loading' || view === null
+								: modelLoading || startingAr
 									? `Cargando a ${card.name}…`
-									: `Toca el plano donde quieras colocar a ${card.name}.`
+									: !auto
+										? `Toca el plano donde quieras colocar a ${card.name}.`
+										: planeFound
+											? `Apunta al suelo donde quieras a ${card.name}.`
+											: 'Mueve el teléfono despacio para encontrar el suelo.'
 						}
 						className='mt-4'
 					>
-						{(model.loading || modelStatus === 'loading' || view === null) && (
+						{(model.loading || modelLoading || startingAr) && (
 							<ActivityIndicator color={colors.lima} />
 						)}
 					</CameraNotice>

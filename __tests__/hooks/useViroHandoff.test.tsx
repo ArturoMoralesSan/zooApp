@@ -57,10 +57,47 @@ describe('useViroExit', () => {
 		const { result } = await renderHook(() => useViroExit('ar'))
 
 		await act(async () => result.current.exit(then))
+		await advance(200)
 		await advance(1499)
 		expect(then).not.toHaveBeenCalled()
 		await advance(1)
 		expect(then).toHaveBeenCalledTimes(1)
+	})
+
+	// Viro's GL thread emitting a per-frame event while Fabric removes the
+	// view deadlocked the app: the scene stops its events first.
+	test('AR says it is closing 200 ms before its view goes', async () => {
+		const { result } = await renderHook(() => useViroExit('ar'))
+
+		expect(result.current.closing).toBe(false)
+		await act(async () => result.current.exit(jest.fn()))
+		expect(result.current.closing).toBe(true)
+		expect(result.current.exiting).toBe(false)
+
+		await advance(199)
+		expect(result.current.exiting).toBe(false)
+		await advance(1)
+		expect(result.current.exiting).toBe(true)
+	})
+
+	test('a 3D view closes at once, and a load still holds an AR view', async () => {
+		const scene3d = await renderHook(() => useViroExit('scene3d'))
+
+		await act(async () => scene3d.result.current.exit(jest.fn()))
+		expect(scene3d.result.current.closing).toBe(true)
+		expect(scene3d.result.current.exiting).toBe(true)
+
+		const ar = await renderHook(
+			({ busy }: { busy: boolean }) => useViroExit('ar', busy),
+			{ initialProps: { busy: true } },
+		)
+
+		await act(async () => ar.result.current.exit(jest.fn()))
+		await advance(1000)
+		expect(ar.result.current.exiting).toBe(false)
+
+		await ar.rerender({ busy: false })
+		expect(ar.result.current.exiting).toBe(true)
 	})
 
 	test('waits for a model that is still loading', async () => {
