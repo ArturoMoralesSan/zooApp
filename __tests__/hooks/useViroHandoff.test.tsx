@@ -63,6 +63,42 @@ describe('useViroExit', () => {
 		expect(then).toHaveBeenCalledTimes(1)
 	})
 
+	// Viro's GL thread emitting a per-frame event while Fabric removes the
+	// view deadlocked the app: the scene stops its events first.
+	test('a view with per-frame events says it is closing 200 ms before it goes', async () => {
+		const { result } = await renderHook(() => useViroExit('ar', false, true))
+
+		expect(result.current.closing).toBe(false)
+		await act(async () => result.current.exit(jest.fn()))
+		expect(result.current.closing).toBe(true)
+		expect(result.current.exiting).toBe(false)
+
+		await advance(199)
+		expect(result.current.exiting).toBe(false)
+		await advance(1)
+		expect(result.current.exiting).toBe(true)
+	})
+
+	test('without them it closes at once, and a load still holds it', async () => {
+		const plain = await renderHook(() => useViroExit('ar'))
+
+		await act(async () => plain.result.current.exit(jest.fn()))
+		expect(plain.result.current.closing).toBe(true)
+		expect(plain.result.current.exiting).toBe(true)
+
+		const loading = await renderHook(
+			({ busy }: { busy: boolean }) => useViroExit('ar', busy, true),
+			{ initialProps: { busy: true } },
+		)
+
+		await act(async () => loading.result.current.exit(jest.fn()))
+		await advance(1000)
+		expect(loading.result.current.exiting).toBe(false)
+
+		await loading.rerender({ busy: false })
+		expect(loading.result.current.exiting).toBe(true)
+	})
+
 	test('waits for a model that is still loading', async () => {
 		const then = jest.fn()
 		const { result, rerender } = await renderHook(

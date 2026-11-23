@@ -18,14 +18,10 @@ import { SectionTitle } from '@/components/ui/SectionTitle'
 import { ScreenHeader } from '@/components/ui/TabHeader'
 import { TopBar } from '@/components/ui/TopBar'
 import { useArAvailability } from '@/hooks/useArAvailability'
+import { useArPlacement } from '@/hooks/useArPlacement'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useScrollBottomSpace } from '@/theme/layout'
-import type {
-	AppLanguage,
-	ArPlacement,
-	GraphicsQuality,
-	ThemeMode,
-} from '@/types/settings'
+import type { AppLanguage, GraphicsQuality, ThemeMode } from '@/types/settings'
 import { formatBytes } from '@/utils/format'
 import {
 	AR_PLACEMENT_OPTIONS,
@@ -38,7 +34,8 @@ import {
 
 type Sheet = 'language' | 'theme' | 'placement' | 'graphics' | null
 
-// App preferences. Draft: the choices live only while the screen is open
+// App preferences. "Colocación del animal" is saved and used by AR; the
+// rest is still a draft: those choices live only while the screen is open
 // and don't change the app yet.
 export default function SettingsScreen() {
 	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
@@ -50,7 +47,8 @@ export default function SettingsScreen() {
 	const [sheet, setSheet] = useState<Sheet>(null)
 	const [language, setLanguage] = useState<AppLanguage>('es')
 	const [theme, setTheme] = useState<ThemeMode>('light')
-	const [placement, setPlacement] = useState<ArPlacement>('auto')
+	// null while it's read: the row shows no value yet.
+	const { placement, setPlacement } = useArPlacement()
 	const [graphics, setGraphics] = useState<GraphicsQuality>('auto')
 
 	const used = DRAFT_STORAGE.reduce((sum, item) => sum + item.bytes, 0)
@@ -121,9 +119,13 @@ export default function SettingsScreen() {
 						description={
 							noAr
 								? 'No disponible en este teléfono'
-								: optionLabel(AR_PLACEMENT_OPTIONS, placement)
+								: placement
+									? optionLabel(AR_PLACEMENT_OPTIONS, placement)
+									: undefined
 						}
-						onPress={noAr ? undefined : () => setSheet('placement')}
+						onPress={
+							noAr || !placement ? undefined : () => setSheet('placement')
+						}
 					/>
 					<ListCard
 						icon={DashboardSpeed01Icon}
@@ -161,15 +163,17 @@ export default function SettingsScreen() {
 				onChange={setTheme}
 				onClose={closeSheet}
 			/>
-			<SettingChoiceSheet
-				visible={sheet === 'placement'}
-				title='Colocación del animal'
-				description='Cómo aparece el animal al abrir la cámara en AR.'
-				options={AR_PLACEMENT_OPTIONS}
-				value={placement}
-				onChange={setPlacement}
-				onClose={closeSheet}
-			/>
+			{placement && (
+				<SettingChoiceSheet
+					visible={sheet === 'placement'}
+					title='Colocación del animal'
+					description='Cómo aparece el animal al abrir la cámara en AR.'
+					options={AR_PLACEMENT_OPTIONS}
+					value={placement}
+					onChange={setPlacement}
+					onClose={closeSheet}
+				/>
+			)}
 			<SettingChoiceSheet
 				visible={sheet === 'graphics'}
 				title='Calidad gráfica'

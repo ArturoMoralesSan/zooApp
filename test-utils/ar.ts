@@ -21,6 +21,8 @@ export const viroMock = {
 	isARSupportedOnDevice: jest.fn(async (): Promise<Support> => ({
 		isARSupported: true,
 	})),
+	// Scenes create their materials when the module loads.
+	ViroMaterials: { createMaterials: jest.fn() },
 }
 
 type CameraPermission = { granted: boolean; canAskAgain: boolean }
@@ -47,11 +49,19 @@ export const arScreenshot = jest.fn(async (): Promise<ScreenshotResult> => ({
 
 type StubProps = { viroAppProps?: { onModelReady?: () => void } }
 
+// The viroAppProps of every navigator mounted: what the scene would get.
+export const arSceneProps = jest.fn((props: unknown) => props)
+
 // ViroARSceneNavigator without a native view: renders nothing, reports the
 // scene's model as loaded and takes "screenshots" (arScreenshot).
 export class ViroARSceneNavigatorStub extends Component<StubProps> {
 	componentDidMount() {
+		arSceneProps(this.props.viroAppProps)
 		this.props.viroAppProps?.onModelReady?.()
+	}
+
+	componentDidUpdate() {
+		arSceneProps(this.props.viroAppProps)
 	}
 
 	_takeScreenshot = () => arScreenshot()

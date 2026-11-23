@@ -4,6 +4,7 @@ import {
 	CubeIcon,
 	Refresh01Icon,
 	Rotate360Icon,
+	Target02Icon,
 	Touch01Icon,
 } from '@hugeicons/core-free-icons'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
@@ -31,6 +32,7 @@ import {
 	type ArAvailability,
 	useArAvailability,
 } from '@/hooks/useArAvailability'
+import { useArPlacement } from '@/hooks/useArPlacement'
 import { useCardAsset } from '@/hooks/useCardAsset'
 import { useCards } from '@/hooks/useCards'
 import { useSessionRedirect } from '@/hooks/useSessionRedirect'
@@ -40,8 +42,11 @@ import { markHintShown, wasHintShown } from '@/services/hints'
 import { clearPhotos, deletePhoto, takeArPhoto } from '@/services/photo'
 import colors from '@/theme/colors'
 import type { OwnedCard } from '@/types/cards'
+import type { ArPlacement } from '@/types/settings'
 
-type Phase = 'placing' | 'loading' | 'placed' | 'error'
+// 'plane': placing (tap) → loading → placed. 'auto': the model loads first,
+// then floats while searching for the floor → placed.
+type Phase = 'placing' | 'loading' | 'searching' | 'placed' | 'error'
 type View360Status = 'loading' | 'loaded' | 'error'
 
 // Why the 360° view opened on its own, before its instructions.
@@ -50,8 +55,9 @@ const REASONS: Partial<Record<ArAvailability, string>> = {
 	'no-camera': 'Sin permiso de cámara. ',
 }
 
-// AR view of an owned card's animal (A-28 → A-29): find a surface, tap to
-// place it at life size, and reset to place it again, take a photo (A-31 →
+// AR view of an owned card's animal (A-28 → A-29): find a surface and place
+// it at life size, automatically or with a tap (the "Colocación del animal"
+// setting), and reset to place it again, take a photo (A-31 →
 // A-32) or switch to the selfie. Without AR (unsupported phone,
 // camera denied, or no surface found) the animal shows in the Vista 360°.
 export default function CardArScreen() {
@@ -77,7 +83,20 @@ export default function CardArScreen() {
 		setModelUrl(model.uri)
 	}
 
-	const [phase, setPhase] = useState<Phase>('placing')
+	// Read once per AR session, so the mode never changes mid-session.
+	const saved = useArPlacement().placement
+	const [placement, setPlacement] = useState<ArPlacement | null>(null)
+
+	if (placement === null && saved) setPlacement(saved)
+
+	const auto = placement === 'auto'
+	// null until a scene event: the first phase depends on the mode.
+	const [phaseState, setPhase] = useState<Phase | null>(null)
+	const phase = phaseState ?? (auto ? 'loading' : 'placing')
+	// Looking for a surface: the pill, and the 360° offer after a while.
+	const searching = auto
+		? phase === 'loading' || phase === 'searching'
+		: phase === 'placing'
 	const [planeFound, setPlaneFound] = useState(false)
 	const [resetKey, setResetKey] = useState(0)
 	// The user chose the 360° view from AR ("¿No encuentras una superficie?").
@@ -107,18 +126,24 @@ export default function CardArScreen() {
 
 	const viroReady = useViroHandoff()
 	// Leaving mid-load would break the next Viro view: wait for the model.
-	const arExit = useViroExit('ar', phase === 'loading')
+	// Auto placement's hit tests stop before the view goes.
+	const arExit = useViroExit('ar', phase === 'loading', auto)
 	const view360Exit = useViroExit(
 		'scene3d',
 		view === '360' && view360 === 'loading',
 	)
 	const exiting = view === '360' ? view360Exit.exiting : arExit.exiting
-	const showAr = view === 'ar' && Boolean(modelUrl) && viroReady && !exiting
+	const showAr =
+		view === 'ar' &&
+		Boolean(modelUrl) &&
+		placement !== null &&
+		viroReady &&
+		!exiting
 	const show360 = view === '360' && Boolean(modelUrl) && viroReady && !exiting
 
 	useSessionRedirect()
 
-	const offer360 = useSurfaceOffer(showAr && phase === 'placing' && !planeFound)
+	const offer360 = useSurfaceOffer(showAr && searching && !planeFound)
 
 	// Back to the card view with replace (it was replaced to open AR), once
 	// the Viro view has been closed: its 3D view can't start before that.
@@ -225,20 +250,24 @@ export default function CardArScreen() {
 	const sceneProps = useMemo<ModelPlacementSceneProps>(
 		() => ({
 			modelUrl,
+			placement: placement ?? 'plane',
 			resetKey,
+			closing: arExit.closing,
 			onPlaneFound: () => setPlaneFound(true),
-			onPlaced: () => setPhase('loading'),
-			onModelLoaded: () => setPhase('placed'),
+			onPlaced: () => setPhase(placement === 'auto' ? 'placed' : 'loading'),
+			onModelLoaded: () =>
+				setPhase(placement === 'auto' ? 'searching' : 'placed'),
 			onModelError: () => setPhase('error'),
 		}),
-		[modelUrl, resetKey],
+		[modelUrl, placement, resetKey, arExit.closing],
 	)
 
 	const on360Loaded = useCallback(() => setView360('loaded'), [])
 	const on360Error = useCallback(() => setView360('error'), [])
 
+	// In auto mode a model that failed loads again; one that loaded floats.
 	const placeAgain = () => {
-		setPhase('placing')
+		setPhase(auto ? (phase === 'error' ? 'loading' : 'searching') : 'placing')
 		setResetKey((value) => value + 1)
 	}
 
@@ -304,7 +333,10 @@ export default function CardArScreen() {
 						>
 							<ActivityIndicator color={colors.lima} />
 						</CameraNotice>
-					) : model.loading || view === null ? (
+					) : model.loading ||
+					  view === null ||
+					  // Waiting for the saved placement mode.
+					  (view === 'ar' && placement === null) ? (
 						<CameraNotice
 							message={
 								model.downloading
@@ -339,16 +371,24 @@ export default function CardArScreen() {
 								onDismiss={() => setShow360Hint(false)}
 							/>
 						) : null
+					) : offer360 ? (
+						<SurfaceOffer onAccept={switchTo360} className='mt-4' />
+					) : phase === 'searching' ? (
+						<CameraNotice
+							icon={Target02Icon}
+							message={
+								planeFound
+									? `Apunta al suelo donde quieras a ${name}.`
+									: 'Mueve el teléfono despacio para encontrar el suelo.'
+							}
+							className='mt-4'
+						/>
 					) : phase === 'placing' ? (
-						offer360 ? (
-							<SurfaceOffer onAccept={switchTo360} className='mt-4' />
-						) : (
-							<CameraNotice
-								icon={Touch01Icon}
-								message={`Toca la parte del plano donde quieras colocar a ${name}.`}
-								className='mt-4'
-							/>
-						)
+						<CameraNotice
+							icon={Touch01Icon}
+							message={`Toca la parte del plano donde quieras colocar a ${name}.`}
+							className='mt-4'
+						/>
 					) : phase === 'loading' ? (
 						<CameraNotice message={`Cargando a ${name}…`} className='mt-4'>
 							<ActivityIndicator color={colors.lima} />
@@ -377,7 +417,7 @@ export default function CardArScreen() {
 					</View>
 				) : (
 					showAr &&
-					(phase === 'placing' ? (
+					(searching ? (
 						planeFound && <SurfaceDetectedPill />
 					) : (
 						<ArCameraControls

@@ -1,6 +1,7 @@
 import { Cancel01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import { Text, View } from 'react-native'
 
+import { Badge } from '@/components/ui/Badge'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Icon } from '@/components/ui/Icon'
 import { IconBox } from '@/components/ui/IconBox'
@@ -58,7 +59,7 @@ export function SettingChoiceSheet<T extends string>({
 								onChange(option.value)
 								onClose()
 							}}
-							accessibilityLabel={`${option.label}. ${option.description}`}
+							accessibilityLabel={`${option.label}${option.badge ? `, ${option.badge}` : ''}. ${option.description}`}
 						>
 							<View className='flex-row items-center gap-3'>
 								<IconBox
@@ -67,7 +68,12 @@ export function SettingChoiceSheet<T extends string>({
 								/>
 
 								<View style={{ flex: 1, minWidth: 0 }}>
-									<Text className='text-h3 text-tinta'>{option.label}</Text>
+									<View className='flex-row flex-wrap items-center gap-2'>
+										<Text className='text-h3 text-tinta'>{option.label}</Text>
+										{option.badge && (
+											<Badge tone='pending' label={option.badge} />
+										)}
+									</View>
 									<Text className='text-meta mt-1'>{option.description}</Text>
 								</View>
 

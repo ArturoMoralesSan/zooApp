@@ -56,20 +56,22 @@ export const THEME_OPTIONS: SettingOption<ThemeMode>[] = [
 	},
 ]
 
+// Plane first: it's the default. Auto is still experimental.
 export const AR_PLACEMENT_OPTIONS: SettingOption<ArPlacement>[] = [
-	{
-		value: 'auto',
-		label: 'Automática',
-		description:
-			'El animal aparece en el primer suelo que encuentre la cámara.',
-		icon: MagicWand01Icon,
-	},
 	{
 		value: 'plane',
 		label: 'En una superficie',
 		description:
 			'Elige tú dónde ponerlo: toca una de las superficies que marca la cámara.',
 		icon: Touch01Icon,
+	},
+	{
+		value: 'auto',
+		label: 'Automática',
+		description:
+			'El animal aparece en el primer suelo que encuentre la cámara.',
+		icon: MagicWand01Icon,
+		badge: 'Experimental',
 	},
 ]
 
@@ -100,7 +102,12 @@ export function optionLabel<T extends string>(
 	options: SettingOption<T>[],
 	value: T,
 ): string {
-	return options.find((option) => option.value === value)?.label ?? ''
+	const option = options.find((item) => item.value === value)
+
+	if (!option) return ''
+
+	// The badge goes along, so the row also says "Experimental".
+	return option.badge ? `${option.label} · ${option.badge}` : option.label
 }
 
 // Placeholder sizes for the settings draft, until storage is measured.
