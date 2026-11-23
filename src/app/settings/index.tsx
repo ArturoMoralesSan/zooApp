@@ -5,8 +5,8 @@ import {
 	PaintBoardIcon,
 	VrGlassesIcon,
 } from '@hugeicons/core-free-icons'
-import { router } from 'expo-router'
-import { useState } from 'react'
+import { router, useFocusEffect } from 'expo-router'
+import { useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 
 import { SettingChoiceSheet } from '@/components/settings/SettingChoiceSheet'
@@ -19,9 +19,10 @@ import { ScreenHeader } from '@/components/ui/TabHeader'
 import { TopBar } from '@/components/ui/TopBar'
 import { useArAvailability } from '@/hooks/useArAvailability'
 import { useArPlacement } from '@/hooks/useArPlacement'
+import { useGraphicsQuality } from '@/hooks/useGraphicsQuality'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useScrollBottomSpace } from '@/theme/layout'
-import type { AppLanguage, GraphicsQuality, ThemeMode } from '@/types/settings'
+import type { AppLanguage, ThemeMode } from '@/types/settings'
 import { formatBytes } from '@/utils/format'
 import {
 	AR_PLACEMENT_OPTIONS,
@@ -32,11 +33,12 @@ import {
 	THEME_OPTIONS,
 } from '@/utils/settings'
 
-type Sheet = 'language' | 'theme' | 'placement' | 'graphics' | null
+type Sheet = 'language' | 'theme' | 'placement' | null
 
-// App preferences. "Colocación del animal" is saved and used by AR; the
-// rest is still a draft: those choices live only while the screen is open
-// and don't change the app yet.
+// App preferences. "Colocación del animal" and "Calidad gráfica" (its own
+// screen) are saved and used by AR and the 360° view; language and theme
+// are still a draft: those choices live only while the screen is open and
+// don't change the app yet.
 export default function SettingsScreen() {
 	const { scrolled, pastTitle, onScroll, onTitleLayout } = useScrolled()
 	const bottomSpace = useScrollBottomSpace(32)
@@ -49,7 +51,14 @@ export default function SettingsScreen() {
 	const [theme, setTheme] = useState<ThemeMode>('light')
 	// null while it's read: the row shows no value yet.
 	const { placement, setPlacement } = useArPlacement()
-	const [graphics, setGraphics] = useState<GraphicsQuality>('auto')
+	// Chosen on its own screen: read again when coming back from it.
+	const { quality: graphics, reload: reloadGraphics } = useGraphicsQuality()
+
+	useFocusEffect(
+		useCallback(() => {
+			reloadGraphics()
+		}, [reloadGraphics]),
+	)
 
 	const used = DRAFT_STORAGE.reduce((sum, item) => sum + item.bytes, 0)
 	const closeSheet = () => setSheet(null)
@@ -130,8 +139,10 @@ export default function SettingsScreen() {
 					<ListCard
 						icon={DashboardSpeed01Icon}
 						title='Calidad gráfica'
-						description={optionLabel(GRAPHICS_OPTIONS, graphics)}
-						onPress={() => setSheet('graphics')}
+						description={
+							graphics ? optionLabel(GRAPHICS_OPTIONS, graphics) : undefined
+						}
+						onPress={() => router.push('/settings/graphics')}
 					/>
 				</View>
 
@@ -174,15 +185,6 @@ export default function SettingsScreen() {
 					onClose={closeSheet}
 				/>
 			)}
-			<SettingChoiceSheet
-				visible={sheet === 'graphics'}
-				title='Calidad gráfica'
-				description='Para AR, la vista 360° y el modelo 3D.'
-				options={GRAPHICS_OPTIONS}
-				value={graphics}
-				onChange={setGraphics}
-				onClose={closeSheet}
-			/>
 		</ScreenBackground>
 	)
 }

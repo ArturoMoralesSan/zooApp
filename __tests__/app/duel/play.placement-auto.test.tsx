@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import DuelPlayScreen from '@/app/duel/play'
 import type { ModelPlacementSceneProps } from '@/components/ar/ModelPlacementScene'
 import { DuelProvider, useDuel } from '@/contexts/DuelContext'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 import { arSceneProps, viroMock } from '../../../test-utils/ar'
 import { makeDuelStart } from '../../../test-utils/factories'
@@ -63,6 +64,7 @@ const duel = makeDuelStart({
 test('auto placement: A-20 waits for the animal to land, and the 360° offer still comes', async () => {
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
 	await SecureStore.setItemAsync('zooapp_pref_ar_placement', 'auto')
+	await SecureStore.setItemAsync('zooapp_pref_graphics', 'saver')
 	// For the 10 s before the 360° offer.
 	jest.useFakeTimers()
 
@@ -78,6 +80,8 @@ test('auto placement: A-20 waits for the animal to land, and the 360° offer sti
 	await act(async () => result.current.begin('QR-1', duel))
 
 	await waitFor(() => expect(scene()?.placement).toBe('auto'))
+	// The saved graphics level reaches the scene.
+	expect(scene()?.graphics).toEqual(GRAPHICS_PRESETS.saver)
 	expect(screen.getByText('Cargando a Lobo gris…')).toBeTruthy()
 
 	// Loaded but floating: no duel yet.

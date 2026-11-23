@@ -1,13 +1,9 @@
-import { Cancel01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Text, View } from 'react-native'
 
-import { Badge } from '@/components/ui/Badge'
+import { SettingOptionCard } from '@/components/settings/SettingOptionCard'
 import { BottomSheet } from '@/components/ui/BottomSheet'
-import { Icon } from '@/components/ui/Icon'
-import { IconBox } from '@/components/ui/IconBox'
 import { IconButton } from '@/components/ui/IconButton'
-import { OptionButton } from '@/components/ui/OptionButton'
-import colors from '@/theme/colors'
 import type { SettingOption } from '@/types/settings'
 
 type SettingChoiceSheetProps<T extends string> = {
@@ -48,43 +44,17 @@ export function SettingChoiceSheet<T extends string>({
 			</View>
 
 			<View accessibilityRole='radiogroup' className='mt-5 gap-3'>
-				{options.map((option) => {
-					const selected = option.value === value
-
-					return (
-						<OptionButton
-							key={option.value}
-							selected={selected}
-							onPress={() => {
-								onChange(option.value)
-								onClose()
-							}}
-							accessibilityLabel={`${option.label}${option.badge ? `, ${option.badge}` : ''}. ${option.description}`}
-						>
-							<View className='flex-row items-center gap-3'>
-								<IconBox
-									icon={option.icon}
-									tone={selected ? 'accent' : 'soft'}
-								/>
-
-								<View style={{ flex: 1, minWidth: 0 }}>
-									<View className='flex-row flex-wrap items-center gap-2'>
-										<Text className='text-h3 text-tinta'>{option.label}</Text>
-										{option.badge && (
-											<Badge tone='pending' label={option.badge} />
-										)}
-									</View>
-									<Text className='text-meta mt-1'>{option.description}</Text>
-								</View>
-
-								{/* The check, not only the border, says which one is on. */}
-								{selected && (
-									<Icon icon={Tick02Icon} color={colors.esmeralda} strong />
-								)}
-							</View>
-						</OptionButton>
-					)
-				})}
+				{options.map((option) => (
+					<SettingOptionCard
+						key={option.value}
+						option={option}
+						selected={option.value === value}
+						onPress={() => {
+							onChange(option.value)
+							onClose()
+						}}
+					/>
+				))}
 			</View>
 		</BottomSheet>
 	)

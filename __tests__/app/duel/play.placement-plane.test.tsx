@@ -1,10 +1,12 @@
 import { expect, jest, test } from '@jest/globals'
 import { act, renderHook, screen, waitFor } from '@testing-library/react-native'
+import * as SecureStore from 'expo-secure-store'
 import type { ReactNode } from 'react'
 
 import DuelPlayScreen from '@/app/duel/play'
 import type { ModelPlacementSceneProps } from '@/components/ar/ModelPlacementScene'
 import { DuelProvider, useDuel } from '@/contexts/DuelContext'
+import { GRAPHICS_PRESETS } from '@/utils/settings'
 
 import { arSceneProps, viroMock } from '../../../test-utils/ar'
 import { makeDuelStart } from '../../../test-utils/factories'
@@ -61,6 +63,7 @@ const duel = makeDuelStart({
 // One scenario: useArAvailability keeps ARCore's answer in the module.
 test('plane placement (the default): tap, load, then A-20, as before', async () => {
 	viroMock.isARSupportedOnDevice.mockResolvedValue({ isARSupported: true })
+	await SecureStore.setItemAsync('zooapp_pref_graphics', 'high')
 
 	const { result } = await renderHook(() => useDuel(), {
 		wrapper: ({ children }: { children: ReactNode }) => (
@@ -74,6 +77,8 @@ test('plane placement (the default): tap, load, then A-20, as before', async () 
 	await act(async () => result.current.begin('QR-1', duel))
 
 	await waitFor(() => expect(scene()?.placement).toBe('plane'))
+	// The saved graphics level reaches the scene.
+	expect(scene()?.graphics).toEqual(GRAPHICS_PRESETS.high)
 	expect(
 		screen.getByText('Toca el plano donde quieras colocar a Lobo gris.'),
 	).toBeTruthy()

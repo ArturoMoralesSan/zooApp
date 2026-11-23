@@ -1,0 +1,56 @@
+import { expect, test } from '@jest/globals'
+
+import {
+	autoGraphicsLevel,
+	GRAPHICS_PRESETS,
+	graphicsLoad,
+	resolveGraphics,
+} from '@/utils/settings'
+
+const GB = 1024 ** 3
+
+test('auto picks Alta with 3 GB or more', () => {
+	// A phone sold with 4 GB reports about 3.4.
+	expect(autoGraphicsLevel({ totalMemory: 3.4 * GB })).toBe('high')
+	expect(autoGraphicsLevel({ totalMemory: 8 * GB })).toBe('high')
+})
+
+test('auto saves on little memory, or when the phone doesn’t say', () => {
+	expect(autoGraphicsLevel({ totalMemory: 2.8 * GB })).toBe('saver')
+	expect(autoGraphicsLevel({ totalMemory: null })).toBe('saver')
+})
+
+test('the load grows with the effects, the savanna weighing most', () => {
+	expect(graphicsLoad(GRAPHICS_PRESETS.high)).toEqual({
+		share: 1,
+		level: 'high',
+	})
+	expect(graphicsLoad(GRAPHICS_PRESETS.saver).level).toBe('low')
+	// The savanna alone makes it high; the rest of Alta without it, medium.
+	expect(
+		graphicsLoad({ ...GRAPHICS_PRESETS.saver, view360Scenario: true }).level,
+	).toBe('high')
+	expect(
+		graphicsLoad({ ...GRAPHICS_PRESETS.high, view360Scenario: false }).level,
+	).toBe('medium')
+})
+
+test('a level resolves to its effects; Personalizada to the user’s mix', () => {
+	const recent = { totalMemory: 8 * GB }
+	const old = { totalMemory: 2 * GB }
+	const mix = { ...GRAPHICS_PRESETS.saver, view360Scenario: true }
+
+	expect(resolveGraphics('high', mix, old)).toEqual(GRAPHICS_PRESETS.high)
+	expect(resolveGraphics('saver', mix, recent)).toEqual(GRAPHICS_PRESETS.saver)
+	expect(resolveGraphics('auto', mix, recent)).toEqual(GRAPHICS_PRESETS.high)
+	expect(resolveGraphics('auto', mix, old)).toEqual(GRAPHICS_PRESETS.saver)
+	expect(resolveGraphics('custom', mix, recent)).toEqual(mix)
+	// The 360° shadow needs the savanna.
+	expect(
+		resolveGraphics(
+			'custom',
+			{ ...GRAPHICS_PRESETS.high, view360Scenario: false },
+			recent,
+		).view360LiveShadow,
+	).toBe(false)
+})

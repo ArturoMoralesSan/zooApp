@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react-native'
 import SettingsScreen from '@/app/settings'
 
 import { viroMock } from '../../../test-utils/ar'
+import { routerSpies } from '../../../test-utils/router'
 import { renderWithProviders } from '../../../test-utils/render'
 
 jest.mock(
@@ -36,7 +37,7 @@ jest.mock(
 )
 
 // One scenario: useArAvailability keeps ARCore's answer in the module.
-test('without ARCore placement is off, and a choice shows on its row', async () => {
+test('without ARCore placement is off; graphics opens its own screen', async () => {
 	viroMock.isARSupportedOnDevice.mockRejectedValue(new Error('UNSUPPORTED'))
 
 	await renderWithProviders(<SettingsScreen />)
@@ -47,7 +48,6 @@ test('without ARCore placement is off, and a choice shows on its row', async () 
 	expect(screen.getByText('No disponible en este teléfono')).toBeTruthy()
 
 	await fireEvent.press(screen.getByLabelText('Calidad gráfica, Automática'))
-	await fireEvent.press(await screen.findByText('Ahorro'))
 
-	expect(await screen.findByLabelText('Calidad gráfica, Ahorro')).toBeTruthy()
+	expect(routerSpies.push).toHaveBeenCalledWith('/settings/graphics')
 })

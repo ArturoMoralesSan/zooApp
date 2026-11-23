@@ -16,6 +16,7 @@ import {
 	type Viewer360SceneProps,
 } from '@/components/ar/Viewer360Scene'
 import { YAW_PER_PX } from '@/components/deck/CardViewerFrame'
+import type { GraphicsEffects } from '@/types/settings'
 
 export type Viewer360Handle = {
 	// Puts the animal back in front of wherever the phone points now.
@@ -24,6 +25,8 @@ export type Viewer360Handle = {
 
 type Viewer360Props = {
 	modelUrl: string | null
+	// Read once per session: the savanna and the live shadow.
+	graphics: GraphicsEffects
 	onModelLoaded: () => void
 	onModelError: () => void
 	ref?: Ref<Viewer360Handle>
@@ -48,6 +51,7 @@ const MAX_RESTARTS = 2
 // turns the animal.
 export function Viewer360({
 	modelUrl,
+	graphics,
 	onModelLoaded,
 	onModelError,
 	ref,
@@ -127,6 +131,8 @@ export function Viewer360({
 			modelUrl,
 			yaw: drag.yaw,
 			centerKey,
+			scenario: graphics.view360Scenario,
+			liveShadow: graphics.view360LiveShadow,
 			onModelLoaded: () => {
 				lockPortrait()
 				onModelLoaded()
@@ -138,6 +144,7 @@ export function Viewer360({
 			modelUrl,
 			drag.yaw,
 			centerKey,
+			graphics,
 			onModelLoaded,
 			onModelError,
 			lockPortrait,
@@ -159,7 +166,7 @@ export function Viewer360({
 					bloomEnabled={false}
 					// For the animal's live shadow. It costs every start about a
 					// second looking at the ground before head tracking begins.
-					shadowsEnabled
+					shadowsEnabled={graphics.view360LiveShadow}
 					debug={false}
 					style={{ flex: 1 }}
 				/>
