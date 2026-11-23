@@ -21,10 +21,13 @@ export const expoLocationMock = {
 	PermissionStatus: { GRANTED: 'granted', DENIED: 'denied' },
 }
 
-export function permission(granted: boolean): LocationPermissionResponse {
+export function permission(
+	granted: boolean,
+	canAskAgain = true,
+): LocationPermissionResponse {
 	return {
 		granted,
-		canAskAgain: true,
+		canAskAgain,
 		expires: 'never',
 		status: (granted
 			? 'granted'
