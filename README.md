@@ -21,7 +21,7 @@ ZooApp is an Android app built with Expo development builds. Its interface is in
 - **Species**: a searchable catalog with a detail page for each animal.
 - **Tickets**: buy entry tickets and show them as QR codes, with the points the purchase earned.
 - **Donations**: donate to the zoo, see the points earned and the donation history.
-- **ZooDeck**: collect animal cards, see them in 3D, in AR with a live shadow on the real floor (on a surface you tap, or placed automatically on the floor, an experimental option in Configuración) or in a 360° view of a savanna, with a graphics quality setting (Automática, Alta, Ahorro or each effect by hand) for slower phones, take photos and selfies with the animal in the zoo's frame to save or share, and download the cards for offline use.
+- **ZooDeck**: collect animal cards, see them in 3D, in AR with a live shadow on the real floor (on a surface you tap, or placed automatically on the floor, an experimental option in Configuración) or in a 360° view of a savanna (switch between them in the view, or before a duel's quiz; the last choice is remembered and also set in Configuración), with a graphics quality setting (Automática, Alta, Ahorro or each effect by hand) for slower phones, take photos and selfies with the animal in the zoo's frame to save or share, and download the cards for offline use.
 - **Duels**: scan a QR code at an enclosure and answer a quiz to win that animal's card.
 - **MiZoo**: the visitor's species, achievements and rewards.
 - **Point seasons**: when the zoo runs a points season, a banner on Explore, MiZoo and ZooDeck announces it, and a screen lists which actions give more or fewer points.
@@ -157,8 +157,9 @@ When the backend runs on your computer, use your computer's LAN IP (not `localho
 ## Roadmap
 
 - **Payment provider integration**: connect ticket purchases and donations to a payment gateway.
-- **Settings**: on the screen (Panel → Configuración) the AR placement and the graphics quality are saved and used; the other choices are a visual draft: language, dark mode and storage (a summary that links to each download, such as the ZooDeck pack).
+- **Settings**: on the screen (Panel → Configuración) the animal view (AR or 360°), the AR placement and the graphics quality are saved and used; the other choices are a visual draft: language, dark mode and storage (a summary that links to each download, such as the ZooDeck pack).
 - **AR lighting from the room**: match the animal's light to ARCore's estimate. Viro runs ARCore in HDR mode and doesn't pass the estimate to JS, so it needs a change in Viro's native code.
+- **Duel timer**: a time limit per question, starting once the animal is placed in AR (or the 360° view has loaded), so looking for a surface never counts.
 - **Help**: complete the Panel's help section.
 - **iOS release**: configure, test and publish the iOS build.
 
