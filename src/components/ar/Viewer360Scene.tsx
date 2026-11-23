@@ -16,6 +16,17 @@ import contactShadow from '@/assets/images/view360/contact-shadow.png'
 import savannaSky from '@/assets/images/view360/savanna-sky.jpg'
 import savannaScenario from '@/assets/models/scenario/savanna.glb'
 import colors from '@/theme/colors'
+import type { BoundingBox } from '@/utils/arPlacement'
+import {
+	blobSize,
+	type Dimensions,
+	dimensionsOf,
+	FALLBACK_DIMENSIONS,
+	SHADOW_CAMERA_DISTANCE,
+	SHADOW_MAP_SIZE,
+	shadowBox,
+	shadowCameraFrom,
+} from '@/utils/shadow'
 import { isUntrackedPose, rotateAroundY, type Vec3 } from '@/utils/view360'
 
 export type Viewer360SceneProps = {
@@ -38,15 +49,6 @@ type Viewer360SceneNavigatorProps = {
 	sceneNavigator: { viroAppProps: Viewer360SceneProps }
 }
 
-type BoundingBox = {
-	minX: number
-	maxX: number
-	minY: number
-	maxY: number
-	minZ: number
-	maxZ: number
-}
-
 // The camera sits at the origin looking down -Z; the ground is this far
 // below it, about where a standing visitor holds the phone.
 const EYE_HEIGHT = 1.4
@@ -58,9 +60,8 @@ const DISTANCE_PER_SIZE = 1.2
 // Ground disc around the user, reaching past the animal.
 const GROUND_MARGIN = 2.5
 const GROUND_SEGMENTS = 48
-// The shadow spreads a little past the animal's footprint, and sits just
-// above the ground so the two don't flicker against each other.
-const SHADOW_SPREAD = 1.4
+// The contact shadow sits just above the ground so the two don't flicker
+// against each other.
 const SHADOW_LIFT = 0.005
 const FLAT: Vec3 = [-90, 0, 0]
 const NO_HOLES: [number, number][][] = []
@@ -77,14 +78,8 @@ const SCENARIO_POSITION: Vec3 = [0, -EYE_HEIGHT, 0]
 // Where the sunlight travels at heading 0: from behind the user, on the
 // right, 32° above the horizon (the sky image's own sun).
 const SUN_DIRECTION: Vec3 = [-0.543, -0.528, -0.653]
-// Only the animal casts a live shadow (the scenario's are baked). The
-// sun's shadow camera sits this far up-sun from the animal, and its box
-// grows with the animal: a low sun casts long shadows.
-const SHADOW_CAMERA_DISTANCE = 15
-const SHADOW_MAP_SIZE = 2048
-const SHADOW_PER_SIZE = 5
-const MIN_SHADOW_BOX = 8
-const MAX_SHADOW_BOX = 30
+// Only the animal casts a live shadow (the scenario's are baked); its
+// shadow camera follows utils/shadow.
 const NO_SHADOW = 0
 
 ViroMaterials.createMaterials({
@@ -119,8 +114,6 @@ function circle(radius: number): [number, number][] {
 		return [Math.cos(angle) * radius, Math.sin(angle) * radius]
 	})
 }
-
-type Dimensions = { size: number; footprint: number }
 
 // Below this horizontal length the phone points almost straight up or down
 // and its forward has no useful heading.
@@ -194,21 +187,14 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 			)
 		: MIN_DISTANCE
 	const ground = useMemo(() => circle(distance + GROUND_MARGIN), [distance])
-	const shadowSize = (dimensions?.footprint ?? 1) * SHADOW_SPREAD
+	const shadowSize = blobSize(dimensions?.footprint ?? 1)
 	const sunShadow = useMemo(() => {
-		const [x, y, z] = rotateAroundY([0, -EYE_HEIGHT, -distance], heading)
-		const [dx, dy, dz] = sunDirection
-		const from: Vec3 = [
-			x - dx * SHADOW_CAMERA_DISTANCE,
-			y - dy * SHADOW_CAMERA_DISTANCE,
-			z - dz * SHADOW_CAMERA_DISTANCE,
-		]
-		const box = Math.min(
-			MAX_SHADOW_BOX,
-			Math.max(MIN_SHADOW_BOX, (dimensions?.size ?? 0) * SHADOW_PER_SIZE),
-		)
+		const animal = rotateAroundY([0, -EYE_HEIGHT, -distance], heading)
 
-		return { from, box }
+		return {
+			from: shadowCameraFrom(animal, sunDirection),
+			box: shadowBox(dimensions?.size ?? 0),
+		}
 	}, [distance, heading, sunDirection, dimensions])
 
 	const faceCamera = async () => {
@@ -276,14 +262,10 @@ export function Viewer360Scene(props?: Viewer360SceneNavigatorProps) {
 
 			if (!box) throw new Error('Sin medidas')
 
-			const width = box.maxX - box.minX
-			const depth = box.maxZ - box.minZ
-			const size = Math.max(width, box.maxY - box.minY, depth)
-
-			setDimensions({ size, footprint: Math.max(width, depth) })
+			setDimensions(dimensionsOf(box))
 		} catch {
 			// Unmeasurable: the nearest distance and a 1 m shadow still work.
-			setDimensions({ size: 0, footprint: 1 })
+			setDimensions(FALLBACK_DIMENSIONS)
 		}
 
 		onModelLoaded()
