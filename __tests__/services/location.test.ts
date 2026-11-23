@@ -35,6 +35,26 @@ describe('getDuelCoordinates', () => {
 		expect(location.requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1)
 	})
 
+	// Requesting opens Android's permission activity even when granted,
+	// which pauses ARCore mid-duel and moves the placed animal (#51).
+	test('an allowed permission is not requested again', async () => {
+		location.getForegroundPermissionsAsync.mockResolvedValueOnce(
+			permission(true),
+		)
+
+		await expect(getDuelCoordinates(true)).resolves.not.toBeNull()
+		expect(location.requestForegroundPermissionsAsync).not.toHaveBeenCalled()
+	})
+
+	test('a permanently denied permission is not requested', async () => {
+		location.getForegroundPermissionsAsync.mockResolvedValueOnce(
+			permission(false, false),
+		)
+
+		await expect(getDuelCoordinates(true)).resolves.toBeNull()
+		expect(location.requestForegroundPermissionsAsync).not.toHaveBeenCalled()
+	})
+
 	test('a recent last known fix avoids waiting for the GPS', async () => {
 		location.getForegroundPermissionsAsync.mockResolvedValueOnce(
 			permission(true),
