@@ -68,6 +68,7 @@ src/
   global.css           Tailwind + type role classes (text-h1, text-body…)
 assets/models/         3D models for AR (.glb), typed in src/assets.d.ts
 docs/design/           Design PDFs (design-system.pdf, mobile-app.pdf)
+docs/store/            Play Store listing assets (512 icon)
 __tests__/             Jest tests, mirroring src/ paths (smoke/, services/, contexts/…)
 jest/                  Jest setup and in-memory mocks of native modules (mocks/)
 test-utils/            Test helpers: MSW server, render with providers, router mock, pack, factories
