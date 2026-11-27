@@ -234,7 +234,6 @@ Key App measurements:
 
 - Never commit to `main`. Create a branch per task (`feat/…`, `fix/…`, `refactor/…`, `design/…`, `chore/…`) from an up-to-date `main`.
 - Small commits, one logical change each. Message: imperative subject under 72 chars, plus a short body explaining why.
-- **No AI attribution anywhere:** no `Co-Authored-By` trailers, no "Generated with…", no mention of AI in commits or PRs.
 - Push, open, or merge PRs only when the user asks. PRs use `gh pr create --base main` and merge with `gh pr merge --merge --delete-branch`. The description says what changed, how to test, and whether a native rebuild or `expo start -c` is needed.
 
 ## Keeping the docs current
